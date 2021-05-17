@@ -22,7 +22,7 @@ local MAJOR, MINOR = "Gladdy", 4
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
 Gladdy.version_major = "TBC-Classic_v1"
-Gladdy.version_minor = "0.3-Beta"
+Gladdy.version_minor = "0.4-Beta"
 Gladdy.version = Gladdy.version_major .. "." .. Gladdy.version_minor
 
 LibStub("AceTimer-3.0"):Embed(Gladdy)
