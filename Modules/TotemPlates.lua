@@ -1,5 +1,5 @@
 local select, pairs, string_lower, tremove, tinsert, format, string_gsub, ipairs = select, pairs, string.lower, tremove, tinsert, format, string.gsub, ipairs
-local UnitExists, UnitIsUnit, UnitName = UnitExists, UnitIsUnit, UnitName
+local UnitExists, UnitIsUnit, UnitName, UnitIsEnemy = UnitExists, UnitIsUnit, UnitName, UnitIsEnemy
 local C_NamePlate = C_NamePlate
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
@@ -222,6 +222,8 @@ end
 
 local TotemPlates = Gladdy:NewModule("TotemPlates", nil, {
     npTotems = true,
+    npTotemsShowFriendly = true,
+    npTotemsShowEnemy = true,
     npTotemPlatesBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     npTotemPlatesSize = 40,
     npTotemPlatesWidthFactor = 1,
@@ -303,6 +305,13 @@ end
 
 function TotemPlates:NAME_PLATE_UNIT_ADDED(...)
     local unitID = ...
+    local isEnemy = UnitIsEnemy("player", unitID)
+    if not Gladdy.db.npTotemsShowEnemy and isEnemy then
+        return
+    end
+    if not Gladdy.db.npTotemsShowFriendly and not isEnemy then
+        return
+    end
     local nameplateName = UnitName(unitID)
     local totemName = string_gsub(nameplateName, "^%s+", "") --trim
     totemName = string_gsub(totemName, "%s+$", "") --trim
@@ -414,6 +423,21 @@ function TotemPlates:GetOptions()
             name = L["Totem icons on/off"],
             desc = L["Turns totem icons instead of nameplates on or off. (Requires reload)"],
             order = 3,
+            width = 0.9,
+        }),
+        npTotemsShowFriendly = Gladdy:option({
+            type = "toggle",
+            name = L["Show friendly"],
+            desc = L["Turns totem icons instead of nameplates on or off. (Requires reload)"],
+            order = 4,
+            width = 0.65,
+        }),
+        npTotemsShowEnemy = Gladdy:option({
+            type = "toggle",
+            name = L["Show enemy"],
+            desc = L["Turns totem icons instead of nameplates on or off. (Requires reload)"],
+            order = 5,
+            width = 0.6,
         }),
         group = {
             type = "group",
