@@ -1,0 +1,8 @@
+## Interface: 20400
+## Title: Lib: Diminishing Returns Data-1.0
+## Notes: DB of spellIDs -> DR category
+## Author: Mayen
+
+LibStub-1.0\LibStub-1.0.xml
+
+DRData-1.0.xml

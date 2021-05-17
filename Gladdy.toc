@@ -1,0 +1,35 @@
+## Interface: 20501
+## Title: Gladdy - Macumba/XiCoN Edit
+## Version: 1.0.3-Beta
+## Notes: The most powerful arena AddOn for WoW 2.5.1
+## Author: XiconQoo
+## X-Email:
+## SavedVariables: GladdyXZ
+## OptionalDeps: SharedMedia, Blizzard_CombatLog, Blizzard_ArenaUI, Blizzard_CombatText
+
+embeds.xml
+
+Gladdy.lua
+Lang.lua
+Frame.lua
+Options.lua
+Constants.lua
+
+Modules\Announcements.lua
+Modules\Healthbar.lua
+Modules\Powerbar.lua
+Modules\Auras.lua
+Modules\Castbar.lua
+Modules\Classicon.lua
+Modules\Diminishings.lua
+Modules\Highlight.lua
+Modules\TotemPlates.lua
+Modules\Trinket.lua
+Modules\Cooldowns.lua
+Modules\ArenaCountDown.lua
+Modules\BuffsDebuffs.lua
+Modules\VersionCheck.lua
+Modules\XiconProfiles.lua
+Modules\Pets.lua
+Modules\ExportImport.lua
+EventListener.lua

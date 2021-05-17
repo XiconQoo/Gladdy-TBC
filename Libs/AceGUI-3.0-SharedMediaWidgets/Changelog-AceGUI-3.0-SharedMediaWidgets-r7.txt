@@ -1,0 +1,63 @@
+------------------------------------------------------------------------
+r7 | yssaril | 2008-10-11 23:20:40 +0000 (Sat, 11 Oct 2008) | 1 line
+Changed paths:
+   M /trunk/AceGUI-3.0-SharedMediaWidgets.toc
+
+remove LoD so it will load in 3.0
+------------------------------------------------------------------------
+r6 | yssaril | 2008-10-11 04:40:30 +0000 (Sat, 11 Oct 2008) | 1 line
+Changed paths:
+   M /trunk/AceGUI-3.0-SharedMediaWidgets/SharedFunctions.lua
+
+remove leftover stuff
+------------------------------------------------------------------------
+r5 | yssaril | 2008-10-11 04:34:50 +0000 (Sat, 11 Oct 2008) | 2 lines
+Changed paths:
+   M /trunk/AceGUI-3.0-SharedMediaWidgets/SharedFunctions.lua
+   M /trunk/AceGUI-3.0-SharedMediaWidgets.toc
+
+update toc to be LoD
+force load LibSharedMedia-3.0 to make sure LSM is running first in WOTLK
+------------------------------------------------------------------------
+r4 | yssaril | 2008-10-11 04:16:25 +0000 (Sat, 11 Oct 2008) | 2 lines
+Changed paths:
+   D /trunk/AceGUI-3.0-SharedMediaWidgets/AceGUI-3.0-SharedMediaWidgets.lua
+   M /trunk/AceGUI-3.0-SharedMediaWidgets.toc
+
+delete old file
+update toc
+------------------------------------------------------------------------
+r3 | yssaril | 2008-10-11 04:13:38 +0000 (Sat, 11 Oct 2008) | 4 lines
+Changed paths:
+   A /trunk/AceGUI-3.0-SharedMediaWidgets/BackgroundWidget.lua
+   A /trunk/AceGUI-3.0-SharedMediaWidgets/BorderWidget.lua
+   A /trunk/AceGUI-3.0-SharedMediaWidgets/FontWidget.lua
+   A /trunk/AceGUI-3.0-SharedMediaWidgets/SharedFunctions.lua
+   A /trunk/AceGUI-3.0-SharedMediaWidgets/SoundWidget.lua
+   A /trunk/AceGUI-3.0-SharedMediaWidgets/StatusbarWidget.lua
+   M /trunk/AceGUI-3.0-SharedMediaWidgets/widget.xml
+
+simplified widgets internal working
+backwards compatible if you use the AceGUIWidgetLSMlists
+for values use the LSM HashTable(...) or the old AceGUIWidgetLSMlists still work
+HashTable was a lot easier to work with
+------------------------------------------------------------------------
+r2 | root | 2008-09-29 22:00:26 +0000 (Mon, 29 Sep 2008) | 1 line
+Changed paths:
+   A /trunk/.pkgmeta
+
+Facilitate WowAce-on-CurseForge transition
+------------------------------------------------------------------------
+r1 | root | 2008-09-29 21:18:51 +0000 (Mon, 29 Sep 2008) | 1 line
+Changed paths:
+   A /branches
+   A /tags
+   A /trunk
+   A /trunk/AceGUI-3.0-SharedMediaWidgets
+   A /trunk/AceGUI-3.0-SharedMediaWidgets/AceGUI-3.0-SharedMediaWidgets.lua
+   A /trunk/AceGUI-3.0-SharedMediaWidgets/widget.xml
+   A /trunk/AceGUI-3.0-SharedMediaWidgets.toc
+   A /trunk/widget.xml
+
+Initial import of HEAD
+------------------------------------------------------------------------
