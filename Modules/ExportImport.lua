@@ -18,18 +18,10 @@ local function table_copy(t)
     return t2;
 end
 
-local function applyImport(t)
-    for k,v in pairs(t) do
-        if type(v) == "table" then
-            applyImport(v, Gladdy.dbi.profile[k]);
-        else
-            Gladdy.dbi.profile[k] = v;
-        end
-    end
-end
-
 local ExportImport = Gladdy:NewModule("ExportImport", nil, {
 })
+
+
 
 local export = AceGUI:Create("Frame")
 export:SetWidth(550)
@@ -72,7 +64,7 @@ importButton:SetText("Import\n(this will overwrite your current profile!)")
 importButton:SetWidth(200)
 importButton:SetHeight(50)
 importButton:SetCallback("OnClick", function(widget)
-    applyImport(import.deserializedTable)
+    ExportImport:ApplyImport(import.deserializedTable)
     Gladdy:UpdateFrame()
     import:Hide()
 end)
@@ -154,35 +146,10 @@ function ExportImport:GetOptions()
                 import.statustext:SetTextColor(1,0,0)
                 import.eb:SetFocus()
                 import.eb:SetCallback("OnTextChanged", function(widget)
-                    local decoded_string = LibDeflate:DecodeForPrint(widget:GetText())
-                    if not decoded_string then
-                        import.statustext:SetTextColor(1,0,0)
-                        import:SetStatusText("Invalid Import String FAILED LibDeflate:DecodeForPrint")
-                        import.button.frame:Disable()
+                    local deserialized = ExportImport:Decode(widget:GetText(), true)
+                    if not deserialized then
                         return
                     end
-                    local decompress_deflate = LibDeflate:DecompressZlib(decoded_string)
-                    if not decompress_deflate then
-                        import.statustext:SetTextColor(1,0,0)
-                        import:SetStatusText("Invalid Import String FAILED LibDeflate:DecompressZlib")
-                        import.button.frame:Disable()
-                        return
-                    end
-                    local success, deserialized = AceSerializer:Deserialize(decompress_deflate)
-                    if not success then
-                        import.statustext:SetTextColor(1,0,0)
-                        import:SetStatusText("Invalid Import String FAILED AceSerializer:Deserialize")
-                        import.button.frame:Disable()
-                        return
-                    end
-                    local statusOption, error = ExportImport:CheckDeserializedOptions(deserialized, Gladdy.db)
-                    if not statusOption then
-                        import.statustext:SetTextColor(1,0,0)
-                        import:SetStatusText(error)
-                        import.button.frame:Disable()
-                        return
-                    end
-
                     import.statustext:SetTextColor(0,1,0)
                     import:SetStatusText("SUCCESS")
                     import.button.frame:Enable()
@@ -194,4 +161,57 @@ function ExportImport:GetOptions()
             order = 4,
         },
     }
+end
+
+function ExportImport:ApplyImport(t, table)
+    if table == nil then
+        table = Gladdy.dbi.profile
+    end
+    for k,v in pairs(t) do
+        if type(v) == "table" then
+            ExportImport:ApplyImport(v, table[k])
+        else
+            table[k] = v;
+        end
+    end
+end
+
+function ExportImport:Decode(str, showError)
+    local decoded_string = LibDeflate:DecodeForPrint(str)
+    if not decoded_string then
+        if showError then
+            import.statustext:SetTextColor(1,0,0)
+            import:SetStatusText("Invalid Import String FAILED LibDeflate:DecodeForPrint")
+            import.button.frame:Disable()
+        end
+        return nil
+    end
+    local decompress_deflate = LibDeflate:DecompressZlib(decoded_string)
+    if not decompress_deflate then
+        if showError then
+            import.statustext:SetTextColor(1,0,0)
+            import:SetStatusText("Invalid Import String FAILED LibDeflate:DecompressZlib")
+            import.button.frame:Disable()
+        end
+        return nil
+    end
+    local success, deserialized = AceSerializer:Deserialize(decompress_deflate)
+    if not success then
+        if showError then
+            import.statustext:SetTextColor(1,0,0)
+            import:SetStatusText("Invalid Import String FAILED AceSerializer:Deserialize")
+            import.button.frame:Disable()
+        end
+        return nil
+    end
+    local statusOption, error = ExportImport:CheckDeserializedOptions(deserialized, Gladdy.db)
+    if not statusOption then
+        if showError then
+            import.statustext:SetTextColor(1,0,0)
+            import:SetStatusText(error)
+            import.button.frame:Disable()
+        end
+        return nil
+    end
+    return deserialized
 end
