@@ -1,9 +1,9 @@
 ## Interface: 20501
-## Title: Gladdy - Macumba/XiCoN Edit
+## Title: Gladdy - TBC
 ## Version: 1.0.3-Beta
 ## Notes: The most powerful arena AddOn for WoW 2.5.1
-## Author: XiconQoo
-## X-Email:
+## Author: XiconQoo, DnB_Junkee, Knall
+## X-Email: contact me on discord Knall#1751
 ## SavedVariables: GladdyXZ
 ## OptionalDeps: SharedMedia, Blizzard_CombatLog, Blizzard_ArenaUI, Blizzard_CombatText
 
