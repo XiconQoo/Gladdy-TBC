@@ -1,3 +1,5 @@
+local str_match, tonumber, tostring = string.match, tonumber, tostring
+
 local UnitName = UnitName
 
 local Gladdy = LibStub("Gladdy")
@@ -24,19 +26,20 @@ end
 function VersionCheck:Test(unit)
     if unit == "arena1" then
         self:RegisterComm("GladdyVCheck", VersionCheck.OnCommReceived)
-        self:SendCommMessage("GladdyVCheck", Gladdy.version, "RAID", self.playerName)
+        self:SendCommMessage("GladdyVCheck", tostring(Gladdy.version_num), "RAID", self.playerName)
     end
 end
 
 function VersionCheck.OnCommReceived(prefix, message, distribution, sender)
     if sender ~= VersionCheck.playerName then
-        local addonVersion = Gladdy.version
-        if (message == addonVersion) then
+        local addonVersion = Gladdy.version_num
+        message = tonumber(message)
+        if message and message <= Gladdy.version_num then
             --Gladdy:Print("Version", "\"".. addonVersion.."\"", "is up to date")
         else
             Gladdy:Warn("Current version", "\"".. addonVersion.."\"", "is outdated. Most recent version is", "\"".. message.."\"")
             Gladdy:Warn("Please download the latest Gladdy version at:")
-            Gladdy:Warn("https://github.com/XiconQoo/Gladdy")
+            Gladdy:Warn("https://github.com/XiconQoo/Gladdy-TBC")
         end
     end
 end

@@ -11,6 +11,9 @@ local IsAddOnLoaded = IsAddOnLoaded
 local IsInInstance = IsInInstance
 local GetBattlefieldStatus = GetBattlefieldStatus
 local IsActiveBattlefieldArena = IsActiveBattlefieldArena
+local RELEASE_TYPES = { alpha = "Alpha", beta = "Beta", release = "Release"}
+local PREFIX = "TBC-Classic_v"
+local VERSION_REGEX = PREFIX .. "(%d+%.%d+)%-(%a)"
 
 ---------------------------
 
@@ -21,9 +24,12 @@ local IsActiveBattlefieldArena = IsActiveBattlefieldArena
 local MAJOR, MINOR = "Gladdy", 4
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
-Gladdy.version_major = "TBC-Classic_v1"
-Gladdy.version_minor = "0.4-Beta"
-Gladdy.version = Gladdy.version_major .. "." .. Gladdy.version_minor
+Gladdy.version_major_num = 1
+Gladdy.version_minor_num = 0.04
+Gladdy.version_num = Gladdy.version_major_num + Gladdy.version_minor_num
+Gladdy.version_releaseType = RELEASE_TYPES.beta
+Gladdy.version = PREFIX .. Gladdy.version_num .. "-" .. Gladdy.version_releaseType
+Gladdy.VERSION_REGEX = VERSION_REGEX
 
 LibStub("AceTimer-3.0"):Embed(Gladdy)
 LibStub("AceComm-3.0"):Embed(Gladdy)
