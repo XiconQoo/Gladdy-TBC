@@ -1,4 +1,4 @@
-local pairs, ipairs, select, tinsert, tbl_sort = pairs, ipairs, select, tinsert, table.sort
+local pairs, ipairs, select, tinsert, tbl_sort, tostring = pairs, ipairs, select, tinsert, table.sort, tostring
 
 local GetSpellInfo = GetSpellInfo
 local CreateFrame, GetTime = CreateFrame, GetTime
@@ -10,9 +10,9 @@ local function defaultSpells(auraType)
     local spells = {}
     for k,v in pairs(Gladdy:GetImportantAuras()) do
         if not auraType or auraType == v.track then
-            spells[k] = {}
-            spells[k].enabled = true
-            spells[k].priority = v.priority
+            spells[tostring(v.spellID)] = {}
+            spells[tostring(v.spellID)].enabled = true
+            spells[tostring(v.spellID)].priority = v.priority
         end
     end
     return spells
@@ -74,7 +74,7 @@ function Auras:CreateFrame(unit)
                 Auras:AURA_FADE(unit)
             else
                 self.timeLeft = self.timeLeft - elapsed
-                self.text:SetFormattedText("%.1f", self.timeLeft)
+                self.text:SetFormattedText("%.1f", self.timeLeft >= 0.0 and self.timeLeft or 0.0)
             end
         end
     end)
@@ -136,16 +136,13 @@ function Auras:Test(unit)
 
     if (unit == "arena1") then
         aura, _, icon = GetSpellInfo(12826)
-    elseif (unit == "arena4") then
+        self:AURA_GAIN(unit,nil, 12826, aura, icon, self.auras[aura].duration, GetTime() + self.auras[aura].duration)
+    elseif (unit == "arena2") then
         aura, _, icon = GetSpellInfo(6770)
+        self:AURA_GAIN(unit,nil, 6770, aura, icon, self.auras[aura].duration, GetTime() + self.auras[aura].duration)
     elseif (unit == "arena3") then
         aura, _, icon = GetSpellInfo(31224)
-    end
-
-    if (aura) then
-        --(unit, auraType, spellID, aura, icon, duration, expirationTime, count, debuffType)
-        self:AURA_GAIN(unit,nil, nil, aura, icon, self.auras[aura].duration, GetTime() + self.auras[aura].duration)
-        --self:AURA_FADE(unit)
+        self:AURA_GAIN(unit,nil, 31224, aura, icon, self.auras[aura].duration, GetTime() + self.auras[aura].duration)
     end
 end
 
@@ -157,22 +154,26 @@ function Auras:JOINED_ARENA()
 end
 
 function Auras:AURA_GAIN(unit, auraType, spellID, aura, icon, duration, expirationTime, count, debuffType)
-    if not Gladdy.db.auraListDefault[aura] or not Gladdy.db.auraListDefault[aura].enabled then
-        return
-    end
     local auraFrame = self.frames[unit]
     if (not auraFrame) then
         return
     end
+    if not self.auras[aura] then
+        return
+    end
+    -- don't use spellId from combatlog, in case of different spellrank
+    if not Gladdy.db.auraListDefault[tostring(self.auras[aura].spellID)] or not Gladdy.db.auraListDefault[tostring(self.auras[aura].spellID)].enabled then
+        return
+    end
 
-    if (auraFrame.priority and auraFrame.priority > Gladdy.db.auraListDefault[aura].priority) then
+    if (auraFrame.priority and auraFrame.priority > Gladdy.db.auraListDefault[tostring(self.auras[aura].spellID)].priority) then
         return
     end
     auraFrame.startTime = expirationTime - duration
     auraFrame.endTime = expirationTime
     auraFrame.name = aura
     auraFrame.timeLeft = expirationTime - GetTime()
-    auraFrame.priority = Gladdy.db.auraListDefault[aura].priority
+    auraFrame.priority = Gladdy.db.auraListDefault[tostring(self.auras[aura].spellID)].priority
     auraFrame.icon:SetTexture(icon)
     auraFrame.track = self.auras[aura].track
     auraFrame.active = true
@@ -356,28 +357,28 @@ function Auras:GetAuraOptions(auraType)
     local auras = {}
     for k,v in pairs(Gladdy:GetImportantAuras()) do
         if v.track == auraType then
-            tinsert(auras, k)
+            tinsert(auras, v.spellID)
         end
     end
     tbl_sort(auras)
     for i,k in ipairs(auras) do
-        options[k] = {
+        options[tostring(k)] = {
             type = "group",
-            name = k,
+            name = GetSpellInfo(k),
             order = i+2,
-            icon = select(3, GetSpellInfo(Gladdy:GetImportantAuras()[k].spellID)),
+            icon = select(3, GetSpellInfo(k)),
             args = {
                 enabled = {
                     order = 1,
                     name = L["Enabled"],
                     type = "toggle",
-                    image = select(3, GetSpellInfo(Gladdy:GetImportantAuras()[k].spellID)),
+                    image = select(3, GetSpellInfo(k)),
                     width = "2",
                     set = function(info, value)
-                        Gladdy.db.auraListDefault[k].enabled = value
+                        Gladdy.db.auraListDefault[tostring(k)].enabled = value
                     end,
                     get = function(info)
-                        return Gladdy.db.auraListDefault[k].enabled
+                        return Gladdy.db.auraListDefault[tostring(k)].enabled
                     end
                 },
                 priority = {
@@ -389,10 +390,10 @@ function Auras:GetAuraOptions(auraType)
                     width = "2",
                     step = 1,
                     get = function(info)
-                        return Gladdy.db.auraListDefault[k].priority
+                        return Gladdy.db.auraListDefault[tostring(k)].priority
                     end,
                     set = function(info, value)
-                        Gladdy.db.auraListDefault[k].priority = value
+                        Gladdy.db.auraListDefault[tostring(k)].priority = value
                     end,
                 }
             }
