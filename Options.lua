@@ -1,4 +1,4 @@
-local type, pairs, tinsert, tsort = type, pairs, table.insert, table.sort
+local type, pairs, tinsert, tsort, tostring = type, pairs, table.insert, table.sort, tostring
 
 local InterfaceOptionsFrame_OpenToFrame = InterfaceOptionsFrame_OpenToFrame
 local GetSpellInfo = GetSpellInfo
@@ -699,7 +699,7 @@ function Gladdy:GetAuras(auraType)
             if classSpells[i].texture then
                 texture = classSpells[i].texture
             end
-            args[classSpells[i].name] = {
+            args[tostring(classSpells[i].id[1])] = {
                 order = i,
                 name = classSpells[i].name,
                 type = "toggle",
@@ -707,7 +707,7 @@ function Gladdy:GetAuras(auraType)
                 width = "2",
                 arg = classSpells[i].name
             }
-            defaultDebuffs[classSpells[i].name] = true
+            defaultDebuffs[tostring(classSpells[i].id[1])] = true
         end
         return args
     end
