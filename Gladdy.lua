@@ -166,6 +166,25 @@ end
 
 ---------------------------
 
+function Gladdy:DeleteUnknownOptions(tbl, refTbl, str)
+    if str == nil then
+        str = "Gladdy.db"
+    end
+    for k,v in pairs(tbl) do
+        if refTbl[k] == nil then
+            --Gladdy:Print("SavedVariable deleted:", str .. "." .. k, "not found!")
+            tbl[k] = nil
+        else
+            if type(v) ~= type(refTbl[k]) then
+                --Gladdy:Print("SavedVariable deleted:", str .. "." .. k, "type error!", "Expected", type(refTbl[k]), "but found", type(v))
+                tbl[k] = nil
+            elseif type(v) == "table" then
+                Gladdy:DeleteUnknownOptions(v, refTbl[k], str .. "." .. k)
+            end
+        end
+    end
+end
+
 function Gladdy:OnInitialize()
     self.dbi = LibStub("AceDB-3.0"):New("GladdyXZ", self.defaults)
     self.dbi.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
@@ -207,10 +226,12 @@ function Gladdy:OnInitialize()
     for k, v in self:IterModules() do
         self:Call(v, "Initialize") -- B.E > A.E :D
     end
+    self:DeleteUnknownOptions(self.db, self.defaults.profile)
 end
 
 function Gladdy:OnProfileChanged()
     self.db = self.dbi.profile
+    self:DeleteUnknownOptions(self.db, self.defaults.profile)
 
     self:HideFrame()
     self:ToggleFrame(3)
