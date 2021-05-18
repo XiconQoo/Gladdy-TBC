@@ -1,7 +1,7 @@
 local GetSpellInfo = GetSpellInfo
 local CreateFrame = CreateFrame
 local GetTime = GetTime
-local select, lower, ceil, tremove, tinsert, pairs, ipairs = select, string.lower, ceil, tremove, tinsert, pairs, ipairs
+local select, lower, ceil, tremove, tinsert, pairs, ipairs, tostring = select, string.lower, ceil, tremove, tinsert, pairs, ipairs, tostring
 local auraTypeColor = { }
 local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
 local auraTypes = {AURA_TYPE_BUFF, AURA_TYPE_DEBUFF}
@@ -21,9 +21,10 @@ auraTypeColor[""]         = auraTypeColor["none"]
 ---------------------------
 
 local Gladdy = LibStub("Gladdy")
+local LibClassAuras = LibStub("LibClassAuras-1.0")
 local L = Gladdy.L
-local defaultTrackedDebuffs = select(2, Gladdy:GetAuras("debuff"))
-local defaultTrackedBuffs = select(2, Gladdy:GetAuras("buff"))
+local defaultTrackedDebuffs = select(2, Gladdy:GetAuras(AURA_TYPE_DEBUFF))
+local defaultTrackedBuffs = select(2, Gladdy:GetAuras(AURA_TYPE_BUFF))
 local BuffsDebuffs = Gladdy:NewModule("BuffsDebuffs", nil, {
     buffsEnabled = true,
     buffsShowAuraDebuffs = false,
@@ -145,18 +146,23 @@ end
 function BuffsDebuffs:Test(unit)
     if Gladdy.db.buffsEnabled then
         if unit == "arena1" or unit == "arena3" then
-            self:AddOrRefreshAura(unit, 1943, AURA_TYPE_DEBUFF, 10, 10, 1,"physical", select(3, GetSpellInfo(1943)), 1)
-            self:AddOrRefreshAura(unit, 18647, AURA_TYPE_DEBUFF, 10, 10,1, "immune", select(3, GetSpellInfo(18647)), 2)
-            self:AddOrRefreshAura(unit, 27218, AURA_TYPE_DEBUFF, 24, 20,1, "curse", select(3, GetSpellInfo(27218)), 3)
-            self:AddOrRefreshAura(unit, 27216, AURA_TYPE_DEBUFF, 18, 18,1, "magic", select(3, GetSpellInfo(27216)), 4)
-            self:AddOrRefreshAura(unit, 27189, AURA_TYPE_DEBUFF, 12, 12,5, "poison", select(3, GetSpellInfo(27189)), 5)
-            self:AddOrRefreshAura(unit, 1, AURA_TYPE_BUFF, 20, 20,5, "magic", select(3, GetSpellInfo(32999)), 1)
-            self:AddOrRefreshAura(unit, 1, AURA_TYPE_BUFF, 20, 20,5, "magic", select(3, GetSpellInfo(25389)), 2)
+            BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_DEBUFF)
+            BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_BUFF)
+            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 1943, select(1, GetSpellInfo(1943)), select(3, GetSpellInfo(1943)), 10, GetTime() + 10, 1, "physical")
+            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 18647, select(1, GetSpellInfo(18647)), select(3, GetSpellInfo(18647)), 10, GetTime() + 10, 1, "immune")
+            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 27218, select(1, GetSpellInfo(27218)), select(3, GetSpellInfo(27218)), 24, GetTime() + 20, 1, "curse")
+            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 27216, select(1, GetSpellInfo(27216)), select(3, GetSpellInfo(27216)), 18, GetTime() + 18, 1, "magic")
+            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 27189, select(1, GetSpellInfo(27189)), select(3, GetSpellInfo(27189)), 12, GetTime() + 12, 5, "poison")
+            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_BUFF, 33076, select(1, GetSpellInfo(33076)), select(3, GetSpellInfo(33076)), 20, GetTime() + 20, 1, "magic")
+            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_BUFF, 26980, select(1, GetSpellInfo(26980)), select(3, GetSpellInfo(26980)), 20, GetTime() + 20, 5, "magic")
         elseif unit == "arena2" then
-            self:AddOrRefreshAura(unit, 1943, AURA_TYPE_DEBUFF, 10, 10, 1, "physical", select(3, GetSpellInfo(1943)), 1)
-            self:AddOrRefreshAura(unit, 1, AURA_TYPE_DEBUFF, 20, 20,5, "poison", select(3, GetSpellInfo(1)), 2)
-            self:AddOrRefreshAura(unit, 1, AURA_TYPE_BUFF, 20, 20,5, "magic", select(3, GetSpellInfo(32999)), 1)
-            self:AddOrRefreshAura(unit, 1, AURA_TYPE_BUFF, 20, 20,5, "magic", select(3, GetSpellInfo(25389)), 2)
+            BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_DEBUFF)
+            BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_BUFF)
+            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 1943, select(1, GetSpellInfo(1943)), select(3, GetSpellInfo(1943)), 10, GetTime() + 10, 1, "physical")
+            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 1, select(1, GetSpellInfo(1)), select(3, GetSpellInfo(1)), 20, GetTime() + 20, 5, "poison")
+            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_BUFF, 27009, select(1, GetSpellInfo(27009)), select(3, GetSpellInfo(27009)), 20, GetTime() + 15, 1, "magic")
+            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_BUFF, 11426, select(1, GetSpellInfo(11426)), select(3, GetSpellInfo(11426)), 10, GetTime() + 10, 1, "magic")
+
         end
     end
 end
@@ -196,11 +202,13 @@ function BuffsDebuffs:AURA_GAIN(unit, auraType, spellID, spellName, texture, dur
         return
     end
     local auraFrame = self.frames[unit]
-    local aura = Gladdy.db.auraListDefault[spellName] and Gladdy.db.auraListDefault[spellName].enabled
+    local aura = Gladdy:GetImportantAuras()[spellName] and Gladdy.db.auraListDefault[tostring(Gladdy:GetImportantAuras()[spellName].spellID)].enabled
     if aura and Gladdy.db.buffsShowAuraDebuffs then
         aura = false
     end
-    if not aura and spellID and expirationTime and (Gladdy.db.trackedBuffs[spellName] or Gladdy.db.trackedDebuffs[spellName]) then
+    local auraNames = LibClassAuras.GetSpellNameToId(auraType)
+    local spellId = auraNames[spellName] and auraNames[spellName].id[1]
+    if not aura and spellID and spellId and expirationTime and (Gladdy.db.trackedBuffs[tostring(spellId)] or Gladdy.db.trackedDebuffs[tostring(spellId)]) then
         local index
         if auraType == AURA_TYPE_DEBUFF then
             auraFrame.numDebuffs = auraFrame.numDebuffs + 1
@@ -457,10 +465,6 @@ function BuffsDebuffs:UpdateAurasOnUnit(unit)
             end
         end
     end
-end
-
-function BuffsDebuffs:UNIT_DEATH(destUnit)
-    self:RemoveAuras(destUnit)
 end
 
 local function iconTimer(auraFrame, elapsed)
@@ -1021,7 +1025,7 @@ function BuffsDebuffs:GetOptions()
             type = "group",
             order = 11,
             childGroups = "tree",
-            args = select(1, Gladdy:GetAuras("debuff")),
+            args = select(1, Gladdy:GetAuras(AURA_TYPE_DEBUFF)),
             set = function(info, state)
                 local optionKey = info[#info]
                 Gladdy.dbi.profile.trackedDebuffs[optionKey] = state
@@ -1036,7 +1040,7 @@ function BuffsDebuffs:GetOptions()
             type = "group",
             order = 12,
             childGroups = "tree",
-            args = select(1, Gladdy:GetAuras("buffs")),
+            args = select(1, Gladdy:GetAuras(AURA_TYPE_BUFF)),
             set = function(info, state)
                 local optionKey = info[#info]
                 Gladdy.dbi.profile.trackedBuffs[optionKey] = state
