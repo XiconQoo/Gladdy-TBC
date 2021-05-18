@@ -1,4 +1,4 @@
-local select, string_gsub = select, string.gsub
+local select, string_gsub, tostring = select, string.gsub, tostring
 
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local RAID_CLASS_COLORS = RAID_CLASS_COLORS
@@ -34,7 +34,7 @@ function EventListener:JOINED_ARENA()
     self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
     self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
     self:SetScript("OnEvent", EventListener.OnEvent)
-    Gladdy:SendCommMessage("GladdyVCheck", Gladdy.version, "RAID", UnitName("player"))
+    Gladdy:SendCommMessage("GladdyVCheck", tostring(Gladdy.version_num), "RAID", UnitName("player"))
 end
 
 function EventListener:Reset()
@@ -106,17 +106,24 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
         end
     end
     if srcUnit then
+        local unitRace = Gladdy.buttons[srcUnit].race
         -- cooldown tracker
         if Gladdy.db.cooldown and Cooldowns.cooldownSpellIds[spellName] then
             local unitClass
             local spellId = Cooldowns.cooldownSpellIds[spellName] -- don't use spellId from combatlog, in case of different spellrank
-            if (Cooldowns.cooldownSpells[Gladdy.buttons[srcUnit].class][spellId]) then
-                unitClass = Gladdy.buttons[srcUnit].class
-            else
-                unitClass = Gladdy.buttons[srcUnit].race
+            if Gladdy.db.cooldownCooldowns[tostring(spellId)] then
+                if (Gladdy:GetCooldownList()[Gladdy.buttons[srcUnit].class][spellId]) then
+                    unitClass = Gladdy.buttons[srcUnit].class
+                else
+                    unitClass = Gladdy.buttons[srcUnit].race
+                end
+                Cooldowns:CooldownUsed(srcUnit, unitClass, spellId, spellName)
+                Gladdy:DetectSpec(srcUnit, Gladdy.specSpells[spellName])
             end
-            Cooldowns:CooldownUsed(srcUnit, unitClass, spellId, spellName)
-            Gladdy:DetectSpec(srcUnit, Gladdy.specSpells[spellName])
+        end
+
+        if Gladdy.db.racialEnabled and Gladdy:Racials()[unitRace].spellName == spellName and Gladdy:Racials()[unitRace][spellID] then
+            Gladdy:SendMessage("RACIAL_USED", srcUnit)
         end
 
         if not Gladdy.buttons[srcUnit].class then
