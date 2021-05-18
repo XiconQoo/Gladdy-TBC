@@ -1,5 +1,6 @@
 local type, ipairs, pairs, tinsert = type, ipairs, pairs, tinsert
 local GetSpellInfo = GetSpellInfo
+local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
 
 local LibClassAuras = LibStub:NewLibrary("LibClassAuras-1.0", 1)
 LibClassAuras.debuffs = {}
@@ -72,3 +73,13 @@ local function getClassBuffs(class)
     return classSpells
 end
 LibClassAuras.GetClassBuffs = getClassBuffs
+
+local function getSpellNameToId(auraType)
+    if auraType == AURA_TYPE_DEBUFF then
+        return LibClassAuras.debuffToId
+    else
+        return LibClassAuras.buffToId
+    end
+end
+
+LibClassAuras.GetSpellNameToId = getSpellNameToId

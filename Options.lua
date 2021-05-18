@@ -4,6 +4,7 @@ local InterfaceOptionsFrame_OpenToFrame = InterfaceOptionsFrame_OpenToFrame
 local GetSpellInfo = GetSpellInfo
 local LOCALIZED_CLASS_NAMES_MALE = LOCALIZED_CLASS_NAMES_MALE
 local CLASS_ICON_TCOORDS = CLASS_ICON_TCOORDS
+local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
 
 local Gladdy = LibStub("Gladdy")
 local LibClassAuras = LibStub("LibClassAuras-1.0")
@@ -597,8 +598,14 @@ function Gladdy:GetAuras(auraType)
             name = "Check All",
             type = "execute",
             func = function(info)
-                for k,v in pairs(Gladdy.dbi.profile.trackedDebuffs) do
-                    Gladdy.dbi.profile.trackedDebuffs[k] = true
+                if auraType == AURA_TYPE_DEBUFF then
+                    for k,v in pairs(Gladdy.defaults.profile.trackedDebuffs) do
+                        Gladdy.dbi.profile.trackedDebuffs[k] = true
+                    end
+                else
+                    for k,v in pairs(Gladdy.defaults.profile.trackedBuffs) do
+                        Gladdy.dbi.profile.trackedBuffs[k] = true
+                    end
                 end
             end,
         },
@@ -608,8 +615,14 @@ function Gladdy:GetAuras(auraType)
             name = "Uncheck All",
             type = "execute",
             func = function(info)
-                for k,v in pairs(Gladdy.dbi.profile.trackedDebuffs) do
-                    Gladdy.dbi.profile.trackedDebuffs[k] = false
+                if auraType == AURA_TYPE_DEBUFF then
+                    for k,v in pairs(Gladdy.defaults.profile.trackedDebuffs) do
+                        Gladdy.dbi.profile.trackedDebuffs[k] = false
+                    end
+                else
+                    for k,v in pairs(Gladdy.defaults.profile.trackedBuffs) do
+                        Gladdy.dbi.profile.trackedBuffs[k] = false
+                    end
                 end
             end,
         },
@@ -689,13 +702,12 @@ function Gladdy:GetAuras(auraType)
     local defaultDebuffs = {}
     local assignForClass = function(class)
         local args = {}
-        local classSpells = auraType == "debuff" and LibClassAuras.GetClassDebuffs(class) or LibClassAuras.GetClassBuffs(class)
+        local classSpells = auraType == AURA_TYPE_DEBUFF and LibClassAuras.GetClassDebuffs(class) or LibClassAuras.GetClassBuffs(class)
         table.sort(classSpells, function(a, b)
             return a.name:upper() < b.name:upper()
         end)
         for i=1, #classSpells do
-            local spellName, _, texture = GetSpellInfo(classSpells[i].id[#classSpells[i].id])
-            --spellName = (classSpells[i].id[#classSpells[i].id] == 31117 or classSpells[i].id[#classSpells[i].id] ==  43523) and "Unstable Affliction Silence" or spellName
+            local _, _, texture = GetSpellInfo(classSpells[i].id[#classSpells[i].id])
             if classSpells[i].texture then
                 texture = classSpells[i].texture
             end
@@ -705,7 +717,7 @@ function Gladdy:GetAuras(auraType)
                 type = "toggle",
                 image = texture,
                 width = "2",
-                arg = classSpells[i].name
+                arg = tostring(classSpells[i].id[1])
             }
             defaultDebuffs[tostring(classSpells[i].id[1])] = true
         end

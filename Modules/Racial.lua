@@ -194,7 +194,7 @@ function Racial:ResetUnit(unit)
     if (not racial) then
         return
     end
-
+    racial.texture:SetTexture(nil)
     racial.timeLeft = nil
     racial.active = false
     racial.cooldown:Clear()
