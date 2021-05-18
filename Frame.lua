@@ -285,3 +285,17 @@ function Gladdy:CreateButton(i)
         self:Call(v, "CreateFrame", button.unit)
     end
 end
+
+function Gladdy:GetAnchor(unit, position)
+    local anchor = "healthBar"
+    if Gladdy.db.classIconPos == position then
+        anchor = "classIcon"
+    end
+    if Gladdy.db.trinketPos == position then
+        anchor = "trinket"
+    end
+    if anchor == Gladdy.db.racialAnchor and Gladdy.db.racialPos == position then
+        anchor = "racial"
+    end
+    return Gladdy.buttons[unit][anchor]
+end

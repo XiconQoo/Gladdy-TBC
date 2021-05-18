@@ -62,7 +62,7 @@ end
 
 function Diminishings:Initialize()
     self.frames = {}
-    self:RegisterMessage("UNIT_DEATH", "ResetUnit", "AURA_FADE")
+    self:RegisterMessage("UNIT_DEATH", "ResetUnit", "AURA_FADE", "UNIT_DESTROYED")
 end
 
 function Diminishings:CreateFrame(unit)
@@ -94,7 +94,7 @@ function Diminishings:CreateFrame(unit)
                     if self.timeLeft >=5 then
                         self.timeText:SetFormattedText("%d", self.timeLeft)
                     else
-                        self.timeText:SetFormattedText("%.1f", self.timeLeft)
+                        self.timeText:SetFormattedText("%.1f", self.timeLeft >= 0.0 and self.timeLeft or 0.0)
                     end
                 end
             end
@@ -161,56 +161,21 @@ function Diminishings:UpdateFrame(unit)
 
     drFrame:ClearAllPoints()
     local horizontalMargin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
-    local verticalMargin = -(Gladdy.db.powerBarHeight)/2
     if (Gladdy.db.drCooldownPos == "LEFT") then
-        if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
-            horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
-            if (Gladdy.db.classIconPos == "LEFT") then
-                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
-            end
-        elseif (Gladdy.db.classIconPos == "LEFT") then
-            horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
-            if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
-                horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
-            end
+        local anchor = Gladdy:GetAnchor(unit, "LEFT")
+        if anchor == Gladdy.buttons[unit].healthBar then
+            drFrame:SetPoint("RIGHT", anchor, "LEFT", -horizontalMargin + Gladdy.db.drXOffset, Gladdy.db.drYOffset)
+        else
+            drFrame:SetPoint("RIGHT", anchor, "LEFT", -Gladdy.db.padding + Gladdy.db.drXOffset, Gladdy.db.drYOffset)
         end
-        if (Gladdy.db.castBarPos == "LEFT") then
-            verticalMargin = verticalMargin -
-                    (((Gladdy.db.castBarHeight < Gladdy.db.castBarIconSize) and Gladdy.db.castBarIconSize
-                            or Gladdy.db.castBarHeight)/2 + Gladdy.db.padding/2)
-        end
-        if (Gladdy.db.cooldownYPos == "LEFT" and Gladdy.db.cooldown) then
-            verticalMargin = verticalMargin - (Gladdy.db.cooldownSize/2 + Gladdy.db.padding/2)
-        end
-        if (Gladdy.db.buffsCooldownPos == "LEFT" and Gladdy.db.buffsEnabled) then
-            verticalMargin = verticalMargin - (Gladdy.db.buffsIconSize/2 + Gladdy.db.padding/2)
-        end
-        drFrame:SetPoint("RIGHT", Gladdy.buttons[unit].healthBar, "LEFT", -horizontalMargin + Gladdy.db.drXOffset, Gladdy.db.drYOffset + verticalMargin)
     end
     if (Gladdy.db.drCooldownPos == "RIGHT") then
-        if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
-            horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
-            if (Gladdy.db.classIconPos == "RIGHT") then
-                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
-            end
-        elseif (Gladdy.db.classIconPos == "RIGHT") then
-            horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
-            if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
-                horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
-            end
+        local anchor = Gladdy:GetAnchor(unit, "RIGHT")
+        if anchor == Gladdy.buttons[unit].healthBar then
+            drFrame:SetPoint("LEFT", anchor, "RIGHT", horizontalMargin + Gladdy.db.drXOffset, Gladdy.db.drYOffset)
+        else
+            drFrame:SetPoint("LEFT", anchor, "RIGHT", Gladdy.db.padding + Gladdy.db.drXOffset, Gladdy.db.drYOffset)
         end
-        if (Gladdy.db.castBarPos == "RIGHT") then
-            verticalMargin = verticalMargin -
-                    (((Gladdy.db.castBarHeight < Gladdy.db.castBarIconSize) and Gladdy.db.castBarIconSize
-                            or Gladdy.db.castBarHeight)/2 + Gladdy.db.padding/2)
-        end
-        if (Gladdy.db.cooldownYPos == "RIGHT" and Gladdy.db.cooldown) then
-            verticalMargin = verticalMargin - (Gladdy.db.cooldownSize/2 + Gladdy.db.padding/2)
-        end
-        if (Gladdy.db.buffsCooldownPos == "RIGHT" and Gladdy.db.buffsEnabled) then
-            verticalMargin = verticalMargin - (Gladdy.db.buffsIconSize/2 + Gladdy.db.padding/2)
-        end
-        drFrame:SetPoint("LEFT", Gladdy.buttons[unit].healthBar, "RIGHT", horizontalMargin + Gladdy.db.drXOffset, Gladdy.db.drYOffset + verticalMargin)
     end
 
     drFrame:SetWidth(Gladdy.db.drIconSize * 16)
@@ -287,6 +252,10 @@ function Diminishings:ResetUnit(unit)
         icon.timeText:SetText("")
         icon:Hide()
     end
+end
+
+function Diminishings:UNIT_DESTROYED(unit)
+    Diminishings:ResetUnit(unit)
 end
 
 function Diminishings:Test(unit)

@@ -1,11 +1,53 @@
-local type, pairs, ceil, tonumber, mod = type, pairs, ceil, tonumber, mod
+local type, pairs, ceil, tonumber, mod, tostring, upper, select = type, pairs, ceil, tonumber, mod, tostring, string.upper, select
 local GetTime = GetTime
 local CreateFrame = CreateFrame
+local RACE_ICON_TCOORDS = {
+    ["HUMAN_MALE"]		= {0, 0.125, 0, 0.25},
+    ["DWARF_MALE"]		= {0.125, 0.25, 0, 0.25},
+    ["GNOME_MALE"]		= {0.25, 0.375, 0, 0.25},
+    ["NIGHTELF_MALE"]	= {0.375, 0.5, 0, 0.25},
+
+    ["TAUREN_MALE"]		= {0, 0.125, 0.25, 0.5},
+    ["SCOURGE_MALE"]	= {0.125, 0.25, 0.25, 0.5},
+    ["TROLL_MALE"]		= {0.25, 0.375, 0.25, 0.5},
+    ["ORC_MALE"]		= {0.375, 0.5, 0.25, 0.5},
+
+    ["HUMAN_FEMALE"]	= {0, 0.125, 0.5, 0.75},
+    ["DWARF_FEMALE"]	= {0.125, 0.25, 0.5, 0.75},
+    ["GNOME_FEMALE"]	= {0.25, 0.375, 0.5, 0.75},
+    ["NIGHTELF_FEMALE"]	= {0.375, 0.5, 0.5, 0.75},
+
+    ["TAUREN_FEMALE"]	= {0, 0.125, 0.75, 1.0},
+    ["SCOURGE_FEMALE"]	= {0.125, 0.25, 0.75, 1.0},
+    ["TROLL_FEMALE"]	= {0.25, 0.375, 0.75, 1.0},
+    ["ORC_FEMALE"]		= {0.375, 0.5, 0.75, 1.0},
+
+    ["BLOODELF_MALE"]	= {0.5, 0.625, 0.25, 0.5},
+    ["BLOODELF_FEMALE"]	= {0.5, 0.625, 0.75, 1.0},
+
+    ["DRAENEI_MALE"]	= {0.5, 0.625, 0, 0.25},
+    ["DRAENEI_FEMALE"]	= {0.5, 0.625, 0.5, 0.75},
+}
 
 local GetSpellInfo = GetSpellInfo
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
+
+local function getDefaultCooldown()
+    local cooldowns = {}
+    for class, t in pairs(Gladdy:GetCooldownList()) do
+        for spellId, v in pairs(t) do
+            local spellName, _, texture = GetSpellInfo(spellId)
+            if spellName then
+                cooldowns[tostring(spellId)] = true
+            else
+                Gladdy:Print("spellid does not exist  " .. spellId)
+            end
+        end
+    end
+    return cooldowns
+end
 
 local Cooldowns = Gladdy:NewModule("Cooldowns", nil, {
     cooldownFont = "DorisPP",
@@ -23,13 +65,14 @@ local Cooldowns = Gladdy:NewModule("Cooldowns", nil, {
     cooldownBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_Gloss",
     cooldownBorderColor = { r = 1, g = 1, b = 1, a = 1 },
     cooldownDisableCircle = false,
-    cooldownCooldownAlpha = 1
+    cooldownCooldownAlpha = 1,
+    cooldownCooldowns = getDefaultCooldown()
 })
 
 function Cooldowns:Initialize()
     self.cooldownSpellIds = {}
     self.spellTextures = {}
-    for class, t in pairs(self.cooldownSpells) do
+    for class, t in pairs(Gladdy:GetCooldownList()) do
         for k, v in pairs(t) do
             local spellName, _, texture = GetSpellInfo(k)
             if spellName then
@@ -43,6 +86,7 @@ function Cooldowns:Initialize()
     self:RegisterMessage("ENEMY_SPOTTED")
     self:RegisterMessage("SPEC_DETECTED")
     self:RegisterMessage("UNIT_DEATH")
+    self:RegisterMessage("UNIT_DESTROYED")
 end
 
 function Cooldowns:CreateFrame(unit)
@@ -102,56 +146,19 @@ function Cooldowns:UpdateFrame(unit)
                 button.spellCooldownFrame:SetPoint("TOPLEFT", button.powerBar, "BOTTOMLEFT", Gladdy.db.cooldownXOffset, -Gladdy.db.highlightBorderSize + Gladdy.db.cooldownYOffset)
             end
         elseif Gladdy.db.cooldownYPos == "LEFT" then
-            local horizontalMargin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
-            if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
-                horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
-                if (Gladdy.db.classIconPos == "LEFT") then
-                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
-                end
-            elseif (Gladdy.db.classIconPos == "LEFT") then
-                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
-                if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
-                    horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
-                end
+            local anchor = Gladdy:GetAnchor(unit, "LEFT")
+            if anchor == Gladdy.buttons[unit].healthBar then
+                button.spellCooldownFrame:SetPoint("RIGHT", anchor, "LEFT", -(Gladdy.db.highlightBorderSize + Gladdy.db.padding) + Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset)
+            else
+                button.spellCooldownFrame:SetPoint("RIGHT", anchor, "LEFT", -Gladdy.db.padding + Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset)
             end
-            if (Gladdy.db.drCooldownPos == "LEFT" and Gladdy.db.drEnabled) then
-                verticalMargin = verticalMargin + Gladdy.db.drIconSize/2 + Gladdy.db.padding/2
-            end
-            if (Gladdy.db.castBarPos == "LEFT") then
-                verticalMargin = verticalMargin -
-                        ((Gladdy.db.castBarHeight < Gladdy.db.castBarIconSize) and Gladdy.db.castBarIconSize
-                                or Gladdy.db.castBarHeight)/2 + Gladdy.db.padding/2
-            end
-            if (Gladdy.db.buffsCooldownPos == "LEFT" and Gladdy.db.buffsEnabled) then
-                verticalMargin = verticalMargin - (Gladdy.db.buffsIconSize/2 + Gladdy.db.padding/2)
-            end
-            button.spellCooldownFrame:SetPoint("RIGHT", button.healthBar, "LEFT", -horizontalMargin + Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset + verticalMargin)
         elseif Gladdy.db.cooldownYPos == "RIGHT" then
-            verticalMargin = -(Gladdy.db.powerBarHeight)/2
-            local horizontalMargin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
-            if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
-                horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
-                if (Gladdy.db.classIconPos == "RIGHT") then
-                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
-                end
-            elseif (Gladdy.db.classIconPos == "RIGHT") then
-                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
-                if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
-                    horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
-                end
+            local anchor = Gladdy:GetAnchor(unit, "RIGHT")
+            if anchor == Gladdy.buttons[unit].healthBar then
+                button.spellCooldownFrame:SetPoint("LEFT", anchor, "RIGHT", Gladdy.db.highlightBorderSize + Gladdy.db.padding + Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset)
+            else
+                button.spellCooldownFrame:SetPoint("LEFT", anchor, "RIGHT", Gladdy.db.padding + Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset)
             end
-            if (Gladdy.db.drCooldownPos == "RIGHT" and Gladdy.db.drEnabled) then
-                verticalMargin = verticalMargin + Gladdy.db.drIconSize/2 + Gladdy.db.padding/2
-            end
-            if (Gladdy.db.castBarPos == "RIGHT") then
-                verticalMargin = verticalMargin -
-                        ((Gladdy.db.castBarHeight < Gladdy.db.castBarIconSize) and Gladdy.db.castBarIconSize
-                                or Gladdy.db.castBarHeight)/2 + Gladdy.db.padding/2
-            end
-            if (Gladdy.db.buffsCooldownPos == "RIGHT" and Gladdy.db.buffsEnabled) then
-                verticalMargin = verticalMargin - (Gladdy.db.buffsIconSize/2 + Gladdy.db.padding/2)
-            end
-            button.spellCooldownFrame:SetPoint("LEFT", button.healthBar, "RIGHT", horizontalMargin + Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset + verticalMargin)
         end
         button.spellCooldownFrame:SetHeight(Gladdy.db.cooldownSize)
         button.spellCooldownFrame:SetWidth(1)
@@ -227,12 +234,10 @@ function Cooldowns:UpdateFrame(unit)
 end
 
 function Cooldowns:Test(unit)
-    if Gladdy.db.cooldown then
-        local button = Gladdy.buttons[unit]
-        button.spellCooldownFrame:Show()
-        button.lastCooldownSpell = 1
-        self:UpdateTestCooldowns(unit)
-    end
+    local button = Gladdy.buttons[unit]
+    button.spellCooldownFrame:Show()
+    button.lastCooldownSpell = 1
+    self:UpdateTestCooldowns(unit)
 end
 
 function Cooldowns:UpdateTestCooldowns(unit)
@@ -246,12 +251,12 @@ function Cooldowns:UpdateTestCooldowns(unit)
         button.test = true
 
         -- use class spells
-        for k, v in pairs(self.cooldownSpells[button.class]) do
+        for k, v in pairs(Gladdy:GetCooldownList()[button.class]) do
             --k is spellId
             self:CooldownUsed(unit, button.class, k, nil)
         end
         -- use race spells
-        for k, v in pairs(self.cooldownSpells[button.race]) do
+        for k, v in pairs(Gladdy:GetCooldownList()[button.race]) do
             self:CooldownUsed(unit, button.race, k, nil)
         end
     end
@@ -345,30 +350,32 @@ function Cooldowns:DetectSpec(unit, spec)
     if (Gladdy.db.cooldown) then
         local class = Gladdy.buttons[unit].class
         local race = Gladdy.buttons[unit].race
-        for k, v in pairs(self.cooldownSpells[class]) do
-            --if (self.db.cooldownList[k] ~= false and self.db.cooldownList[class] ~= false) then
-            if (type(v) == "table" and ((v.spec ~= nil and v.spec == spec) or (v.notSpec ~= nil and v.notSpec ~= spec))) then
-                local sharedCD = false
-                if (type(v) == "table" and v.sharedCD ~= nil and v.sharedCD.cd == nil) then
-                    for spellId, _ in pairs(v.sharedCD) do
-                        for i = 1, button.lastCooldownSpell do
-                            local icon = button.spellCooldownFrame["icon" .. i]
-                            if (icon.spellId == spellId) then
-                                sharedCD = true
+        for k, v in pairs(Gladdy:GetCooldownList()[class]) do
+            if Gladdy.db.cooldownCooldowns[tostring(k)] then
+                --if (self.db.cooldownList[k] ~= false and self.db.cooldownList[class] ~= false) then
+                if (type(v) == "table" and ((v.spec ~= nil and v.spec == spec) or (v.notSpec ~= nil and v.notSpec ~= spec))) then
+                    local sharedCD = false
+                    if (type(v) == "table" and v.sharedCD ~= nil and v.sharedCD.cd == nil) then
+                        for spellId, _ in pairs(v.sharedCD) do
+                            for i = 1, button.lastCooldownSpell do
+                                local icon = button.spellCooldownFrame["icon" .. i]
+                                if (icon.spellId == spellId) then
+                                    sharedCD = true
+                                end
                             end
                         end
                     end
-                end
-                if sharedCD then
-                    return
-                end
+                    if sharedCD then
+                        return
+                    end
 
-                local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
-                icon:Show()
-                icon.texture:SetTexture(self.spellTextures[k])
-                icon.spellId = k
-                button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
-                button.lastCooldownSpell = button.lastCooldownSpell + 1
+                    local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
+                    icon:Show()
+                    icon.texture:SetTexture(self.spellTextures[k])
+                    icon.spellId = k
+                    button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
+                    button.lastCooldownSpell = button.lastCooldownSpell + 1
+                end
             end
         end
         --end
@@ -377,31 +384,33 @@ function Cooldowns:DetectSpec(unit, spec)
     --- RACE FUNCTIONALITY
     ----------------------
     local race = Gladdy.buttons[unit].race
-    if self.cooldownSpells[race] then
-        for k, v in pairs(self.cooldownSpells[race]) do
-            --if (self.db.cooldownList[k] ~= false and self.db.cooldownList[class] ~= false) then
-            if (type(v) == "table" and ((v.spec ~= nil and v.spec == spec) or (v.notSpec ~= nil and v.notSpec ~= spec))) then
-                local sharedCD = false
-                if (type(v) == "table" and v.sharedCD ~= nil and v.sharedCD.cd == nil) then
-                    for spellId, _ in pairs(v.sharedCD) do
-                        for i = 1, button.lastCooldownSpell do
-                            local icon = button.spellCooldownFrame["icon" .. i]
-                            if (icon.spellId == spellId) then
-                                sharedCD = true
+    if Gladdy:GetCooldownList()[race] then
+        for k, v in pairs(Gladdy:GetCooldownList()[race]) do
+            if Gladdy.db.cooldownCooldowns[tostring(k)] then
+                --if (self.db.cooldownList[k] ~= false and self.db.cooldownList[class] ~= false) then
+                if (type(v) == "table" and ((v.spec ~= nil and v.spec == spec) or (v.notSpec ~= nil and v.notSpec ~= spec))) then
+                    local sharedCD = false
+                    if (type(v) == "table" and v.sharedCD ~= nil and v.sharedCD.cd == nil) then
+                        for spellId, _ in pairs(v.sharedCD) do
+                            for i = 1, button.lastCooldownSpell do
+                                local icon = button.spellCooldownFrame["icon" .. i]
+                                if (icon.spellId == spellId) then
+                                    sharedCD = true
+                                end
                             end
                         end
                     end
-                end
-                if sharedCD then
-                    return
-                end
+                    if sharedCD then
+                        return
+                    end
 
-                local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
-                icon:Show()
-                icon.texture:SetTexture(self.spellTextures[k])
-                icon.spellId = k
-                button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
-                button.lastCooldownSpell = button.lastCooldownSpell + 1
+                    local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
+                    icon:Show()
+                    icon.texture:SetTexture(self.spellTextures[k])
+                    icon.spellId = k
+                    button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
+                    button.lastCooldownSpell = button.lastCooldownSpell + 1
+                end
             end
         end
     end
@@ -412,6 +421,10 @@ function Cooldowns:ResetUnit(unit)
     Gladdy.buttons[unit].test = nil
 end
 
+function Cooldowns:UNIT_DESTROYED(unit)
+
+end
+
 function Cooldowns:UpdateCooldowns(button)
     local class = button.class
     local race = button.race
@@ -420,29 +433,31 @@ function Cooldowns:UpdateCooldowns(button)
     end
 
     if (Gladdy.db.cooldown) then
-        for k, v in pairs(self.cooldownSpells[class]) do
-            if (type(v) ~= "table" or (type(v) == "table" and v.spec == nil and v.notSpec == nil)) then
-                -- see if we have shared cooldowns without a cooldown defined
-                -- e.g. hunter traps have shared cooldowns, so only display one trap instead all of them
-                local sharedCD = false
-                if (type(v) == "table" and v.sharedCD ~= nil and v.sharedCD.cd == nil) then
-                    for spellId, _ in pairs(v.sharedCD) do
-                        for i = 1, button.lastCooldownSpell do
-                            local icon = button.spellCooldownFrame["icon" .. i]
-                            if (icon.spellId == spellId) then
-                                sharedCD = true
+        for k, v in pairs(Gladdy:GetCooldownList()[class]) do
+            if Gladdy.db.cooldownCooldowns[tostring(k)] then
+                if (type(v) ~= "table" or (type(v) == "table" and v.spec == nil and v.notSpec == nil)) then
+                    -- see if we have shared cooldowns without a cooldown defined
+                    -- e.g. hunter traps have shared cooldowns, so only display one trap instead all of them
+                    local sharedCD = false
+                    if (type(v) == "table" and v.sharedCD ~= nil and v.sharedCD.cd == nil) then
+                        for spellId, _ in pairs(v.sharedCD) do
+                            for i = 1, button.lastCooldownSpell do
+                                local icon = button.spellCooldownFrame["icon" .. i]
+                                if (icon.spellId == spellId) then
+                                    sharedCD = true
+                                end
                             end
                         end
                     end
-                end
 
-                if (not sharedCD) then
-                    local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
-                    icon:Show()
-                    icon.spellId = k
-                    icon.texture:SetTexture(self.spellTextures[k])
-                    button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
-                    button.lastCooldownSpell = button.lastCooldownSpell + 1
+                    if (not sharedCD) then
+                        local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
+                        icon:Show()
+                        icon.spellId = k
+                        icon.texture:SetTexture(self.spellTextures[k])
+                        button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
+                        button.lastCooldownSpell = button.lastCooldownSpell + 1
+                    end
                 end
             end
         end
@@ -450,14 +465,16 @@ function Cooldowns:UpdateCooldowns(button)
         -- RACE FUNCTIONALITY
         ----
 
-        for k, v in pairs(self.cooldownSpells[race]) do
-            if (type(v) ~= "table" or (type(v) == "table" and v.spec == nil and v.notSpec == nil)) then
-                local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
-                icon:Show()
-                icon.spellId = k
-                icon.texture:SetTexture(self.spellTextures[k])
-                button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
-                button.lastCooldownSpell = button.lastCooldownSpell + 1
+        for k, v in pairs(Gladdy:GetCooldownList()[race]) do
+            if Gladdy.db.cooldownCooldowns[tostring(k)] then
+                if (type(v) ~= "table" or (type(v) == "table" and v.spec == nil and v.notSpec == nil)) then
+                    local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
+                    icon:Show()
+                    icon.spellId = k
+                    icon.texture:SetTexture(self.spellTextures[k])
+                    button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
+                    button.lastCooldownSpell = button.lastCooldownSpell + 1
+                end
             end
         end
     end
@@ -470,7 +487,7 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId, spellName)
     end
     -- if (self.db.cooldownList[spellId] == false) then return end
 
-    local cooldown = self.cooldownSpells[unitClass][spellId]
+    local cooldown = Gladdy:GetCooldownList()[unitClass][spellId]
     local cd = cooldown
     if (type(cooldown) == "table") then
         -- return if the spec doesn't have a cooldown for this spell
@@ -755,7 +772,78 @@ function Cooldowns:GetOptions()
                 },
             },
         },
+        cooldowns = {
+            type = "group",
+            childGroups = "tree",
+            name = "Cooldowns",
+            order = 4,
+            args = Cooldowns:GetCooldownOptions(),
+        },
     }
+end
+
+function Cooldowns:GetCooldownOptions()
+    local group = {}
+
+    local p = 1
+    for i,class in ipairs(Gladdy.CLASSES) do
+        group[class] = {
+            type = "group",
+            name = LOCALIZED_CLASS_NAMES_MALE[class],
+            order = i,
+            icon = "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes",
+            iconCoords = CLASS_ICON_TCOORDS[class],
+            args = {}
+        }
+        local o = 1
+        for spellId,cooldown in pairs(Gladdy:GetCooldownList()[class]) do
+            group[class].args[tostring(spellId)] = {
+                type = "toggle",
+                name = select(1, GetSpellInfo(spellId)) .. (type(cooldown) == "table" and cooldown.spec and (" - " .. cooldown.spec) or ""),
+                order = o,
+                width = "full",
+                image = select(3, GetSpellInfo(spellId)),
+                get = function(info)
+                    return Gladdy.db.cooldownCooldowns[tostring(spellId)]
+                end,
+                set = function(info, value)
+                    Gladdy.db.cooldownCooldowns[tostring(spellId)] = value
+                    Gladdy:UpdateFrame()
+                end
+            }
+            o = o + 1
+        end
+        p = p + i
+    end
+    for i,race in ipairs(Gladdy.RACES) do
+        group[race] = {
+            type = "group",
+            name = L[race],
+            order = i + p,
+            icon = "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Races",
+            iconCoords = RACE_ICON_TCOORDS[upper(race) .. "_FEMALE"],
+            args = {}
+        }
+        local o = 1
+        for spellId,cooldown in pairs(Gladdy:GetCooldownList()[race]) do
+            group[race].args[tostring(spellId)] = {
+                type = "toggle",
+                name = select(1, GetSpellInfo(spellId)) .. (type(cooldown) == "table" and cooldown.spec and (" - " .. cooldown.spec) or ""),
+                order = o,
+                width = "full",
+                image = select(3, GetSpellInfo(spellId)),
+                get = function(info)
+                    return Gladdy.db.cooldownCooldowns[tostring(spellId)]
+                end,
+                set = function(info, value)
+                    Gladdy.db.cooldownCooldowns[tostring(spellId)] = value
+                    Gladdy:UpdateFrame()
+                end
+            }
+            o = o + 1
+        end
+    end
+    return group
 end
 
 function Gladdy:UpdateTestCooldowns(i)
@@ -769,219 +857,13 @@ function Gladdy:UpdateTestCooldowns(i)
         Cooldowns:DetectSpec(unit, button.testSpec)
 
         -- use class spells
-        for k, v in pairs(Cooldowns.cooldownSpells[button.class]) do
+        for k, v in pairs(Gladdy:GetCooldownList()[button.class]) do
             --k is spellId
             Cooldowns:CooldownUsed(unit, button.class, k, nil)
         end
         -- use race spells
-        for k, v in pairs(Cooldowns.cooldownSpells[button.race]) do
+        for k, v in pairs(Gladdy:GetCooldownList()[button.race]) do
             Cooldowns:CooldownUsed(unit, button.race, k, nil)
         end
     end
 end
-
-Cooldowns.cooldownSpells = {
-    -- Spell Name			   Cooldown[, Spec]
-    -- Mage
-    ["MAGE"] = {
-        [1953] = 15, -- Blink
-        --[122] 	= 22,    -- Frost Nova
-        --[12051] = 480, --Evocation
-        [2139] = 24, -- Counterspell
-        [45438] = { cd = 300, [L["Frost"]] = 240, }, -- Ice Block
-        [12472] = { cd = 180, spec = L["Frost"], }, -- Icy Veins
-        [31687] = { cd = 180, spec = L["Frost"], }, -- Summon Water Elemental
-        [12043] = { cd = 180, spec = L["Arcane"], }, -- Presence of Mind
-        [11129] = { cd = 180, spec = L["Fire"] }, -- Combustion
-        [120] = { cd = 10,
-                  sharedCD = {
-                      [31661] = true, -- Cone of Cold
-                  }, spec = L["Fire"] }, -- Dragon's Breath
-        [31661] = { cd = 20,
-                    sharedCD = {
-                        [120] = true, -- Cone of Cold
-                    }, spec = L["Fire"] }, -- Dragon's Breath
-        [12042] = { cd = 180, spec = L["Arcane"], }, -- Arcane Power
-        [11958] = { cd = 384, spec = L["Frost"], -- Coldsnap
-                    resetCD = {
-                        [12472] = true,
-                        [45438] = true,
-                        [31687] = true,
-                    },
-        },
-    },
-
-    -- Priest
-    ["PRIEST"] = {
-        [10890] = { cd = 27, [L["Shadow"]] = 23, }, -- Psychic Scream
-        [15487] = { cd = 45, spec = L["Shadow"], }, -- Silence
-        [10060] = { cd = 180, spec = L["Discipline"], }, -- Power Infusion
-        [33206] = { cd = 120, spec = L["Discipline"], }, -- Pain Suppression
-        [34433] = 300, -- Shadowfiend
-    },
-
-    -- Druid
-    ["DRUID"] = {
-        [22812] = 60, -- Barkskin
-        [29166] = 360, -- Innervate
-        [8983] = 60, -- Bash
-        [16689] = 60, -- Natures Grasp
-        [17116] = { cd = 180, spec = L["Restoration"], }, -- Natures Swiftness
-        [33831] = { cd = 180, spec = L["Balance"], }, -- Force of Nature
-    },
-
-    -- Shaman
-    ["SHAMAN"] = {
-        [8042] = { cd = 6, -- Earth Shock
-                   sharedCD = {
-                       [8056] = true, -- Frost Shock
-                       [8050] = true, -- Flame Shock
-                   },
-        },
-        [30823] = { cd = 120, spec = L["Enhancement"], }, -- Shamanistic Rage
-        [16166] = { cd = 180, spec = L["Elemental"], }, -- Elemental Mastery
-        [16188] = { cd = 180, spec = L["Restoration"], }, -- Natures Swiftness
-        [16190] = { cd = 300, spec = L["Restoration"], }, -- Mana Tide Totem
-    },
-
-    -- Paladin
-    ["PALADIN"] = {
-        [10278] = 180, -- Blessing of Protection
-        [1044] = 25, -- Blessing of Freedom
-        [10308] = { cd = 60, [L["Retribution"]] = 40, }, -- Hammer of Justice
-        [642] = { cd = 300, -- Divine Shield
-                  sharedCD = {
-                      cd = 60, -- no actual shared CD but debuff
-                      [31884] = true,
-                  },
-        },
-        [31884] = { cd = 180, spec = L["Retribution"], -- Avenging Wrath
-                    sharedCD = {
-                        cd = 60,
-                        [642] = true,
-                    },
-        },
-        [20066] = { cd = 60, spec = L["Retribution"], }, -- Repentance
-        [31842] = { cd = 180, spec = L["Holy"], }, -- Divine Illumination
-        [31935] = { cd = 30, spec = L["Protection"], }, -- Avengers Shield
-
-    },
-
-    -- Warlock
-    ["WARLOCK"] = {
-        [17928] = 40, -- Howl of Terror
-        [27223] = 120, -- Death Coil
-        --[19647] 	= { cd = 24 },	-- Spell Lock; how will I handle pet spells?
-        [30414] = { cd = 20, spec = L["Destruction"], }, -- Shadowfury
-        [17877] = { cd = 15, spec = L["Destruction"], }, -- Shadowburn
-        [18708] = { cd = 900, spec = L["Demonology"], }, -- Feldom
-    },
-
-    -- Warrior
-    ["WARRIOR"] = {
-        --[[6552] 	= { cd = 10,                              -- Pummel
-           sharedCD = {
-              [72] = true,
-           },
-        },
-        [72] 	   = { cd = 12,                              -- Shield Bash
-           sharedCD = {
-              [6552] = true,
-           },
-        }, ]]
-        --[23920] 	= 10,    -- Spell Reflection
-        [3411] = 30, -- Intervene
-        [676] = 60, -- Disarm
-        [5246] = 180, -- Intimidating Shout
-        --[2565] 	= 60,    -- Shield Block
-        [12292] = { cd = 180, spec = L["Arms"], }, -- Death Wish
-        [12975] = { cd = 180, spec = L["Protection"], }, -- Last Stand
-        [12809] = { cd = 30, spec = L["Protection"], }, -- Concussion Blow
-
-    },
-
-    -- Hunter
-    ["HUNTER"] = {
-        [19503] = 30, -- Scatter Shot
-        [19263] = 300, -- Deterrence; not on BM but can't do 2 specs
-        [14311] = { cd = 30, -- Freezing Trap
-                    sharedCD = {
-                        [13809] = true, -- Frost Trap
-                        [34600] = true, -- Snake Trap
-                    },
-        },
-        [13809] = { cd = 30, -- Frost Trap
-                    sharedCD = {
-                        [14311] = true, -- Freezing Trap
-                        [34600] = true, -- Snake Trap
-                    },
-        },
-        [34600] = { cd = 30, -- Snake Trap
-                    sharedCD = {
-                        [14311] = true, -- Freezing Trap
-                        [13809] = true, -- Frost Trap
-                    },
-        },
-        [34490] = { cd = 20, spec = L["Marksmanship"], }, -- Silencing Shot
-        [19386] = { cd = 60, spec = L["Survival"], }, -- Wyvern Sting
-        [19577] = { cd = 60, spec = L["Beast Mastery"], }, -- Intimidation
-        [38373] = { cd = 120, spec = L["Beast Mastery"], }, -- The Beast Within
-    },
-
-    -- Rogue
-    ["ROGUE"] = {
-        [1766] 	= 10,    -- Kick
-        [8643] 	= 20,    -- Kidney Shot
-        [31224] = 60, -- Cloak of Shadow
-        [26889] = { cd = 300, [L["Subtlety"]] = 180, }, -- Vanish
-        [2094] = { cd = 180, [L["Subtlety"]] = 90, }, -- Blind
-        [11305] = { cd = 300, [L["Combat"]] = 180, }, -- Sprint
-        [26669] = { cd = 300, [L["Combat"]] = 180, }, -- Evasion
-        [14177] = { cd = 180, spec = L["Assassination"], }, -- Cold Blood
-        [13750] = { cd = 300, spec = L["Combat"], }, -- Adrenaline Rush
-        [13877] = { cd = 120, spec = L["Combat"], }, -- Blade Flurry
-        [36554] = { cd = 30, spec = L["Subtlety"], }, -- Shadowstep
-        [14185] = { cd = 600, spec = L["Subtlety"], -- Preparation
-                    resetCD = {
-                        [26669] = true,
-                        [11305] = true,
-                        [26889] = true,
-                        [14177] = true,
-                        [36554] = true,
-                    },
-        },
-    },
-    ["Scourge"] = {
-        [7744] = 120, -- Will of the Forsaken
-    },
-    ["BloodElf"] = {
-        [28730] = 120, -- Arcane Torrent
-    },
-    ["Tauren"] = {
-        [20549] = 120, -- War Stomp
-    },
-    ["Orc"] = {
-
-    },
-    ["Troll"] = {
-
-    },
-    ["NightElf"] = {
-        [2651] = { cd = 180, spec = L["Discipline"], }, -- Elune's Grace
-        [10797] = { cd = 30, spec = L["Discipline"], }, -- Star Shards
-    },
-    ["Draenei"] = {
-        [32548] = { cd = 300, spec = L["Discipline"], }, -- Hymn of Hope
-    },
-    ["Human"] = {
-        [13908] = { cd = 600, spec = L["Discipline"], }, -- Desperate Prayer
-        [20600] = 180, -- Perception
-    },
-    ["Gnome"] = {
-        [20589] = 105, -- Escape Artist
-    },
-    ["Dwarf"] = {
-        [20594] = 180, -- Stoneform
-        [13908] = { cd = 600, spec = L["Discipline"], }, -- Desperate Prayer
-    },
-}

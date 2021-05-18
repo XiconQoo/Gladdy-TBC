@@ -87,6 +87,8 @@ function BuffsDebuffs:Initialize()
     self.trackedCC = {}
     self.framePool = {}
     self:RegisterMessage("JOINED_ARENA")
+    self:RegisterMessage("UNIT_DESTROYED")
+    self:RegisterMessage("UNIT_DEATH")
     self:RegisterMessage("AURA_FADE")
     self:RegisterMessage("AURA_GAIN")
     self:RegisterMessage("AURA_GAIN_LIMIT")
@@ -124,6 +126,14 @@ function BuffsDebuffs:ResetUnit(unit)
             i = i - 1
         end
     end
+end
+
+function BuffsDebuffs:UNIT_DESTROYED(unit)
+    BuffsDebuffs:ResetUnit(unit)
+end
+
+function BuffsDebuffs:UNIT_DEATH(unit)
+    BuffsDebuffs:ResetUnit(unit)
 end
 
 function BuffsDebuffs:Reset()
@@ -282,55 +292,22 @@ function BuffsDebuffs:UpdateFrame(unit)
             self.frames[unit].debuffFrame:SetPoint("TOPRIGHT", Gladdy.buttons[unit].powerBar, "BOTTOMLEFT", Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset -verticalMargin)
         end
     elseif Gladdy.db.buffsCooldownPos == "LEFT" then
-        horizontalMargin = horizontalMargin - 1 + Gladdy.db.padding
-        if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
-            horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
-            if (Gladdy.db.classIconPos == "LEFT") then
-                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
-            end
-        elseif (Gladdy.db.classIconPos == "LEFT") then
-            horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
-            if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
-                horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
-            end
+        horizontalMargin = Gladdy.db.highlightBorderSize - 1 + Gladdy.db.padding
+        local anchor = Gladdy:GetAnchor(unit, "LEFT")
+        if anchor == Gladdy.buttons[unit].healthBar then
+            self.frames[unit].debuffFrame:SetPoint("RIGHT", anchor, "LEFT", -horizontalMargin + Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset)
+        else
+            self.frames[unit].debuffFrame:SetPoint("RIGHT", anchor, "LEFT", -Gladdy.db.padding + Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset)
         end
-        if (Gladdy.db.drCooldownPos == "LEFT" and Gladdy.db.drEnabled) then
-            verticalMargin = verticalMargin + Gladdy.db.drIconSize/2 + Gladdy.db.padding/2
-        end
-        if (Gladdy.db.castBarPos == "LEFT") then
-            verticalMargin = verticalMargin -
-                    (((Gladdy.db.castBarHeight < Gladdy.db.castBarIconSize) and Gladdy.db.castBarIconSize
-                            or Gladdy.db.castBarHeight)/2 + Gladdy.db.padding/2)
-        end
-        if (Gladdy.db.cooldownYPos == "LEFT" and Gladdy.db.cooldown) then
-            verticalMargin = verticalMargin + (Gladdy.db.buffsIconSize/2 + Gladdy.db.padding/2)
-        end
-        self.frames[unit].debuffFrame:SetPoint("RIGHT", Gladdy.buttons[unit].healthBar, "LEFT", -horizontalMargin + Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset + verticalMargin)
+
     elseif Gladdy.db.buffsCooldownPos == "RIGHT" then
         horizontalMargin = horizontalMargin - 1 + Gladdy.db.padding
-        if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
-            horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
-            if (Gladdy.db.classIconPos == "RIGHT") then
-                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
-            end
-        elseif (Gladdy.db.classIconPos == "RIGHT") then
-            horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
-            if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
-                horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
-            end
+        local anchor = Gladdy:GetAnchor(unit, "RIGHT")
+        if anchor == Gladdy.buttons[unit].healthBar then
+            self.frames[unit].debuffFrame:SetPoint("LEFT", anchor, "RIGHT", horizontalMargin + Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset)
+        else
+            self.frames[unit].debuffFrame:SetPoint("LEFT", anchor, "RIGHT", horizontalMargin + Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset)
         end
-        if (Gladdy.db.drCooldownPos == "RIGHT" and Gladdy.db.drEnabled) then
-            verticalMargin = verticalMargin + Gladdy.db.drIconSize/2 + Gladdy.db.padding/2
-        end
-        if (Gladdy.db.castBarPos == "RIGHT") then
-            verticalMargin = verticalMargin -
-                    (((Gladdy.db.castBarHeight < Gladdy.db.castBarIconSize) and Gladdy.db.castBarIconSize
-                            or Gladdy.db.castBarHeight)/2 + Gladdy.db.padding/2)
-        end
-        if (Gladdy.db.cooldownYPos == "RIGHT" and Gladdy.db.cooldown) then
-            verticalMargin = verticalMargin + (Gladdy.db.buffsIconSize/2 + Gladdy.db.padding/2)
-        end
-        self.frames[unit].debuffFrame:SetPoint("LEFT", Gladdy.buttons[unit].healthBar, "RIGHT", horizontalMargin + Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset + verticalMargin)
     end
 
     self.frames[unit].buffFrame:SetHeight(Gladdy.db.buffsBuffsIconSize)
@@ -381,7 +358,16 @@ function BuffsDebuffs:UpdateFrame(unit)
         if (Gladdy.db.cooldownYPos == "LEFT" and Gladdy.db.cooldown) then
             verticalMargin = verticalMargin + (Gladdy.db.buffsBuffsIconSize/2 + Gladdy.db.padding/2)
         end
-        self.frames[unit].buffFrame:SetPoint("RIGHT", Gladdy.buttons[unit].healthBar, "LEFT", -horizontalMargin + Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset + verticalMargin)
+        --self.frames[unit].buffFrame:SetPoint("RIGHT", Gladdy.buttons[unit].healthBar, "LEFT", -horizontalMargin + Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset + verticalMargin)
+
+        local anchor = Gladdy:GetAnchor(unit, "LEFT")
+        horizontalMargin = Gladdy.db.highlightBorderSize - 1 + Gladdy.db.padding
+        if anchor == Gladdy.buttons[unit].healthBar then
+            self.frames[unit].buffFrame:SetPoint("RIGHT", anchor, "LEFT", -horizontalMargin + Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset)
+        else
+            self.frames[unit].buffFrame:SetPoint("RIGHT", anchor, "LEFT", -Gladdy.db.padding + Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset)
+        end
+
     elseif Gladdy.db.buffsBuffsCooldownPos == "RIGHT" then
         horizontalMargin = horizontalMargin - 1 + Gladdy.db.padding
         if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
@@ -406,7 +392,15 @@ function BuffsDebuffs:UpdateFrame(unit)
         if (Gladdy.db.cooldownYPos == "RIGHT" and Gladdy.db.cooldown) then
             verticalMargin = verticalMargin + (Gladdy.db.buffsBuffsIconSize/2 + Gladdy.db.padding/2)
         end
-        self.frames[unit].buffFrame:SetPoint("LEFT", Gladdy.buttons[unit].healthBar, "RIGHT", horizontalMargin + Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset + verticalMargin)
+        --self.frames[unit].buffFrame:SetPoint("LEFT", Gladdy.buttons[unit].healthBar, "RIGHT", horizontalMargin + Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset + verticalMargin)
+
+        local anchor = Gladdy:GetAnchor(unit, "RIGHT")
+        horizontalMargin = Gladdy.db.highlightBorderSize - 1 + Gladdy.db.padding
+        if anchor == Gladdy.buttons[unit].healthBar then
+            self.frames[unit].buffFrame:SetPoint("LEFT", anchor, "RIGHT", horizontalMargin + Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset)
+        else
+            self.frames[unit].buffFrame:SetPoint("LEFT", anchor, "RIGHT", Gladdy.db.padding + Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset)
+        end
     end
     for i=1, #self.frames[unit].auras[AURA_TYPE_BUFF] do
         styleIcon(self.frames[unit].auras[AURA_TYPE_BUFF][i], AURA_TYPE_BUFF)
@@ -490,7 +484,7 @@ local function iconTimer(auraFrame, elapsed)
             auraFrame.cooldown:SetFormattedText("%d", timeLeftSec)
         elseif timeLeftMilliSec <= 3 and timeLeftMilliSec > 0 then
             if Gladdy.db.buffsDynamicColor then auraFrame.cooldown:SetTextColor(1, 0, 0) end
-            auraFrame.cooldown:SetFormattedText("%.1f", timeLeftMilliSec)
+            auraFrame.cooldown:SetFormattedText("%.1f", timeLeftMilliSec >= 0.0 and timeLeftMilliSec or 0.0)
         elseif timeLeftMilliSec <= 0 and timeLeftMilliSec > -0.05 then -- 50ms ping max wait for SPELL_AURA_REMOVED event
             auraFrame.cooldown:SetText("")
         else -- fallback in case SPELL_AURA_REMOVED is not fired
