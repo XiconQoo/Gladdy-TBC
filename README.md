@@ -1,7 +1,7 @@
 # Gladdy - TBC
 
 ### The most powerful arena addon for WoW TBC 2.5.1
-## [v1.0.4-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v1.0.4-Beta/Gladdy_TBC-Classic_v1.0.4-Beta.zip)
+## [v1.0.5-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v1.0.5-Beta/Gladdy_TBC-Classic_v1.0.5-Beta.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -34,6 +34,20 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 <img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/sample3.png" width="48.5%">
 
 ### Changes
+
+#### v1.0.5-Beta
+- fixed Aura-Module
+- Racial module added to EventListener and Version check updated
+- constants for auras/cooldowns/racials updated
+- anchoring for modules rewritten
+- fix Aura module options (localization independent for profile export)
+- Power-/HealthBar customize texts added and UNIT_DESTROYED added
+- Racial module added and trinket modified
+- XiconProfiles import strings
+- Pets position extended
+- delete unused saved variables
+- ExportImport, VersionCheck & XiconProfiles fix
+- TotemPlates add option to show friendly/enemy icons
 
 #### v1.0.4-Beta
 - XiconProfiles fixed
