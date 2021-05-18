@@ -164,52 +164,21 @@ function Castbar:UpdateFrame(unit)
 
     castBar:ClearAllPoints()
     local horizontalMargin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
-    local verticalMargin = -(Gladdy.db.powerBarHeight)/2
     if (Gladdy.db.castBarPos == "LEFT") then
-        if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
-            horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
-            if (Gladdy.db.classIconPos == "LEFT") then
-                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
-            end
-        elseif (Gladdy.db.classIconPos == "LEFT") then
-            horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
-            if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
-                horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
-            end
+        local anchor = Gladdy:GetAnchor(unit, "LEFT")
+        if anchor == Gladdy.buttons[unit].healthBar then
+            castBar:SetPoint("RIGHT", anchor, "LEFT", -horizontalMargin - leftMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset)
+        else
+            castBar:SetPoint("RIGHT", anchor, "LEFT", -Gladdy.db.padding - leftMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset)
         end
-        if (Gladdy.db.cooldownYPos == "LEFT" and Gladdy.db.cooldown) then
-            verticalMargin = verticalMargin + (Gladdy.db.cooldownSize/2 + Gladdy.db.padding/2)
-        end
-        if (Gladdy.db.drCooldownPos == "LEFT" and Gladdy.db.drEnabled) then
-            verticalMargin = verticalMargin + (Gladdy.db.drIconSize/2 + Gladdy.db.padding/2)
-        end
-        if (Gladdy.db.buffsCooldownPos == "LEFT" and Gladdy.db.buffsEnabled) then
-            verticalMargin = verticalMargin + Gladdy.db.buffsIconSize/2 + Gladdy.db.padding/2
-        end
-        castBar:SetPoint("RIGHT", button.healthBar, "LEFT", -horizontalMargin - leftMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset + verticalMargin)
     end
     if (Gladdy.db.castBarPos == "RIGHT") then
-        if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
-            horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
-            if (Gladdy.db.classIconPos == "RIGHT") then
-                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
-            end
-        elseif (Gladdy.db.classIconPos == "RIGHT") then
-            horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
-            if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
-                horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
-            end
+        local anchor = Gladdy:GetAnchor(unit, "RIGHT")
+        if anchor == Gladdy.buttons[unit].healthBar then
+            castBar:SetPoint("LEFT", anchor, "RIGHT", horizontalMargin + rightMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset)
+        else
+            castBar:SetPoint("LEFT", anchor, "RIGHT", Gladdy.db.padding + rightMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset)
         end
-        if (Gladdy.db.cooldownYPos == "RIGHT" and Gladdy.db.cooldown) then
-            verticalMargin = verticalMargin + (Gladdy.db.cooldownSize/2 + Gladdy.db.padding/2)
-        end
-        if (Gladdy.db.drCooldownPos == "RIGHT" and Gladdy.db.drEnabled) then
-            verticalMargin = verticalMargin + (Gladdy.db.drIconSize/2 + Gladdy.db.padding/2)
-        end
-        if (Gladdy.db.buffsCooldownPos == "RIGHT" and Gladdy.db.buffsEnabled) then
-            verticalMargin = verticalMargin + Gladdy.db.buffsIconSize/2 + Gladdy.db.padding/2
-        end
-        castBar:SetPoint("LEFT", button.healthBar, "RIGHT", horizontalMargin + rightMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset + verticalMargin)
     end
 
     castBar.spellText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.auraFont), Gladdy.db.castBarFontSize)
@@ -515,7 +484,7 @@ function Castbar:Test(unit)
 
     if (unit == "arena2") then
         spell, _, icon = GetSpellInfo(27072)
-        value, maxValue, event = 0, 2, "cast"
+        value, maxValue, event = 0, 40, "cast"
     elseif (unit == "arena1") then
         spell, _, icon = GetSpellInfo(27220)
         endTime = GetTime() * 1000 + 60*1000

@@ -1,4 +1,5 @@
 local ceil, floor, string_format, tonumber = ceil, floor, string.format, tonumber
+local C_PvP = C_PvP
 
 local CreateFrame = CreateFrame
 local GetTime = GetTime
@@ -23,6 +24,49 @@ function Trinket:Initialize()
     self.frames = {}
 
     self:RegisterMessage("JOINED_ARENA")
+end
+
+local function iconTimer(self, elapsed)
+    if (self.active) then
+        if (self.timeLeft <= 0) then
+            self.active = false
+            self.cooldown:Clear()
+            Gladdy:SendMessage("TRINKET_READY", self.unit)
+        else
+            self.timeLeft = self.timeLeft - elapsed
+        end
+
+        local timeLeft = ceil(self.timeLeft)
+
+        if timeLeft >= 60 then
+            -- more than 1 minute
+            self.cooldownFont:SetTextColor(1, 1, 0)
+            self.cooldownFont:SetText(floor(timeLeft / 60) .. ":" .. string_format("%02.f", floor(timeLeft - floor(timeLeft / 60) * 60)))
+            self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (self:GetWidth()/2 - 0.15*self:GetWidth()) * Gladdy.db.trinketFontScale, "OUTLINE")
+        elseif timeLeft < 60 and timeLeft >= 21 then
+            -- between 60s and 21s (green)
+            self.cooldownFont:SetTextColor(0.7, 1, 0)
+            self.cooldownFont:SetText(timeLeft)
+            self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
+        elseif timeLeft < 20.9 and timeLeft >= 11 then
+            -- between 20s and 11s (green)
+            self.cooldownFont:SetTextColor(0, 1, 0)
+            self.cooldownFont:SetText(timeLeft)
+            self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
+        elseif timeLeft <= 10 and timeLeft >= 5 then
+            -- between 10s and 5s (orange)
+            self.cooldownFont:SetTextColor(1, 0.7, 0)
+            self.cooldownFont:SetFormattedText("%.1f", timeLeft)
+            self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
+        elseif timeLeft < 5 and timeLeft > 0 then
+            -- between 5s and 1s (red)
+            self.cooldownFont:SetTextColor(1, 0, 0)
+            self.cooldownFont:SetFormattedText("%.1f", timeLeft >= 0.0 and timeLeft or 0.0)
+            self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
+        else
+            self.cooldownFont:SetText("")
+        end
+    end
 end
 
 function Trinket:CreateFrame(unit)
@@ -52,55 +96,12 @@ function Trinket:CreateFrame(unit)
     trinket.texture.overlay:SetAllPoints(trinket)
     trinket.texture.overlay:SetTexture(Gladdy.db.trinketBorderStyle)
 
-    local function formatTimer(num, numDecimalPlaces)
-        return tonumber(string_format("%." .. (numDecimalPlaces or 0) .. "f", num))
-    end
+    trinket.unit = unit
 
-    trinket:SetScript("OnUpdate", function(self, elapsed)
-        if (self.active) then
-            if (self.timeLeft <= 0) then
-                self.active = false
-                self.cooldown:Clear()
-                Gladdy:SendMessage("TRINKET_READY", unit)
-            else
-                self.timeLeft = self.timeLeft - elapsed
-            end
-
-            local timeLeft = ceil(self.timeLeft)
-            local timeLeftMilliSec = formatTimer(self.timeLeft, 1)
-
-            if timeLeft >= 60 then
-                -- more than 1 minute
-                self.cooldownFont:SetTextColor(1, 1, 0)
-                self.cooldownFont:SetText(floor(timeLeft / 60) .. ":" .. string_format("%02.f", floor(timeLeft - floor(timeLeft / 60) * 60)))
-                self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (trinket:GetWidth()/2 - 0.15*trinket:GetWidth()) * Gladdy.db.trinketFontScale, "OUTLINE")
-            elseif timeLeft < 60 and timeLeft >= 21 then
-                -- between 60s and 21s (green)
-                self.cooldownFont:SetTextColor(0.7, 1, 0)
-                self.cooldownFont:SetText(timeLeft)
-                self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (trinket:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
-            elseif timeLeft < 20.9 and timeLeft >= 11 then
-                -- between 20s and 11s (green)
-                self.cooldownFont:SetTextColor(0, 1, 0)
-                self.cooldownFont:SetText(timeLeft)
-                self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (trinket:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
-            elseif timeLeftMilliSec <= 10 and timeLeftMilliSec >= 5 then
-                -- between 10s and 5s (orange)
-                self.cooldownFont:SetTextColor(1, 0.7, 0)
-                self.cooldownFont:SetFormattedText("%.1f", timeLeftMilliSec)
-                self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (trinket:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
-            elseif timeLeftMilliSec < 5 and timeLeftMilliSec > 0 then
-                -- between 5s and 1s (red)
-                self.cooldownFont:SetTextColor(1, 0, 0)
-                self.cooldownFont:SetFormattedText("%.1f", timeLeftMilliSec)
-                self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (trinket:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
-            else
-                self.cooldownFont:SetText("")
-            end
-        end
-    end)
+    trinket:SetScript("OnUpdate", iconTimer)
 
     self.frames[unit] = trinket
+    Gladdy.buttons[unit].trinket = trinket
 end
 
 function Trinket:UpdateFrame(unit)

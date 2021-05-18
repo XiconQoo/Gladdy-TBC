@@ -11,6 +11,9 @@ local IsAddOnLoaded = IsAddOnLoaded
 local IsInInstance = IsInInstance
 local GetBattlefieldStatus = GetBattlefieldStatus
 local IsActiveBattlefieldArena = IsActiveBattlefieldArena
+local RELEASE_TYPES = { alpha = "Alpha", beta = "Beta", release = "Release"}
+local PREFIX = "TBC-Classic_v"
+local VERSION_REGEX = PREFIX .. "(%d+%.%d+)%-(%a)"
 
 ---------------------------
 
@@ -21,9 +24,12 @@ local IsActiveBattlefieldArena = IsActiveBattlefieldArena
 local MAJOR, MINOR = "Gladdy", 4
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
-Gladdy.version_major = "TBC-Classic_v1"
-Gladdy.version_minor = "0.4-Beta"
-Gladdy.version = Gladdy.version_major .. "." .. Gladdy.version_minor
+Gladdy.version_major_num = 1
+Gladdy.version_minor_num = 0.05
+Gladdy.version_num = Gladdy.version_major_num + Gladdy.version_minor_num
+Gladdy.version_releaseType = RELEASE_TYPES.beta
+Gladdy.version = PREFIX .. Gladdy.version_num .. "-" .. Gladdy.version_releaseType
+Gladdy.VERSION_REGEX = VERSION_REGEX
 
 LibStub("AceTimer-3.0"):Embed(Gladdy)
 LibStub("AceComm-3.0"):Embed(Gladdy)
@@ -160,6 +166,25 @@ end
 
 ---------------------------
 
+function Gladdy:DeleteUnknownOptions(tbl, refTbl, str)
+    if str == nil then
+        str = "Gladdy.db"
+    end
+    for k,v in pairs(tbl) do
+        if refTbl[k] == nil then
+            --Gladdy:Print("SavedVariable deleted:", str .. "." .. k, "not found!")
+            tbl[k] = nil
+        else
+            if type(v) ~= type(refTbl[k]) then
+                --Gladdy:Print("SavedVariable deleted:", str .. "." .. k, "type error!", "Expected", type(refTbl[k]), "but found", type(v))
+                tbl[k] = nil
+            elseif type(v) == "table" then
+                Gladdy:DeleteUnknownOptions(v, refTbl[k], str .. "." .. k)
+            end
+        end
+    end
+end
+
 function Gladdy:OnInitialize()
     self.dbi = LibStub("AceDB-3.0"):New("GladdyXZ", self.defaults)
     self.dbi.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
@@ -201,10 +226,12 @@ function Gladdy:OnInitialize()
     for k, v in self:IterModules() do
         self:Call(v, "Initialize") -- B.E > A.E :D
     end
+    self:DeleteUnknownOptions(self.db, self.defaults.profile)
 end
 
 function Gladdy:OnProfileChanged()
     self.db = self.dbi.profile
+    self:DeleteUnknownOptions(self.db, self.defaults.profile)
 
     self:HideFrame()
     self:ToggleFrame(3)

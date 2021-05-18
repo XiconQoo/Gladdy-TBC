@@ -16,6 +16,8 @@ local Powerbar = Gladdy:NewModule("Powerbar", 90, {
     powerBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
     powerBarBgColor = { r = 0.3, g = 0.3, b = 0.3, a = 0.7 },
     powerBarFontSize = 10,
+    powerShowSpec = true,
+    powerShowRace = true,
     powerActual = true,
     powerMax = true,
     powerPercentage = false,
@@ -27,6 +29,7 @@ function Powerbar:Initialize()
     self:RegisterMessage("ENEMY_SPOTTED")
     self:RegisterMessage("UNIT_SPEC")
     self:RegisterMessage("UNIT_DEATH")
+    self:RegisterMessage("UNIT_DESTROYED")
 end
 
 function Powerbar:CreateFrame(unit)
@@ -185,9 +188,9 @@ function Powerbar:ENEMY_SPOTTED(unit)
         return
     end
 
-    local raceText = button.raceLoc
+    local raceText = Gladdy.db.powerShowRace and button.raceLoc or ""
 
-    if (button.spec) then
+    if (button.spec and Gladdy.db.powerShowSpec) then
         raceText = button.spec .. " " .. raceText
     end
 
@@ -263,6 +266,15 @@ function Powerbar:UNIT_DEATH(unit)
     powerBar.powerText:SetText("0%")
 end
 
+function Powerbar:UNIT_DESTROYED(unit)
+    local powerBar = self.frames[unit]
+    if (not powerBar) then
+        return
+    end
+    powerBar.energy:SetValue(0)
+    powerBar.powerText:SetText("0%")
+end
+
 local function option(params)
     local defaults = {
         get = function(info)
@@ -272,9 +284,12 @@ local function option(params)
         set = function(info, value)
             local key = info.arg or info[#info]
             Gladdy.dbi.profile[key] = value
-            Gladdy.options.args.Powerbar.args.group.args.border.arg.powerBarBorderSize.max = Gladdy.db.powerBarHeight/2
+            Gladdy.options.args.Powerbar.args.group.args.border.args.powerBarBorderSize.max = Gladdy.db.powerBarHeight/2
             if Gladdy.db.powerBarBorderSize > Gladdy.db.powerBarHeight/2 then
                 Gladdy.db.powerBarBorderSize = Gladdy.db.powerBarHeight/2
+            end
+            for i=1,Gladdy.curBracket do
+                Powerbar:Test("arena" .. i)
             end
             Gladdy:UpdateFrame()
         end,
@@ -366,6 +381,7 @@ function Powerbar:GetOptions()
                             name = L["Font size"],
                             desc = L["Size of the text"],
                             order = 13,
+                            step = 0.1,
                             min = 1,
                             max = 20,
                         }),
@@ -408,14 +424,26 @@ function Powerbar:GetOptions()
                 },
                 powerValues = {
                     type = "group",
-                    name = L["Power Values"],
+                    name = L["Power Bar Text"],
                     order = 4,
                     args = {
                         header = {
                             type = "header",
-                            name = L["Power Values"],
+                            name = L["Power Texts"],
                             order = 1,
                         },
+                        powerShowRace = option({
+                            type = "toggle",
+                            name = L["Show race"],
+                            desc = L["Show race"],
+                            order = 2,
+                        }),
+                        powerShowSpec= option({
+                            type = "toggle",
+                            name = L["Show spec"],
+                            desc = L["Show spec"],
+                            order = 3,
+                        }),
                         powerActual = option({
                             type = "toggle",
                             name = L["Show the actual power"],

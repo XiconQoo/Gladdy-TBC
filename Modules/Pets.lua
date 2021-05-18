@@ -500,20 +500,25 @@ function Pets:GetOptions()
                     name = L["Position"],
                     order = 5,
                     args = {
+                        header = {
+                            type = "header",
+                            name = L["Position"],
+                            order = 1,
+                        },
                         petXOffset = Gladdy:option({
                             type = "range",
                             name = L["Horizontal offset"],
                             order = 22,
-                            min = -400,
-                            max = 400,
+                            min = -600,
+                            max = 600,
                             step = 0.1,
                         }),
                         petYOffset = Gladdy:option({
                             type = "range",
                             name = L["Vertical offset"],
                             order = 23,
-                            min = -400,
-                            max = 400,
+                            min = -600,
+                            max = 600,
                             step = 0.1,
                         }),
                     }

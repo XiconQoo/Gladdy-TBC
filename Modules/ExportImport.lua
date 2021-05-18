@@ -64,9 +64,11 @@ importButton:SetText("Import\n(this will overwrite your current profile!)")
 importButton:SetWidth(200)
 importButton:SetHeight(50)
 importButton:SetCallback("OnClick", function(widget)
-    ExportImport:ApplyImport(import.deserializedTable)
-    Gladdy:UpdateFrame()
+    ExportImport:ApplyImport(import.deserializedTable, Gladdy.db)
     import:Hide()
+    Gladdy:Reset()
+    Gladdy:HideFrame()
+    Gladdy:ToggleFrame(3)
 end)
 import:AddChild(importButton)
 import.button = importButton
@@ -84,25 +86,24 @@ import:AddChild(importClearButton)
 import.clearButton = importClearButton
 
 function ExportImport:CheckDeserializedOptions(tbl, refTbl, str)
-    if str == nil and not tbl.version_major then
-        return false, "Version conflict: version_major not seen"
+    if str == nil and not tbl.version_major_num then
+        return false, "Version conflict: version_major_num not seen"
     end
-    if str == nil and tbl.version_major ~= Gladdy.version_major then
-        return false, "Version conflict: " .. tbl.version_major .. " ~= " .. Gladdy.version_major
+    if str == nil and tbl.version_major_num ~= Gladdy.version_major_num then
+        return false, "Version conflict: " .. tbl.version_major_num .. " ~= " .. Gladdy.version_major_num
     end
     if str == nil then
         str = "Gladdy.db"
-        tbl.version_major = nil
+        tbl.version_major_num = nil
     end
-    if type(tbl) == "table" then
-        for k,v in pairs(tbl) do
-            if refTbl[k] ~= nil then
-                if type(v) ~= type(refTbl[k]) then
-                    return false, str .. "." .. k .. " type error. Expected " .. type(refTbl[k]) .. " found " .. type(v)
-                end
+    for k,v in pairs(tbl) do
+        if refTbl[k] == nil then
+            return false, str .. "." .. k .. " does not exist"
+        else
+            if type(v) ~= type(refTbl[k]) then
+                return false, str .. "." .. k .. " type error. Expected " .. type(refTbl[k]) .. " found " .. type(v)
+            elseif type(v) == "table" then
                 ExportImport:CheckDeserializedOptions(v, refTbl[k], str .. "." .. k)
-            else
-                return false, str .. "." .. k .. " does not exist"
             end
         end
     end
@@ -122,7 +123,7 @@ function ExportImport:GetOptions()
             type = "execute",
             func = function()
                 local db = table_copy(Gladdy.db)
-                db.version_major = Gladdy.version_major
+                db.version_major_num = Gladdy.version_major_num
                 dump = AceSerializer:Serialize(db)
                 local compress_deflate = LibDeflate:CompressZlib(dump)
                 printable_compressed = LibDeflate:EncodeForPrint(compress_deflate)
@@ -164,14 +165,11 @@ function ExportImport:GetOptions()
 end
 
 function ExportImport:ApplyImport(t, table)
-    if table == nil then
-        table = Gladdy.dbi.profile
-    end
     for k,v in pairs(t) do
         if type(v) == "table" then
             ExportImport:ApplyImport(v, table[k])
         else
-            table[k] = v;
+            table[k] = v
         end
     end
 end
@@ -204,7 +202,7 @@ function ExportImport:Decode(str, showError)
         end
         return nil
     end
-    local statusOption, error = ExportImport:CheckDeserializedOptions(deserialized, Gladdy.db)
+    local statusOption, error = ExportImport:CheckDeserializedOptions(deserialized, Gladdy.defaults.profile)
     if not statusOption then
         if showError then
             import.statustext:SetTextColor(1,0,0)

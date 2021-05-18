@@ -1,3 +1,5 @@
+local tbl_sort, select = table.sort, select
+
 local GetSpellInfo = GetSpellInfo
 
 local Gladdy = LibStub("Gladdy")
@@ -155,7 +157,7 @@ function Gladdy:GetImportantAuras()
             priority = 40,
             spellID = 33786,
         },
-        -- Hibername
+        -- Hibernate
         [GetSpellInfo(18658)] = {
             track = AURA_TYPE_DEBUFF,
             duration = 10,
@@ -581,6 +583,14 @@ function Gladdy:GetImportantAuras()
             spellSchool = "magic",
             spellID = 18498,
         },
+        -- Death Wish
+        [GetSpellInfo(12292)] = {
+            track = AURA_TYPE_BUFF,
+            duration = 3,
+            priority = 15,
+            spellSchool = "magic",
+            spellID = 12292,
+        },
 
         -- Grounding Totem Effect
         [GetSpellInfo(8178)] = {
@@ -605,6 +615,285 @@ function Gladdy:GetImportantAuras()
             priority = 15,
             magic = true,
             spellID = 28730,
+        },
+    }
+end
+
+Gladdy.CLASSES = {"MAGE", "PRIEST", "DRUID", "SHAMAN", "PALADIN", "WARLOCK", "WARRIOR", "HUNTER", "ROGUE"}
+tbl_sort(Gladdy.CLASSES)
+Gladdy.RACES = {"Scourge", "BloodElf", "Tauren", "Orc", "Troll", "NightElf", "Draenei", "Human", "Gnome", "Dwarf"}
+tbl_sort(Gladdy.RACES)
+
+function Gladdy:GetCooldownList()
+    return {
+        -- Spell Name			   Cooldown[, Spec]
+        -- Mage
+        ["MAGE"] = {
+            [1953] = 15, -- Blink
+            --[122] 	= 22,    -- Frost Nova
+            --[12051] = 480, --Evocation
+            [2139] = 24, -- Counterspell
+            [45438] = { cd = 300, [L["Frost"]] = 240, }, -- Ice Block
+            [12472] = { cd = 180, spec = L["Frost"], }, -- Icy Veins
+            [31687] = { cd = 180, spec = L["Frost"], }, -- Summon Water Elemental
+            [12043] = { cd = 180, spec = L["Arcane"], }, -- Presence of Mind
+            [11129] = { cd = 180, spec = L["Fire"] }, -- Combustion
+            [120] = { cd = 10,
+                      sharedCD = {
+                          [31661] = true, -- Cone of Cold
+                      }, spec = L["Fire"] }, -- Dragon's Breath
+            [31661] = { cd = 20,
+                        sharedCD = {
+                            [120] = true, -- Cone of Cold
+                        }, spec = L["Fire"] }, -- Dragon's Breath
+            [12042] = { cd = 180, spec = L["Arcane"], }, -- Arcane Power
+            [11958] = { cd = 384, spec = L["Frost"], -- Coldsnap
+                        resetCD = {
+                            [12472] = true,
+                            [45438] = true,
+                            [31687] = true,
+                        },
+            },
+        },
+
+        -- Priest
+        ["PRIEST"] = {
+            [10890] = { cd = 27, [L["Shadow"]] = 23, }, -- Psychic Scream
+            [15487] = { cd = 45, spec = L["Shadow"], }, -- Silence
+            [10060] = { cd = 180, spec = L["Discipline"], }, -- Power Infusion
+            [33206] = { cd = 120, spec = L["Discipline"], }, -- Pain Suppression
+            [34433] = 300, -- Shadowfiend
+        },
+
+        -- Druid
+        ["DRUID"] = {
+            [22812] = 60, -- Barkskin
+            [29166] = 360, -- Innervate
+            [8983] = 60, -- Bash
+            [16689] = 60, -- Natures Grasp
+            [17116] = { cd = 180, spec = L["Restoration"], }, -- Natures Swiftness
+            [33831] = { cd = 180, spec = L["Balance"], }, -- Force of Nature
+        },
+
+        -- Shaman
+        ["SHAMAN"] = {
+            [8042] = { cd = 6, -- Earth Shock
+                       sharedCD = {
+                           [8056] = true, -- Frost Shock
+                           [8050] = true, -- Flame Shock
+                       },
+            },
+            [30823] = { cd = 120, spec = L["Enhancement"], }, -- Shamanistic Rage
+            [16166] = { cd = 180, spec = L["Elemental"], }, -- Elemental Mastery
+            [16188] = { cd = 180, spec = L["Restoration"], }, -- Natures Swiftness
+            [16190] = { cd = 300, spec = L["Restoration"], }, -- Mana Tide Totem
+        },
+
+        -- Paladin
+        ["PALADIN"] = {
+            [10278] = 180, -- Blessing of Protection
+            [1044] = 25, -- Blessing of Freedom
+            [10308] = { cd = 60, [L["Retribution"]] = 40, }, -- Hammer of Justice
+            [642] = { cd = 300, -- Divine Shield
+                      sharedCD = {
+                          cd = 60, -- no actual shared CD but debuff
+                          [31884] = true,
+                      },
+            },
+            [31884] = { cd = 180, spec = L["Retribution"], -- Avenging Wrath
+                        sharedCD = {
+                            cd = 60,
+                            [642] = true,
+                        },
+            },
+            [20066] = { cd = 60, spec = L["Retribution"], }, -- Repentance
+            [31842] = { cd = 180, spec = L["Holy"], }, -- Divine Illumination
+            [31935] = { cd = 30, spec = L["Protection"], }, -- Avengers Shield
+
+        },
+
+        -- Warlock
+        ["WARLOCK"] = {
+            [17928] = 40, -- Howl of Terror
+            [27223] = 120, -- Death Coil
+            --[19647] 	= { cd = 24 },	-- Spell Lock; how will I handle pet spells?
+            [30414] = { cd = 20, spec = L["Destruction"], }, -- Shadowfury
+            [17877] = { cd = 15, spec = L["Destruction"], }, -- Shadowburn
+            [18708] = { cd = 900, spec = L["Demonology"], }, -- Feldom
+        },
+
+        -- Warrior
+        ["WARRIOR"] = {
+            --[[6552] 	= { cd = 10,                              -- Pummel
+               sharedCD = {
+                  [72] = true,
+               },
+            },
+            [72] 	   = { cd = 12,                              -- Shield Bash
+               sharedCD = {
+                  [6552] = true,
+               },
+            }, ]]
+            --[23920] 	= 10,    -- Spell Reflection
+            [3411] = 30, -- Intervene
+            [676] = 60, -- Disarm
+            [5246] = 180, -- Intimidating Shout
+            --[2565] 	= 60,    -- Shield Block
+            [12292] = { cd = 180, spec = L["Arms"], }, -- Death Wish
+            [12975] = { cd = 180, spec = L["Protection"], }, -- Last Stand
+            [12809] = { cd = 30, spec = L["Protection"], }, -- Concussion Blow
+
+        },
+
+        -- Hunter
+        ["HUNTER"] = {
+            [19503] = 30, -- Scatter Shot
+            [19263] = 300, -- Deterrence; not on BM but can't do 2 specs
+            [14311] = { cd = 30, -- Freezing Trap
+                        sharedCD = {
+                            [13809] = true, -- Frost Trap
+                            [34600] = true, -- Snake Trap
+                        },
+            },
+            [13809] = { cd = 30, -- Frost Trap
+                        sharedCD = {
+                            [14311] = true, -- Freezing Trap
+                            [34600] = true, -- Snake Trap
+                        },
+            },
+            [34600] = { cd = 30, -- Snake Trap
+                        sharedCD = {
+                            [14311] = true, -- Freezing Trap
+                            [13809] = true, -- Frost Trap
+                        },
+            },
+            [34490] = { cd = 20, spec = L["Marksmanship"], }, -- Silencing Shot
+            [19386] = { cd = 60, spec = L["Survival"], }, -- Wyvern Sting
+            [19577] = { cd = 60, spec = L["Beast Mastery"], }, -- Intimidation
+            [38373] = { cd = 120, spec = L["Beast Mastery"], }, -- The Beast Within
+        },
+
+        -- Rogue
+        ["ROGUE"] = {
+            [1766] 	= 10,    -- Kick
+            [8643] 	= 20,    -- Kidney Shot
+            [31224] = 60, -- Cloak of Shadow
+            [26889] = { cd = 300, [L["Subtlety"]] = 180, }, -- Vanish
+            [2094] = { cd = 180, [L["Subtlety"]] = 90, }, -- Blind
+            [11305] = { cd = 300, [L["Combat"]] = 180, }, -- Sprint
+            [26669] = { cd = 300, [L["Combat"]] = 180, }, -- Evasion
+            [14177] = { cd = 180, spec = L["Assassination"], }, -- Cold Blood
+            [13750] = { cd = 300, spec = L["Combat"], }, -- Adrenaline Rush
+            [13877] = { cd = 120, spec = L["Combat"], }, -- Blade Flurry
+            [36554] = { cd = 30, spec = L["Subtlety"], }, -- Shadowstep
+            [14185] = { cd = 600, spec = L["Subtlety"], -- Preparation
+                        resetCD = {
+                            [26669] = true,
+                            [11305] = true,
+                            [26889] = true,
+                            [14177] = true,
+                            [36554] = true,
+                        },
+            },
+        },
+        ["Scourge"] = {
+
+        },
+        ["BloodElf"] = {
+
+        },
+        ["Tauren"] = {
+
+        },
+        ["Orc"] = {
+
+        },
+        ["Troll"] = {
+
+        },
+        ["NightElf"] = {
+            [2651] = { cd = 180, spec = L["Discipline"], }, -- Elune's Grace
+            [10797] = { cd = 30, spec = L["Discipline"], }, -- Star Shards
+        },
+        ["Draenei"] = {
+            [32548] = { cd = 300, spec = L["Discipline"], }, -- Hymn of Hope
+        },
+        ["Human"] = {
+            [13908] = { cd = 600, spec = L["Discipline"], }, -- Desperate Prayer
+        },
+        ["Gnome"] = {
+        },
+        ["Dwarf"] = {
+            [13908] = { cd = 600, spec = L["Discipline"], }, -- Desperate Prayer
+        },
+    }
+end
+
+function Gladdy:Racials()
+    return {
+        ["Scourge"] = {
+            [7744] = true, -- Will of the Forsaken
+            duration = 120,
+            spellName = select(1, GetSpellInfo(7744)),
+            texture = select(3, GetSpellInfo(7744))
+        },
+        ["BloodElf"] = {
+            [28730] = true, -- Arcane Torrent
+            duration = 120,
+            spellName = select(1, GetSpellInfo(28730)),
+            texture = select(3, GetSpellInfo(28730))
+        },
+        ["Tauren"] = {
+            [20549] = true, -- War Stomp
+            duration = 120,
+            spellName = select(1, GetSpellInfo(20549)),
+            texture = select(3, GetSpellInfo(20549))
+        },
+        ["Orc"] = {
+            [20572] = true,
+            [33697] = true,
+            [33702] = true,
+            duration = 120,
+            spellName = select(1, GetSpellInfo(20572)),
+            texture = select(3, GetSpellInfo(20572))
+        },
+        ["Troll"] = {
+            [20554] = true,
+            [26296] = true,
+            [26297] = true,
+            duration = 180,
+            spellName = select(1, GetSpellInfo(20554)),
+            texture = select(3, GetSpellInfo(20554))
+        },
+        ["NightElf"] = {
+            [20580] = true,
+            duration = 10,
+            spellName = select(1, GetSpellInfo(20580)),
+            texture = select(3, GetSpellInfo(20580))
+        },
+        ["Draenei"] = {
+            [28880] = true,
+            duration = 180,
+            spellName = select(1, GetSpellInfo(28880)),
+            texture = select(3, GetSpellInfo(28880))
+        },
+        ["Human"] = {
+            [20600] = true, -- Perception
+            duration = 180,
+            spellName = select(1, GetSpellInfo(20600)),
+            texture = select(3, GetSpellInfo(20600))
+        },
+        ["Gnome"] = {
+            [20589] = true, -- Escape Artist
+            duration = 105,
+            spellName = select(1, GetSpellInfo(20589)),
+            texture = select(3, GetSpellInfo(20589))
+        },
+        ["Dwarf"] = {
+            [20594] = true, -- Stoneform
+            duration = 180,
+            spellName = select(1, GetSpellInfo(20594)),
+            texture = select(3, GetSpellInfo(20594))
         },
     }
 end
