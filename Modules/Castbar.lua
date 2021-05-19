@@ -57,6 +57,7 @@ end
 
 function Castbar:CreateFrame(unit)
     local castBar = CreateFrame("Frame", nil, Gladdy.buttons[unit], BackdropTemplateMixin and "BackdropTemplate")
+    castBar:EnableMouse(false)
     castBar.unit = unit
 
     castBar:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.castBarBorderStyle),
@@ -85,6 +86,7 @@ function Castbar:CreateFrame(unit)
 
     castBar.icon = CreateFrame("Frame", nil, castBar)
     castBar.icon.texture = castBar.icon:CreateTexture(nil, "BACKGROUND")
+    castBar.icon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
     castBar.icon.texture:SetAllPoints(castBar.icon)
     castBar.icon.texture.overlay = castBar.icon:CreateTexture(nil, "BORDER")
     castBar.icon.texture.overlay:SetAllPoints(castBar.icon.texture)

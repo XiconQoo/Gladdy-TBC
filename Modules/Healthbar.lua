@@ -19,6 +19,7 @@ local Healthbar = Gladdy:NewModule("Healthbar", 100, {
     healthBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
     healthBarNameFontSize = 12,
     healthBarHealthFontSize = 12,
+    healthNameToArenaId = false,
     healthName = true,
     healthActual = false,
     healthMax = true,
@@ -27,6 +28,7 @@ local Healthbar = Gladdy:NewModule("Healthbar", 100, {
 
 function Healthbar:Initialize()
     self.frames = {}
+    self:RegisterMessage("JOINED_ARENA")
     self:RegisterMessage("ENEMY_SPOTTED")
     self:RegisterMessage("UNIT_DESTROYED")
     self:RegisterMessage("UNIT_DEATH")
@@ -36,6 +38,7 @@ function Healthbar:CreateFrame(unit)
     local button = Gladdy.buttons[unit]
 
     local healthBar = CreateFrame("Frame", nil, Gladdy.buttons[unit], BackdropTemplateMixin and "BackdropTemplate")
+    healthBar:EnableMouse(false)
     healthBar:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.healthBarBorderStyle),
                                    edgeSize = Gladdy.db.healthBarBorderSize })
     healthBar:SetBackdropBorderColor(Gladdy.db.healthBarBorderColor.r, Gladdy.db.healthBarBorderColor.g, Gladdy.db.healthBarBorderColor.b, Gladdy.db.healthBarBorderColor.a)
@@ -210,8 +213,18 @@ function Healthbar:Test(unit)
         return
     end
 
+    self:JOINED_ARENA()
     self:ENEMY_SPOTTED(unit)
     self:UNIT_HEALTH(unit, button.health, button.healthMax)
+end
+
+function Healthbar:JOINED_ARENA()
+    if Gladdy.db.healthNameToArenaId and Gladdy.db.healthName then
+        for i=1,Gladdy.curBracket do
+            local healthBar = self.frames["arena" .. i]
+            healthBar.nameText:SetText("Arena" .. i)
+        end
+    end
 end
 
 function Healthbar:ENEMY_SPOTTED(unit)
@@ -228,7 +241,10 @@ function Healthbar:ENEMY_SPOTTED(unit)
         healthBar.hp:SetValue(health)
         Healthbar:SetHealthText(healthBar, health, healthMax)
     end
-    healthBar.nameText:SetText(button.name)
+    if Gladdy.db.healthName and not Gladdy.db.healthNameToArenaId then
+        healthBar.nameText:SetText(button.name)
+    end
+
     healthBar.hp:SetStatusBarColor(RAID_CLASS_COLORS[button.class].r, RAID_CLASS_COLORS[button.class].g, RAID_CLASS_COLORS[button.class].b, 1)
 end
 
@@ -459,27 +475,34 @@ function Healthbar:GetOptions()
                         },
                         healthName = option({
                             type = "toggle",
-                            name = L["Show the name"],
+                            name = L["Show name text"],
                             desc = L["Show the units name"],
-                            order = 30,
+                            order = 2,
+                        }),
+                        healthNameToArenaId = option({
+                            type = "toggle",
+                            name = L["Show ArenaX"],
+                            desc = L["Show Arena1-5 as name instead"],
+                            order = 3,
+                            disabled = function() return not Gladdy.db.healthName end
                         }),
                         healthActual = option({
                             type = "toggle",
                             name = L["Show the actual health"],
                             desc = L["Show the actual health on the health bar"],
-                            order = 31,
+                            order = 4,
                         }),
                         healthMax = option({
                             type = "toggle",
                             name = L["Show max health"],
                             desc = L["Show max health on the health bar"],
-                            order = 32,
+                            order = 5,
                         }),
                         healthPercentage = option({
                             type = "toggle",
                             name = L["Show health percentage"],
                             desc = L["Show health percentage on the health bar"],
-                            order = 33,
+                            order = 6,
                         }),
                     },
                 },

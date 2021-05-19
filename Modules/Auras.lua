@@ -42,6 +42,7 @@ end
 
 function Auras:CreateFrame(unit)
     local auraFrame = CreateFrame("Frame", nil, Gladdy.modules.Classicon.frames[unit])
+    auraFrame:EnableMouse(false)
     auraFrame:SetFrameStrata("MEDIUM")
     auraFrame:SetFrameLevel(3)
 
@@ -59,6 +60,7 @@ function Auras:CreateFrame(unit)
     auraFrame.cooldownFrame:SetFrameLevel(5)
 
     auraFrame.icon = auraFrame:CreateTexture(nil, "BACKGROUND")
+    auraFrame.icon:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
     auraFrame.icon:SetAllPoints(auraFrame)
 
     auraFrame.icon.overlay = auraFrame.cooldownFrame:CreateTexture(nil, "OVERLAY")

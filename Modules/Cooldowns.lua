@@ -93,11 +93,13 @@ function Cooldowns:CreateFrame(unit)
     local button = Gladdy.buttons[unit]
     -- Cooldown frame
     local spellCooldownFrame = CreateFrame("Frame", nil, button)
+    spellCooldownFrame:EnableMouse(false)
     for x = 1, 14 do
         local icon = CreateFrame("Frame", nil, spellCooldownFrame)
         icon:EnableMouse(false)
         icon:SetFrameLevel(3)
         icon.texture = icon:CreateTexture(nil, "BACKGROUND")
+        icon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
         icon.texture:SetAllPoints(icon)
 
         icon.cooldown = CreateFrame("Cooldown", nil, icon, "CooldownFrameTemplate")

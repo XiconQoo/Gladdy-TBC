@@ -77,8 +77,10 @@ end
 
 function Racial:CreateFrame(unit)
     local racial = CreateFrame("Button", "GladdyTrinketButton" .. unit, Gladdy.buttons[unit])
+    racial:EnableMouse(false)
     racial.texture = racial:CreateTexture(nil, "BACKGROUND")
     racial.texture:SetAllPoints(racial)
+    racial.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
     --racial.texture:SetTexture("Interface\\Icons\\INV_Jewelry_TrinketPVP_02")
 
     racial.cooldown = CreateFrame("Cooldown", nil, racial, "CooldownFrameTemplate")

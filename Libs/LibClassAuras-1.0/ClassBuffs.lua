@@ -59,41 +59,107 @@ Buff({ 33891 }, { buffType = "form"}, "DRUID") -- Tree of Life
 Buff({ 16864 }, { buffType = "magic"}, "DRUID") -- Omen of Clarity
 Buff({ 16689, 16810, 16811, 16812, 16813, 17329, 27009 }, { buffType = "magic"}, "DRUID") -- Nature's Grasp
 Buff({ 45281, 45282, 45283 }, { buffType = "magic"}, "DRUID") -- Natural Perfection
-Buff({ 16188 }, { buffType = "magic"}, "DRUID") -- Nature's Swiftness
+Buff({ 17116 }, { buffType = "magic"}, "DRUID") -- Nature's Swiftness
 Buff({ 17007 }, { buffType = "aura"}, "DRUID") -- Leader of the Pack
 
 -------------
--- WARRIOR
+-- WARRIOR -- TODO
 -------------
---Buff({ 29703 }, { buffType = "physical"}, "WARRIOR") -- Dazed
+Buff({ 29838 }, { buffType = "physical"}, "WARRIOR") -- Second Wind
+Buff({ 12292 }, { buffType = "physical"}, "WARRIOR") -- Death Wish
+Buff({ 6673 }, { buffType = "physical"}, "WARRIOR") -- Battle Shout
+Buff({ 469 }, { buffType = "physical"}, "WARRIOR") -- Commanding Shout
+Buff({ 12328 }, { buffType = "physical"}, "WARRIOR") -- Sweeping Strikes
+Buff({ 30032 }, { buffType = "physical"}, "WARRIOR") -- Rampage
+Buff({ 2687 }, { buffType = "physical"}, "WARRIOR") -- Blood Rage
+Buff({ 20230 }, { buffType = "physical"}, "WARRIOR") -- Retaliation
+Buff({ 871 }, { buffType = "physical"}, "WARRIOR") -- Shield Wall
+Buff({ 18499 }, { buffType = "physical"}, "WARRIOR") -- Berserker Rage
+Buff({ 23885 }, { buffType = "physical"}, "WARRIOR") -- Bloodthirst
+Buff({ 3411 }, { buffType = "physical"}, "WARRIOR") -- Intervene
 
 
 --------------
--- ROGUE
+-- ROGUE -- TODO
 --------------
 
 Buff({ 2983 }, { buffType = "physical" }, "ROGUE") -- Sprint
 Buff({ 5277 }, { buffType = "physical" }, "ROGUE") -- Evasion
+Buff({ 31224 }, { buffType = "physical" }, "ROGUE") -- Cloak of Shadows
+Buff({ 14278 }, { buffType = "physical" }, "ROGUE") -- Ghostly Strike
 
 
 ------------
--- WARLOCK
+-- WARLOCK --TODO
 ------------
-Buff({ 19028 }, { buffType = "immune"}, "WARLOCK") -- Soul Link
-Buff({ 23759 }, { buffType = "immune"}, "WARLOCK") -- Master Demonologist
+Buff({ 19028 }, { buffType = "aura"}, "WARLOCK") -- Soul Link
+Buff({ 696 }, { buffType = "aura"}, "WARLOCK") -- Demon Skin
+Buff({ 706 }, { buffType = "aura"}, "WARLOCK") -- Demon Armor
+Buff({ 28176 }, { buffType = "aura"}, "WARLOCK") -- Fel Armor
+Buff({ 23759 }, { buffType = "aura"}, "WARLOCK") -- Master Demonologist
+Buff({ 34936 }, { buffType = "magic"}, "WARLOCK") -- Backlash
+Buff({ 5697 }, { buffType = "magic"}, "WARLOCK") -- Unending Breath
+Buff({ 132 }, { buffType = "magic"}, "WARLOCK") -- Detect Invisibility
+Buff({ 1949 }, { buffType = "aura"}, "WARLOCK") -- Hellfire
+Buff({ 6229 }, { buffType = "magic"}, "WARLOCK") -- Shadow Ward
+Buff({ 19480 }, { buffType = "magic"}, "WARLOCK") -- Paranoia
+Buff({ 7812 }, { buffType = "magic"}, "WARLOCK") -- Sacrifice
+Buff({ 2947 }, { buffType = "magic"}, "WARLOCK") -- Fire Shield
+
 
 ---------------
 -- SHAMAN
 ---------------
 
 Buff({ 8178 } ,{ buffType = "magic" }, "SHAMAN") -- Grounding Totem Effect
-
+Buff({ 30823 } ,{ buffType = "magic" }, "SHAMAN") -- Shamanistic Rage
+Buff({ 32182 } ,{ buffType = "magic" }, "SHAMAN") -- Heroism
+Buff({ 2825 } ,{ buffType = "magic" }, "SHAMAN") -- Bloodlust
+Buff({ 974 } ,{ buffType = "magic" }, "SHAMAN") -- Earth Shield
+Buff({ 24398 } ,{ buffType = "magic" }, "SHAMAN") -- Water Shield
+Buff({ 324 } ,{ buffType = "magic" }, "SHAMAN") -- Lightning Shield
+Buff({ 16188 } ,{ buffType = "magic" }, "SHAMAN") -- Nature's Swiftness
+Buff({ 16166 } ,{ buffType = "magic" }, "SHAMAN") -- Elemental Mastery
 
 --------------
--- PALADIN
+-- PALADIN --TODO
 --------------
-
---Buff( { 25771 }, { buffType = "immune"}, "PALADIN") -- Forbearance
+--Blessings
+Buff( { 1022, 5599, 10278 }, { buffType = "magic"}, "PALADIN") -- Blessing of Protection
+Buff( { 6940 }, { buffType = "magic"}, "PALADIN") -- Blessing of Sacrifice
+Buff( { 1044 }, { buffType = "magic"}, "PALADIN") -- Blessing of Freedom
+Buff( { 19740, 19834, 19835, 19836, 19837, 19838, 25291, 27140 }, { buffType = "magic"}, "PALADIN") -- Blessing of Might
+Buff( { 19742 }, { buffType = "magic"}, "PALADIN") -- Blessing of Wisdom
+Buff( { 20217 }, { buffType = "magic"}, "PALADIN") -- Blessing of Kings
+Buff( { 19977 }, { buffType = "magic"}, "PALADIN") -- Blessing of Light
+Buff( { 1038 }, { buffType = "magic"}, "PALADIN") -- Blessing of Salvation
+Buff( { 20911 }, { buffType = "magic"}, "PALADIN") -- Blessing of Sanctuary
+Buff( { 25898 }, { buffType = "magic"}, "PALADIN") -- Greater Blessing of Kings
+Buff( { 25890 }, { buffType = "magic"}, "PALADIN") -- Greater Blessing of Light
+Buff( { 25782 }, { buffType = "magic"}, "PALADIN") -- Greater Blessing of Might
+Buff( { 25895 }, { buffType = "magic"}, "PALADIN") -- Greater Blessing of Salvation
+Buff( { 25899 }, { buffType = "magic"}, "PALADIN") -- Greater Blessing of Sanctuary
+Buff( { 25894 }, { buffType = "magic"}, "PALADIN") -- Greater Blessing of Wisdom
+Buff( { 642 }, { buffType = "magic"}, "PALADIN") -- Divine Shield
+--Auras
+Buff( { 465, 10290, 643, 10291, 1032, 10292, 10293, 27149 }, { buffType = "aura"}, "PALADIN") -- Devotion Aura
+Buff( { 7294 }, { buffType = "aura"}, "PALADIN") -- Retribution Aura
+Buff( { 19746 }, { buffType = "aura"}, "PALADIN") -- Concentration Aura
+Buff( { 19876 }, { buffType = "aura"}, "PALADIN") -- Shadow Resistance Aura
+Buff( { 20218 }, { buffType = "aura"}, "PALADIN") -- Sanctity Aura
+Buff( { 19888 }, { buffType = "aura"}, "PALADIN") -- Frost Resistance Aura
+Buff( { 19891 }, { buffType = "aura"}, "PALADIN") -- Fire Resistance Aura
+Buff( { 32223 }, { buffType = "aura"}, "PALADIN") -- Crusader Aura
+--Seals
+Buff( { 20154, 20287, 20288, 20289, 20290, 20291, 20292, 20293, 27155 }, { buffType = "magic"}, "PALADIN") -- Seal of Righteousness
+Buff( { 31892 }, { buffType = "magic"}, "PALADIN") -- Seal of Blood
+Buff( { 20375 }, { buffType = "magic"}, "PALADIN") -- Seal of Command
+Buff( { 20164 }, { buffType = "magic"}, "PALADIN") -- Seal of Justice
+Buff( { 20165 }, { buffType = "magic"}, "PALADIN") -- Seal of Light
+Buff( { 15277 }, { buffType = "magic"}, "PALADIN") -- Seal of Reckoning
+Buff( { 31801 }, { buffType = "magic"}, "PALADIN") -- Seal of Vengeance
+Buff( { 20166 }, { buffType = "magic"}, "PALADIN") -- Seal of Wisdom
+Buff( { 21082 }, { buffType = "magic"}, "PALADIN") -- Seal of the Crusade
 
 
 -------------

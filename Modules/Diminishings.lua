@@ -67,6 +67,7 @@ end
 
 function Diminishings:CreateFrame(unit)
     local drFrame = CreateFrame("Frame", nil, Gladdy.buttons[unit])
+    drFrame:EnableMouse(false)
 
     for i = 1, 16 do
         local icon = CreateFrame("Frame", "GladdyDr" .. unit .. "Icon" .. i, drFrame)
@@ -74,6 +75,7 @@ function Diminishings:CreateFrame(unit)
         icon:EnableMouse(false)
         icon:SetFrameLevel(3)
         icon.texture = icon:CreateTexture(nil, "BACKGROUND")
+        icon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
         icon.texture:SetAllPoints(icon)
         icon:SetScript("OnUpdate", function(self, elapsed)
             if (self.active) then
@@ -229,9 +231,9 @@ function Diminishings:UpdateFrame(unit)
             icon.border:SetTexture(Gladdy.db.drBorderStyle)
         end
 
-        icon.texture:SetTexCoord(.1, .9, .1, .9)
-        icon.texture:SetPoint("TOPLEFT", icon, "TOPLEFT", 2, -2)
-        icon.texture:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", -2, 2)
+        --icon.texture:SetTexCoord(.1, .9, .1, .9)
+        --icon.texture:SetPoint("TOPLEFT", icon, "TOPLEFT", 2, -2)
+        --icon.texture:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", -2, 2)
     end
 end
 

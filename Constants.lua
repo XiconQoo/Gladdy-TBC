@@ -366,6 +366,13 @@ function Gladdy:GetImportantAuras()
             priority = 10,
             spellID = 1044,
         },
+        -- Blessing of Sacrifice
+        [GetSpellInfo(6940)] = {
+            track = AURA_TYPE_BUFF,
+            duration = 30,
+            priority = 12,
+            spellID = 6940,
+        },
         -- Divine Shield
         [GetSpellInfo(642)] = {
             track = AURA_TYPE_BUFF,
@@ -598,6 +605,14 @@ function Gladdy:GetImportantAuras()
             duration = 0,
             priority = 20,
             spellID = 8178
+        },
+        --Intervene
+        [GetSpellInfo(3411)] = {
+            track = AURA_TYPE_BUFF,
+            duration = 10,
+            priority = 10,
+            spellSchool = "physical",
+            spellID = 3411,
         },
 
 

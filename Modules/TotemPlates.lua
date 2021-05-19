@@ -26,7 +26,7 @@ local totemData = {
     [string_lower("Disease Cleansing Totem")] = {id = 8170,texture = select(3, GetSpellInfo(8170)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Disease Cleansing Totem
     [string_lower("Healing Stream Totem")] = {id = 5394,texture = select(3, GetSpellInfo(5394)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Healing Stream Totem
     [string_lower("Mana Tide Totem")] = {id = 16190,texture = select(3, GetSpellInfo(16190)), color = {r = 0.078, g = 0.9, b = 0.16, a = 1}, enabled = true, priority = 3}, -- Mana Tide Totem
-    [string_lower("Mana Spring Totem")] = {id = 5675,texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_ManaRegenTotem_edit", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 1}, -- Mana Spring Totem
+    [string_lower("Mana Spring Totem")] = {id = 5675,texture = select(3, GetSpellInfo(5675)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 1}, -- Mana Spring Totem
     -- Earth
     [string_lower("Earthbind Totem")] = {id = 2484,texture = select(3, GetSpellInfo(2484)), color = {r = 0.5, g = 0.5, b = 0.5, a = 1}, enabled = true, priority = 1}, -- Earthbind Totem
     [string_lower("Stoneclaw Totem")] = {id = 5730,texture = select(3, GetSpellInfo(5730)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Stoneclaw Totem
@@ -36,13 +36,13 @@ local totemData = {
     [string_lower("Tremor Totem")] = {id = 8143,texture = select(3, GetSpellInfo(8143)), color = {r = 1, g = 0.9, b = 0.1, a = 1}, enabled = true, priority = 3}, -- Tremor Totem
     -- Air
     [string_lower("Grounding Totem")] = {id = 8177,texture = select(3, GetSpellInfo(8177)), color = {r = 0, g = 0.53, b = 0.92, a = 1}, enabled = true, priority = 3}, -- Grounding Totem
-    [string_lower("Grace of Air Totem")] = {id = 8835,texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_InvisibilityTotem_edit", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Grace of Air Totem
+    [string_lower("Grace of Air Totem")] = {id = 8835,texture = select(3, GetSpellInfo(8835)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Grace of Air Totem
     [string_lower("Nature Resistance Totem")] = {id = 10595,texture = select(3, GetSpellInfo(10595)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Nature Resistance Totem
-    [string_lower("Windfury Totem")] = {id = 8512,texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_Windfury_edit", color = {r = 0.96, g = 0, b = 0.07, a = 1}, enabled = true, priority = 2}, -- Windfury Totem
-    [string_lower("Sentry Totem")] = {id = 6495, texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_RemoveCurse_edit", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Sentry Totem
+    [string_lower("Windfury Totem")] = {id = 8512,texture = select(3, GetSpellInfo(8512)), color = {r = 0.96, g = 0, b = 0.07, a = 1}, enabled = true, priority = 2}, -- Windfury Totem
+    [string_lower("Sentry Totem")] = {id = 6495, texture = select(3, GetSpellInfo(6495)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Sentry Totem
     [string_lower("Windwall Totem")] = {id = 15107,texture = select(3, GetSpellInfo(15107)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Windwall Totem
-    [string_lower("Wrath of Air Totem")] = {id = 3738,texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_SlowingTotem_edit", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Wrath of Air Totem
-    [string_lower("Tranquil Air Totem")] = {id = 25908,texture = "Interface\\Icons\\INV_Staff_07", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Tranquil Air Totem
+    [string_lower("Wrath of Air Totem")] = {id = 3738,texture = select(3, GetSpellInfo(3738)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Wrath of Air Totem
+    [string_lower("Tranquil Air Totem")] = {id = 25908,texture = select(3, GetSpellInfo(25908)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Tranquil Air Totem
 }
 local localizedTotemData = {
     ["default"] = {
@@ -77,38 +77,6 @@ local localizedTotemData = {
         [string_lower(select(1, GetSpellInfo(3738)))] = totemData[string_lower("Wrath of Air Totem")], -- Wrath of Air Totem
         [string_lower(select(1, GetSpellInfo(25908)))] = totemData[string_lower("Tranquil Air Totem")], -- Tranquil Air Totem
     },
-    ["frFR"] = {
-        [string_lower("Totem incendiaire")] = totemData[string_lower("Searing Totem")],
-        [string_lower("Totem Langue de feu")] = totemData[string_lower("Flametongue Totem")],
-        [string_lower("Totem de lien terrestre")] = totemData[string_lower("Earthbind Totem")],
-        [string_lower("Totem de Griffes de pierre")] = totemData[string_lower("Stoneclaw Totem")],
-        [string_lower("Totem Nova de feu")] = totemData[string_lower("Fire Nova Totem")],
-        [string_lower("Totem de Magma")] = totemData[string_lower("Magma Totem")],
-        [string_lower("Totem de courroux")] = totemData[string_lower("Totem of Wrath")],
-        [string_lower("Totem d'\195\169lementaire de feu")] = totemData[string_lower("Fire Elemental Totem")],
-		[string_lower("Totem d'\195\169l\195\169mentaire de feu")] = totemData[string_lower("Fire Elemental Totem")],
-        [string_lower("Totem de Peau de pierre")] = totemData[string_lower("Stoneskin Totem")],
-        [string_lower("Totem d'\195\169lementaire de terre")] = totemData[string_lower("Earth Elemental Totem")],
-		[string_lower("Totem d'\195\169l\195\169mentaire de terre")] = totemData[string_lower("Earth Elemental Totem")],
-        [string_lower("Totem de Force de la Terre")] = totemData[string_lower("Strength of Earth Totem")],
-        [string_lower("Totem de r\195\169sistance au Givre")] = totemData[string_lower("Frost Resistance Totem")],
-        [string_lower("Totem de r\195\169sistance au Feu")] = totemData[string_lower("Fire Resistance Totem")],
-        [string_lower("Totem de Gl\195\168be")] = totemData[string_lower("Grounding Totem")],
-        [string_lower("Totem de Gr\195\162ce a\195\169rienne")] = totemData[string_lower("Grace of Air Totem")],
-        [string_lower("Totem de R\195\169sistance \195\160 la Nature")] = totemData[string_lower("Nature Resistance Totem")],
-        [string_lower("Totem Furie-des-vents")] = totemData[string_lower("Windfury Totem")],
-        [string_lower("Totem Sentinelle")] = totemData[string_lower("Sentry Totem")],
-        [string_lower("Totem de Mur des vents")] = totemData[string_lower("Windwall Totem")],
-        [string_lower("Totem de courroux de l'air")] = totemData[string_lower("Wrath of Air Totem")],
-        [string_lower("Totem de S\195\169isme")] = totemData[string_lower("Tremor Totem")],
-        [string_lower("Totem gu\195\169risseur")] = totemData[string_lower("Healing Stream Totem")],
-        [string_lower("Totem de Purification du poison")] = totemData[string_lower("Poison Cleansing Totem")],
-        [string_lower("Totem Fontaine de mana")] = totemData[string_lower("Mana Spring Totem")],
-        [string_lower("Totem de Purification des maladies")] = totemData[string_lower("Disease Cleansing Totem")],
-        [string_lower("Totem de purification")] = totemData[string_lower("Disease Cleansing Totem")],
-        [string_lower("Totem de Vague de mana")] = totemData[string_lower("Mana Tide Totem")],
-        [string_lower("Totem de Tranquillit\195\169 de l'air")] = totemData[string_lower("Tranquil Air Totem")],
-    }
 }
 
 local function GetTotemColorDefaultOptions()
@@ -329,6 +297,7 @@ function TotemPlates:NAME_PLATE_UNIT_ADDED(...)
             nameplate.gladdyTotemFrame:SetWidth(Gladdy.db.npTotemPlatesSize * Gladdy.db.npTotemPlatesWidthFactor)
             nameplate.gladdyTotemFrame:SetHeight(Gladdy.db.npTotemPlatesSize)
             nameplate.gladdyTotemFrame.totemIcon = nameplate.gladdyTotemFrame:CreateTexture(nil, "BACKGROUND")
+            nameplate.gladdyTotemFrame.totemIcon:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
             nameplate.gladdyTotemFrame.totemIcon:ClearAllPoints()
             nameplate.gladdyTotemFrame.totemIcon:SetPoint("TOPLEFT", nameplate.gladdyTotemFrame, "TOPLEFT")
             nameplate.gladdyTotemFrame.totemIcon:SetPoint("BOTTOMRIGHT", nameplate.gladdyTotemFrame, "BOTTOMRIGHT")

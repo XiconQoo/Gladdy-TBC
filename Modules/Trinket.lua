@@ -71,9 +71,11 @@ end
 
 function Trinket:CreateFrame(unit)
     local trinket = CreateFrame("Button", "GladdyTrinketButton" .. unit, Gladdy.buttons[unit])
+    trinket:EnableMouse(false)
     trinket.texture = trinket:CreateTexture(nil, "BACKGROUND")
     trinket.texture:SetAllPoints(trinket)
     trinket.texture:SetTexture("Interface\\Icons\\INV_Jewelry_TrinketPVP_02")
+    trinket.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
 
     trinket.cooldown = CreateFrame("Cooldown", nil, trinket, "CooldownFrameTemplate")
     trinket.cooldown.noCooldownCount = true --Gladdy.db.trinketDisableOmniCC
