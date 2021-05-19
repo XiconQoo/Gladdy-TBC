@@ -1,4 +1,4 @@
-local type, pairs, tinsert, tsort, tostring = type, pairs, table.insert, table.sort, tostring
+local type, pairs, tinsert, tsort, tostring, str_match, tonumber = type, pairs, table.insert, table.sort, tostring, string.match, tonumber
 
 local InterfaceOptionsFrame_OpenToFrame = InterfaceOptionsFrame_OpenToFrame
 local GetSpellInfo = GetSpellInfo
@@ -26,15 +26,13 @@ Gladdy.defaults = {
 
 SLASH_GLADDY1 = "/gladdy"
 SlashCmdList["GLADDY"] = function(msg)
-    if (msg == "test2") then
-        Gladdy:ToggleFrame(2)
-    elseif (msg == "test5") then
-        Gladdy:ToggleFrame(5)
-    elseif (msg:find("test")) then
+    if (str_match(msg, "test[1-5]")) then
+        local _, num = str_match(msg, "(test)([1-5])")
+        Gladdy:ToggleFrame(tonumber(num))
+    elseif (msg == "test") then
         Gladdy:ToggleFrame(3)
     elseif (msg == "ui" or msg == "options" or msg == "config") then
         LibStub("AceConfigDialog-3.0"):Open("Gladdy")
-        --Gladdy:ShowOptions()
     elseif (msg == "reset") then
         Gladdy.dbi:ResetProfile()
     elseif (msg == "hide") then
@@ -43,7 +41,8 @@ SlashCmdList["GLADDY"] = function(msg)
     else
         Gladdy:Print(L["Valid slash commands are:"])
         Gladdy:Print("/gladdy ui")
-        Gladdy:Print("/gladdy test2-5")
+        Gladdy:Print("/gladdy test")
+        Gladdy:Print("/gladdy test1-5")
         Gladdy:Print("/gladdy hide")
         Gladdy:Print("/gladdy reset")
     end
