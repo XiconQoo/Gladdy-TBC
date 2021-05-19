@@ -207,8 +207,13 @@ function Powerbar:UNIT_SPEC(unit, spec)
     if (not powerBar or not button) then
         return
     end
+    local raceText = Gladdy.db.powerShowRace and button.raceLoc or ""
 
-    powerBar.raceText:SetText(spec .. " " .. button.raceLoc)
+    if (button.spec and Gladdy.db.powerShowSpec) then
+        raceText = spec .. " " .. raceText
+    end
+
+    powerBar.raceText:SetText(raceText)
 end
 
 function Powerbar:UNIT_POWER(unit, power, powerMax, powerType)
