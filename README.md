@@ -1,7 +1,7 @@
 # Gladdy - TBC
 
 ### The most powerful arena addon for WoW TBC 2.5.1
-## [v1.06-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v1.06-Beta/Gladdy_TBC-Classic_v1.06-Beta.zip)
+## [v1.07-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v1.07-Beta/Gladdy_TBC-Classic_v1.07-Beta.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -17,11 +17,15 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 - Announcement (drink, trinket usage, spec detection ...)
 - ArenaCountDown
 - Auras (show important (de)buffs in the class icon)
+- BuffsDebuffs (show buffs and debuffs on arena frames - can be filtered)
+- ClassIcon (or specicon, once detected)
+- CombatIndicator 
 - Cooldown (tracks important cooldowns)
 - Diminishing (tracks DRs)
 - ExportImport (share your profile with your friends in the form of a string, which can be imported)
 - Highlight (highlights focus and target)
 - Pets (show arena pets)
+- Racial Spells
 - TotemPlates (show totem icons instead of normal nameplates)
 - Trinket (tracks trinket usage)
 - VersionCheck (checks if you use an older version that your teammate)
@@ -34,6 +38,20 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 <img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/sample3.png" width="48.5%">
 
 ### Changes
+
+#### v1.07-Beta
+
+- CombatIndicator module added
+- spec icon option added to Classicon module
+- arena1-5 for name option added
+- add a couple buffs to LibClassAuras
+- add blessing of sacrifice and intervene to auras
+- general options updated to apply font/borders/etc for all frames
+- XiconProfiles updated
+- /gladdy test1-5 now possible
+- fix PowerBar text updates
+- click through frames exept health/power bar
+- add mask texture for icons
 
 #### v1.06-Beta
 - fixed BuffsDebuff module
