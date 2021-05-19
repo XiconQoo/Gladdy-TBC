@@ -34,4 +34,5 @@ Modules\VersionCheck.lua
 Modules\XiconProfiles.lua
 Modules\Pets.lua
 Modules\ExportImport.lua
+Modules\CombatIndicator.lua
 EventListener.lua
