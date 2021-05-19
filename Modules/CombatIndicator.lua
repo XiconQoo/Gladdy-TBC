@@ -68,16 +68,8 @@ function CombatIndicator:UpdateFrame(unit)
     ciFrame.border:SetVertexColor(Gladdy.db.ciBorderColor.r, Gladdy.db.ciBorderColor.g, Gladdy.db.ciBorderColor.b, Gladdy.db.ciBorderColor.a)
 
     ciFrame:ClearAllPoints()
-    local parent = Gladdy.buttons[unit][Gladdy.db.ciAnchor]
-    if (Gladdy.db.ciPos == "RIGHT") then
-        ciFrame:SetPoint(ANCHORS[Gladdy.db.ciPos], parent, Gladdy.db.ciPos, Gladdy.db.padding + Gladdy.db.ciXOffset, Gladdy.db.ciYOffset)
-    elseif (Gladdy.db.ciPos == "LEFT") then
-        ciFrame:SetPoint(ANCHORS[Gladdy.db.ciPos], parent, Gladdy.db.ciPos, -Gladdy.db.padding + Gladdy.db.ciXOffset, Gladdy.db.ciYOffset)
-    elseif (Gladdy.db.ciPos == "TOP") then
-        ciFrame:SetPoint(ANCHORS[Gladdy.db.ciPos], parent, Gladdy.db.ciPos, Gladdy.db.ciXOffset, Gladdy.db.padding + Gladdy.db.ciYOffset)
-    elseif (Gladdy.db.ciPos == "BOTTOM") then
-        ciFrame:SetPoint(ANCHORS[Gladdy.db.ciPos], parent, Gladdy.db.ciPos, Gladdy.db.ciXOffset, -Gladdy.db.padding + Gladdy.db.ciYOffset)
-    end
+    ciFrame:SetPoint(ANCHORS[Gladdy.db.ciPos], Gladdy.buttons[unit][Gladdy.db.ciAnchor], Gladdy.db.ciPos, Gladdy.db.ciXOffset, Gladdy.db.ciYOffset)
+
     ciFrame:SetAlpha(Gladdy.db.ciAlpha)
 
     if (Gladdy.db.ciEnabled == false) then
