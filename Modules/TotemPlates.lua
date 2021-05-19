@@ -77,38 +77,6 @@ local localizedTotemData = {
         [string_lower(select(1, GetSpellInfo(3738)))] = totemData[string_lower("Wrath of Air Totem")], -- Wrath of Air Totem
         [string_lower(select(1, GetSpellInfo(25908)))] = totemData[string_lower("Tranquil Air Totem")], -- Tranquil Air Totem
     },
-    ["frFR"] = {
-        [string_lower("Totem incendiaire")] = totemData[string_lower("Searing Totem")],
-        [string_lower("Totem Langue de feu")] = totemData[string_lower("Flametongue Totem")],
-        [string_lower("Totem de lien terrestre")] = totemData[string_lower("Earthbind Totem")],
-        [string_lower("Totem de Griffes de pierre")] = totemData[string_lower("Stoneclaw Totem")],
-        [string_lower("Totem Nova de feu")] = totemData[string_lower("Fire Nova Totem")],
-        [string_lower("Totem de Magma")] = totemData[string_lower("Magma Totem")],
-        [string_lower("Totem de courroux")] = totemData[string_lower("Totem of Wrath")],
-        [string_lower("Totem d'\195\169lementaire de feu")] = totemData[string_lower("Fire Elemental Totem")],
-		[string_lower("Totem d'\195\169l\195\169mentaire de feu")] = totemData[string_lower("Fire Elemental Totem")],
-        [string_lower("Totem de Peau de pierre")] = totemData[string_lower("Stoneskin Totem")],
-        [string_lower("Totem d'\195\169lementaire de terre")] = totemData[string_lower("Earth Elemental Totem")],
-		[string_lower("Totem d'\195\169l\195\169mentaire de terre")] = totemData[string_lower("Earth Elemental Totem")],
-        [string_lower("Totem de Force de la Terre")] = totemData[string_lower("Strength of Earth Totem")],
-        [string_lower("Totem de r\195\169sistance au Givre")] = totemData[string_lower("Frost Resistance Totem")],
-        [string_lower("Totem de r\195\169sistance au Feu")] = totemData[string_lower("Fire Resistance Totem")],
-        [string_lower("Totem de Gl\195\168be")] = totemData[string_lower("Grounding Totem")],
-        [string_lower("Totem de Gr\195\162ce a\195\169rienne")] = totemData[string_lower("Grace of Air Totem")],
-        [string_lower("Totem de R\195\169sistance \195\160 la Nature")] = totemData[string_lower("Nature Resistance Totem")],
-        [string_lower("Totem Furie-des-vents")] = totemData[string_lower("Windfury Totem")],
-        [string_lower("Totem Sentinelle")] = totemData[string_lower("Sentry Totem")],
-        [string_lower("Totem de Mur des vents")] = totemData[string_lower("Windwall Totem")],
-        [string_lower("Totem de courroux de l'air")] = totemData[string_lower("Wrath of Air Totem")],
-        [string_lower("Totem de S\195\169isme")] = totemData[string_lower("Tremor Totem")],
-        [string_lower("Totem gu\195\169risseur")] = totemData[string_lower("Healing Stream Totem")],
-        [string_lower("Totem de Purification du poison")] = totemData[string_lower("Poison Cleansing Totem")],
-        [string_lower("Totem Fontaine de mana")] = totemData[string_lower("Mana Spring Totem")],
-        [string_lower("Totem de Purification des maladies")] = totemData[string_lower("Disease Cleansing Totem")],
-        [string_lower("Totem de purification")] = totemData[string_lower("Disease Cleansing Totem")],
-        [string_lower("Totem de Vague de mana")] = totemData[string_lower("Mana Tide Totem")],
-        [string_lower("Totem de Tranquillit\195\169 de l'air")] = totemData[string_lower("Tranquil Air Totem")],
-    }
 }
 
 local function GetTotemColorDefaultOptions()
