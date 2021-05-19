@@ -211,11 +211,11 @@ function Gladdy:UpdateFrame()
         end
 
 
-        for k, v in self:IterModules() do
+        for _, v in self:IterModules() do
             self:Call(v, "UpdateFrame", button.unit)
         end
     end
-    for k, v in self:IterModules() do
+    for _, v in self:IterModules() do
         self:Call(v, "UpdateFrameOnce")
     end
 end
@@ -279,7 +279,7 @@ function Gladdy:CreateButton(i)
 
     self.buttons[button.unit] = button
 
-    for k, v in self:IterModules() do
+    for _, v in self:IterModules() do
         self:Call(v, "CreateFrame", button.unit)
     end
 end
