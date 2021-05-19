@@ -7,7 +7,6 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 
 local CombatIndicator = Gladdy:NewModule("CombatIndicator", nil, {
-    ciFontScale = 1,
     ciEnabled = true,
     ciSize = 20,
     ciAlpha = 1,
