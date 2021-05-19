@@ -787,7 +787,7 @@ function Gladdy:GetAuras(auraType)
                 name = classSpells[i].name,
                 type = "toggle",
                 image = texture,
-                width = "2",
+                width = "full",
                 arg = tostring(classSpells[i].id[1])
             }
             defaultDebuffs[tostring(classSpells[i].id[1])] = true
