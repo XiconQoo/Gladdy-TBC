@@ -54,17 +54,17 @@ function Highlight:CreateFrame(unit)
 
     local targetBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
     targetBorder:SetBackdrop({ edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = Gladdy.db.highlightBorderSize })
-    targetBorder:SetFrameStrata("HIGH")
+    --targetBorder:SetFrameStrata("MEDIUM")
     targetBorder:Hide()
 
     local focusBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
     focusBorder:SetBackdrop({ edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = Gladdy.db.highlightBorderSize })
-    focusBorder:SetFrameStrata("LOW")
+    --focusBorder:SetFrameStrata("MEDIUM")
     focusBorder:Hide()
 
     local leaderBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
     leaderBorder:SetBackdrop({ edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = Gladdy.db.highlightBorderSize })
-    leaderBorder:SetFrameStrata("MEDIUM")
+    --leaderBorder:SetFrameStrata("MEDIUM")
     leaderBorder:Hide()
 
     local highlight = healthBar:CreateTexture(nil, "OVERLAY")
