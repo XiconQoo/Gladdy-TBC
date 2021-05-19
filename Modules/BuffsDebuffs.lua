@@ -508,6 +508,7 @@ function BuffsDebuffs:AddAura(unit, spellID, auraType, duration, timeLeft, stack
             aura = CreateFrame("Frame")
             aura:SetFrameLevel(3)
             aura.texture = aura:CreateTexture(nil, "BACKGROUND")
+            aura.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
             aura.texture:SetAllPoints(aura)
             aura.cooldowncircle = CreateFrame("Cooldown", nil, aura, "CooldownFrameTemplate")
             aura.cooldowncircle:SetFrameLevel(4)

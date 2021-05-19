@@ -59,6 +59,7 @@ function Auras:CreateFrame(unit)
     auraFrame.cooldownFrame:SetFrameLevel(5)
 
     auraFrame.icon = auraFrame:CreateTexture(nil, "BACKGROUND")
+    auraFrame.icon:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
     auraFrame.icon:SetAllPoints(auraFrame)
 
     auraFrame.icon.overlay = auraFrame.cooldownFrame:CreateTexture(nil, "OVERLAY")

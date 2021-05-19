@@ -98,6 +98,7 @@ function Cooldowns:CreateFrame(unit)
         icon:EnableMouse(false)
         icon:SetFrameLevel(3)
         icon.texture = icon:CreateTexture(nil, "BACKGROUND")
+        icon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
         icon.texture:SetAllPoints(icon)
 
         icon.cooldown = CreateFrame("Cooldown", nil, icon, "CooldownFrameTemplate")
