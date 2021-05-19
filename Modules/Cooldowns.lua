@@ -93,6 +93,7 @@ function Cooldowns:CreateFrame(unit)
     local button = Gladdy.buttons[unit]
     -- Cooldown frame
     local spellCooldownFrame = CreateFrame("Frame", nil, button)
+    spellCooldownFrame:EnableMouse(false)
     for x = 1, 14 do
         local icon = CreateFrame("Frame", nil, spellCooldownFrame)
         icon:EnableMouse(false)

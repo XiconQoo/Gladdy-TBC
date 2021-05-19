@@ -506,6 +506,7 @@ function BuffsDebuffs:AddAura(unit, spellID, auraType, duration, timeLeft, stack
             aura = tremove(self.framePool, #self.framePool)
         else
             aura = CreateFrame("Frame")
+            aura:EnableMouse(false)
             aura:SetFrameLevel(3)
             aura.texture = aura:CreateTexture(nil, "BACKGROUND")
             aura.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")

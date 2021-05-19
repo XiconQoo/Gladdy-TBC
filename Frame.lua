@@ -32,7 +32,7 @@ function Gladdy:CreateFrame()
     self.frame = CreateFrame("Frame", "GladdyFrame", UIParent)
 
     self.frame:SetClampedToScreen(true)
-    self.frame:EnableMouse(true)
+    self.frame:EnableMouse(false)
     self.frame:SetMovable(true)
     self.frame:RegisterForDrag("LeftButton")
 
@@ -187,7 +187,7 @@ function Gladdy:UpdateFrame()
         local button = self.buttons["arena" .. i]
         button:SetWidth(self.db.barWidth + extraBarWidth)
         button:SetHeight(self.db.healthBarHeight)
-        button.secure:SetWidth(self.db.barWidth + extraBarWidth)
+        button.secure:SetWidth(self.db.barWidth)
         button.secure:SetHeight(self.db.healthBarHeight + extraBarHeight)
 
         button:ClearAllPoints()
@@ -195,18 +195,18 @@ function Gladdy:UpdateFrame()
         if (self.db.growUp) then
             if (i == 1) then
                 button:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", self.db.padding + 2, 0)
-                button.secure:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", self.db.padding + 2, 0)
+                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             else
                 button:SetPoint("BOTTOMLEFT", self.buttons["arena" .. (i - 1)], "TOPLEFT", 0, margin + self.db.bottomMargin)
-                button.secure:SetPoint("BOTTOMLEFT", self.buttons["arena" .. (i - 1)], "TOPLEFT", 0, margin + self.db.bottomMargin)
+                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             end
         else
             if (i == 1) then
                 button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", self.db.padding + 2, 0)
-                button.secure:SetPoint("TOPLEFT", self.frame, "TOPLEFT", self.db.padding + 2, 0)
+                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             else
                 button:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "BOTTOMLEFT", 0, -margin - self.db.bottomMargin)
-                button.secure:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "BOTTOMLEFT", 0, -margin - self.db.bottomMargin)
+                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             end
         end
 
@@ -257,6 +257,7 @@ function Gladdy:CreateButton(i)
     end
 
     local button = CreateFrame("Frame", "GladdyButtonFrame" .. i, self.frame)
+    button:EnableMouse(false)
     button:SetAlpha(0)
 
     local secure = CreateFrame("Button", "GladdyButton" .. i, button, "SecureActionButtonTemplate")
@@ -265,12 +266,9 @@ function Gladdy:CreateButton(i)
     secure:SetAttribute("*type1", "target")
     secure:SetAttribute("*type2", "focus")
     secure:SetAttribute("unit", "arena" .. i)
-
-    button:RegisterEvent("UNIT_NAME_UPDATE")
-    button:RegisterEvent("ARENA_OPPONENT_UPDATE")
-    button:RegisterEvent("ARENA_COOLDOWNS_UPDATE")
-    button:RegisterEvent("ARENA_CROWD_CONTROL_SPELL_UPDATE")
-    button:RegisterUnitEvent("UNIT_CONNECTION", "arena" .. i)
+    --secure.texture = secure:CreateTexture(nil, "OVERLAY")
+    --secure.texture:SetAllPoints(secure)
+    --secure.texture:SetTexture("Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp")
 
     button.id = i
     button.unit = "arena" .. i

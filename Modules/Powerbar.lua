@@ -36,6 +36,7 @@ function Powerbar:CreateFrame(unit)
     local button = Gladdy.buttons[unit]
 
     local powerBar = CreateFrame("Frame", nil, Gladdy.buttons[unit], BackdropTemplateMixin and "BackdropTemplate")
+    powerBar:EnableMouse(false)
     powerBar:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.powerBarBorderStyle),
                                   edgeSize = Gladdy.db.powerBarBorderSize })
     powerBar:SetBackdropBorderColor(Gladdy.db.powerBarBorderColor.r, Gladdy.db.powerBarBorderColor.g, Gladdy.db.powerBarBorderColor.b, Gladdy.db.powerBarBorderColor.a)

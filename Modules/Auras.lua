@@ -42,6 +42,7 @@ end
 
 function Auras:CreateFrame(unit)
     local auraFrame = CreateFrame("Frame", nil, Gladdy.modules.Classicon.frames[unit])
+    auraFrame:EnableMouse(false)
     auraFrame:SetFrameStrata("MEDIUM")
     auraFrame:SetFrameLevel(3)
 

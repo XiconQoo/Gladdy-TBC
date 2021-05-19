@@ -67,6 +67,7 @@ end
 
 function Diminishings:CreateFrame(unit)
     local drFrame = CreateFrame("Frame", nil, Gladdy.buttons[unit])
+    drFrame:EnableMouse(false)
 
     for i = 1, 16 do
         local icon = CreateFrame("Frame", "GladdyDr" .. unit .. "Icon" .. i, drFrame)
