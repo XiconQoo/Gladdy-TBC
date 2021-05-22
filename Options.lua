@@ -16,10 +16,11 @@ Gladdy.defaults = {
         x = 0,
         y = 0,
         growUp = false,
+        growDirection = "BOTTOM",
         frameScale = 1,
-        padding = 3,
+        padding = 1,
         barWidth = 180,
-        bottomMargin = 10,
+        bottomMargin = 2,
         statusbarBorderOffset = 6,
     },
 }
@@ -193,10 +194,21 @@ function Gladdy:SetupOptions()
                         desc = L["If enabled the frame will grow upwards instead of downwards"],
                         order = 2,
                     },
+                    growDirection = {
+                        type = "select",
+                        name = L["Grow Direction"],
+                        order = 3,
+                        values = {
+                            ["BOTTOM"] = L["Down"],
+                            ["TOP"] = L["Up"],
+                            ["LEFT"] = L["Left"],
+                            ["RIGHT"] = L["Right"],
+                        }
+                    },
                     group = {
                         type = "group",
                         name = "General",
-                        order = 3,
+                        order = 4,
                         childGroups = "tree",
                         args = {
                             frameGeneral = {
@@ -238,11 +250,11 @@ function Gladdy:SetupOptions()
                                     },
                                     bottomMargin = {
                                         type = "range",
-                                        name = L["Bottom margin"],
+                                        name = L["Margin"],
                                         desc = L["Margin between each button"],
                                         order = 7,
-                                        min = -100,
-                                        max = 100,
+                                        min = -200,
+                                        max = 200,
                                         step = 1,
                                     },
                                 }
