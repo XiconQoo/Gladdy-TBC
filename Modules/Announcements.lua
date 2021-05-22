@@ -21,12 +21,12 @@ local Announcements = Gladdy:NewModule("Announcements", nil, {
         drinks = true,
         resurrections = true,
         enemy = false,
-        spec = false,
+        spec = true,
         health = false,
         healthThreshold = 20,
         trinketUsed = true,
         trinketReady = false,
-        dest = "self",
+        dest = "party",
     },
 })
 
