@@ -13,6 +13,7 @@ local function defaultSpells(auraType)
             spells[tostring(v.spellID)] = {}
             spells[tostring(v.spellID)].enabled = true
             spells[tostring(v.spellID)].priority = v.priority
+            spells[tostring(v.spellID)].track = v.track
         end
     end
     return spells
@@ -70,16 +71,6 @@ function Auras:CreateFrame(unit)
     local classIcon = Gladdy.modules.Classicon.frames[unit]
     auraFrame:ClearAllPoints()
     auraFrame:SetAllPoints(classIcon)
-    auraFrame:SetScript("OnUpdate", function(self, elapsed)
-        if (self.active) then
-            if (self.timeLeft <= 0) then
-                Auras:AURA_FADE(unit)
-            else
-                self.timeLeft = self.timeLeft - elapsed
-                self.text:SetFormattedText("%.1f", self.timeLeft >= 0.0 and self.timeLeft or 0.0)
-            end
-        end
-    end)
 
     auraFrame.text = auraFrame.cooldownFrame:CreateFontString(nil, "OVERLAY")
     auraFrame.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.auraFont), 10, "OUTLINE")
@@ -89,6 +80,17 @@ function Auras:CreateFrame(unit)
     auraFrame.text:SetJustifyH("CENTER")
     auraFrame.text:SetPoint("CENTER")
     auraFrame.unit = unit
+
+    auraFrame:SetScript("OnUpdate", function(self, elapsed)
+        if (self.active) then
+            if (self.timeLeft <= 0) then
+                Auras:AURA_FADE(self.unit, self.track)
+            else
+                self.timeLeft = self.timeLeft - elapsed
+                self.text:SetFormattedText("%.1f", self.timeLeft >= 0.0 and self.timeLeft or 0.0)
+            end
+        end
+    end)
 
     self.frames[unit] = auraFrame
     self:ResetUnit(unit)
@@ -123,6 +125,7 @@ function Auras:UpdateFrame(unit)
     else
         auraFrame.icon.overlay:SetVertexColor(0, 0, 0, 1)
     end
+    auraFrame.icon.overlay:Hide()
     if Gladdy.db.auraDisableCircle then
         auraFrame.cooldown:SetAlpha(0)
     end
@@ -130,21 +133,32 @@ end
 
 function Auras:ResetUnit(unit)
     self.frames[unit]:UnregisterAllEvents()
-    self:AURA_FADE(unit)
+    self:AURA_FADE(unit, AURA_TYPE_DEBUFF)
+    self:AURA_FADE(unit, AURA_TYPE_BUFF)
 end
 
 function Auras:Test(unit)
-    local aura, _, icon
+    local spellName, _, icon
 
     if (unit == "arena1") then
-        aura, _, icon = GetSpellInfo(12826)
-        self:AURA_GAIN(unit,nil, 12826, aura, icon, self.auras[aura].duration, GetTime() + self.auras[aura].duration)
+        spellName, _, icon = GetSpellInfo(12826)
+        self:AURA_FADE(unit, AURA_TYPE_BUFF)
+        self:AURA_FADE(unit, AURA_TYPE_DEBUFF)
+        self:AURA_GAIN(unit,AURA_TYPE_DEBUFF, 12826, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
     elseif (unit == "arena2") then
-        aura, _, icon = GetSpellInfo(6770)
-        self:AURA_GAIN(unit,nil, 6770, aura, icon, self.auras[aura].duration, GetTime() + self.auras[aura].duration)
+        spellName, _, icon = GetSpellInfo(6770)
+        self:AURA_FADE(unit, AURA_TYPE_BUFF)
+        self:AURA_FADE(unit,AURA_TYPE_DEBUFF)
+        self:AURA_GAIN(unit,AURA_TYPE_DEBUFF, 6770, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
     elseif (unit == "arena3") then
-        aura, _, icon = GetSpellInfo(31224)
-        self:AURA_GAIN(unit,nil, 31224, aura, icon, self.auras[aura].duration, GetTime() + self.auras[aura].duration)
+        spellName, _, icon = GetSpellInfo(17)
+        self:AURA_FADE(unit, AURA_TYPE_BUFF)
+        self:AURA_GAIN(unit,AURA_TYPE_BUFF, 17, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
+        self:AURA_FADE(unit,AURA_TYPE_DEBUFF)
+        spellName, _, icon = GetSpellInfo(6770)
+        self:AURA_FADE(unit, AURA_TYPE_BUFF)
+        self:AURA_FADE(unit, AURA_TYPE_DEBUFF)
+        self:AURA_GAIN(unit,AURA_TYPE_DEBUFF, 6770, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
     end
 end
 
@@ -155,35 +169,36 @@ function Auras:JOINED_ARENA()
     end
 end
 
-function Auras:AURA_GAIN(unit, auraType, spellID, aura, icon, duration, expirationTime, count, debuffType)
+function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, expirationTime, count, debuffType)
     local auraFrame = self.frames[unit]
     if (not auraFrame) then
         return
     end
-    if not self.auras[aura] then
+
+    if not self.auras[spellName] then
         return
     end
     -- don't use spellId from combatlog, in case of different spellrank
-    if not Gladdy.db.auraListDefault[tostring(self.auras[aura].spellID)] or not Gladdy.db.auraListDefault[tostring(self.auras[aura].spellID)].enabled then
+    if not Gladdy.db.auraListDefault[tostring(self.auras[spellName].spellID)] or not Gladdy.db.auraListDefault[tostring(self.auras[spellName].spellID)].enabled then
         return
     end
 
-    if (auraFrame.priority and auraFrame.priority > Gladdy.db.auraListDefault[tostring(self.auras[aura].spellID)].priority) then
+    if (auraFrame.priority and auraFrame.priority > Gladdy.db.auraListDefault[tostring(self.auras[spellName].spellID)].priority) then
         return
     end
     auraFrame.startTime = expirationTime - duration
     auraFrame.endTime = expirationTime
-    auraFrame.name = aura
+    auraFrame.name = spellName
     auraFrame.timeLeft = expirationTime - GetTime()
-    auraFrame.priority = Gladdy.db.auraListDefault[tostring(self.auras[aura].spellID)].priority
+    auraFrame.priority = Gladdy.db.auraListDefault[tostring(self.auras[spellName].spellID)].priority
     auraFrame.icon:SetTexture(icon)
-    auraFrame.track = self.auras[aura].track
+    auraFrame.track = auraType
     auraFrame.active = true
-    auraFrame.icon.overlay:SetTexture(Gladdy.db.auraBorderStyle)
+    auraFrame.icon.overlay:Show()
     auraFrame.cooldownFrame:Show()
-    if auraFrame.track and auraFrame.track == AURA_TYPE_DEBUFF then
+    if auraType == AURA_TYPE_DEBUFF then
         auraFrame.icon.overlay:SetVertexColor(Gladdy.db.auraDebuffBorderColor.r, Gladdy.db.auraDebuffBorderColor.g, Gladdy.db.auraDebuffBorderColor.b, Gladdy.db.auraDebuffBorderColor.a)
-    elseif auraFrame.track and auraFrame.track == AURA_TYPE_BUFF then
+    elseif auraType == AURA_TYPE_BUFF then
         auraFrame.icon.overlay:SetVertexColor(Gladdy.db.auraBuffBorderColor.r, Gladdy.db.auraBuffBorderColor.g, Gladdy.db.auraBuffBorderColor.b, Gladdy.db.auraBuffBorderColor.a)
     else
         auraFrame.icon.overlay:SetVertexColor(Gladdy.db.frameBorderColor.r, Gladdy.db.frameBorderColor.g, Gladdy.db.frameBorderColor.b, Gladdy.db.frameBorderColor.a)
@@ -194,9 +209,9 @@ function Auras:AURA_GAIN(unit, auraType, spellID, aura, icon, duration, expirati
     end
 end
 
-function Auras:AURA_FADE(unit)
+function Auras:AURA_FADE(unit, auraType)
     local auraFrame = self.frames[unit]
-    if (not auraFrame) then
+    if (not auraFrame or auraFrame.track ~= auraType) then
         return
     end
     if auraFrame.active then
@@ -211,7 +226,7 @@ function Auras:AURA_FADE(unit)
     auraFrame.endTime = nil
     auraFrame.icon:SetTexture("")
     auraFrame.text:SetText("")
-    auraFrame.icon.overlay:SetTexture("")
+    auraFrame.icon.overlay:Hide()
     auraFrame.cooldownFrame:Hide()
 end
 
