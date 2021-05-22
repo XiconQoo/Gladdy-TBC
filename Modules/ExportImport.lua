@@ -85,6 +85,10 @@ end)
 import:AddChild(importClearButton)
 import.clearButton = importClearButton
 
+local deletedOptions = { --TODO backward compatibility Imports on deleted options
+    growUp = true
+}
+
 function ExportImport:CheckDeserializedOptions(tbl, refTbl, str)
     if str == nil and not tbl.version_major_num then
         return false, "Version conflict: version_major_num not seen"
