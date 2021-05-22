@@ -34,12 +34,41 @@ function XiconProfiles:ApplyClassic()
     Gladdy:ToggleFrame(3)
 end
 
+function XiconProfiles:ApplyBlizz()
+    local deserialized = Gladdy.modules["ExportImport"]:Decode(Gladdy:GetBlizzardProfile())
+    if deserialized then
+        Gladdy.modules["ExportImport"]:ApplyImport(deserialized, Gladdy.db)
+    end
+    Gladdy:Reset()
+    Gladdy:HideFrame()
+    Gladdy:ToggleFrame(3)
+end
+
 function XiconProfiles:GetOptions()
     return {
+        headerProfileBlizzard = {
+            type = "header",
+            name = L["Blizzard Profile"],
+            order = 2,
+        },
+        blizzardProfile = {
+            type = "execute",
+            func = function()
+                Gladdy.dbi:ResetProfile(Gladdy.dbi:GetCurrentProfile())
+                XiconProfiles:ApplyBlizz()
+            end,
+            name = " ",
+            desc = "Blizzard Profile",
+            image = "Interface\\AddOns\\Gladdy\\Images\\BasicProfiles\\Blizz1.blp",
+            imageWidth = 350,
+            imageHeight = 175,
+            width = "full",
+            order = 3,
+        },
         headerProfileClassic = {
             type = "header",
             name = L["Classic Profile"],
-            order = 2,
+            order = 4,
         },
         classicProfile = {
             type = "execute",
@@ -53,12 +82,12 @@ function XiconProfiles:GetOptions()
             imageWidth = 350,
             imageHeight = 175,
             width = "full",
-            order = 3,
+            order = 5,
         },
         headerProfileKnall = {
             type = "header",
             name = L["Knall's Profile"],
-            order = 4,
+            order = 6,
         },
         knallProfile = {
             type = "execute",
@@ -72,12 +101,12 @@ function XiconProfiles:GetOptions()
             imageWidth = 350,
             imageHeight = 175,
             width = "full",
-            order = 5,
+            order = 7,
         },
         headerProfileKlimp = {
             type = "header",
             name = L["Klimp's Profile"],
-            order = 6,
+            order = 8,
         },
         klimpProfiles = {
             type = "execute",
@@ -91,7 +120,8 @@ function XiconProfiles:GetOptions()
             name = " ",
             desc = "Klimp's Profile",
             width = "full",
-            order = 7,
+            order = 9,
         },
+
     }
 end
