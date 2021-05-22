@@ -226,15 +226,16 @@ end
 ---------------------------
 
 function BuffsDebuffs:CreateFrame(unit)
+    local verticalMargin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
     local debuffFrame = CreateFrame("Frame", "GladdyDebuffs" .. unit, Gladdy.buttons[unit])
     debuffFrame:SetHeight(Gladdy.db.buffsIconSize)
     debuffFrame:SetWidth(1)
-    debuffFrame:SetPoint("BOTTOMLEFT", Gladdy.buttons[unit].healthBar, "TOPLEFT", 0, Gladdy.db.highlightBorderSize + Gladdy.db.padding)
+    debuffFrame:SetPoint("BOTTOMLEFT", Gladdy.buttons[unit].healthBar, "TOPLEFT", 0, verticalMargin)
     debuffFrame.unit = unit
     local buffFrame = CreateFrame("Frame", "GladdyBuffs" .. unit, Gladdy.buttons[unit])
     buffFrame:SetHeight(Gladdy.db.buffsIconSize)
     buffFrame:SetWidth(1)
-    buffFrame:SetPoint("BOTTOMLEFT", Gladdy.buttons[unit].healthBar, "TOPLEFT", 0, Gladdy.db.highlightBorderSize + Gladdy.db.padding)
+    buffFrame:SetPoint("BOTTOMLEFT", Gladdy.buttons[unit].healthBar, "TOPLEFT", 0, verticalMargin)
     buffFrame.unit = unit
     self.frames[unit] = {}
     self.frames[unit].buffFrame = buffFrame
@@ -277,7 +278,9 @@ end
 function BuffsDebuffs:UpdateFrame(unit)
     self.frames[unit].debuffFrame:SetHeight(Gladdy.db.buffsIconSize)
     self.frames[unit].debuffFrame:ClearAllPoints()
-    local horizontalMargin = Gladdy.db.highlightBorderSize
+
+    --DEBUFFS
+    local horizontalMargin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize)
     local verticalMargin = -(Gladdy.db.powerBarHeight)/2
     if Gladdy.db.buffsCooldownPos == "TOP" then
         verticalMargin = horizontalMargin + 1
@@ -300,7 +303,7 @@ function BuffsDebuffs:UpdateFrame(unit)
             self.frames[unit].debuffFrame:SetPoint("TOPRIGHT", Gladdy.buttons[unit].powerBar, "BOTTOMLEFT", Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset -verticalMargin)
         end
     elseif Gladdy.db.buffsCooldownPos == "LEFT" then
-        horizontalMargin = Gladdy.db.highlightBorderSize - 1 + Gladdy.db.padding
+        horizontalMargin = horizontalMargin - 1 + Gladdy.db.padding
         local anchor = Gladdy:GetAnchor(unit, "LEFT")
         if anchor == Gladdy.buttons[unit].healthBar then
             self.frames[unit].debuffFrame:SetPoint("RIGHT", anchor, "LEFT", -horizontalMargin + Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset)
@@ -318,9 +321,10 @@ function BuffsDebuffs:UpdateFrame(unit)
         end
     end
 
+    --BUFFS
     self.frames[unit].buffFrame:SetHeight(Gladdy.db.buffsBuffsIconSize)
     self.frames[unit].buffFrame:ClearAllPoints()
-    horizontalMargin = Gladdy.db.highlightBorderSize
+    horizontalMargin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize)
     verticalMargin = -(Gladdy.db.powerBarHeight)/2
     if Gladdy.db.buffsBuffsCooldownPos == "TOP" then
         verticalMargin = horizontalMargin + 1
@@ -369,7 +373,7 @@ function BuffsDebuffs:UpdateFrame(unit)
         --self.frames[unit].buffFrame:SetPoint("RIGHT", Gladdy.buttons[unit].healthBar, "LEFT", -horizontalMargin + Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset + verticalMargin)
 
         local anchor = Gladdy:GetAnchor(unit, "LEFT")
-        horizontalMargin = Gladdy.db.highlightBorderSize - 1 + Gladdy.db.padding
+        horizontalMargin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) - 1 + Gladdy.db.padding
         if anchor == Gladdy.buttons[unit].healthBar then
             self.frames[unit].buffFrame:SetPoint("RIGHT", anchor, "LEFT", -horizontalMargin + Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset)
         else
@@ -403,7 +407,7 @@ function BuffsDebuffs:UpdateFrame(unit)
         --self.frames[unit].buffFrame:SetPoint("LEFT", Gladdy.buttons[unit].healthBar, "RIGHT", horizontalMargin + Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset + verticalMargin)
 
         local anchor = Gladdy:GetAnchor(unit, "RIGHT")
-        horizontalMargin = Gladdy.db.highlightBorderSize - 1 + Gladdy.db.padding
+        horizontalMargin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) - 1 + Gladdy.db.padding
         if anchor == Gladdy.buttons[unit].healthBar then
             self.frames[unit].buffFrame:SetPoint("LEFT", anchor, "RIGHT", horizontalMargin + Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset)
         else

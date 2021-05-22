@@ -135,29 +135,30 @@ function Cooldowns:UpdateFrame(unit)
     if (Gladdy.db.cooldown) then
         button.spellCooldownFrame:ClearAllPoints()
         local verticalMargin = -(Gladdy.db.powerBarHeight)/2
+        local horizontalMargin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize)
         if Gladdy.db.cooldownYPos == "TOP" then
             if Gladdy.db.cooldownXPos == "RIGHT" then
-                button.spellCooldownFrame:SetPoint("BOTTOMRIGHT", button.healthBar, "TOPRIGHT", Gladdy.db.cooldownXOffset, Gladdy.db.highlightBorderSize + Gladdy.db.cooldownYOffset) -- needs to be properly anchored after trinket
+                button.spellCooldownFrame:SetPoint("BOTTOMRIGHT", button.healthBar, "TOPRIGHT", Gladdy.db.cooldownXOffset, horizontalMargin + Gladdy.db.cooldownYOffset)
             else
-                button.spellCooldownFrame:SetPoint("BOTTOMLEFT", button.healthBar, "TOPLEFT", Gladdy.db.cooldownXOffset, Gladdy.db.highlightBorderSize + Gladdy.db.cooldownYOffset)
+                button.spellCooldownFrame:SetPoint("BOTTOMLEFT", button.healthBar, "TOPLEFT", Gladdy.db.cooldownXOffset, horizontalMargin + Gladdy.db.cooldownYOffset)
             end
         elseif Gladdy.db.cooldownYPos == "BOTTOM" then
             if Gladdy.db.cooldownXPos == "RIGHT" then
-                button.spellCooldownFrame:SetPoint("TOPRIGHT", button.powerBar, "BOTTOMRIGHT", Gladdy.db.cooldownXOffset, -Gladdy.db.highlightBorderSize + Gladdy.db.cooldownYOffset) -- needs to be properly anchored after trinket
+                button.spellCooldownFrame:SetPoint("TOPRIGHT", button.powerBar, "BOTTOMRIGHT", Gladdy.db.cooldownXOffset, -horizontalMargin + Gladdy.db.cooldownYOffset)
             else
-                button.spellCooldownFrame:SetPoint("TOPLEFT", button.powerBar, "BOTTOMLEFT", Gladdy.db.cooldownXOffset, -Gladdy.db.highlightBorderSize + Gladdy.db.cooldownYOffset)
+                button.spellCooldownFrame:SetPoint("TOPLEFT", button.powerBar, "BOTTOMLEFT", Gladdy.db.cooldownXOffset, -horizontalMargin + Gladdy.db.cooldownYOffset)
             end
         elseif Gladdy.db.cooldownYPos == "LEFT" then
             local anchor = Gladdy:GetAnchor(unit, "LEFT")
             if anchor == Gladdy.buttons[unit].healthBar then
-                button.spellCooldownFrame:SetPoint("RIGHT", anchor, "LEFT", -(Gladdy.db.highlightBorderSize + Gladdy.db.padding) + Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset)
+                button.spellCooldownFrame:SetPoint("RIGHT", anchor, "LEFT", -(horizontalMargin + Gladdy.db.padding) + Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset)
             else
                 button.spellCooldownFrame:SetPoint("RIGHT", anchor, "LEFT", -Gladdy.db.padding + Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset)
             end
         elseif Gladdy.db.cooldownYPos == "RIGHT" then
             local anchor = Gladdy:GetAnchor(unit, "RIGHT")
             if anchor == Gladdy.buttons[unit].healthBar then
-                button.spellCooldownFrame:SetPoint("LEFT", anchor, "RIGHT", Gladdy.db.highlightBorderSize + Gladdy.db.padding + Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset)
+                button.spellCooldownFrame:SetPoint("LEFT", anchor, "RIGHT", horizontalMargin + Gladdy.db.padding + Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset)
             else
                 button.spellCooldownFrame:SetPoint("LEFT", anchor, "RIGHT", Gladdy.db.padding + Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset)
             end
@@ -601,7 +602,7 @@ function Cooldowns:GetOptions()
                             desc = L["Size of each cd icon"],
                             order = 4,
                             min = 5,
-                            max = (Gladdy.db.healthBarHeight + Gladdy.db.castBarHeight + Gladdy.db.powerBarHeight + Gladdy.db.bottomMargin) / 2,
+                            max = 50,
                         }),
                         cooldownWidthFactor = Gladdy:option({
                             type = "range",

@@ -1,12 +1,12 @@
 local string_gsub, floor, pairs = string.gsub, math.floor, pairs
-local CreateFrame = CreateFrame
+local CreateFrame, SetPortraitTexture = CreateFrame, SetPortraitTexture
 local UnitHealthMax, UnitHealth, UnitGUID = UnitHealthMax, UnitHealth, UnitGUID
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local Pets = Gladdy:NewModule("Pets", nil, {
     petEnabled = true,
-    petWidth = 100,
+    petWidth = 128,
     petHeight = 20,
     petPortraitEnabled = true,
     petPortraitBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
@@ -21,8 +21,8 @@ local Pets = Gladdy:NewModule("Pets", nil, {
     petHealthBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
     petHealthBarFontSize = 12,
     petHealthPercentage = true,
-    petXOffset = 50,
-    petYOffset = 0,
+    petXOffset = 1,
+    petYOffset = -62,
 })
 
 function Pets:Initialize()
@@ -124,6 +124,7 @@ function Pets:Test(unitId)
         petFrame.healthBar.hp:SetMinMaxValues(0, 6200)
         petFrame.healthBar.hp:SetValue(2000)
         Pets:SetHealthText(petFrame.healthBar, 2000, 6200)
+        SetPortraitTexture(petFrame.healthBar.portrait, "player")
     end
 end
 
@@ -374,7 +375,7 @@ function Pets:GetOptions()
                             desc = L["Width of the bar"],
                             order = 4,
                             min = 10,
-                            max = 100,
+                            max = 300,
                             step = 1,
                         }),
                         petHealthBarTexture = option({

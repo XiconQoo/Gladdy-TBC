@@ -16,10 +16,11 @@ Gladdy.defaults = {
         x = 0,
         y = 0,
         growUp = false,
+        growDirection = "BOTTOM",
         frameScale = 1,
-        padding = 3,
+        padding = 1,
         barWidth = 180,
-        bottomMargin = 10,
+        bottomMargin = 2,
         statusbarBorderOffset = 6,
     },
 }
@@ -193,10 +194,21 @@ function Gladdy:SetupOptions()
                         desc = L["If enabled the frame will grow upwards instead of downwards"],
                         order = 2,
                     },
+                    growDirection = {
+                        type = "select",
+                        name = L["Grow Direction"],
+                        order = 3,
+                        values = {
+                            ["BOTTOM"] = L["Down"],
+                            ["TOP"] = L["Up"],
+                            ["LEFT"] = L["Left"],
+                            ["RIGHT"] = L["Right"],
+                        }
+                    },
                     group = {
                         type = "group",
                         name = "General",
-                        order = 3,
+                        order = 4,
                         childGroups = "tree",
                         args = {
                             frameGeneral = {
@@ -238,11 +250,11 @@ function Gladdy:SetupOptions()
                                     },
                                     bottomMargin = {
                                         type = "range",
-                                        name = L["Bottom margin"],
+                                        name = L["Margin"],
                                         desc = L["Margin between each button"],
                                         order = 7,
-                                        min = -100,
-                                        max = 100,
+                                        min = -200,
+                                        max = 200,
                                         step = 1,
                                     },
                                 }
@@ -490,6 +502,7 @@ function Gladdy:SetupOptions()
                                             local g = Gladdy.db.cooldownBorderColor
                                             local h = Gladdy.db.drBorderColor
                                             local i = Gladdy.db.trinketBorderColor
+                                            local j = Gladdy.db.racialBorderColor
                                             if (a.r == b.r and a.g == b.g and a.b == b.b and a.a == b.a
                                                     and a.r == c.r and a.g == c.g and a.b == c.b and a.a == c.a
                                                     and a.r == d.r and a.g == d.g and a.b == d.b and a.a == d.a
@@ -497,7 +510,8 @@ function Gladdy:SetupOptions()
                                                     and a.r == f.r and a.g == f.g and a.b == f.b and a.a == f.a
                                                     and a.r == g.r and a.g == g.g and a.b == g.b and a.a == g.a
                                                     and a.r == h.r and a.g == h.g and a.b == h.b and a.a == h.a
-                                                    and a.r == i.r and a.g == i.g and a.b == i.b and a.a == i.a) then
+                                                    and a.r == i.r and a.g == i.g and a.b == i.b and a.a == i.a
+                                                    and a.r == j.r and a.g == j.g and a.b == j.b and a.a == j.a) then
                                                 return a.r, a.g, a.b, a.a
                                             else
                                                 return { r = 0, g = 0, b = 0, a = 0 }
@@ -514,6 +528,7 @@ function Gladdy:SetupOptions()
                                             Gladdy.db.cooldownBorderColor = rgb
                                             Gladdy.db.drBorderColor = rgb
                                             Gladdy.db.trinketBorderColor = rgb
+                                            Gladdy.db.racialBorderColor = rgb
                                             Gladdy:UpdateFrame()
                                         end,
                                     },

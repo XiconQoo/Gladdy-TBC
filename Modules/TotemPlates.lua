@@ -451,7 +451,7 @@ function TotemPlates:GetOptions()
                     args = {
                         header = {
                             type = "header",
-                            name = L["Icon"],
+                            name = L["Font"],
                             order = 1,
                         },
                         npTremorFont = Gladdy:option({

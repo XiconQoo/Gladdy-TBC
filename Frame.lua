@@ -30,6 +30,9 @@ Gladdy.BUTTON_DEFAULTS = {
 
 function Gladdy:CreateFrame()
     self.frame = CreateFrame("Frame", "GladdyFrame", UIParent)
+    --self.frame.texture = self.frame:CreateTexture(nil, "OVERLAY")
+    --self.frame.texture:SetAllPoints(self.frame)
+    --self.frame.texture:SetTexture("Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp")
 
     self.frame:SetClampedToScreen(true)
     self.frame:EnableMouse(false)
@@ -109,48 +112,69 @@ function Gladdy:UpdateFrame()
     end
     local teamSize = self.curBracket or 0
 
-    local iconSize = self.db.healthBarHeight
-    local margin = 0
-    local width = self.db.barWidth + self.db.padding * 2 + 5
-    local height = self.db.healthBarHeight * teamSize + margin * (teamSize - 1) + self.db.padding * 2 + 5
-    local extraBarWidth = 0
-    local extraBarHeight = 0
+    local highlightBorderSize = (self.db.highlightInset and 0 or self.db.highlightBorderSize * 2)
+    local leftSize = 0
+    local rightSize = 0
+    --Trinket + Racial
+    if self.db.trinketEnabled and self.db.trinketPos == "LEFT" then
+        leftSize = leftSize + self.db.trinketSize * self.db.trinketWidthFactor + self.db.padding
+        if self.db.racialEnabled and self.db.racialAnchor == "trinket" and self.db.racialPos == "LEFT" then
+            leftSize = leftSize + self.db.racialSize * self.db.racialWidthFactor + self.db.padding
+        end
+    end
+    if self.db.trinketEnabled and self.db.trinketPos == "RIGHT" then
+        rightSize = rightSize + self.db.trinketSize * self.db.trinketWidthFactor + self.db.padding
+        if self.db.racialEnabled and self.db.racialAnchor == "trinket" and self.db.racialPos == "RIGHT" then
+            rightSize = rightSize + self.db.racialSize * self.db.racialWidthFactor + self.db.padding
+        end
+    end
+    --ClassIcon
+    if self.db.classIconPos == "LEFT" then
+        leftSize = leftSize + self.db.classIconSize * self.db.classIconWidthFactor + self.db.padding
+    else
+        rightSize = rightSize + self.db.classIconSize * self.db.classIconWidthFactor + self.db.padding
+    end
+    --Highlight
+    if not self.db.highlightInset then
+        leftSize = leftSize + self.db.highlightBorderSize
+        rightSize = rightSize + self.db.highlightBorderSize
+    end
 
-    -- Powerbar
-    iconSize = iconSize + self.db.powerBarHeight
-    margin = margin + self.db.powerBarHeight
-    height = height + self.db.powerBarHeight * teamSize
-    extraBarHeight = extraBarHeight + self.db.powerBarHeight
+    local margin = self.db.powerBarHeight + 1
+    local width = self.db.barWidth + leftSize + rightSize
+    local height = (self.db.healthBarHeight + self.db.powerBarHeight + 1) * teamSize
+            + (self.db.highlightInset and 0 or self.db.highlightBorderSize * 2 * teamSize)
+            + self.db.bottomMargin * (teamSize - 1)
 
-    -- Cooldown
-    margin = margin + 1 + self.db.highlightBorderSize * 2 + 1 -- + 1 space between health and power bar
-    height = height + self.db.highlightBorderSize * teamSize
+    -- Highlight
+    margin = margin + highlightBorderSize
 
     if (self.db.cooldownYPos == "TOP" or self.db.cooldownYPos == "BOTTOM") and self.db.cooldown then
         margin = margin + self.db.cooldownSize
-        height = height + self.db.cooldownSize * teamSize
+        height = height + self.db.cooldownSize * (teamSize - 1)
     end
     if (self.db.buffsCooldownPos == "TOP" or self.db.buffsCooldownPos == "BOTTOM") and self.db.buffsEnabled then
         margin = margin + self.db.buffsIconSize
-        height = height + self.db.buffsIconSize * teamSize
+        height = height + self.db.buffsIconSize * (teamSize - 1)
     end
     if (self.db.buffsBuffsCooldownPos == "TOP" or self.db.buffsBuffsCooldownPos == "BOTTOM") and self.db.buffsEnabled then
         margin = margin + self.db.buffsBuffsIconSize
-        height = height + self.db.buffsBuffsIconSize * teamSize
+        height = height + self.db.buffsBuffsIconSize * (teamSize - 1)
     end
     if self.db.buffsCooldownPos == "TOP" and self.db.cooldownYPos == "TOP" and self.db.cooldown and self.db.buffsEnabled then
         margin = margin + 1
+        height = height + (teamSize - 1)
     end
     if self.db.buffsCooldownPos == "BOTTOM" and self.db.cooldownYPos == "BOTTOM" and self.db.cooldown and self.db.buffsEnabled then
         margin = margin + 1
+        height = height + (teamSize - 1)
     end
 
-    -- Classicon
-    width = width + iconSize
-    extraBarWidth = extraBarWidth + iconSize
-
-    -- Trinket
-    width = width + iconSize
+    -- GrowDirection
+    if (self.db.growDirection == "LEFT" or self.db.growDirection == "RIGHT") then
+        width = self.db.barWidth * teamSize + (leftSize + rightSize) * teamSize + self.db.bottomMargin * (teamSize - 1)
+        height = self.db.healthBarHeight + self.db.powerBarHeight + 1
+    end
 
     self.frame:SetScale(self.db.frameScale)
     self.frame:SetWidth(width)
@@ -161,23 +185,25 @@ function Gladdy:UpdateFrame()
         self.frame:SetPoint("CENTER")
     else
         local scale = self.frame:GetEffectiveScale()
-        if (self.db.growUp) then
+        if (self.db.growDirection == "TOP") then
             self.frame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", self.db.x / scale, self.db.y / scale)
         else
             self.frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.x / scale, self.db.y / scale)
         end
     end
 
+    --Anchor
     self.anchor:SetWidth(width)
     self.anchor:ClearAllPoints()
-    if (self.db.growUp) then
+    if (self.db.growDirection == "TOP") then
         self.anchor:SetPoint("TOPLEFT", self.frame, "BOTTOMLEFT")
-    else
+    elseif self.growDirection == "BOTTOM" or self.growDirection == "RIGHT" then
         self.anchor:SetPoint("BOTTOMLEFT", self.frame, "TOPLEFT")
+    else
+        self.anchor:SetPoint("BOTTOMRIGHT", self.frame, "TOPRIGHT")
     end
 
     if (self.db.locked) then
-        self.anchor:Hide()
         self.anchor:Hide()
     else
         self.anchor:Show()
@@ -185,27 +211,43 @@ function Gladdy:UpdateFrame()
 
     for i = 1, teamSize do
         local button = self.buttons["arena" .. i]
-        button:SetWidth(self.db.barWidth + extraBarWidth)
+        button:SetWidth(self.db.barWidth)
         button:SetHeight(self.db.healthBarHeight)
         button.secure:SetWidth(self.db.barWidth)
-        button.secure:SetHeight(self.db.healthBarHeight + extraBarHeight)
+        button.secure:SetHeight(self.db.healthBarHeight + self.db.powerBarHeight + 1)
 
         button:ClearAllPoints()
         button.secure:ClearAllPoints()
-        if (self.db.growUp) then
+        if (self.db.growDirection == "TOP") then
             if (i == 1) then
-                button:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", self.db.padding + 2, 0)
-                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
+                button:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", leftSize, self.db.powerBarHeight + 1)
+                button.secure:SetPoint("TOPLEFT", button.powerBar, "TOPLEFT")
             else
                 button:SetPoint("BOTTOMLEFT", self.buttons["arena" .. (i - 1)], "TOPLEFT", 0, margin + self.db.bottomMargin)
-                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
+                button.secure:SetPoint("TOPLEFT", button.powerBar, "TOPLEFT")
             end
-        else
+        elseif (self.db.growDirection == "BOTTOM") then
             if (i == 1) then
-                button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", self.db.padding + 2, 0)
+                button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", leftSize, 0)
                 button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             else
                 button:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "BOTTOMLEFT", 0, -margin - self.db.bottomMargin)
+                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
+            end
+        elseif (self.db.growDirection == "LEFT") then
+            if (i == 1) then
+                button:SetPoint("TOPRIGHT", self.frame, "TOPRIGHT", -rightSize, 0)
+                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
+            else
+                button:SetPoint("TOPRIGHT", self.buttons["arena" .. (i - 1)], "TOPLEFT", -rightSize - leftSize - self.db.bottomMargin, 0)
+                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
+            end
+        elseif (self.db.growDirection == "RIGHT") then
+            if (i == 1) then
+                button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", leftSize, 0)
+                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
+            else
+                button:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "TOPRIGHT", leftSize + rightSize + self.db.bottomMargin, 0)
                 button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             end
         end
@@ -258,7 +300,10 @@ function Gladdy:CreateButton(i)
 
     local button = CreateFrame("Frame", "GladdyButtonFrame" .. i, self.frame)
     button:EnableMouse(false)
-    button:SetAlpha(0)
+    --button:SetAlpha(0)
+    --button.texture = button:CreateTexture(nil, "OVERLAY")
+    --button.texture:SetAllPoints(button)
+    --button.texture:SetTexture("Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp")
 
     local secure = CreateFrame("Button", "GladdyButton" .. i, button, "SecureActionButtonTemplate")
     secure:RegisterForClicks("AnyUp")

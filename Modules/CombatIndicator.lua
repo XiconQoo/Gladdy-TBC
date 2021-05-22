@@ -64,6 +64,7 @@ function CombatIndicator:UpdateFrame(unit)
     end
     ciFrame:SetHeight(Gladdy.db.ciSize)
     ciFrame:SetWidth(Gladdy.db.ciSize * Gladdy.db.ciWidthFactor)
+    ciFrame.border:SetTexture(Gladdy.db.ciBorderStyle)
     ciFrame.border:SetVertexColor(Gladdy.db.ciBorderColor.r, Gladdy.db.ciBorderColor.g, Gladdy.db.ciBorderColor.b, Gladdy.db.ciBorderColor.a)
 
     ciFrame:ClearAllPoints()

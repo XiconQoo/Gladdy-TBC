@@ -130,7 +130,7 @@ function Trinket:UpdateFrame(unit)
     trinket.texture.overlay:SetVertexColor(Gladdy.db.trinketBorderColor.r, Gladdy.db.trinketBorderColor.g, Gladdy.db.trinketBorderColor.b, Gladdy.db.trinketBorderColor.a)
 
     trinket:ClearAllPoints()
-    local margin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
+    local margin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
     if (Gladdy.db.classIconPos == "LEFT") then
         if (Gladdy.db.trinketPos == "RIGHT") then
             trinket:SetPoint("TOPLEFT", Gladdy.buttons[unit].healthBar, "TOPRIGHT", margin, 0)

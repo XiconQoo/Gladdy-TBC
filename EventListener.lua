@@ -177,7 +177,7 @@ function EventListener:ARENA_OPPONENT_UPDATE(unit, updateReason)
     end
 end
 
-local exceptionNames = {
+local exceptionNames = { -- TODO MOVE ME TO CLASSBUFFS LIB
     [31117] = GetSpellInfo(30405) .. " Silence", -- Unstable Affliction Silence
     [43523] = GetSpellInfo(30405) .. " Silence",
     [24131] = select(1, GetSpellInfo(19386)) .. " Dot", -- Wyvern Sting Dot
