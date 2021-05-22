@@ -151,14 +151,12 @@ function Auras:Test(unit)
         self:AURA_FADE(unit,AURA_TYPE_DEBUFF)
         self:AURA_GAIN(unit,AURA_TYPE_DEBUFF, 6770, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
     elseif (unit == "arena3") then
-        spellName, _, icon = GetSpellInfo(17)
+        spellName, _, icon = GetSpellInfo(31224)
         self:AURA_FADE(unit, AURA_TYPE_BUFF)
-        self:AURA_GAIN(unit,AURA_TYPE_BUFF, 17, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
-        self:AURA_FADE(unit,AURA_TYPE_DEBUFF)
-        spellName, _, icon = GetSpellInfo(6770)
-        self:AURA_FADE(unit, AURA_TYPE_BUFF)
+        self:AURA_GAIN(unit,AURA_TYPE_BUFF, 31224, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
+        spellName, _, icon = GetSpellInfo(18425)
         self:AURA_FADE(unit, AURA_TYPE_DEBUFF)
-        self:AURA_GAIN(unit,AURA_TYPE_DEBUFF, 6770, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
+        self:AURA_GAIN(unit,AURA_TYPE_DEBUFF, 18425, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
     end
 end
 
@@ -267,6 +265,13 @@ function Auras:GetOptions()
                             step = 0.1,
                             order = 4,
                         }),
+                    }
+                },
+                font = {
+                    type = "group",
+                    name = L["Font"],
+                    order = 2,
+                    args = {
                         auraFont = Gladdy:option({
                             type = "select",
                             name = L["Font"],
@@ -291,12 +296,12 @@ function Auras:GetOptions()
                             order = 7,
                             hasAlpha = true,
                         }),
-                    }
+                    },
                 },
                 border = {
                     type = "group",
                     name = "Border",
-                    order = 2,
+                    order = 3,
                     args = {
                         headerAuras = {
                             type = "header",

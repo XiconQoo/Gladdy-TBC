@@ -203,6 +203,11 @@ function Classicon:GetOptions()
                     name = L["Icon size"],
                     order = 1,
                     args = {
+                        header = {
+                            type = "header",
+                            name = L["Icon size"],
+                            order = 1,
+                        },
                         classIconSize = Gladdy:option({
                             type = "range",
                             name = L["Icon size"],
