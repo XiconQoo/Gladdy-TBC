@@ -165,7 +165,7 @@ function Castbar:UpdateFrame(unit)
     end
 
     castBar:ClearAllPoints()
-    local horizontalMargin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
+    local horizontalMargin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
     if (Gladdy.db.castBarPos == "LEFT") then
         local anchor = Gladdy:GetAnchor(unit, "LEFT")
         if anchor == Gladdy.buttons[unit].healthBar then

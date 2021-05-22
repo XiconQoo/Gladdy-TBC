@@ -3,10 +3,12 @@ local CreateFrame, UnitIsUnit = CreateFrame, UnitIsUnit
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local Highlight = Gladdy:NewModule("Highlight", nil, {
-    highlightBorderSize = 2,
+    highlightBorderSize = 1,
+    highlightInset = false,
     targetBorderColor = { r = 1, g = 0.8, b = 0, a = 1 },
     focusBorderColor = { r = 1, g = 0, b = 0, a = 1 },
     leaderBorderColor = { r = 0, g = 1, b = 0, a = 1 },
+    highlightBorderStyle = "Square Full White",
     highlight = true,
     targetBorder = true,
     focusBorder = true,
@@ -53,17 +55,17 @@ function Highlight:CreateFrame(unit)
     local healthBar = Gladdy.modules.Healthbar.frames[unit]
 
     local targetBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
-    targetBorder:SetBackdrop({ edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = Gladdy.db.highlightBorderSize })
+    targetBorder:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.highlightBorderStyle), edgeSize = Gladdy.db.highlightBorderSize })
     --targetBorder:SetFrameStrata("MEDIUM")
     targetBorder:Hide()
 
     local focusBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
-    focusBorder:SetBackdrop({ edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = Gladdy.db.highlightBorderSize })
+    focusBorder:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.highlightBorderStyle), edgeSize = Gladdy.db.highlightBorderSize })
     --focusBorder:SetFrameStrata("MEDIUM")
     focusBorder:Hide()
 
     local leaderBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
-    leaderBorder:SetBackdrop({ edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = Gladdy.db.highlightBorderSize })
+    leaderBorder:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.highlightBorderStyle), edgeSize = Gladdy.db.highlightBorderSize })
     --leaderBorder:SetFrameStrata("MEDIUM")
     leaderBorder:Hide()
 
@@ -88,29 +90,48 @@ function Highlight:UpdateFrame(unit)
     end
 
     local borderSize = Gladdy.db.highlightBorderSize
+    local borderOffset = borderSize
     local iconSize = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight + 1
-    local width = Gladdy.db.barWidth + borderSize * 2
-    local height = iconSize + borderSize * 2
+    local width = Gladdy.db.barWidth + (Gladdy.db.highlightInset and 0 or borderSize * 2)
+    local height = iconSize + (Gladdy.db.highlightInset and 0 or borderSize * 2)
 
     button.targetBorder:SetWidth(width)
     button.targetBorder:SetHeight(height)
     button.targetBorder:ClearAllPoints()
-    button.targetBorder:SetPoint("TOP", button.healthBar, "TOP", 0, borderSize)
-    button.targetBorder:SetBackdrop({ edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = borderSize })
+    if Gladdy.db.highlightInset then
+        button.targetBorder:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT", -(borderOffset/Gladdy.db.statusbarBorderOffset), (borderOffset/Gladdy.db.statusbarBorderOffset))
+        button.targetBorder:SetPoint("BOTTOMRIGHT", button.powerBar, "BOTTOMRIGHT", (borderOffset/Gladdy.db.statusbarBorderOffset), -(borderOffset/Gladdy.db.statusbarBorderOffset))
+    else
+        button.targetBorder:SetPoint("TOP", button.healthBar, "TOP", 0, (Gladdy.db.highlightInset and 0 or borderSize))
+    end
+
+    button.targetBorder:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.highlightBorderStyle), edgeSize = borderSize })
     button.targetBorder:SetBackdropBorderColor(Gladdy.db.targetBorderColor.r, Gladdy.db.targetBorderColor.g, Gladdy.db.targetBorderColor.b, Gladdy.db.targetBorderColor.a)
 
     button.focusBorder:SetWidth(width)
     button.focusBorder:SetHeight(height)
     button.focusBorder:ClearAllPoints()
-    button.focusBorder:SetPoint("TOP", button.healthBar, "TOP", 0, borderSize)
-    button.focusBorder:SetBackdrop({ edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = borderSize })
+    if Gladdy.db.highlightInset then
+        button.focusBorder:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT", -(borderOffset/Gladdy.db.statusbarBorderOffset), (borderOffset/Gladdy.db.statusbarBorderOffset))
+        button.focusBorder:SetPoint("BOTTOMRIGHT", button.powerBar, "BOTTOMRIGHT", (borderOffset/Gladdy.db.statusbarBorderOffset), -(borderOffset/Gladdy.db.statusbarBorderOffset))
+    else
+        button.focusBorder:SetPoint("TOP", button.healthBar, "TOP", 0, (Gladdy.db.highlightInset and 0 or borderSize))
+    end
+
+    button.focusBorder:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.highlightBorderStyle), edgeSize = borderSize })
     button.focusBorder:SetBackdropBorderColor(Gladdy.db.focusBorderColor.r, Gladdy.db.focusBorderColor.g, Gladdy.db.focusBorderColor.b, Gladdy.db.focusBorderColor.a)
 
     button.leaderBorder:SetWidth(width)
     button.leaderBorder:SetHeight(height)
     button.leaderBorder:ClearAllPoints()
-    button.leaderBorder:SetPoint("TOP", button.healthBar, "TOP", 0, borderSize)
-    button.leaderBorder:SetBackdrop({ edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = borderSize })
+    if Gladdy.db.highlightInset then
+        button.leaderBorder:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT", -(borderOffset/Gladdy.db.statusbarBorderOffset), (borderOffset/Gladdy.db.statusbarBorderOffset))
+        button.leaderBorder:SetPoint("BOTTOMRIGHT", button.powerBar, "BOTTOMRIGHT", (borderOffset/Gladdy.db.statusbarBorderOffset), -(borderOffset/Gladdy.db.statusbarBorderOffset))
+    else
+        button.leaderBorder:SetPoint("TOP", button.healthBar, "TOP", 0, (Gladdy.db.highlightInset and 0 or borderSize))
+    end
+
+    button.leaderBorder:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.highlightBorderStyle), edgeSize = borderSize })
     button.leaderBorder:SetBackdropBorderColor(Gladdy.db.leaderBorderColor.r, Gladdy.db.leaderBorderColor.g, Gladdy.db.leaderBorderColor.b, Gladdy.db.leaderBorderColor.a)
     if Gladdy.frame.testing then
         Highlight:Test(unit)
@@ -179,34 +200,52 @@ function Highlight:GetOptions()
             name = L["Highlight"],
             order = 2,
         },
-        highlightBorderSize = {
+        highlightInset = Gladdy:option({
+            type = "toggle",
+            name = L["Show Inside"],
+            desc = L["Show Highlight border inside of frame"],
+            order = 3,
+        }),
+        highlightBorderSize = Gladdy:option({
             type = "range",
             name = L["Border size"],
             desc = L["Border size"],
-            order = 3,
+            order = 4,
             min = 1,
-            max = 10,
+            max = 20,
             step = 1,
+        }),
+        highlightBorderStyle = Gladdy:option({
+            type = "select",
+            name = L["Border style"],
+            order = 5,
+            dialogControl = "LSM30_Border",
+            values = AceGUIWidgetLSMlists.border,
+        }),
+        headerColor = {
+            type = "header",
+            name = L["Colors"],
+            order = 6,
         },
         targetBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Target border color"],
             desc = L["Color of the selected targets border"],
-            order = 4,
+            order = 7,
             hasAlpha = true,
         }),
         focusBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Focus border color"],
             desc = L["Color of the focus border"],
-            order = 5,
+            order = 8,
             hasAlpha = true,
         }),
         leaderBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Raid leader border color"],
             desc = L["Color of the raid leader border"],
-            order = 6,
+            order = 9,
             hasAlpha = true,
         }),
         headerEnable = {

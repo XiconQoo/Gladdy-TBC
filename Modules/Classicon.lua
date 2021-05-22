@@ -120,7 +120,7 @@ function Classicon:UpdateFrame(unit)
     classIcon:SetHeight(Gladdy.db.classIconSize)
 
     classIcon:ClearAllPoints()
-    local margin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
+    local margin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
     if (Gladdy.db.classIconPos == "LEFT") then
         classIcon:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -margin, 0)
     else

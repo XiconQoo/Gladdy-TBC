@@ -134,7 +134,7 @@ function Racial:UpdateFrame(unit)
     racial.texture.overlay:SetVertexColor(Gladdy.db.racialBorderColor.r, Gladdy.db.racialBorderColor.g, Gladdy.db.racialBorderColor.b, Gladdy.db.racialBorderColor.a)
 
     racial:ClearAllPoints()
-    local margin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
+    local margin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
     local parent = Gladdy.buttons[unit][Gladdy.db.racialAnchor]
     if (Gladdy.db.racialPos == "RIGHT") then
         racial:SetPoint(ANCHORS[Gladdy.db.racialPos], parent, Gladdy.db.racialPos, Gladdy.db.padding + Gladdy.db.racialXOffset, Gladdy.db.racialYOffset)
@@ -237,7 +237,7 @@ function Racial:GetOptions()
                         header = {
                             type = "header",
                             name = L["Size"],
-                            order = 4,
+                            order = 1,
                         },
                         racialSize = Gladdy:option({
                             type = "range",
@@ -245,7 +245,7 @@ function Racial:GetOptions()
                             min = 5,
                             max = 100,
                             step = 1,
-                            order = 4,
+                            order = 2,
                         }),
                         racialWidthFactor = Gladdy:option({
                             type = "range",
@@ -253,7 +253,7 @@ function Racial:GetOptions()
                             min = 0.5,
                             max = 2,
                             step = 0.05,
-                            order = 6,
+                            order = 3,
                         }),
                     },
                 },
