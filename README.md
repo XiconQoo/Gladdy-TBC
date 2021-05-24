@@ -1,7 +1,7 @@
 # Gladdy - TBC
 
 ### The most powerful arena addon for WoW TBC 2.5.1
-## [v1.09-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v1.09-Beta/Gladdy_TBC-Classic_v1.09-Beta.zip)
+## [v1.10-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v1.10-Beta/Gladdy_TBC-Classic_v1.10-Beta.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -38,6 +38,12 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 <img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/sample3.png" width="48.5%">
 
 ### Changes
+
+### v1.10-Beta
+- fix german and russian client not working
+- ArenaCountdown loacalization now working for all languages (except itIT...beta has no option to select italian)
+- Race and Class localization working for all languages
+- Localization finished for German
 
 #### v1.09-Beta
 - fix Blizzard profile not having all modules preconfigured

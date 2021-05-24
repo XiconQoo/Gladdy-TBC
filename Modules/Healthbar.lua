@@ -98,8 +98,9 @@ function Healthbar.OnEvent(self, event, unit)
     if event == "UNIT_HEALTH" then
         local health = UnitHealth(unit)
         local healthMax = UnitHealthMax(unit)
-        Healthbar:SetHealthText(self, health, healthMax)
+        self.hp:SetMinMaxValues(0, healthMax)
         self.hp:SetValue(UnitHealth(unit))
+        Healthbar:SetHealthText(self, health, healthMax)
     elseif event == "UNIT_MAXHEALTH" then
         local health = UnitHealth(unit)
         local healthMax = UnitHealthMax(unit)
@@ -109,7 +110,9 @@ function Healthbar.OnEvent(self, event, unit)
     elseif event == "UNIT_NAME_UPDATE" then
         local name = UnitName(unit)
         Gladdy.buttons[unit].name = name
-        self.nameText:SetText(name)
+        if Gladdy.db.healthName and not Gladdy.db.healthNameToArenaId then
+            self.nameText:SetText(name)
+        end
     end
     if not Gladdy.buttons[unit].class then
         Gladdy:SpotEnemy(unit, true)
@@ -316,7 +319,7 @@ local function option(params)
         set = function(info, value)
             local key = info.arg or info[#info]
             Gladdy.dbi.profile[key] = value
-            Gladdy.options.args.Healthbar.args.group.args.border.args.healthBarBorderSize.max = Gladdy.db.healthBarHeight/2
+            Gladdy.options.args["Health Bar"].args.group.args.border.args.healthBarBorderSize.max = Gladdy.db.healthBarHeight/2
             if Gladdy.db.healthBarBorderSize > Gladdy.db.healthBarHeight/2 then
                 Gladdy.db.healthBarBorderSize = Gladdy.db.healthBarHeight/2
             end
