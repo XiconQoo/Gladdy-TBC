@@ -519,7 +519,7 @@ local function option(params)
         set = function(info, value)
             local key = info.arg or info[#info]
             Gladdy.dbi.profile[key] = value
-            Gladdy.options.args.Castbar.args.group.args.barFrame.args.castBarBorderSize.max = Gladdy.db.castBarHeight/2
+            Gladdy.options.args["Cast Bar"].args.group.args.barFrame.args.castBarBorderSize.max = Gladdy.db.castBarHeight/2
             if Gladdy.db.castBarBorderSize > Gladdy.db.castBarHeight/2 then
                 Gladdy.db.castBarBorderSize = Gladdy.db.castBarHeight/2
             end

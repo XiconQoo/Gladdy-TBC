@@ -319,7 +319,7 @@ local function option(params)
         set = function(info, value)
             local key = info.arg or info[#info]
             Gladdy.dbi.profile[key] = value
-            Gladdy.options.args.Healthbar.args.group.args.border.args.healthBarBorderSize.max = Gladdy.db.healthBarHeight/2
+            Gladdy.options.args["Health Bar"].args.group.args.border.args.healthBarBorderSize.max = Gladdy.db.healthBarHeight/2
             if Gladdy.db.healthBarBorderSize > Gladdy.db.healthBarHeight/2 then
                 Gladdy.db.healthBarBorderSize = Gladdy.db.healthBarHeight/2
             end

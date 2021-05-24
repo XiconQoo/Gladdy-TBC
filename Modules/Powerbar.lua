@@ -290,7 +290,7 @@ local function option(params)
         set = function(info, value)
             local key = info.arg or info[#info]
             Gladdy.dbi.profile[key] = value
-            Gladdy.options.args.Powerbar.args.group.args.border.args.powerBarBorderSize.max = Gladdy.db.powerBarHeight/2
+            Gladdy.options.args["Power Bar"].args.group.args.border.args.powerBarBorderSize.max = Gladdy.db.powerBarHeight/2
             if Gladdy.db.powerBarBorderSize > Gladdy.db.powerBarHeight/2 then
                 Gladdy.db.powerBarBorderSize = Gladdy.db.powerBarHeight/2
             end
