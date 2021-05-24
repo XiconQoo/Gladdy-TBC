@@ -206,9 +206,6 @@ function Announcements:GetOptions()
         ["party"] = L["Party"],
         ["rw"] = L["Raid Warning"],
         ["fct"] = L["Blizzard's Floating Combat Text"],
-        --["msbt"] = L["MikScrollingBattleText"],
-        --["sct"] = L["Scrolling Combat Text"],
-        --["parrot"] = L["Parrot"],
     }
 
     return {
