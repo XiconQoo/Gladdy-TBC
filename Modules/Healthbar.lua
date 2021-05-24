@@ -8,7 +8,7 @@ local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
-local Healthbar = Gladdy:NewModule("Healthbar", 100, {
+local Healthbar = Gladdy:NewModule("Health Bar", 100, {
     healthBarFont = "DorisPP",
     healthBarHeight = 60,
     healthBarTexture = "Smooth",
@@ -344,7 +344,7 @@ function Healthbar:GetOptions()
         group = {
             type = "group",
             childGroups = "tree",
-            name = "Frame",
+            name = L["Frame"],
             order = 3,
             args = {
                 general = {
@@ -478,12 +478,14 @@ function Healthbar:GetOptions()
                             name = L["Show name text"],
                             desc = L["Show the units name"],
                             order = 2,
+                            width = "full",
                         }),
                         healthNameToArenaId = option({
                             type = "toggle",
                             name = L["Show ArenaX"],
                             desc = L["Show Arena1-5 as name instead"],
                             order = 3,
+                            width = "full",
                             disabled = function() return not Gladdy.db.healthName end
                         }),
                         healthActual = option({
@@ -491,18 +493,21 @@ function Healthbar:GetOptions()
                             name = L["Show the actual health"],
                             desc = L["Show the actual health on the health bar"],
                             order = 4,
+                            width = "full",
                         }),
                         healthMax = option({
                             type = "toggle",
                             name = L["Show max health"],
                             desc = L["Show max health on the health bar"],
                             order = 5,
+                            width = "full",
                         }),
                         healthPercentage = option({
                             type = "toggle",
                             name = L["Show health percentage"],
                             desc = L["Show health percentage on the health bar"],
                             order = 6,
+                            width = "full",
                         }),
                     },
                 },

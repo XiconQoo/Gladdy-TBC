@@ -114,7 +114,7 @@ function Gladdy:SetupModule(name, module, order)
         self.options.args[name] = {
             type = "group",
             name = L[name],
-            desc = L[name .. " settings"],
+            desc = L[name] .. " " .. L["settings"],
             childGroups = "tab",
             order = order,
             args = {},
@@ -152,7 +152,7 @@ local function pairsByKeys(t)
     for k in pairs(t) do
         tinsert(a, k)
     end
-    tsort(a)
+    tsort(a, function(a, b) return L[a] < L[b] end)
 
     local i = 0
     return function()
@@ -207,7 +207,7 @@ function Gladdy:SetupOptions()
                     },
                     group = {
                         type = "group",
-                        name = "General",
+                        name = L["General"],
                         order = 4,
                         childGroups = "tree",
                         args = {

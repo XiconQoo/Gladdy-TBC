@@ -333,21 +333,21 @@ end
 
 function Pets:GetOptions()
     return {
-        headerHealthbar = {
+        header = {
             type = "header",
-            name = L["Health Bar"],
+            name = L["Pets"],
             order = 2,
         },
         petEnabled = Gladdy:option({
             type = "toggle",
-            name = L["Enable"],
-            desc = L["Enabled Pets module"],
+            name = L["Enabled"],
+            desc = L["Enables Pets module"],
             order = 3,
         }),
         group = {
             type = "group",
             childGroups = "tree",
-            name = "Frame",
+            name = L["Frame"],
             order = 3,
             args = {
                 general = {

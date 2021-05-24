@@ -25,7 +25,7 @@ local LibClassAuras = LibStub("LibClassAuras-1.0")
 local L = Gladdy.L
 local defaultTrackedDebuffs = select(2, Gladdy:GetAuras(AURA_TYPE_DEBUFF))
 local defaultTrackedBuffs = select(2, Gladdy:GetAuras(AURA_TYPE_BUFF))
-local BuffsDebuffs = Gladdy:NewModule("BuffsDebuffs", nil, {
+local BuffsDebuffs = Gladdy:NewModule("Buffs and Debuffs", nil, {
     buffsEnabled = true,
     buffsShowAuraDebuffs = false,
     buffsAlpha = 1,
@@ -623,7 +623,7 @@ function BuffsDebuffs:GetOptions()
         },
         buffsEnabled = Gladdy:option({
             type = "toggle",
-            name = L["Enable"],
+            name = L["Enabled"],
             desc = L["Enabled Buffs and Debuffs module"],
             order = 3,
         }),
@@ -636,7 +636,7 @@ function BuffsDebuffs:GetOptions()
         group = {
             type = "group",
             childGroups = "tree",
-            name = "Frame",
+            name = L["Frame"],
             order = 5,
             args = {
                 buffs = {
@@ -646,7 +646,7 @@ function BuffsDebuffs:GetOptions()
                     args = {
                         size = {
                             type = "group",
-                            name = "Size & Padding",
+                            name = L["Size & Padding"],
                             order = 1,
                             args = {
                                 header = {
@@ -685,7 +685,7 @@ function BuffsDebuffs:GetOptions()
                         },
                         position = {
                             type = "group",
-                            name = "Position",
+                            name = L["Position"],
                             order = 3,
                             args = {
                                 header = {
@@ -762,7 +762,7 @@ function BuffsDebuffs:GetOptions()
                     args = {
                         size = {
                             type = "group",
-                            name = "Size & Padding",
+                            name = L["Size & Padding"],
                             order = 1,
                             args = {
                                 header = {
@@ -801,7 +801,7 @@ function BuffsDebuffs:GetOptions()
                         },
                         position = {
                             type = "group",
-                            name = "Position",
+                            name = L["Position"],
                             order = 3,
                             args = {
                                 header = {
@@ -873,7 +873,7 @@ function BuffsDebuffs:GetOptions()
                 },
                 cooldown = {
                     type = "group",
-                    name = "Cooldown",
+                    name = L["Cooldown"],
                     order = 3,
                     args = {
                         header = {
@@ -885,6 +885,7 @@ function BuffsDebuffs:GetOptions()
                             type = "toggle",
                             name = L["No Cooldown Circle"],
                             order = 9,
+                            width = "full",
                         }),
                         buffsCooldownAlpha = Gladdy:option({
                             type = "range",

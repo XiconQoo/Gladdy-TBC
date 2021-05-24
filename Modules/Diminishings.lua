@@ -359,14 +359,14 @@ function Diminishings:GetOptions()
         },
         drEnabled = Gladdy:option({
             type = "toggle",
-            name = L["Enable"],
+            name = L["Enabled"],
             desc = L["Enabled DR module"],
             order = 3,
         }),
         group = {
             type = "group",
             childGroups = "tree",
-            name = "Frame",
+            name = L["Frame"],
             order = 4,
             args = {
                 icon = {
@@ -422,6 +422,7 @@ function Diminishings:GetOptions()
                             type = "toggle",
                             name = L["No Cooldown Circle"],
                             order = 8,
+                            width = "full",
                         }),
                         drCooldownAlpha = Gladdy:option({
                             type = "range",
