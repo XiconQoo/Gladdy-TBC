@@ -52,7 +52,7 @@ function Highlight:CreateFrame(unit)
         return
     end
 
-    local healthBar = Gladdy.modules.Healthbar.frames[unit]
+    local healthBar = Gladdy.modules["Health Bar"].frames[unit]
 
     local targetBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
     targetBorder:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.highlightBorderStyle), edgeSize = Gladdy.db.highlightBorderSize })
@@ -241,16 +241,9 @@ function Highlight:GetOptions()
             order = 8,
             hasAlpha = true,
         }),
-        leaderBorderColor = Gladdy:colorOption({
-            type = "color",
-            name = L["Raid leader border color"],
-            desc = L["Color of the raid leader border"],
-            order = 9,
-            hasAlpha = true,
-        }),
         headerEnable = {
             type = "header",
-            name = L["Enable/Disable"],
+            name = L["Enabled"],
             order = 10,
         },
         highlight = Gladdy:option({
@@ -258,24 +251,21 @@ function Highlight:GetOptions()
             name = L["Highlight target"],
             desc = L["Toggle if the selected target should be highlighted"],
             order = 11,
+            width = "full",
         }),
         targetBorder = Gladdy:option({
             type = "toggle",
             name = L["Show border around target"],
             desc = L["Toggle if a border should be shown around the selected target"],
             order = 12,
+            width = "full",
         }),
         focusBorder = Gladdy:option({
             type = "toggle",
             name = L["Show border around focus"],
             desc = L["Toggle of a border should be shown around the current focus"],
             order = 13,
-        }),
-        leaderBorder = Gladdy:option({
-            type = "toggle",
-            name = L["Show border around raid leader"],
-            desc = L["Toggle if a border should be shown around the raid leader"],
-            order = 14,
+            width = "full",
         }),
     }
 end

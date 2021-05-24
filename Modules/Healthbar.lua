@@ -8,7 +8,7 @@ local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
-local Healthbar = Gladdy:NewModule("Healthbar", 100, {
+local Healthbar = Gladdy:NewModule("Health Bar", 100, {
     healthBarFont = "DorisPP",
     healthBarHeight = 60,
     healthBarTexture = "Smooth",
@@ -98,8 +98,9 @@ function Healthbar.OnEvent(self, event, unit)
     if event == "UNIT_HEALTH" then
         local health = UnitHealth(unit)
         local healthMax = UnitHealthMax(unit)
-        Healthbar:SetHealthText(self, health, healthMax)
+        self.hp:SetMinMaxValues(0, healthMax)
         self.hp:SetValue(UnitHealth(unit))
+        Healthbar:SetHealthText(self, health, healthMax)
     elseif event == "UNIT_MAXHEALTH" then
         local health = UnitHealth(unit)
         local healthMax = UnitHealthMax(unit)
@@ -109,7 +110,9 @@ function Healthbar.OnEvent(self, event, unit)
     elseif event == "UNIT_NAME_UPDATE" then
         local name = UnitName(unit)
         Gladdy.buttons[unit].name = name
-        self.nameText:SetText(name)
+        if Gladdy.db.healthName and not Gladdy.db.healthNameToArenaId then
+            self.nameText:SetText(name)
+        end
     end
     if not Gladdy.buttons[unit].class then
         Gladdy:SpotEnemy(unit, true)
@@ -316,7 +319,7 @@ local function option(params)
         set = function(info, value)
             local key = info.arg or info[#info]
             Gladdy.dbi.profile[key] = value
-            Gladdy.options.args.Healthbar.args.group.args.border.args.healthBarBorderSize.max = Gladdy.db.healthBarHeight/2
+            Gladdy.options.args["Health Bar"].args.group.args.border.args.healthBarBorderSize.max = Gladdy.db.healthBarHeight/2
             if Gladdy.db.healthBarBorderSize > Gladdy.db.healthBarHeight/2 then
                 Gladdy.db.healthBarBorderSize = Gladdy.db.healthBarHeight/2
             end
@@ -344,7 +347,7 @@ function Healthbar:GetOptions()
         group = {
             type = "group",
             childGroups = "tree",
-            name = "Frame",
+            name = L["Frame"],
             order = 3,
             args = {
                 general = {
@@ -478,12 +481,14 @@ function Healthbar:GetOptions()
                             name = L["Show name text"],
                             desc = L["Show the units name"],
                             order = 2,
+                            width = "full",
                         }),
                         healthNameToArenaId = option({
                             type = "toggle",
                             name = L["Show ArenaX"],
                             desc = L["Show Arena1-5 as name instead"],
                             order = 3,
+                            width = "full",
                             disabled = function() return not Gladdy.db.healthName end
                         }),
                         healthActual = option({
@@ -491,18 +496,21 @@ function Healthbar:GetOptions()
                             name = L["Show the actual health"],
                             desc = L["Show the actual health on the health bar"],
                             order = 4,
+                            width = "full",
                         }),
                         healthMax = option({
                             type = "toggle",
                             name = L["Show max health"],
                             desc = L["Show max health on the health bar"],
                             order = 5,
+                            width = "full",
                         }),
                         healthPercentage = option({
                             type = "toggle",
                             name = L["Show health percentage"],
                             desc = L["Show health percentage on the health bar"],
                             order = 6,
+                            width = "full",
                         }),
                     },
                 },

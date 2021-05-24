@@ -18,7 +18,7 @@ local function table_copy(t)
     return t2;
 end
 
-local ExportImport = Gladdy:NewModule("ExportImport", nil, {
+local ExportImport = Gladdy:NewModule("Export Import", nil, {
 })
 
 

@@ -6,7 +6,7 @@ local ANCHORS = { ["LEFT"] = "RIGHT", ["RIGHT"] = "LEFT", ["BOTTOM"] = "TOP", ["
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 
-local CombatIndicator = Gladdy:NewModule("CombatIndicator", nil, {
+local CombatIndicator = Gladdy:NewModule("Combat Indicator", nil, {
     ciEnabled = true,
     ciSize = 20,
     ciAlpha = 1,
@@ -107,21 +107,21 @@ end
 
 function CombatIndicator:GetOptions()
     return {
-        headerTrinket = {
+        header = {
             type = "header",
-            name = L["Racial"],
+            name = L["Combat Indicator"],
             order = 2,
         },
         ciEnabled = Gladdy:option({
             type = "toggle",
             name = L["Enabled"],
-            desc = L["Enable ci icon"],
+            desc = L["Enable Combat Indicator icon"],
             order = 3,
         }),
         group = {
             type = "group",
             childGroups = "tree",
-            name = "Frame",
+            name = L["Frame"],
             order = 4,
             args = {
                 general = {

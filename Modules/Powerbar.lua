@@ -6,7 +6,7 @@ local CreateFrame, UnitPower, UnitPowerType, UnitPowerMax, UnitExists = CreateFr
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
-local Powerbar = Gladdy:NewModule("Powerbar", 90, {
+local Powerbar = Gladdy:NewModule("Power Bar", 90, {
     powerBarFont = "DorisPP",
     powerBarHeight = 20,
     powerBarTexture = "Smooth",
@@ -132,7 +132,7 @@ function Powerbar:UpdateFrame(unit)
         return
     end
 
-    local healthBar = Gladdy.modules.Healthbar.frames[unit]
+    local healthBar = Gladdy.modules["Health Bar"].frames[unit]
 
 
     powerBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
@@ -290,7 +290,7 @@ local function option(params)
         set = function(info, value)
             local key = info.arg or info[#info]
             Gladdy.dbi.profile[key] = value
-            Gladdy.options.args.Powerbar.args.group.args.border.args.powerBarBorderSize.max = Gladdy.db.powerBarHeight/2
+            Gladdy.options.args["Power Bar"].args.group.args.border.args.powerBarBorderSize.max = Gladdy.db.powerBarHeight/2
             if Gladdy.db.powerBarBorderSize > Gladdy.db.powerBarHeight/2 then
                 Gladdy.db.powerBarBorderSize = Gladdy.db.powerBarHeight/2
             end
@@ -318,7 +318,7 @@ function Powerbar:GetOptions()
         group = {
             type = "group",
             childGroups = "tree",
-            name = "Frame",
+            name = L["Frame"],
             order = 3,
             args = {
                 general = {

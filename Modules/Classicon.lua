@@ -4,7 +4,7 @@ local Gladdy = LibStub("Gladdy")
 local CreateFrame = CreateFrame
 local GetSpellInfo = GetSpellInfo
 local L = Gladdy.L
-local Classicon = Gladdy:NewModule("Classicon", 80, {
+local Classicon = Gladdy:NewModule("Class Icon", 80, {
     classIconPos = "LEFT",
     classIconSize = 60 + 20 + 1,
     classIconWidthFactor = 0.9,
@@ -195,7 +195,7 @@ function Classicon:GetOptions()
         group = {
             type = "group",
             childGroups = "tree",
-            name = "Frame",
+            name = L["Frame"],
             order = 4,
             args = {
                 size = {

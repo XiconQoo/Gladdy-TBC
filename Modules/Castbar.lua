@@ -18,7 +18,7 @@ local BackdropTemplateMixin = BackdropTemplateMixin
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
-local Castbar = Gladdy:NewModule("Castbar", 70, {
+local Castbar = Gladdy:NewModule("Cast Bar", 70, {
     castBarHeight = 20,
     castBarWidth = 160,
     castBarIconSize = 22,
@@ -519,7 +519,7 @@ local function option(params)
         set = function(info, value)
             local key = info.arg or info[#info]
             Gladdy.dbi.profile[key] = value
-            Gladdy.options.args.Castbar.args.group.args.barFrame.args.castBarBorderSize.max = Gladdy.db.castBarHeight/2
+            Gladdy.options.args["Cast Bar"].args.group.args.barFrame.args.castBarBorderSize.max = Gladdy.db.castBarHeight/2
             if Gladdy.db.castBarBorderSize > Gladdy.db.castBarHeight/2 then
                 Gladdy.db.castBarBorderSize = Gladdy.db.castBarHeight/2
             end
@@ -544,12 +544,12 @@ function Castbar:GetOptions()
         group = {
             type = "group",
             childGroups = "tree",
-            name = "Frame",
+            name = L["Frame"],
             order = 3,
             args = {
                 barFrame = {
                     type = "group",
-                    name = "Bar",
+                    name = L["Bar"],
                     order = 1,
                     args = {
                         headerSize = {
@@ -632,7 +632,7 @@ function Castbar:GetOptions()
                 },
                 icon = {
                     type = "group",
-                    name = "Icon",
+                    name = L["Icon"],
                     order = 2,
                     args = {
                         headerSize = {
@@ -669,7 +669,7 @@ function Castbar:GetOptions()
                 },
                 spark = {
                     type = "group",
-                    name = "Spark",
+                    name = L["Spark"],
                     order = 3,
                     args = {
                         header = {
@@ -693,7 +693,7 @@ function Castbar:GetOptions()
                 },
                 font = {
                     type = "group",
-                    name = "Font",
+                    name = L["Font"],
                     order = 4,
                     args = {
                         header = {
@@ -743,7 +743,7 @@ function Castbar:GetOptions()
                 },
                 position = {
                     type = "group",
-                    name = "Position",
+                    name = L["Position"],
                     order = 5,
                     args = {
                         header = {

@@ -226,7 +226,7 @@ function Racial:GetOptions()
         group = {
             type = "group",
             childGroups = "tree",
-            name = "Frame",
+            name = L["Frame"],
             order = 4,
             args = {
                 general = {
@@ -271,6 +271,7 @@ function Racial:GetOptions()
                             type = "toggle",
                             name = L["No Cooldown Circle"],
                             order = 7,
+                            width = "full",
                         }),
                         racialCooldownAlpha = Gladdy:option({
                             type = "range",
@@ -318,7 +319,7 @@ function Racial:GetOptions()
                     args = {
                         header = {
                             type = "header",
-                            name = L["Position"],
+                            name = L["Icon position"],
                             order = 4,
                         },
                         racialAnchor = Gladdy:option({
@@ -335,7 +336,7 @@ function Racial:GetOptions()
                         }),
                         racialPos = Gladdy:option({
                             type = "select",
-                            name = L["Position"],
+                            name = L["Icon position"],
                             desc = L["This changes position relative to its anchor of the racial icon"],
                             order = 21,
                             values = {

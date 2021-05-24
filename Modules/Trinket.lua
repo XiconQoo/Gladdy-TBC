@@ -229,7 +229,7 @@ function Trinket:GetOptions()
         group = {
             type = "group",
             childGroups = "tree",
-            name = "Frame",
+            name = L["Frame"],
             order = 4,
             args = {
                 general = {
@@ -240,11 +240,11 @@ function Trinket:GetOptions()
                         header = {
                             type = "header",
                             name = L["Size"],
-                            order = 4,
+                            order = 1,
                         },
                         trinketSize = Gladdy:option({
                             type = "range",
-                            name = L["Trinket size"],
+                            name = L["Size"],
                             min = 5,
                             max = 100,
                             step = 1,
@@ -274,6 +274,7 @@ function Trinket:GetOptions()
                             type = "toggle",
                             name = L["No Cooldown Circle"],
                             order = 7,
+                            width = "full",
                         }),
                         trinketCooldownAlpha = Gladdy:option({
                             type = "range",
@@ -321,12 +322,12 @@ function Trinket:GetOptions()
                     args = {
                         header = {
                             type = "header",
-                            name = L["Position"],
+                            name = L["Icon position"],
                             order = 4,
                         },
                         trinketPos = Gladdy:option({
                             type = "select",
-                            name = L["Trinket position"],
+                            name = L["Icon position"],
                             desc = L["This changes positions of the trinket"],
                             order = 21,
                             values = {

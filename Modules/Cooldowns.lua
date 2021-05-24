@@ -576,14 +576,14 @@ function Cooldowns:GetOptions()
         },
         cooldown = Gladdy:option({
             type = "toggle",
-            name = L["Enable"],
+            name = L["Enabled"],
             desc = L["Enabled cooldown module"],
             order = 2,
         }),
         group = {
             type = "group",
             childGroups = "tree",
-            name = "Frame",
+            name = L["Frame"],
             order = 3,
             args = {
                 icon = {
@@ -646,6 +646,7 @@ function Cooldowns:GetOptions()
                             type = "toggle",
                             name = L["No Cooldown Circle"],
                             order = 8,
+                            width = "full",
                         }),
                         cooldownCooldownAlpha = Gladdy:option({
                             type = "range",
@@ -778,7 +779,7 @@ function Cooldowns:GetOptions()
         cooldowns = {
             type = "group",
             childGroups = "tree",
-            name = "Cooldowns",
+            name = L["Cooldowns"],
             order = 4,
             args = Cooldowns:GetCooldownOptions(),
         },

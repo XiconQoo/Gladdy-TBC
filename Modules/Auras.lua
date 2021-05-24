@@ -42,7 +42,7 @@ function Auras:Initialize()
 end
 
 function Auras:CreateFrame(unit)
-    local auraFrame = CreateFrame("Frame", nil, Gladdy.modules.Classicon.frames[unit])
+    local auraFrame = CreateFrame("Frame", nil, Gladdy.modules["Class Icon"].frames[unit])
     auraFrame:EnableMouse(false)
     auraFrame:SetFrameStrata("MEDIUM")
     auraFrame:SetFrameLevel(3)
@@ -68,7 +68,7 @@ function Auras:CreateFrame(unit)
     auraFrame.icon.overlay:SetAllPoints(auraFrame)
     auraFrame.icon.overlay:SetTexture(Gladdy.db.buttonBorderStyle)
 
-    local classIcon = Gladdy.modules.Classicon.frames[unit]
+    local classIcon = Gladdy.modules["Class Icon"].frames[unit]
     auraFrame:ClearAllPoints()
     auraFrame:SetAllPoints(classIcon)
 
@@ -106,7 +106,7 @@ function Auras:UpdateFrame(unit)
 
     auraFrame:SetWidth(width)
     auraFrame:SetHeight(height)
-    auraFrame:SetAllPoints(Gladdy.modules.Classicon.frames[unit])
+    auraFrame:SetAllPoints(Gladdy.modules["Class Icon"].frames[unit])
 
     auraFrame.cooldown:SetWidth(width - width/16)
     auraFrame.cooldown:SetHeight(height - height/16)
@@ -238,12 +238,12 @@ function Auras:GetOptions()
         group = {
             type = "group",
             childGroups = "tree",
-            name = "Frame",
+            name = L["Frame"],
             order = 3,
             args = {
                 cooldown = {
                     type = "group",
-                    name = "Cooldown",
+                    name = L["Cooldown"],
                     order = 1,
                     args = {
                         headerAuras = {
@@ -272,6 +272,11 @@ function Auras:GetOptions()
                     name = L["Font"],
                     order = 2,
                     args = {
+                        headerAuras = {
+                            type = "header",
+                            name = L["Font"],
+                            order = 1,
+                        },
                         auraFont = Gladdy:option({
                             type = "select",
                             name = L["Font"],
@@ -300,7 +305,7 @@ function Auras:GetOptions()
                 },
                 border = {
                     type = "group",
-                    name = "Border",
+                    name = L["Border"],
                     order = 3,
                     args = {
                         headerAuras = {
@@ -356,7 +361,7 @@ function Auras:GetAuraOptions(auraType)
         ckeckAll = {
             order = 1,
             width = "0.7",
-            name = "Check All",
+            name = L["Check All"],
             type = "execute",
             func = function(info)
                 for k,v in pairs(defaultSpells(auraType)) do
@@ -367,7 +372,7 @@ function Auras:GetAuraOptions(auraType)
         uncheckAll = {
             order = 2,
             width = "0.7",
-            name = "Uncheck All",
+            name = L["Uncheck All"],
             type = "execute",
             func = function(info)
                 for k,v in pairs(defaultSpells(auraType)) do

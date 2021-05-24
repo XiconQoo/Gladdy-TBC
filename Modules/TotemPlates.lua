@@ -77,6 +77,13 @@ local localizedTotemData = {
         [string_lower(select(1, GetSpellInfo(3738)))] = totemData[string_lower("Wrath of Air Totem")], -- Wrath of Air Totem
         [string_lower(select(1, GetSpellInfo(25908)))] = totemData[string_lower("Tranquil Air Totem")], -- Tranquil Air Totem
     },
+    ["frFR"] = {
+        [string_lower("Totem d'\195\169lementaire de terre")] = totemData[string_lower("Earth Elemental Totem")], -- Earth Elemental Totem
+        [string_lower("Totem d'\195\169lementaire de feu")] = totemData[string_lower("Fire Elemental Totem")], -- Fire Elemental Totem
+    },
+    ["ruRU"] = {
+        [string_lower("")] = totemData[string_lower("Sentry Totem")], -- Sentry Totem
+    }
 }
 
 local function GetTotemColorDefaultOptions()
@@ -106,7 +113,7 @@ local function GetTotemColorDefaultOptions()
                 },
                 enabled = {
                     order = 2,
-                    name = "Enabled",
+                    name = L["Enabled"],
                     desc = "Enable " .. format("|T%s:20|t %s", indexedList[i].texture, select(1, GetSpellInfo(indexedList[i].id))),
                     type = "toggle",
                     width = "full",
@@ -188,7 +195,7 @@ end
 
 ---------------------------------------------------
 
-local TotemPlates = Gladdy:NewModule("TotemPlates", nil, {
+local TotemPlates = Gladdy:NewModule("Totem Plates", nil, {
     npTotems = true,
     npTotemsShowFriendly = true,
     npTotemsShowEnemy = true,
@@ -286,7 +293,7 @@ function TotemPlates:NAME_PLATE_UNIT_ADDED(...)
     totemName = string_gsub(totemName, "%s+[I,V,X]+$", "") --trim rank
     totemName = string_lower(totemName)
     local nameplate = C_NamePlate.GetNamePlateForUnit(unitID)
-    local totemDataEntry = localizedTotemData["default"][totemName]
+    local totemDataEntry = localizedTotemData["default"][totemName] or localizedTotemData["frFR"][totemName] or localizedTotemData["ruRU"][totemName]
     if totemDataEntry and Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enabled then-- modify this nameplates
 
         if #self.totemPlateCache > 0 then
@@ -384,12 +391,12 @@ function TotemPlates:GetOptions()
     return {
         headerTotems = {
             type = "header",
-            name = L["Totem General"],
+            name = L["Totem Plates"],
             order = 2,
         },
         npTotems = Gladdy:option({
             type = "toggle",
-            name = L["Totem icons on/off"],
+            name = L["Enabled"],
             desc = L["Turns totem icons instead of nameplates on or off. (Requires reload)"],
             order = 3,
             width = 0.9,
@@ -411,7 +418,7 @@ function TotemPlates:GetOptions()
         group = {
             type = "group",
             childGroups = "tree",
-            name = "Frame",
+            name = L["Frame"],
             order = 4,
             args = {
                 icon = {
@@ -590,7 +597,7 @@ function TotemPlates:GetOptions()
         },
         npTotemColors = {
             order = 50,
-            name = "Customize Totems",
+            name = L["Customize Totems"],
             type = "group",
             childGroups = "tree",
             args = select(2, Gladdy:GetTotemColors())
