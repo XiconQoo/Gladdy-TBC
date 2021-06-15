@@ -200,6 +200,7 @@ function Gladdy:OnInitialize()
     self.LSM:Register("border", "Gladdy Tooltip round", "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round_selfmade")
     self.LSM:Register("border", "Gladdy Tooltip squared", "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_square_selfmade")
     self.LSM:Register("font", "DorisPP", "Interface\\AddOns\\Gladdy\\Images\\DorisPP.TTF")
+    self.LSM:Register("border", "Square Full White", "Interface\\AddOns\\Gladdy\\Images\\Square_FullWhite.tga")
 
     L = self.L
 
@@ -227,6 +228,9 @@ function Gladdy:OnInitialize()
         self:Call(v, "Initialize") -- B.E > A.E :D
     end
     self:DeleteUnknownOptions(self.db, self.defaults.profile)
+    if Gladdy.db.hideBlizzard == "always" then
+        SetCVar("showArenaEnemyFrames", 0)
+    end
 end
 
 function Gladdy:OnProfileChanged()
@@ -355,6 +359,9 @@ function Gladdy:Reset()
     for unit in pairs(self.buttons) do
         self:ResetUnit(unit)
     end
+    if Gladdy.db.hideBlizzard == "never" or Gladdy.db.hideBlizzard == "arena" then
+        SetCVar("showArenaEnemyFrames", 1)
+    end
 end
 
 function Gladdy:ResetUnit(unit)
@@ -411,5 +418,8 @@ function Gladdy:JoinedArena()
     self.frame:Show()
     for i=1, self.curBracket do
         self.buttons["arena" .. i]:SetAlpha(1)
+    end
+    if Gladdy.db.hideBlizzard == "arena" or Gladdy.db.hideBlizzard == "always" then
+        SetCVar("showArenaEnemyFrames", 0)
     end
 end
