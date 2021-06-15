@@ -27,7 +27,7 @@ end
 function XiconProfiles:ApplyClassic()
     local deserialized = Gladdy.modules["Export Import"]:Decode(Gladdy:GetClassicProfile())
     if deserialized then
-        Gladdy.modules["ExportImport"]:ApplyImport(deserialized, Gladdy.db)
+        Gladdy.modules["Export Import"]:ApplyImport(deserialized, Gladdy.db)
     end
     Gladdy:Reset()
     Gladdy:HideFrame()

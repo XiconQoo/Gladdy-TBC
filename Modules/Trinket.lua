@@ -56,12 +56,12 @@ local function iconTimer(self, elapsed)
         elseif timeLeft <= 10 and timeLeft >= 5 then
             -- between 10s and 5s (orange)
             self.cooldownFont:SetTextColor(1, 0.7, 0)
-            self.cooldownFont:SetFormattedText("%.1f", timeLeft)
+            self.cooldownFont:SetFormattedText("%.1f", self.timeLeft)
             self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
         elseif timeLeft < 5 and timeLeft > 0 then
             -- between 5s and 1s (red)
             self.cooldownFont:SetTextColor(1, 0, 0)
-            self.cooldownFont:SetFormattedText("%.1f", timeLeft >= 0.0 and timeLeft or 0.0)
+            self.cooldownFont:SetFormattedText("%.1f", self.timeLeft >= 0.0 and self.timeLeft or 0.0)
             self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
         else
             self.cooldownFont:SetText("")
@@ -249,6 +249,7 @@ function Trinket:GetOptions()
                             max = 100,
                             step = 1,
                             order = 4,
+                            width = "full",
                         }),
                         trinketWidthFactor = Gladdy:option({
                             type = "range",
@@ -257,6 +258,7 @@ function Trinket:GetOptions()
                             max = 2,
                             step = 0.05,
                             order = 6,
+                            width = "full",
                         }),
                     },
                 },
@@ -283,6 +285,7 @@ function Trinket:GetOptions()
                             max = 1,
                             step = 0.1,
                             order = 8,
+                            width = "full",
                         }),
                     },
                 },
@@ -312,6 +315,7 @@ function Trinket:GetOptions()
                             min = 0.1,
                             max = 2,
                             step = 0.1,
+                            width = "full",
                         }),
                     },
                 },

@@ -368,6 +368,7 @@ function Healthbar:GetOptions()
                             min = 10,
                             max = 100,
                             step = 1,
+                            width = "full",
                         }),
                         healthBarTexture = option({
                             type = "select",
@@ -419,6 +420,7 @@ function Healthbar:GetOptions()
                             step = 0.1,
                             min = 0,
                             max = 20,
+                            width = "full",
                         }),
                         healthBarHealthFontSize = option({
                             type = "range",
@@ -428,6 +430,7 @@ function Healthbar:GetOptions()
                             step = 0.1,
                             min = 0,
                             max = 20,
+                            width = "full",
                         }),
                     },
                 },
@@ -456,6 +459,7 @@ function Healthbar:GetOptions()
                             min = 0.5,
                             max = Gladdy.db.healthBarHeight/2,
                             step = 0.5,
+                            width = "full",
                         }),
                         healthBarBorderColor = Gladdy:colorOption({
                             type = "color",

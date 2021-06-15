@@ -156,7 +156,7 @@ function Pets:CreateFrame(unitId)
     healthBar:SetAllPoints(button)
     healthBar:SetAlpha(0)
 
-    healthBar.portrait = healthBar:CreateTexture(nil, "OVERLAY")
+    healthBar.portrait = healthBar:CreateTexture(nil, "BACKGROUND")
     healthBar.portrait:SetPoint("LEFT", healthBar, "RIGHT")
     healthBar.portrait:SetTexCoord(0.1, 0.9, 0.1, 0.9)
     SetPortraitTexture(healthBar.portrait, "player")
@@ -368,6 +368,7 @@ function Pets:GetOptions()
                             min = 10,
                             max = 100,
                             step = 1,
+                            width = "full",
                         }),
                         petWidth = option({
                             type = "range",
@@ -377,6 +378,7 @@ function Pets:GetOptions()
                             min = 10,
                             max = 300,
                             step = 1,
+                            width = "full",
                         }),
                         petHealthBarTexture = option({
                             type = "select",
@@ -458,6 +460,7 @@ function Pets:GetOptions()
                             order = 13,
                             min = 0,
                             max = 20,
+                            width = "full",
                         }),
                     },
                 },
@@ -486,6 +489,7 @@ function Pets:GetOptions()
                             min = 0.5,
                             max = Gladdy.db.petHeight/2,
                             step = 0.5,
+                            width = "full",
                         }),
                         petHealthBarBorderColor = Gladdy:colorOption({
                             type = "color",
@@ -513,6 +517,7 @@ function Pets:GetOptions()
                             min = -600,
                             max = 600,
                             step = 0.1,
+                            width = "full",
                         }),
                         petYOffset = Gladdy:option({
                             type = "range",
@@ -521,6 +526,7 @@ function Pets:GetOptions()
                             min = -600,
                             max = 600,
                             step = 0.1,
+                            width = "full",
                         }),
                     }
                 },
