@@ -141,10 +141,10 @@ function Auras:Test(unit)
     local spellName, _, icon
 
     if (unit == "arena1") then
-        spellName, _, icon = GetSpellInfo(12826)
+        spellName, _, icon = GetSpellInfo(7922)
         self:AURA_FADE(unit, AURA_TYPE_BUFF)
         self:AURA_FADE(unit, AURA_TYPE_DEBUFF)
-        self:AURA_GAIN(unit,AURA_TYPE_DEBUFF, 12826, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
+        self:AURA_GAIN(unit,AURA_TYPE_DEBUFF, 7922, spellName, icon, self.auras[spellName].duration + 2, GetTime() + self.auras[spellName].duration + 2)
     elseif (unit == "arena2") then
         spellName, _, icon = GetSpellInfo(6770)
         self:AURA_FADE(unit, AURA_TYPE_BUFF)
@@ -173,6 +173,10 @@ function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, exp
         return
     end
 
+    if spellID == 31117 then
+        spellName = "Unstable Affliction Silence"
+    end
+
     if not self.auras[spellName] then
         return
     end
@@ -189,7 +193,7 @@ function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, exp
     auraFrame.name = spellName
     auraFrame.timeLeft = expirationTime - GetTime()
     auraFrame.priority = Gladdy.db.auraListDefault[tostring(self.auras[spellName].spellID)].priority
-    auraFrame.icon:SetTexture(icon)
+    auraFrame.icon:SetTexture(Gladdy:GetImportantAuras()[GetSpellInfo(self.auras[spellName].spellID)] and Gladdy:GetImportantAuras()[GetSpellInfo(self.auras[spellName].spellID)].texture or icon)
     auraFrame.track = auraType
     auraFrame.active = true
     auraFrame.icon.overlay:Show()
@@ -389,19 +393,22 @@ function Auras:GetAuraOptions(auraType)
             tinsert(auras, v.spellID)
         end
     end
-    tbl_sort(auras)
+    tbl_sort(auras, function(a, b) return GetSpellInfo(a) < GetSpellInfo(b) end)
     for i,k in ipairs(auras) do
         options[tostring(k)] = {
             type = "group",
-            name = GetSpellInfo(k),
+            name = Gladdy:GetImportantAuras()["Unstable Affliction Silence"]
+                    and Gladdy:GetImportantAuras()["Unstable Affliction Silence"].spellID == k
+                    and Gladdy:GetImportantAuras()["Unstable Affliction Silence"].altName
+                    or GetSpellInfo(k),
             order = i+2,
-            icon = select(3, GetSpellInfo(k)),
+            icon = Gladdy:GetImportantAuras()[GetSpellInfo(k)] and Gladdy:GetImportantAuras()[GetSpellInfo(k)].texture or select(3, GetSpellInfo(k)),
             args = {
                 enabled = {
                     order = 1,
                     name = L["Enabled"],
                     type = "toggle",
-                    image = select(3, GetSpellInfo(k)),
+                    image = Gladdy:GetImportantAuras()[GetSpellInfo(k)] and Gladdy:GetImportantAuras()[GetSpellInfo(k)].texture or select(3, GetSpellInfo(k)),
                     width = "2",
                     set = function(info, value)
                         Gladdy.db.auraListDefault[tostring(k)].enabled = value
