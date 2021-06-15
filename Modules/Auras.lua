@@ -92,6 +92,7 @@ function Auras:CreateFrame(unit)
         end
     end)
 
+    Gladdy.buttons[unit].aura = auraFrame
     self.frames[unit] = auraFrame
     self:ResetUnit(unit)
 end
@@ -125,7 +126,6 @@ function Auras:UpdateFrame(unit)
     else
         auraFrame.icon.overlay:SetVertexColor(0, 0, 0, 1)
     end
-    auraFrame.icon.overlay:Hide()
     if Gladdy.db.auraDisableCircle then
         auraFrame.cooldown:SetAlpha(0)
     end
@@ -264,6 +264,7 @@ function Auras:GetOptions()
                             max = 1,
                             step = 0.1,
                             order = 4,
+                            width = "full",
                         }),
                     }
                 },
@@ -293,6 +294,7 @@ function Auras:GetOptions()
                             min = 0.1,
                             max = 2,
                             step = 0.1,
+                            width = "full",
                         }),
                         auraFontColor = Gladdy:colorOption({
                             type = "color",
@@ -422,6 +424,7 @@ function Auras:GetAuraOptions(auraType)
                     set = function(info, value)
                         Gladdy.db.auraListDefault[tostring(k)].priority = value
                     end,
+                    width = "full",
                 }
             }
         }
