@@ -126,6 +126,9 @@ function Auras:UpdateFrame(unit)
     else
         auraFrame.icon.overlay:SetVertexColor(0, 0, 0, 1)
     end
+    if not auraFrame.active then
+        auraFrame.icon.overlay:Hide()
+    end
     if Gladdy.db.auraDisableCircle then
         auraFrame.cooldown:SetAlpha(0)
     end
