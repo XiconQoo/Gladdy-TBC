@@ -280,6 +280,7 @@ function BuffsDebuffs:UpdateFrame(unit)
     self.frames[unit].debuffFrame:ClearAllPoints()
 
     --DEBUFFS
+    local powerBarHeight = Gladdy.db.powerBarEnabled and (Gladdy.db.powerBarHeight + 1) or 0
     local horizontalMargin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize)
     local verticalMargin = -(Gladdy.db.powerBarHeight)/2
     if Gladdy.db.buffsCooldownPos == "TOP" then
@@ -298,9 +299,9 @@ function BuffsDebuffs:UpdateFrame(unit)
             verticalMargin = verticalMargin + Gladdy.db.cooldownSize
         end
         if Gladdy.db.buffsCooldownGrowDirection == "LEFT" then
-            self.frames[unit].debuffFrame:SetPoint("TOPLEFT", Gladdy.buttons[unit].powerBar, "BOTTOMRIGHT", Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset -verticalMargin)
+            self.frames[unit].debuffFrame:SetPoint("TOPLEFT", Gladdy.buttons[unit].healthBar, "BOTTOMRIGHT", Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset -verticalMargin - powerBarHeight)
         else
-            self.frames[unit].debuffFrame:SetPoint("TOPRIGHT", Gladdy.buttons[unit].powerBar, "BOTTOMLEFT", Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset -verticalMargin)
+            self.frames[unit].debuffFrame:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "BOTTOMLEFT", Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset -verticalMargin - powerBarHeight)
         end
     elseif Gladdy.db.buffsCooldownPos == "LEFT" then
         horizontalMargin = horizontalMargin - 1 + Gladdy.db.padding
@@ -342,9 +343,9 @@ function BuffsDebuffs:UpdateFrame(unit)
             verticalMargin = verticalMargin + Gladdy.db.cooldownSize
         end
         if Gladdy.db.buffsBuffsCooldownGrowDirection == "LEFT" then
-            self.frames[unit].buffFrame:SetPoint("TOPLEFT", Gladdy.buttons[unit].powerBar, "BOTTOMRIGHT", Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset -verticalMargin)
+            self.frames[unit].buffFrame:SetPoint("TOPLEFT", Gladdy.buttons[unit].healthBar, "BOTTOMRIGHT", Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset -verticalMargin - powerBarHeight)
         else
-            self.frames[unit].buffFrame:SetPoint("TOPRIGHT", Gladdy.buttons[unit].powerBar, "BOTTOMLEFT", Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset -verticalMargin)
+            self.frames[unit].buffFrame:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "BOTTOMLEFT", Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset -verticalMargin - powerBarHeight)
         end
     elseif Gladdy.db.buffsBuffsCooldownPos == "LEFT" then
         horizontalMargin = horizontalMargin - 1 + Gladdy.db.padding
@@ -662,6 +663,7 @@ function BuffsDebuffs:GetOptions()
                                     min = 5,
                                     max = 50,
                                     step = 1,
+                                    width = "full",
                                 }),
                                 buffsBuffsWidthFactor = Gladdy:option({
                                     type = "range",
@@ -671,6 +673,7 @@ function BuffsDebuffs:GetOptions()
                                     min = 0.5,
                                     max = 2,
                                     step = 0.05,
+                                    width = "full",
                                 }),
                                 buffsBuffsIconPadding = Gladdy:option({
                                     type = "range",
@@ -680,6 +683,7 @@ function BuffsDebuffs:GetOptions()
                                     min = 0,
                                     max = 10,
                                     step = 0.1,
+                                    width = "full",
                                 }),
                             },
                         },
@@ -722,6 +726,7 @@ function BuffsDebuffs:GetOptions()
                                     min = -400,
                                     max = 400,
                                     step = 0.1,
+                                    width = "full",
                                 }),
                                 buffsBuffsYOffset = Gladdy:option({
                                     type = "range",
@@ -730,6 +735,7 @@ function BuffsDebuffs:GetOptions()
                                     min = -400,
                                     max = 400,
                                     step = 0.1,
+                                    width = "full",
                                 }),
                             },
                         },
@@ -750,6 +756,7 @@ function BuffsDebuffs:GetOptions()
                                     min = 0,
                                     max = 1,
                                     step = 0.05,
+                                    width = "full",
                                 }),
                             }
                         }
@@ -778,6 +785,7 @@ function BuffsDebuffs:GetOptions()
                                     min = 5,
                                     max = 50,
                                     step = 1,
+                                    width = "full",
                                 }),
                                 buffsWidthFactor = Gladdy:option({
                                     type = "range",
@@ -787,6 +795,7 @@ function BuffsDebuffs:GetOptions()
                                     min = 0.5,
                                     max = 2,
                                     step = 0.05,
+                                    width = "full",
                                 }),
                                 buffsIconPadding = Gladdy:option({
                                     type = "range",
@@ -796,6 +805,7 @@ function BuffsDebuffs:GetOptions()
                                     min = 0,
                                     max = 10,
                                     step = 0.1,
+                                    width = "full",
                                 }),
                             },
                         },
@@ -838,6 +848,7 @@ function BuffsDebuffs:GetOptions()
                                     min = -400,
                                     max = 400,
                                     step = 0.1,
+                                    width = "full",
                                 }),
                                 buffsYOffset = Gladdy:option({
                                     type = "range",
@@ -846,6 +857,7 @@ function BuffsDebuffs:GetOptions()
                                     min = -400,
                                     max = 400,
                                     step = 0.1,
+                                    width = "full",
                                 }),
                             },
                         },
@@ -866,6 +878,7 @@ function BuffsDebuffs:GetOptions()
                                     min = 0,
                                     max = 1,
                                     step = 0.05,
+                                    width = "full",
                                 }),
                             }
                         }
@@ -894,6 +907,7 @@ function BuffsDebuffs:GetOptions()
                             max = 1,
                             step = 0.1,
                             order = 10,
+                            width = "full",
                         }),
                     },
                 },
@@ -923,6 +937,7 @@ function BuffsDebuffs:GetOptions()
                             min = 0.1,
                             max = 2,
                             step = 0.1,
+                            width = "full",
                         }),
                         buffsDynamicColor = Gladdy:option({
                             type = "toggle",

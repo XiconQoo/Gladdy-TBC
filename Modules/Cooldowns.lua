@@ -134,7 +134,7 @@ function Cooldowns:UpdateFrame(unit)
     -- Cooldown frame
     if (Gladdy.db.cooldown) then
         button.spellCooldownFrame:ClearAllPoints()
-        local verticalMargin = -(Gladdy.db.powerBarHeight)/2
+        local powerBarHeight = Gladdy.db.powerBarEnabled and (Gladdy.db.powerBarHeight + 1) or 0
         local horizontalMargin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize)
         if Gladdy.db.cooldownYPos == "TOP" then
             if Gladdy.db.cooldownXPos == "RIGHT" then
@@ -144,9 +144,9 @@ function Cooldowns:UpdateFrame(unit)
             end
         elseif Gladdy.db.cooldownYPos == "BOTTOM" then
             if Gladdy.db.cooldownXPos == "RIGHT" then
-                button.spellCooldownFrame:SetPoint("TOPRIGHT", button.powerBar, "BOTTOMRIGHT", Gladdy.db.cooldownXOffset, -horizontalMargin + Gladdy.db.cooldownYOffset)
+                button.spellCooldownFrame:SetPoint("TOPRIGHT", button.healthBar, "BOTTOMRIGHT", Gladdy.db.cooldownXOffset, -horizontalMargin + Gladdy.db.cooldownYOffset - powerBarHeight)
             else
-                button.spellCooldownFrame:SetPoint("TOPLEFT", button.powerBar, "BOTTOMLEFT", Gladdy.db.cooldownXOffset, -horizontalMargin + Gladdy.db.cooldownYOffset)
+                button.spellCooldownFrame:SetPoint("TOPLEFT", button.healthBar, "BOTTOMLEFT", Gladdy.db.cooldownXOffset, -horizontalMargin + Gladdy.db.cooldownYOffset - powerBarHeight)
             end
         elseif Gladdy.db.cooldownYPos == "LEFT" then
             local anchor = Gladdy:GetAnchor(unit, "LEFT")
@@ -603,6 +603,7 @@ function Cooldowns:GetOptions()
                             order = 4,
                             min = 5,
                             max = 50,
+                            width = "full",
                         }),
                         cooldownWidthFactor = Gladdy:option({
                             type = "range",
@@ -612,6 +613,7 @@ function Cooldowns:GetOptions()
                             min = 0.5,
                             max = 2,
                             step = 0.05,
+                            width = "full",
                         }),
                         cooldownIconPadding = Gladdy:option({
                             type = "range",
@@ -621,6 +623,7 @@ function Cooldowns:GetOptions()
                             min = 0,
                             max = 10,
                             step = 0.1,
+                            width = "full",
                         }),
                         cooldownMaxIconsPerLine = Gladdy:option({
                             type = "range",
@@ -629,6 +632,7 @@ function Cooldowns:GetOptions()
                             min = 3,
                             max = 14,
                             step = 1,
+                            width = "full",
                         }),
                     },
                 },
@@ -655,6 +659,7 @@ function Cooldowns:GetOptions()
                             max = 1,
                             step = 0.1,
                             order = 9,
+                            width = "full",
                         }),
                     },
                 },
@@ -684,6 +689,7 @@ function Cooldowns:GetOptions()
                             min = 0.1,
                             max = 2,
                             step = 0.1,
+                            width = "full",
                         }),
                         cooldownFontColor = Gladdy:colorOption({
                             type = "color",
@@ -738,6 +744,7 @@ function Cooldowns:GetOptions()
                             min = -400,
                             max = 400,
                             step = 0.1,
+                            width = "full",
                         }),
                         cooldownYOffset = Gladdy:option({
                             type = "range",
@@ -746,6 +753,7 @@ function Cooldowns:GetOptions()
                             min = -400,
                             max = 400,
                             step = 0.1,
+                            width = "full",
                         }),
                     },
                 },

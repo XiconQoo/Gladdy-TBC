@@ -141,6 +141,7 @@ function CombatIndicator:GetOptions()
                             max = 100,
                             step = 1,
                             order = 2,
+                            width = "full",
                         }),
                         ciWidthFactor = Gladdy:option({
                             type = "range",
@@ -149,6 +150,7 @@ function CombatIndicator:GetOptions()
                             max = 2,
                             step = 0.05,
                             order = 3,
+                            width = "full",
                         }),
                         ciAlpha = Gladdy:option({
                             type = "range",
@@ -157,6 +159,7 @@ function CombatIndicator:GetOptions()
                             max = 1,
                             step = 0.05,
                             order = 4,
+                            width = "full",
                         }),
                     },
                 },
@@ -201,6 +204,7 @@ function CombatIndicator:GetOptions()
                             min = -400,
                             max = 400,
                             step = 0.1,
+                            width = "full",
                         }),
                         ciYOffset = Gladdy:option({
                             type = "range",
@@ -209,6 +213,7 @@ function CombatIndicator:GetOptions()
                             min = -400,
                             max = 400,
                             step = 0.1,
+                            width = "full",
                         }),
                     },
                 },

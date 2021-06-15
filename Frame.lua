@@ -113,6 +113,7 @@ function Gladdy:UpdateFrame()
     local teamSize = self.curBracket or 0
 
     local highlightBorderSize = (self.db.highlightInset and 0 or self.db.highlightBorderSize * 2)
+    local powerBarHeight = self.db.powerBarEnabled and (self.db.powerBarHeight + 1) or 0
     local leftSize = 0
     local rightSize = 0
     --Trinket + Racial
@@ -140,9 +141,9 @@ function Gladdy:UpdateFrame()
         rightSize = rightSize + self.db.highlightBorderSize
     end
 
-    local margin = self.db.powerBarHeight + 1
+    local margin = powerBarHeight
     local width = self.db.barWidth + leftSize + rightSize
-    local height = (self.db.healthBarHeight + self.db.powerBarHeight + 1) * teamSize
+    local height = (self.db.healthBarHeight + powerBarHeight) * teamSize
             + (self.db.highlightInset and 0 or self.db.highlightBorderSize * 2 * teamSize)
             + self.db.bottomMargin * (teamSize - 1)
 
@@ -173,7 +174,7 @@ function Gladdy:UpdateFrame()
     -- GrowDirection
     if (self.db.growDirection == "LEFT" or self.db.growDirection == "RIGHT") then
         width = self.db.barWidth * teamSize + (leftSize + rightSize) * teamSize + self.db.bottomMargin * (teamSize - 1)
-        height = self.db.healthBarHeight + self.db.powerBarHeight + 1
+        height = self.db.healthBarHeight + powerBarHeight
     end
 
     self.frame:SetScale(self.db.frameScale)
@@ -214,13 +215,13 @@ function Gladdy:UpdateFrame()
         button:SetWidth(self.db.barWidth)
         button:SetHeight(self.db.healthBarHeight)
         button.secure:SetWidth(self.db.barWidth)
-        button.secure:SetHeight(self.db.healthBarHeight + self.db.powerBarHeight + 1)
+        button.secure:SetHeight(self.db.healthBarHeight + powerBarHeight)
 
         button:ClearAllPoints()
         button.secure:ClearAllPoints()
         if (self.db.growDirection == "TOP") then
             if (i == 1) then
-                button:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", leftSize, self.db.powerBarHeight + 1)
+                button:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", leftSize, powerBarHeight)
                 button.secure:SetPoint("TOPLEFT", button.powerBar, "TOPLEFT")
             else
                 button:SetPoint("BOTTOMLEFT", self.buttons["arena" .. (i - 1)], "TOPLEFT", 0, margin + self.db.bottomMargin)
