@@ -255,7 +255,7 @@ function Gladdy:UpdateFrame()
 
 
         for _, v in self:IterModules() do
-            self:Call(v, "UpdateFrame", button.unit)
+            self:Call(v, "UpdateFrame", "arena" .. i)
         end
     end
     for _, v in self:IterModules() do
@@ -308,8 +308,9 @@ function Gladdy:CreateButton(i)
 
     local secure = CreateFrame("Button", "GladdyButton" .. i, button, "SecureActionButtonTemplate, SecureHandlerEnterLeaveTemplate")
     secure:RegisterForClicks("AnyUp")
-    secure:SetAttribute("*type1", "target")
-    secure:SetAttribute("*type2", "focus")
+    secure:SetAttribute("*type*", "macro")
+    --secure:SetAttribute("*type1", "target")
+    --secure:SetAttribute("*type2", "focus")
     secure:SetAttribute("unit", "arena" .. i)
     --secure.texture = secure:CreateTexture(nil, "OVERLAY")
     --secure.texture:SetAllPoints(secure)
@@ -320,12 +321,12 @@ function Gladdy:CreateButton(i)
     button.secure = secure
 
 
-    self:ResetButton(button.unit)
+    self:ResetButton("arena" .. i)
 
-    self.buttons[button.unit] = button
+    self.buttons["arena" .. i] = button
 
     for _, v in self:IterModules() do
-        self:Call(v, "CreateFrame", button.unit)
+        self:Call(v, "CreateFrame", "arena" .. i)
     end
 end
 

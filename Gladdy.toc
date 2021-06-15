@@ -22,6 +22,7 @@ Modules\Powerbar.lua
 Modules\Auras.lua
 Modules\Castbar.lua
 Modules\Classicon.lua
+Modules\Clicks.lua
 Modules\Diminishings.lua
 Modules\Highlight.lua
 Modules\TotemPlates.lua
