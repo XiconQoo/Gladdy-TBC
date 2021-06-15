@@ -97,7 +97,7 @@ local function GetTotemColorDefaultOptions()
         return a.name < b.name
     end)
     for i=1,#indexedList do
-        defaultDB["totem" .. indexedList[i].id] = {color = indexedList[i].color, enabled = indexedList[i].enabled, alpha = 0.6}
+        defaultDB["totem" .. indexedList[i].id] = {color = indexedList[i].color, enabled = indexedList[i].enabled, alpha = 0.6, customText = ""}
         options["totem" .. indexedList[i].id] = {
             order = i+1,
             name = select(1, GetSpellInfo(indexedList[i].id)),
@@ -163,12 +163,12 @@ local function GetTotemColorDefaultOptions()
                     end
                 },
                 customText = {
-                  type = "input",
-                  name = L["Custom totem name"],
-                  order = 5,
-                  width = "full",
-                  get = function(info) return Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].customText end,
-                  set = function(info, value) Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].customText = value Gladdy:UpdateFrame() end
+                    type = "input",
+                    name = L["Custom totem name"],
+                    order = 5,
+                    width = "full",
+                    get = function(info) return Gladdy.db.npTotemColors["totem" .. indexedList[i].id].customText end,
+                    set = function(info, value) Gladdy.db.npTotemColors["totem" .. indexedList[i].id].customText = value Gladdy:UpdateFrame() end
                 },
             }
         }
@@ -228,6 +228,20 @@ function TotemPlates:Initialize()
     self:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
     self:RegisterEvent("PLAYER_TARGET_CHANGED")
     self:SetScript("OnEvent", TotemPlates.OnEvent)
+    if Gladdy.db.npTotems and Gladdy.db.npTotemsShowEnemy then
+        --GetCVar("nameplateShowEnemyTotems")
+        --SetCVar("nameplateShowEnemyTotems", true);
+    end
+    if Gladdy.db.npTotems and Gladdy.db.npTotemsShowFriendly then
+        --GetCVar("nameplateShowFriendlyTotems")
+        --SetCVar("nameplateShowFriendlyTotems", true);
+    end
+
+    --NeatPlates
+    --ELVUI
+    --Plater
+    --KUI
+    --threatplates
 end
 
 function TotemPlates:PLAYER_ENTERING_WORLD()
@@ -332,15 +346,14 @@ function TotemPlates:NAME_PLATE_UNIT_ADDED(...)
         TotemPlates:SetTotemAlpha(nameplate.gladdyTotemFrame, unitID)
 
         nameplate.UnitFrame:SetAlpha(0)
-        nameplate.UnitFrame.point = select(2, nameplate.UnitFrame.selectionHighlight:GetPoint())
         nameplate.UnitFrame.selectionHighlight:ClearAllPoints()
         nameplate.UnitFrame.selectionHighlight:SetPoint("TOPLEFT", nameplate.gladdyTotemFrame, "TOPLEFT", Gladdy.db.npTotemPlatesSize/16, -Gladdy.db.npTotemPlatesSize/16)
         nameplate.UnitFrame.selectionHighlight:SetPoint("BOTTOMRIGHT", nameplate.gladdyTotemFrame, "BOTTOMRIGHT", -Gladdy.db.npTotemPlatesSize/16, Gladdy.db.npTotemPlatesSize/16)
         nameplate.UnitFrame:SetScript("OnHide", function(unitFrame)
             unitFrame:SetAlpha(1)
             unitFrame.selectionHighlight:ClearAllPoints()
-            unitFrame.selectionHighlight:SetPoint("TOPLEFT", unitFrame.point, "TOPLEFT")
-            unitFrame.selectionHighlight:SetPoint("BOTTOMRIGHT", unitFrame.point, "BOTTOMRIGHT")
+            unitFrame.selectionHighlight:SetPoint("TOPLEFT", unitFrame.healthBar.barTexture, "TOPLEFT")
+            unitFrame.selectionHighlight:SetPoint("BOTTOMRIGHT", unitFrame.healthBar.barTexture, "BOTTOMRIGHT")
             unitFrame:SetScript("OnHide", nil)
         end)
         self.activeTotemNameplates[unitID] = nameplate
@@ -439,6 +452,7 @@ function TotemPlates:GetOptions()
                             min = 20,
                             max = 100,
                             step = 1,
+                            width = "full",
                         }),
                         npTotemPlatesWidthFactor = Gladdy:option({
                             type = "range",
@@ -448,6 +462,7 @@ function TotemPlates:GetOptions()
                             min = 0.5,
                             max = 2,
                             step = 0.05,
+                            width = "full",
                         }),
                     },
                 },
@@ -477,6 +492,7 @@ function TotemPlates:GetOptions()
                             min = 1,
                             max = 50,
                             step = 0.1,
+                            width = "full",
                         }),
                         npTremorFontXOffset = Gladdy:option({
                             type = "range",
@@ -486,6 +502,7 @@ function TotemPlates:GetOptions()
                             min = -300,
                             max = 300,
                             step = 1,
+                            width = "full",
                         }),
                         npTremorFontYOffset = Gladdy:option({
                             type = "range",
@@ -495,6 +512,7 @@ function TotemPlates:GetOptions()
                             min = -300,
                             max = 300,
                             step = 1,
+                            width = "full",
                         }),
                     },
                 },
@@ -528,7 +546,7 @@ function TotemPlates:GetOptions()
                             min = 0,
                             max = 1,
                             step = 0.1,
-                            width = "double",
+                            width = "full",
                             order = 23,
                             get = function(info)
                                 local alphas = GetTotemOptions()
