@@ -1,6 +1,8 @@
 local str_match, tonumber, tostring = string.match, tonumber, tostring
 
 local UnitName = UnitName
+local IsInGroup, IsInRaid = IsInGroup, IsInRaid
+local LE_PARTY_CATEGORY_HOME, LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_HOME, LE_PARTY_CATEGORY_INSTANCE
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
@@ -21,6 +23,13 @@ end
 
 function VersionCheck:JOINED_ARENA()
     self:RegisterComm("GladdyVCheck", VersionCheck.OnCommReceived)
+    if IsInRaid(LE_PARTY_CATEGORY_HOME) then
+        self:SendCommMessage("GladdyVCheck", tostring(Gladdy.version_num), "RAID", self.playerName)
+    elseif IsInGroup(LE_PARTY_CATEGORY_INSTANCE) or IsInRaid(LE_PARTY_CATEGORY_INSTANCE) then
+        self:SendCommMessage("GladdyVCheck", tostring(Gladdy.version_num), "INSTANCE_CHAT", self.playerName)
+    elseif IsInGroup(LE_PARTY_CATEGORY_HOME) then
+        self:SendCommMessage("GladdyVCheck", tostring(Gladdy.version_num), "PARTY", self.playerName)
+    end
 end
 
 function VersionCheck:Test(unit)
@@ -39,7 +48,7 @@ function VersionCheck.OnCommReceived(prefix, message, distribution, sender)
         else
             Gladdy:Warn("Current version", "\"".. addonVersion.."\"", "is outdated. Most recent version is", "\"".. message.."\"")
             Gladdy:Warn("Please download the latest Gladdy version at:")
-            Gladdy:Warn("https://github.com/XiconQoo/Gladdy-TBC")
+            Gladdy:Warn("https://www.curseforge.com/wow/addons/gladdy-tbc or https://github.com/XiconQoo/Gladdy-TBC")
         end
     end
 end
