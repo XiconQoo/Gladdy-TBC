@@ -26,6 +26,8 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 - Highlight (highlights focus and target)
 - Pets (show arena pets)
 - Racial Spells
+- Range Check
+- Shadowsight Timer
 - TotemPlates (show totem icons instead of normal nameplates)
 - Trinket (tracks trinket usage)
 - VersionCheck (checks if you use an older version that your teammate)
@@ -36,6 +38,16 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 <img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/sample1.jpg">
 <img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/sample2.jpg" align="right" width="48.5%">
 <img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/sample3.png" width="48.5%">
+
+## Special Thanks
+
+- **Macumba** (thanks for all the support, your feedback and your dedication for the TBC community)
+- **RMO** (without you I would not have modified Gladdy at all and thanks for all the suggestions and active feedback)
+- **Ur0b0r0s aka DrainTheLock** (thanks for testing, giving feedback and correcting/adding wrong CDs)
+- **Klimp** (thanks for all the suggestions and active feedback)
+- **Schaka** (thanks for letting me continue Gladdy and all the work you put into the TBC community)
+- **the whole TBC addons 2.4.3 discord** (thanks for the support and great community, especially the MVPs)
+- **Hydra** (thanks for constructive feedback and suggestions)
 
 ### Changes
 
