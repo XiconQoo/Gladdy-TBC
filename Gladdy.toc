@@ -35,4 +35,6 @@ Modules\XiconProfiles.lua
 Modules\Pets.lua
 Modules\ExportImport.lua
 Modules\CombatIndicator.lua
+Modules\RangeCheck.lua
+Modules\ShadowsightTimer.lua
 EventListener.lua
