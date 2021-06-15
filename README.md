@@ -41,11 +41,11 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 
 ## Special Thanks
 
+- **Schaka** - the original author of Gladdy! (thanks for letting me continue Gladdy and all the work you put into the TBC community)
 - **Macumba** (thanks for all the support, your feedback and your dedication for the TBC community)
 - **RMO** (without you I would not have modified Gladdy at all and thanks for all the suggestions and active feedback)
 - **Ur0b0r0s aka DrainTheLock** (thanks for testing, giving feedback and correcting/adding wrong CDs)
 - **Klimp** (thanks for all the suggestions and active feedback)
-- **Schaka** (thanks for letting me continue Gladdy and all the work you put into the TBC community)
 - **the whole TBC addons 2.4.3 discord** (thanks for the support and great community, especially the MVPs)
 - **Hydra** (thanks for constructive feedback and suggestions)
 
