@@ -415,6 +415,14 @@ local importantAuras = {
         magic = true,
         spellID = 605,
     },
+    --Blackout Stun 15269
+    [GetSpellInfo(15269)] = {
+        track = AURA_TYPE_DEBUFF,
+        duration = 3,
+        priority = 40,
+        spellSchool = "magic",
+        spellID = 15269,
+    },
     -- Silence
     [GetSpellInfo(15487)] = {
         track = AURA_TYPE_DEBUFF,
@@ -552,6 +560,7 @@ local importantAuras = {
     -- Unstable Affliction Silence
     ["Unstable Affliction Silence"] = { -- GetSpellInfo returns "Unstable Affliction"
         track = AURA_TYPE_DEBUFF,
+        altName = select(1, GetSpellInfo(31117)) .. " Silence",
         duration = 5,
         priority = 15,
         magic = true,
@@ -581,6 +590,15 @@ local importantAuras = {
         duration = 3,
         priority = 40,
         spellID = 25274,
+        texture = select(3, GetSpellInfo(25272))
+    },
+    -- Charge Stun
+    [GetSpellInfo(7922)] = {
+        track = AURA_TYPE_DEBUFF,
+        duration = 1,
+        priority = 40,
+        spellID = 7922,
+        texture = select(3, GetSpellInfo(100))
     },
     -- Spell Reflection
     [GetSpellInfo(23920)] = {
@@ -621,7 +639,33 @@ local importantAuras = {
         spellSchool = "physical",
         spellID = 3411,
     },
+    --Improved Hamstring
+    [GetSpellInfo(23694)] = {
+        track = AURA_TYPE_DEBUFF,
+        duration = 5,
+        priority = 40,
+        spellSchool = "physical",
+        spellID = 23694,
+    },
 
+    -- Mace Stun Effect
+    [GetSpellInfo(5530)] = {
+        track = AURA_TYPE_DEBUFF,
+        duration = 3,
+        priority = 40,
+        spellSchool = "physical",
+        texture = select(3, GetSpellInfo(12284)),
+        spellID = 5530,
+    },
+
+    -- Storm Herald Stun effect
+    [GetSpellInfo(34510)] = {
+        track = AURA_TYPE_DEBUFF,
+        duration = 4,
+        priority = 40,
+        spellSchool = "physical",
+        spellID = 34510,
+    },
 
     -- War Stomp
     [GetSpellInfo(20549)] = {
@@ -637,6 +681,14 @@ local importantAuras = {
         priority = 15,
         magic = true,
         spellID = 28730,
+    },
+    -- Shadowsight Buff
+    [GetSpellInfo(34709)] = {
+        track = AURA_TYPE_BUFF,
+        duration = 15,
+        priority = 15,
+        magic = true,
+        spellID = 34709,
     },
 }
 function Gladdy:GetImportantAuras()
