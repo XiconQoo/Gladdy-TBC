@@ -282,8 +282,7 @@ function TotemPlates:UpdateFrameOnce()
         nameplate.gladdyTotemFrame.totemName:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.npTremorFont), Gladdy.db.npTremorFontSize, "OUTLINE")
         nameplate.gladdyTotemFrame.totemName:SetText(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].customText or "")
         self:SetTotemAlpha(nameplate.gladdyTotemFrame, k)
-        nameplate.UnitFrame.selectionHighlight:SetPoint("TOPLEFT", nameplate.gladdyTotemFrame, "TOPLEFT", Gladdy.db.npTotemPlatesSize/16, -Gladdy.db.npTotemPlatesSize/16)
-        nameplate.UnitFrame.selectionHighlight:SetPoint("BOTTOMRIGHT", nameplate.gladdyTotemFrame, "BOTTOMRIGHT", -Gladdy.db.npTotemPlatesSize/16, Gladdy.db.npTotemPlatesSize/16)
+        self:ToggleAddon(nameplate)
     end
     for i,gladdyTotemFrame in ipairs(self.totemPlateCache) do
         gladdyTotemFrame:SetWidth(Gladdy.db.npTotemPlatesSize * Gladdy.db.npTotemPlatesWidthFactor)
@@ -344,23 +343,21 @@ function TotemPlates:PLAYER_TARGET_CHANGED()
     end
 end
 
-function TotemPlates:ToggleAddon(nameplate, show)
-    if not show then
-        if self.addon == "Blizzard" then
-            nameplate.UnitFrame:Hide()
-        elseif self.addon == "Plater" then
+function TotemPlates:ToggleAddon(nameplate)
+    if self.addon == "Blizzard" then
+        nameplate.UnitFrame:Hide()
+    elseif self.addon == "Plater" then
+        nameplate.unitFrame:Hide()
+    elseif self.addon == "Kui_Nameplates" then
+        nameplate.kui:Hide()
+    elseif self.addon == "NeatPlates" then
+        nameplate.extended:Hide()
+        nameplate.carrier:Hide()
+    elseif self.addon == "TidyPlates_ThreatPlates" then
+        nameplate.TPFrame:Hide()
+    elseif self.addon == "Tukui" or self.addon == "ElvUI" then
+        if nameplate.unitFrame then
             nameplate.unitFrame:Hide()
-        elseif self.addon == "Kui_Nameplates" then
-            nameplate.kui:Hide()
-        elseif self.addon == "NeatPlates" then
-            nameplate.extended:Hide()
-            nameplate.carrier:Hide()
-        elseif self.addon == "TidyPlates_ThreatPlates" then
-            nameplate.TPFrame:Hide()
-        elseif self.addon == "Tukui" or self.addon == "ElvUI" then
-            if nameplate.unitFrame then
-                nameplate.unitFrame:Hide()
-            end
         end
     end
 end
@@ -413,7 +410,7 @@ function TotemPlates:NAME_PLATE_UNIT_ADDED(...)
         nameplate.gladdyTotemFrame.parent = nameplate
         nameplate.gladdyTotemFrame:Show()
         TotemPlates:SetTotemAlpha(nameplate.gladdyTotemFrame, unitID)
-        self:ToggleAddon(nameplate, false)
+        self:ToggleAddon(nameplate)
         self.activeTotemNameplates[unitID] = nameplate
     end
 end
