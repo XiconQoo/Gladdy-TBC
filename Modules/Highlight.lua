@@ -157,7 +157,7 @@ function Highlight:Test(unit)
     elseif (unit == "arena2") then
         self:Toggle(unit, "target", true)
     elseif (unit == "arena3") then
-        self:Toggle(unit, "leader", true)
+        --self:Toggle(unit, "leader", true)
     end
 end
 
