@@ -238,9 +238,16 @@ end
 
 function Cooldowns:Test(unit)
     local button = Gladdy.buttons[unit]
-    button.spellCooldownFrame:Show()
-    button.lastCooldownSpell = 1
-    self:UpdateTestCooldowns(unit)
+    if Gladdy.db.cooldown then
+        button.spellCooldownFrame:Show()
+        button.lastCooldownSpell = 1
+        self:UpdateTestCooldowns(unit)
+    else
+        button.spellCooldownFrame:Hide()
+        button.lastCooldownSpell = 1
+        self:UpdateTestCooldowns(unit)
+    end
+
 end
 
 function Cooldowns:UpdateTestCooldowns(unit)
