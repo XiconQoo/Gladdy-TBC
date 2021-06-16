@@ -311,12 +311,14 @@ function Gladdy:CreateButton(i)
     secure:SetAttribute("*type*", "macro")
     --secure:SetAttribute("*type1", "target")
     --secure:SetAttribute("*type2", "focus")
+    --secure:SetAttribute("unit", "target")
     secure:SetAttribute("unit", "arena" .. i)
     --secure.texture = secure:CreateTexture(nil, "OVERLAY")
     --secure.texture:SetAllPoints(secure)
     --secure.texture:SetTexture("Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp")
 
     button.id = i
+    --button.unit = "target"
     button.unit = "arena" .. i
     button.secure = secure
 

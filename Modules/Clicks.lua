@@ -190,8 +190,17 @@ local function SetupAttributeOption(i)
             },
             spell = {
                 type = "input",
-                name = L["Spell name / Macro text"],
-                desc = L["Use *arena* as placeholder. Like a '/rofl *arena*'"],
+                name = L["Cast Spell / Macro"],
+                desc = L["\n|cff1ac742Cast Spell:|r\n" ..
+                        "Type in the spell name.\n" ..
+                        "For example:\n" ..
+                        "|cff17d1c8Polymorph|r\n" ..
+                        "\n" ..
+                        "|cff1ac742Macro:|r\n" ..
+                        "Use *arena* as placeholder.\n" ..
+                        "For example:\n" ..
+                        "|cff17d1c8/cast [@*arena*] Blind\n" ..
+                        "/run SendChatMessage(\"Blinding \" .. UnitName(\"*arena*\"), \"PARTY\")|r"],
                 order = 5,
                 width = "full",
                 multiline = 10,
