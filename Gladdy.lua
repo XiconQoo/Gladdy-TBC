@@ -289,7 +289,7 @@ end
 ---------------------------
 
 function Gladdy:Test()
-    Gladdy.frame.testing = true
+    self.frame.testing = true
     for i = 1, self.curBracket do
         local unit = "arena" .. i
         if (not self.buttons[unit]) then
@@ -388,7 +388,7 @@ function Gladdy:ResetButton(unit)
             button[k1] = nil
         elseif (type(v1) == "number") then
             button[k1] = 0
-        elseif (type(v1) == "array") then
+        elseif (type(v1) == "table") then
             button[k1] = {}
         elseif (type(v1) == "boolean") then
             button[k1] = false

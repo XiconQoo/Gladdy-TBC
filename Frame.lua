@@ -26,6 +26,8 @@ Gladdy.BUTTON_DEFAULTS = {
     damaged = 0,
     click = false,
     stealthed = false,
+    classColors = {},
+    lastState = 0,
 }
 
 function Gladdy:CreateFrame()
@@ -272,7 +274,6 @@ end
 
 function Gladdy:ToggleFrame(i)
     self:Reset()
-
     if (self.frame and self.frame:IsShown() and i == self.curBracket) then
         self:HideFrame()
     else
@@ -288,6 +289,8 @@ function Gladdy:ToggleFrame(i)
                 self:CreateButton(o)
             end
         end
+        self:Reset()
+        self.curBracket = i
         self:UpdateFrame()
         self:Test()
         self.frame:Show()

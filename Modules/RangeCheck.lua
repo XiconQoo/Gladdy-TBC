@@ -64,8 +64,8 @@ end
 function RangeCheck:ResetUnit(unit)
     local button = Gladdy.buttons[unit]
     self:CancelTimer(button)
-    button.lastState = 0
     self:SetColor(button, 1)
+    button.classColors = {}
 end
 
 function RangeCheck:Test(unit)
@@ -99,7 +99,7 @@ function RangeCheck:SetColor(button, oorFac)
         return
     end
 
-    if not button.classColors then
+    if not button.classColors.r then
         if button.class then
             button.classColors = { r = RAID_CLASS_COLORS[button.class].r, g = RAID_CLASS_COLORS[button.class].g, b = RAID_CLASS_COLORS[button.class].b }
         else
