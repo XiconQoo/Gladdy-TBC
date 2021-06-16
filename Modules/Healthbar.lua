@@ -1,6 +1,6 @@
 local pairs = pairs
 local floor = math.floor
-local UnitHealth, UnitHealthMax, UnitName, UnitExists = UnitHealth, UnitHealthMax, UnitName, UnitExists
+local UnitHealth, UnitHealthMax, UnitName, UnitExists, UnitIsDeadOrGhost = UnitHealth, UnitHealthMax, UnitName, UnitExists, UnitIsDeadOrGhost
 
 local CreateFrame = CreateFrame
 local RAID_CLASS_COLORS = RAID_CLASS_COLORS
@@ -95,13 +95,22 @@ function Healthbar:CreateFrame(unit)
 end
 
 function Healthbar.OnEvent(self, event, unit)
+    local isDead = UnitExists(unit) and UnitIsDeadOrGhost(unit)
     if event == "UNIT_HEALTH" then
+        if isDead then
+            Gladdy:SendMessage("UNIT_DEATH", unit)
+            return
+        end
         local health = UnitHealth(unit)
         local healthMax = UnitHealthMax(unit)
         self.hp:SetMinMaxValues(0, healthMax)
         self.hp:SetValue(UnitHealth(unit))
         Healthbar:SetHealthText(self, health, healthMax)
     elseif event == "UNIT_MAXHEALTH" then
+        if isDead then
+            Gladdy:SendMessage("UNIT_DEATH", unit)
+            return
+        end
         local health = UnitHealth(unit)
         local healthMax = UnitHealthMax(unit)
         self.hp:SetMinMaxValues(0, healthMax)
