@@ -183,6 +183,7 @@ function Powerbar:ResetUnit(unit)
     powerBar.raceText:SetText("")
     powerBar.powerText:SetText("")
     powerBar.energy:SetValue(0)
+    powerBar.powerType = ""
     powerBar.powerColor = {r = 1, g = 1, b = 1}
 end
 
