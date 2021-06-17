@@ -385,7 +385,7 @@ function Diminishings:GetOptions()
                             desc = L["Size of the DR Icons"],
                             order = 5,
                             min = 5,
-                            max = 50,
+                            max = 80,
                             step = 1,
                             width = "full",
                         }),
