@@ -148,21 +148,24 @@ function BuffsDebuffs:Test(unit)
         if unit == "arena1" or unit == "arena3" then
             BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_DEBUFF)
             BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_BUFF)
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 1943, select(1, GetSpellInfo(1943)), select(3, GetSpellInfo(1943)), 10, GetTime() + 10, 1, "physical")
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 18647, select(1, GetSpellInfo(18647)), select(3, GetSpellInfo(18647)), 10, GetTime() + 10, 1, "immune")
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 27218, select(1, GetSpellInfo(27218)), select(3, GetSpellInfo(27218)), 24, GetTime() + 20, 1, "curse")
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 27216, select(1, GetSpellInfo(27216)), select(3, GetSpellInfo(27216)), 18, GetTime() + 18, 1, "magic")
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 27189, select(1, GetSpellInfo(27189)), select(3, GetSpellInfo(27189)), 12, GetTime() + 12, 5, "poison")
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_BUFF, 33076, select(1, GetSpellInfo(33076)), select(3, GetSpellInfo(33076)), 20, GetTime() + 20, 1, "magic")
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_BUFF, 26980, select(1, GetSpellInfo(26980)), select(3, GetSpellInfo(26980)), 20, GetTime() + 20, 5, "magic")
-        elseif unit == "arena2" then
+
+            BuffsDebuffs:AddOrRefreshAura(unit, 1943, AURA_TYPE_DEBUFF, 12, 12, 1, "physical", select(3, GetSpellInfo(1943)), 1)
+            BuffsDebuffs:AddOrRefreshAura(unit, 18647, AURA_TYPE_DEBUFF, 10, 10, 1, "immune", select(3, GetSpellInfo(18647)), 2)
+            BuffsDebuffs:AddOrRefreshAura(unit, 27218, AURA_TYPE_DEBUFF, 9, 9, 1, "curse", select(3, GetSpellInfo(27218)), 3)
+            BuffsDebuffs:AddOrRefreshAura(unit, 27216, AURA_TYPE_DEBUFF, 9, 9, 1, "magic", select(3, GetSpellInfo(27216)), 4)
+            BuffsDebuffs:AddOrRefreshAura(unit, 27189, AURA_TYPE_DEBUFF, 9, 9, 5, "poison", select(3, GetSpellInfo(27189)), 5)
+
+            BuffsDebuffs:AddOrRefreshAura(unit, 33076, AURA_TYPE_BUFF, 15, 15, 1, "magic", select(3, GetSpellInfo(33076)), 1)
+            BuffsDebuffs:AddOrRefreshAura(unit, 26980, AURA_TYPE_BUFF, 12, 12, 5, "magic", select(3, GetSpellInfo(26980)), 2)
+        else
             BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_DEBUFF)
             BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_BUFF)
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 1943, select(1, GetSpellInfo(1943)), select(3, GetSpellInfo(1943)), 10, GetTime() + 10, 1, "physical")
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 1, select(1, GetSpellInfo(1)), select(3, GetSpellInfo(1)), 20, GetTime() + 20, 5, "poison")
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_BUFF, 27009, select(1, GetSpellInfo(27009)), select(3, GetSpellInfo(27009)), 20, GetTime() + 15, 1, "magic")
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_BUFF, 11426, select(1, GetSpellInfo(11426)), select(3, GetSpellInfo(11426)), 10, GetTime() + 10, 1, "magic")
 
+            BuffsDebuffs:AddOrRefreshAura(unit, 1, AURA_TYPE_BUFF, 12, 12, 1, "poison", select(3, GetSpellInfo(1943)), 1)
+            BuffsDebuffs:AddOrRefreshAura(unit, 1, AURA_TYPE_BUFF, 10, 10, 2, "magic", select(3, GetSpellInfo(1)), 2)
+
+            BuffsDebuffs:AddOrRefreshAura(unit, 5, AURA_TYPE_DEBUFF, 12, 12, 3, "physical", select(3, GetSpellInfo(27009)), 1)
+            BuffsDebuffs:AddOrRefreshAura(unit, 5, AURA_TYPE_DEBUFF, 11, 11, 4, "disease", select(3, GetSpellInfo(11426)), 2)
         end
     end
 end
