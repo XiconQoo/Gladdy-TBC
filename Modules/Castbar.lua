@@ -496,7 +496,7 @@ function Castbar:Test(unit)
             value = (endTime / 1000) - GetTime()
             maxValue = (endTime - startTime) / 1000
             event = "channel"
-        elseif (unit == "arena3") then
+        else
             spell, _, icon = GetSpellInfo(20770)
             value, maxValue, event = 0, 60, "cast"
         end
