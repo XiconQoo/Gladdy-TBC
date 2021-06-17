@@ -333,6 +333,7 @@ function Gladdy:CreateButton(i)
     for _, v in self:IterModules() do
         self:Call(v, "CreateFrame", "arena" .. i)
     end
+    self:ResetButton("arena" .. i)
 end
 
 function Gladdy:GetAnchor(unit, position)
