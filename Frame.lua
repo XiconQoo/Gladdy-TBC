@@ -311,17 +311,18 @@ function Gladdy:CreateButton(i)
 
     local secure = CreateFrame("Button", "GladdyButton" .. i, button, "SecureActionButtonTemplate, SecureHandlerEnterLeaveTemplate")
     secure:RegisterForClicks("AnyUp")
-    secure:SetAttribute("*type*", "macro")
+    secure:RegisterForClicks("AnyDown")
+    --secure:SetAttribute("*type*", "macro")
     --secure:SetAttribute("*type1", "target")
     --secure:SetAttribute("*type2", "focus")
-    --secure:SetAttribute("unit", "target")
     secure:SetAttribute("unit", "arena" .. i)
+    --secure:SetAttribute("unit", i == 1 and "player" or "focus")
     --secure.texture = secure:CreateTexture(nil, "OVERLAY")
     --secure.texture:SetAllPoints(secure)
     --secure.texture:SetTexture("Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp")
 
     button.id = i
-    --button.unit = "target"
+    --button.unit = i == 1 and "player" or "focus"
     button.unit = "arena" .. i
     button.secure = secure
 

@@ -120,18 +120,24 @@ function Clicks:SetupAttributes(unit)
 end
 
 function Clicks:SetupAttribute(button, key, mod, action, spell)
-    local attr = mod .. "macrotext" .. key
+    local attr = ""
     local text = ""
 
     if (action == "macro") then
+        attr = mod .. "macrotext" .. key
         text = spell:gsub("%*arena%*", button.unit)
+        button.secure:SetAttribute(mod .. "type" .. key, "macro")
     elseif (action ~= "disabled") then
         if (action == "target") then
-            text = "/target [@" .. button.unit .. "]"
+            attr = mod .. "type" .. key
+            text = "target"
         elseif (action == "focus") then
-            text = "/focus [@" .. button.unit .. "]"
+            attr = mod .. "type" .. key
+            text = "focus"
         elseif (action == "spell") then
-            text = "/cast [@" .. button.unit .. "] " .. spell
+            attr = mod .. "type" .. key
+            text = "spell"
+            button.secure:SetAttribute(mod .. "spell" .. key, spell)
         end
     end
 
