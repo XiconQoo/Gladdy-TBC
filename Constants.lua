@@ -741,6 +741,7 @@ local cooldownList = {
         [29166] = 360, -- Innervate
         [8983] = 60, -- Bash
         [16689] = 60, -- Natures Grasp
+        [18562] = { cd = 15, spec = L["Restoration"], }, -- Swiftmend
         [17116] = { cd = 180, spec = L["Restoration"], }, -- Natures Swiftness
         [33831] = { cd = 180, spec = L["Balance"], }, -- Force of Nature
     },
@@ -808,6 +809,7 @@ local cooldownList = {
         [3411] = 30, -- Intervene
         [676] = 60, -- Disarm
         [5246] = 180, -- Intimidating Shout
+        [18499] = 30, -- Berserker Rage
         --[2565] 	= 60,    -- Shield Block
         [12292] = { cd = 180, spec = L["Arms"], }, -- Death Wish
         [12975] = { cd = 180, spec = L["Protection"], }, -- Last Stand
