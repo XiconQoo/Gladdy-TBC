@@ -10,6 +10,7 @@ local ShadowsightTimer = Gladdy:NewModule("Shadowsight Timer", nil, {
     shadowsightTimerRelPoint2 = "CENTER",
     shadowsightTimerX = 0,
     shadowsightTimerY = 0,
+    shadowsightAnnounce = true,
 })
 
 function ShadowsightTimer:OnEvent(event, ...)
@@ -120,12 +121,14 @@ function ShadowsightTimer.OnUpdate(self, elapsed)
     if (self.timeSinceLastUpdate > 0.1) then
         self.font:SetFormattedText(floor(self.endTime / 60) .. ":" ..  "%02d", self.endTime - floor(self.endTime / 60) * 60)
         self.timeSinceLastUpdate = 0;
-        if floor(self.endTime) == 15 then
+        if floor(self.endTime) == 15 and Gladdy.db.shadowsightAnnounce then
             Gladdy:SendMessage("SHADOWSIGHT", L["Shadowsight up in %ds"]:format(15))
         end
     end
     if self.endTime <= 0 then
-        Gladdy:SendMessage("SHADOWSIGHT", L["Shadowsight up!"])
+        if Gladdy.db.shadowsightAnnounce then
+            Gladdy:SendMessage("SHADOWSIGHT", L["Shadowsight up!"])
+        end
         self:SetScript("OnUpdate", nil)
         self.font:SetText("0:00")
         self.font:SetTextColor(0, 1, 0)
@@ -146,10 +149,17 @@ function ShadowsightTimer:GetOptions()
             order = 3,
             width = "full",
         }),
+        shadowsightAnnounce = Gladdy:option({
+            type = "toggle",
+            name = L["Announce"],
+            --desc = L["Turns countdown before the start of an arena match on/off."],
+            order = 4,
+            width = "full",
+        }),
         shadowsightTimerScale = Gladdy:option({
             type = "range",
             name = L["Scale"],
-            order = 4,
+            order = 5,
             min = 0.1,
             max = 5,
             step = 0.1,
