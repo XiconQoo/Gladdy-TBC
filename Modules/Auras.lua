@@ -275,10 +275,11 @@ function Auras:Test(unit)
         self:AURA_GAIN(unit,AURA_TYPE_DEBUFF, 7922, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
         self:SPELL_INTERRUPT(unit,19244, select(1, GetSpellInfo(19244)), "physical", 25396, select(1, GetSpellInfo(25396)), 64)
     elseif (unit == "arena2") then
-        spellName, _, icon = GetSpellInfo(6770)
+        spellName = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689))
+        _, _, icon = GetSpellInfo(27010)
         self:AURA_FADE(unit, AURA_TYPE_BUFF)
         self:AURA_FADE(unit,AURA_TYPE_DEBUFF)
-        self:AURA_GAIN(unit,AURA_TYPE_DEBUFF, 6770, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
+        self:AURA_GAIN(unit,AURA_TYPE_DEBUFF, 27010, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
         self:SPELL_INTERRUPT(unit,19244, select(1, GetSpellInfo(19244)), "physical", 25396, select(1, GetSpellInfo(25396)), 64)
     elseif (unit == "arena3") then
         spellName, _, icon = GetSpellInfo(31224)
@@ -618,9 +619,12 @@ function Auras:GetAuraOptions(auraType)
     for i,k in ipairs(auras) do
         options[tostring(k)] = {
             type = "group",
-            name = Gladdy:GetImportantAuras()["Unstable Affliction Silence"]
+            name = (Gladdy:GetImportantAuras()["Unstable Affliction Silence"]
                     and Gladdy:GetImportantAuras()["Unstable Affliction Silence"].spellID == k
-                    and Gladdy:GetImportantAuras()["Unstable Affliction Silence"].altName
+                    and Gladdy:GetImportantAuras()["Unstable Affliction Silence"].altName)
+                    or (Gladdy:GetImportantAuras()[select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689))]
+                    and Gladdy:GetImportantAuras()[select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689))].spellID == k
+                    and Gladdy:GetImportantAuras()[select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689))].altName)
                     or GetSpellInfo(k),
             order = i+2,
             icon = Gladdy:GetImportantAuras()[GetSpellInfo(k)] and Gladdy:GetImportantAuras()[GetSpellInfo(k)].texture or select(3, GetSpellInfo(k)),
