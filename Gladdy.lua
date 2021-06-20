@@ -270,6 +270,7 @@ function Gladdy:OnEnable()
 
         self:HideFrame()
         self:ToggleFrame(3)
+        self.showConfig = true
     end
 end
 
@@ -316,6 +317,10 @@ end
 ---------------------------
 
 function Gladdy:PLAYER_ENTERING_WORLD()
+    if self.showConfig then
+        LibStub("AceConfigDialog-3.0"):Open("Gladdy", nil, LibStub("AceConfigDialog-3.0"):SelectGroup("Gladdy", "XiconProfiles"))
+        self.showConfig = nil
+    end
     local instance = select(2, IsInInstance())
     if (instance ~= "arena" and self.frame and self.frame:IsVisible() and not self.frame.testing) then
         self:Reset()
