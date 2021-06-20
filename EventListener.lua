@@ -74,7 +74,7 @@ end
 
 function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
     -- timestamp,eventType,hideCaster,sourceGUID,sourceName,sourceFlags,sourceRaidFlags,destGUID,destName,destFlags,destRaidFlags,spellId,spellName,spellSchool
-    local _,eventType,_,sourceGUID,_,_,_,destGUID,_,_,_,spellID,spellName = CombatLogGetCurrentEventInfo()
+    local _,eventType,_,sourceGUID,_,_,_,destGUID,_,_,_,spellID,spellName,spellSchool,extraSpellId,extraSpellName,extraSpellSchool = CombatLogGetCurrentEventInfo()
     local srcUnit = Gladdy.guids[sourceGUID]
     local destUnit = Gladdy.guids[destGUID]
 
@@ -90,6 +90,10 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
         -- spec detection
         if not Gladdy.buttons[destUnit].class then
             Gladdy:SpotEnemy(destUnit, true)
+        end
+        --interrupt detection
+        if eventType == "SPELL_INTERRUPT" then
+            Gladdy:SendMessage("SPELL_INTERRUPT", destUnit,spellID,spellName,spellSchool,extraSpellId,extraSpellName,extraSpellSchool)
         end
     end
     if srcUnit then

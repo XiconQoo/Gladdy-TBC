@@ -2,19 +2,8 @@ local GetSpellInfo = GetSpellInfo
 local CreateFrame = CreateFrame
 local GetTime = GetTime
 local select, lower, ceil, tremove, tinsert, pairs, ipairs, tostring = select, string.lower, ceil, tremove, tinsert, pairs, ipairs, tostring
-local auraTypeColor = { }
 local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
 local auraTypes = {AURA_TYPE_BUFF, AURA_TYPE_DEBUFF}
-
-auraTypeColor["none"]     = { r = 0.80, g = 0, b = 0 , a = 1}
-auraTypeColor["magic"]    = { r = 0.20, g = 0.60, b = 1.00, a = 1}
-auraTypeColor["curse"]    = { r = 0.60, g = 0.00, b = 1.00, a = 1 }
-auraTypeColor["disease"]  = { r = 0.60, g = 0.40, b = 0, a = 1 }
-auraTypeColor["poison"]   = { r = 0.00, g = 0.60, b = 0, a = 1 }
-auraTypeColor["immune"]   = { r = 1.00, g = 0.02, b = 0.99, a = 1 }
-auraTypeColor["form"]     = auraTypeColor["none"]
-auraTypeColor["aura"]     = auraTypeColor["none"]
-auraTypeColor[""]         = auraTypeColor["none"]
 
 ---------------------------
 -- Module init
@@ -55,14 +44,14 @@ local BuffsDebuffs = Gladdy:NewModule("Buffs and Debuffs", nil, {
     buffsBorderColorsEnabled = true,
     trackedDebuffs = defaultTrackedDebuffs,
     trackedBuffs = defaultTrackedBuffs,
-    buffsBorderColorCurse = auraTypeColor["curse"],
-    buffsBorderColorMagic = auraTypeColor["magic"],
-    buffsBorderColorPoison = auraTypeColor["poison"],
-    buffsBorderColorPhysical = auraTypeColor["none"],
-    buffsBorderColorImmune = auraTypeColor["immune"],
-    buffsBorderColorDisease = auraTypeColor["disease"],
-    buffsBorderColorForm = auraTypeColor["form"],
-    buffsBorderColorAura = auraTypeColor["aura"]
+    buffsBorderColorCurse = Gladdy:GetAuraTypeColor()["curse"],
+    buffsBorderColorMagic = Gladdy:GetAuraTypeColor()["magic"],
+    buffsBorderColorPoison = Gladdy:GetAuraTypeColor()["poison"],
+    buffsBorderColorPhysical = Gladdy:GetAuraTypeColor()["none"],
+    buffsBorderColorImmune = Gladdy:GetAuraTypeColor()["immune"],
+    buffsBorderColorDisease = Gladdy:GetAuraTypeColor()["disease"],
+    buffsBorderColorForm = Gladdy:GetAuraTypeColor()["form"],
+    buffsBorderColorAura = Gladdy:GetAuraTypeColor()["aura"]
 })
 
 local spellSchoolToOptionValueTable

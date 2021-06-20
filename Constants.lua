@@ -695,6 +695,49 @@ function Gladdy:GetImportantAuras()
     return importantAuras
 end
 
+local interrupts = {
+    [GetSpellInfo(19675)] = {duration = 4, spellID = 19675, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(19675)), priority = 15}, -- Feral Charge Effect (Druid)
+    [GetSpellInfo(2139)] = {duration = 8, spellID = 2139, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(2139)), priority = 15}, -- Counterspell (Mage)
+    [GetSpellInfo(1766)] = {duration = 5, spellID = 1766, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(1766)), priority = 15}, -- Kick (Rogue)
+    [GetSpellInfo(6552)] = {duration = 4, spellID = 6552, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(6552)), priority = 15}, -- Pummel (Warrior)
+    [GetSpellInfo(72)] = {duration = 6, spellID = 72, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(72)), priority = 15}, -- Shield Bash (Warrior)
+    [GetSpellInfo(8042)] = {duration = 2, spellID = 8042, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(8042)), priority = 15}, -- Earth Shock (Shaman)
+    [GetSpellInfo(19244)] = {duration = 5, spellID = 19244, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(19244)), priority = 15}, -- Spell Lock (Warlock
+    [GetSpellInfo(32747)] = {duration = 3, spellID = 32747, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(32747)), priority = 15}, -- Deadly Throw Interrupt
+}
+function Gladdy:GetInterrupts()
+    return interrupts
+end
+
+local auraTypeColor = {}
+auraTypeColor["none"]     = { r = 0.80, g = 0, b = 0 , a = 1}
+auraTypeColor["magic"]    = { r = 0.20, g = 0.60, b = 1.00, a = 1}
+auraTypeColor["curse"]    = { r = 0.60, g = 0.00, b = 1.00, a = 1 }
+auraTypeColor["disease"]  = { r = 0.60, g = 0.40, b = 0, a = 1 }
+auraTypeColor["poison"]   = { r = 0.00, g = 0.60, b = 0, a = 1 }
+auraTypeColor["immune"]   = { r = 1.00, g = 0.02, b = 0.99, a = 1 }
+auraTypeColor["form"]     = auraTypeColor["none"]
+auraTypeColor["aura"]     = auraTypeColor["none"]
+auraTypeColor[""]         = auraTypeColor["none"]
+
+function Gladdy:GetAuraTypeColor()
+    return auraTypeColor
+end
+
+local spellSchoolColors = {}
+spellSchoolColors[1] = {r = 1, g = 1, b = 0, a =  1, type = "Physical"} --- "physical" 255, 255, 0
+spellSchoolColors[2] = {r = 1, g = 0.901, b = 0.501, a =  1, type = "Holy"} ---"holy" -- 255, 230, 128
+spellSchoolColors[4] = {r = 1, g = 0.501, b = 0, a =  1, type = "Fire"} ---"fire" --  255, 128, 0
+spellSchoolColors[8] = {r = 0.302, g = 1, b = 0.302, a =  1, type = "Nature"} ---"nature" --  77, 255, 77
+spellSchoolColors[16] = {r = 0.501, g = 1, b = 1, a =  1, type = "Frost"} ---"frost" -- 128, 255, 255
+spellSchoolColors[32] = {r = 0.501, g = 0.501, b = 1, a =  1, type = "Shadow"} ---"shadow" --128, 128, 255
+spellSchoolColors[64] = {r = 1, g = 0.501, b = 1, a =  1, type = "Arcane"} ---"arcane" -- 255, 128, 255
+spellSchoolColors["unknown"] = {r = 0, g = 0, b = 0, a =  1, type = "Unknown"} ---"unknown spell school"
+
+function Gladdy:GetSpellSchoolColors()
+    return spellSchoolColors
+end
+
 local cooldownList = {
     -- Spell Name			   Cooldown[, Spec]
     -- Mage
