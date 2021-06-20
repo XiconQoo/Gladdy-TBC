@@ -7,31 +7,41 @@
 
 ### Origin
 
-Based on https://github.com/Schaka/gladdy
+Based on https://github.com/miraage/gladdy
 
 ### Motivation for this edit
 
 The goal is to make Gladdy highly configurable in it's appearance. Everything can be arranged left or right independently. Also I gave Gladdy a new look with black borders. A lot can be configured.
 
 ### Modules:
-- Announcement (drink, trinket usage, spec detection ...)
-- ArenaCountDown
-- Auras (show important (de)buffs in the class icon)
-- BuffsDebuffs (show buffs and debuffs on arena frames - can be filtered)
-- ClassIcon (or specicon, once detected)
-- CombatIndicator 
-- Cooldown (tracks important cooldowns)
-- Diminishing (tracks DRs)
-- ExportImport (share your profile with your friends in the form of a string, which can be imported)
-- Highlight (highlights focus and target)
-- Pets (show arena pets)
-- Racial Spells
-- Range Check
-- Shadowsight Timer
-- TotemPlates (show totem icons instead of normal nameplates)
-- Trinket (tracks trinket usage)
-- VersionCheck (checks if you use an older version that your teammate)
-- XiconProfiles (predefined profiles to start your configuration from)
+- **Announcement** (drink, trinket usage, spec detection ...)
+- **ArenaCountDown**
+- **Auras** (show important (de)buffs as well as interrupts on the class icon)
+- **BuffsDebuffs** (show buffs and debuffs on arena frames - can be filtered)
+- **CastBar** (shows a castbar, can be disabled)
+- **ClassIcon** (or specicon, once detected)
+- **Clicks** (bind spells or macros to click actions)
+- **CombatIndicator** (shows a sword icon if unit is in combat)
+- **Cooldown** (tracks important cooldowns)
+- **Diminishing** (tracks DRs)
+- **ExportImport** (share your profile with your friends in the form of a string, which can be imported)
+- **Highlight** (highlights focus and target)
+- **Pets** (show arena pets)
+- **Racial** (show arena racial cooldowns)
+- **Range Check** (checks the range to a unit by a configurable spell)
+- **Shadowsight Timer** (shows a little movable frame with time left until Shadow Eyes spawn)
+- **TotemPlates** (show totem icons instead of normal nameplates, compatible with **Plater, NeatPlates, KUI, ThreatPlates, ElvUI, TukUI**)
+- **Trinket** (tracks trinket usage)
+- **VersionCheck** (checks if you use an older version that your teammate)
+- **XiconProfiles** (predefined profiles to start your configuration from)
+
+### Valid Slash commands
+
+- **/gladdy ui** (shows config)
+- **/gladdy test** (standard 3v3 test mode)
+- **/gladdy test1** to **/gladdy test5** (test mode with 1-5 frames active)
+- **/gladdy hide** (hides the frames)
+- **/gladdy reset** (resets current profile to default settings)
 
 ## Screenshots
 
@@ -41,7 +51,8 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 
 ## Special Thanks
 
-- **Schaka** - the original author of Gladdy! (thanks for letting me continue Gladdy and all the work you put into the TBC community)
+- **miraage** - the origininal author of Gladdy! Your work set the foundation for this edit. Thanks!
+- **Schaka** - the maintainer of Gladdy! (thanks for letting me continue Gladdy and all the work you put into the TBC community)
 - **Macumba** (thanks for all the support, your feedback and your dedication for the TBC community)
 - **RMO** (without you I would not have modified Gladdy at all and thanks for all the suggestions and active feedback)
 - **Ur0b0r0s aka DrainTheLock** (thanks for testing, giving feedback and correcting/adding wrong CDs)
