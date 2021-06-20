@@ -228,10 +228,10 @@ function Gladdy:UpdateFrame()
         if (self.db.growDirection == "TOP") then
             if (i == 1) then
                 button:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", leftSize, powerBarHeight)
-                button.secure:SetPoint("TOPLEFT", button.powerBar, "TOPLEFT")
+                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             else
                 button:SetPoint("BOTTOMLEFT", self.buttons["arena" .. (i - 1)], "TOPLEFT", 0, margin + self.db.bottomMargin)
-                button.secure:SetPoint("TOPLEFT", button.powerBar, "TOPLEFT")
+                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             end
         elseif (self.db.growDirection == "BOTTOM") then
             if (i == 1) then
