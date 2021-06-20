@@ -182,6 +182,13 @@ local importantAuras = {
         root = true,
         spellID = 26989,
     },
+    [select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689))] = {
+        track = AURA_TYPE_DEBUFF,
+        duration = 10,
+        priority = 30,
+        spellID = 27010,
+        altName = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
+    },
     -- Feral Charge
     [GetSpellInfo(16979)] = {
         track = AURA_TYPE_DEBUFF,

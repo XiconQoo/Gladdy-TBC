@@ -1,7 +1,7 @@
 # Gladdy - TBC
 
 ### The most powerful arena addon for WoW TBC 2.5.1
-## [v1.14-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v1.14-Beta/Gladdy_TBC-Classic_v1.14-Beta.zip)
+## [v1.15-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v1.15-Beta/Gladdy_TBC-Classic_v1.15-Beta.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -61,6 +61,9 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 - **Hydra** (thanks for constructive feedback and suggestions)
 
 ### Changes
+
+### v1.15-Beta
+- hotfix added entangling roots nature's grasp
 
 ### v1.14-Beta
 - hotfix for secure button grow direction up
