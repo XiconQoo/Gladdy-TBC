@@ -25,7 +25,7 @@ local MAJOR, MINOR = "Gladdy", 4
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
 Gladdy.version_major_num = 1
-Gladdy.version_minor_num = 0.12
+Gladdy.version_minor_num = 0.13
 Gladdy.version_num = Gladdy.version_major_num + Gladdy.version_minor_num
 Gladdy.version_releaseType = RELEASE_TYPES.beta
 Gladdy.version = PREFIX .. Gladdy.version_num .. "-" .. Gladdy.version_releaseType
@@ -200,6 +200,7 @@ function Gladdy:OnInitialize()
     self.LSM:Register("border", "Gladdy Tooltip round", "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round_selfmade")
     self.LSM:Register("border", "Gladdy Tooltip squared", "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_square_selfmade")
     self.LSM:Register("font", "DorisPP", "Interface\\AddOns\\Gladdy\\Images\\DorisPP.TTF")
+    self.LSM:Register("border", "Square Full White", "Interface\\AddOns\\Gladdy\\Images\\Square_FullWhite.tga")
 
     L = self.L
 
@@ -227,6 +228,9 @@ function Gladdy:OnInitialize()
         self:Call(v, "Initialize") -- B.E > A.E :D
     end
     self:DeleteUnknownOptions(self.db, self.defaults.profile)
+    if Gladdy.db.hideBlizzard == "always" then
+        SetCVar("showArenaEnemyFrames", 0)
+    end
 end
 
 function Gladdy:OnProfileChanged()
@@ -266,6 +270,7 @@ function Gladdy:OnEnable()
 
         self:HideFrame()
         self:ToggleFrame(3)
+        self.showConfig = true
     end
 end
 
@@ -285,7 +290,7 @@ end
 ---------------------------
 
 function Gladdy:Test()
-    Gladdy.frame.testing = true
+    self.frame.testing = true
     for i = 1, self.curBracket do
         local unit = "arena" .. i
         if (not self.buttons[unit]) then
@@ -312,6 +317,10 @@ end
 ---------------------------
 
 function Gladdy:PLAYER_ENTERING_WORLD()
+    if self.showConfig then
+        LibStub("AceConfigDialog-3.0"):Open("Gladdy", nil, LibStub("AceConfigDialog-3.0"):SelectGroup("Gladdy", "XiconProfiles"))
+        self.showConfig = nil
+    end
     local instance = select(2, IsInInstance())
     if (instance ~= "arena" and self.frame and self.frame:IsVisible() and not self.frame.testing) then
         self:Reset()
@@ -355,6 +364,9 @@ function Gladdy:Reset()
     for unit in pairs(self.buttons) do
         self:ResetUnit(unit)
     end
+    if Gladdy.db.hideBlizzard == "never" or Gladdy.db.hideBlizzard == "arena" then
+        SetCVar("showArenaEnemyFrames", 1)
+    end
 end
 
 function Gladdy:ResetUnit(unit)
@@ -381,7 +393,7 @@ function Gladdy:ResetButton(unit)
             button[k1] = nil
         elseif (type(v1) == "number") then
             button[k1] = 0
-        elseif (type(v1) == "array") then
+        elseif (type(v1) == "table") then
             button[k1] = {}
         elseif (type(v1) == "boolean") then
             button[k1] = false
@@ -411,5 +423,8 @@ function Gladdy:JoinedArena()
     self.frame:Show()
     for i=1, self.curBracket do
         self.buttons["arena" .. i]:SetAlpha(1)
+    end
+    if Gladdy.db.hideBlizzard == "arena" or Gladdy.db.hideBlizzard == "always" then
+        SetCVar("showArenaEnemyFrames", 0)
     end
 end

@@ -385,8 +385,9 @@ function Diminishings:GetOptions()
                             desc = L["Size of the DR Icons"],
                             order = 5,
                             min = 5,
-                            max = 50,
+                            max = 80,
                             step = 1,
+                            width = "full",
                         }),
                         drWidthFactor = Gladdy:option({
                             type = "range",
@@ -396,6 +397,7 @@ function Diminishings:GetOptions()
                             min = 0.5,
                             max = 2,
                             step = 0.05,
+                            width = "full",
                         }),
                         drIconPadding = Gladdy:option({
                             type = "range",
@@ -405,6 +407,7 @@ function Diminishings:GetOptions()
                             min = 0,
                             max = 10,
                             step = 0.1,
+                            width = "full",
                         }),
                     },
                 },
@@ -431,6 +434,7 @@ function Diminishings:GetOptions()
                             max = 1,
                             step = 0.1,
                             order = 9,
+                            width = "full",
                         }),
                     },
                 },
@@ -467,6 +471,7 @@ function Diminishings:GetOptions()
                             min = 0.1,
                             max = 2,
                             step = 0.1,
+                            width = "full",
                         }),
                     }
                 },
@@ -502,6 +507,7 @@ function Diminishings:GetOptions()
                             min = -400,
                             max = 400,
                             step = 0.1,
+                            width = "full",
                         }),
                         drYOffset = Gladdy:option({
                             type = "range",
@@ -510,6 +516,7 @@ function Diminishings:GetOptions()
                             min = -400,
                             max = 400,
                             step = 0.1,
+                            width = "full",
                         }),
                     },
                 },

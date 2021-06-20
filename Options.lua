@@ -13,6 +13,7 @@ local L = Gladdy.L
 Gladdy.defaults = {
     profile = {
         locked = false,
+        hideBlizzard = "arena",
         x = 0,
         y = 0,
         growUp = false,
@@ -97,6 +98,11 @@ local function setOpt(info, value)
     local key = info.arg or info[#info]
     Gladdy.dbi.profile[key] = value
     Gladdy:UpdateFrame()
+    if Gladdy.db.hideBlizzard == "always" then
+        SetCVar("showArenaEnemyFrames", 0)
+    elseif Gladdy.db.hideBlizzard == "never" then
+        SetCVar("showArenaEnemyFrames", 1)
+    end
 end
 local function getColorOpt(info)
     local key = info.arg or info[#info]
@@ -205,10 +211,20 @@ function Gladdy:SetupOptions()
                             ["RIGHT"] = L["Right"],
                         }
                     },
+                    hideBlizzard = {
+                        type = "select",
+                        name = L["Hide Blizzard"],
+                        values = {
+                            ["arena"] = L["Arena only"],
+                            ["never"] = L["Never"],
+                            ["always"] = L["Always"],
+                        },
+                        order = 4,
+                    },
                     group = {
                         type = "group",
                         name = L["General"],
-                        order = 4,
+                        order = 5,
                         childGroups = "tree",
                         args = {
                             frameGeneral = {

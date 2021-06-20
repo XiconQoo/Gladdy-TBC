@@ -1,7 +1,6 @@
 local select, string_gsub, tostring = select, string.gsub, tostring
 
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
-local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 local AURA_TYPE_DEBUFF = AURA_TYPE_DEBUFF
 local AURA_TYPE_BUFF = AURA_TYPE_BUFF
 
@@ -34,7 +33,6 @@ function EventListener:JOINED_ARENA()
     self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
     self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
     self:SetScript("OnEvent", EventListener.OnEvent)
-    Gladdy:SendCommMessage("GladdyVCheck", tostring(Gladdy.version_num), "RAID", UnitName("player"))
 end
 
 function EventListener:Reset()
@@ -76,20 +74,9 @@ end
 
 function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
     -- timestamp,eventType,hideCaster,sourceGUID,sourceName,sourceFlags,sourceRaidFlags,destGUID,destName,destFlags,destRaidFlags,spellId,spellName,spellSchool
-    local _,eventType,_,sourceGUID,_,_,_,destGUID,_,_,_,spellID,spellName = CombatLogGetCurrentEventInfo()
+    local _,eventType,_,sourceGUID,_,_,_,destGUID,_,_,_,spellID,spellName,spellSchool,extraSpellId,extraSpellName,extraSpellSchool = CombatLogGetCurrentEventInfo()
     local srcUnit = Gladdy.guids[sourceGUID]
     local destUnit = Gladdy.guids[destGUID]
-
-    if Gladdy.specSpells[spellName] and srcUnit then
-        --Gladdy:Print(eventType, spellName, Gladdy.specSpells[spellName], srcUnit)
-    end
-    if (eventType == "UNIT_DIED" or eventType == "PARTY_KILL" or eventType == "SPELL_INSTAKILL") then
-        if destUnit then
-            --Gladdy:Print(eventType, "destUnit", destUnit)
-        elseif srcUnit then
-            --Gladdy:Print(eventType, "srcUnit", srcUnit)
-        end
-    end
 
     if destUnit then
         -- diminish tracker
@@ -104,26 +91,32 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
         if not Gladdy.buttons[destUnit].class then
             Gladdy:SpotEnemy(destUnit, true)
         end
+        --interrupt detection
+        if eventType == "SPELL_INTERRUPT" then
+            Gladdy:SendMessage("SPELL_INTERRUPT", destUnit,spellID,spellName,spellSchool,extraSpellId,extraSpellName,extraSpellSchool)
+        end
     end
     if srcUnit then
-        local unitRace = Gladdy.buttons[srcUnit].race
-        -- cooldown tracker
-        if Gladdy.db.cooldown and Cooldowns.cooldownSpellIds[spellName] then
-            local unitClass
-            local spellId = Cooldowns.cooldownSpellIds[spellName] -- don't use spellId from combatlog, in case of different spellrank
-            if Gladdy.db.cooldownCooldowns[tostring(spellId)] then
-                if (Gladdy:GetCooldownList()[Gladdy.buttons[srcUnit].class][spellId]) then
-                    unitClass = Gladdy.buttons[srcUnit].class
-                else
-                    unitClass = Gladdy.buttons[srcUnit].race
+        if (eventType == "SPELL_CAST_SUCCESS" or eventType == "SPELL_AURA_APPLIED") then
+            local unitRace = Gladdy.buttons[srcUnit].race
+            -- cooldown tracker
+            if Gladdy.db.cooldown and Cooldowns.cooldownSpellIds[spellName] then
+                local unitClass
+                local spellId = Cooldowns.cooldownSpellIds[spellName] -- don't use spellId from combatlog, in case of different spellrank
+                if Gladdy.db.cooldownCooldowns[tostring(spellId)] then
+                    if (Gladdy:GetCooldownList()[Gladdy.buttons[srcUnit].class][spellId]) then
+                        unitClass = Gladdy.buttons[srcUnit].class
+                    else
+                        unitClass = Gladdy.buttons[srcUnit].race
+                    end
+                    Cooldowns:CooldownUsed(srcUnit, unitClass, spellId, spellName)
+                    Gladdy:DetectSpec(srcUnit, Gladdy.specSpells[spellName])
                 end
-                Cooldowns:CooldownUsed(srcUnit, unitClass, spellId, spellName)
-                Gladdy:DetectSpec(srcUnit, Gladdy.specSpells[spellName])
             end
-        end
 
-        if Gladdy.db.racialEnabled and Gladdy:Racials()[unitRace].spellName == spellName and Gladdy:Racials()[unitRace][spellID] then
-            Gladdy:SendMessage("RACIAL_USED", srcUnit)
+            if Gladdy.db.racialEnabled and Gladdy:Racials()[unitRace].spellName == spellName and Gladdy:Racials()[unitRace][spellID] then
+                Gladdy:SendMessage("RACIAL_USED", srcUnit)
+            end
         end
 
         if not Gladdy.buttons[srcUnit].class then
@@ -143,12 +136,11 @@ function EventListener:ARENA_OPPONENT_UPDATE(unit, updateReason)
     if button or pet then
         if updateReason == "seen" then
             -- ENEMY_SPOTTED
-            if button and not button.class then
-                Gladdy:SpotEnemy(unit, true)
-            end
-            if button and button.stealthed then
-                local class = Gladdy.buttons[unit].class
-                button.healthBar.hp:SetStatusBarColor(RAID_CLASS_COLORS[class].r, RAID_CLASS_COLORS[class].g, RAID_CLASS_COLORS[class].b, 1)
+            if button then
+                Gladdy:SendMessage("ENEMY_STEALTH", unit, false)
+                if not button.class then
+                    Gladdy:SpotEnemy(unit, true)
+                end
             end
             if pet then
                 Gladdy:SendMessage("PET_SPOTTED", unit)
@@ -156,9 +148,7 @@ function EventListener:ARENA_OPPONENT_UPDATE(unit, updateReason)
         elseif updateReason == "unseen" then
             -- STEALTH
             if button then
-                Gladdy:SendMessage("ENEMY_STEALTH", unit)
-                button.healthBar.hp:SetStatusBarColor(0.66, 0.66, 0.66, 1)
-                button.stealthed = true
+                Gladdy:SendMessage("ENEMY_STEALTH", unit, true)
             end
             if pet then
                 Gladdy:SendMessage("PET_STEALTH", unit)
@@ -213,7 +203,7 @@ function EventListener:UNIT_AURA(unit)
             end
             if not button.spec and Gladdy.specBuffs[spellName] then
                 local unitPet = string_gsub(unit, "%d$", "pet%1")
-                if UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster) then
+                if unitCaster and (UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster)) then
                     Gladdy:DetectSpec(unit, Gladdy.specBuffs[spellName])
                 end
             end
@@ -251,8 +241,4 @@ function EventListener:UNIT_SPELLCAST_SUCCEEDED(unit)
             Gladdy:DetectSpec(unit, Gladdy.specSpells[spellName])
         end
     end
-end
-
-function EventListener:GetOptions()
-    return nil
 end

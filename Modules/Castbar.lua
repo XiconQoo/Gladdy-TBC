@@ -19,6 +19,7 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
 local Castbar = Gladdy:NewModule("Cast Bar", 70, {
+    castBarEnabled = true,
     castBarHeight = 20,
     castBarWidth = 160,
     castBarIconSize = 22,
@@ -439,40 +440,39 @@ end
 ---------------------------
 
 function Castbar:JOINED_ARENA()
-    for i=1, Gladdy.curBracket do
-        local unit = "arena" .. i
-        local castBar = self.frames[unit]
-        castBar:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
-        castBar:RegisterEvent("UNIT_SPELLCAST_DELAYED")
-        castBar:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
-        castBar:RegisterEvent("UNIT_SPELLCAST_CHANNEL_UPDATE")
-        castBar:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
-        castBar:RegisterUnitEvent("UNIT_SPELLCAST_START", unit)
-        castBar:RegisterUnitEvent("UNIT_SPELLCAST_STOP", unit)
-        castBar:RegisterUnitEvent("UNIT_SPELLCAST_FAILED", unit)
-        castBar:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", unit)
-        castBar:SetScript("OnEvent", Castbar.OnEvent)
-        castBar:SetScript("OnUpdate", Castbar.OnUpdate)
-        castBar.fadeOut = nil
-        self:CAST_STOP(unit)
-        --Castbar.OnEvent(castBar, "PLAYER_ENTERING_WORLD")
+    if Gladdy.db.castBarEnabled then
+        for i=1, Gladdy.curBracket do
+            local unit = "arena" .. i
+            local castBar = self.frames[unit]
+            castBar:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
+            castBar:RegisterEvent("UNIT_SPELLCAST_DELAYED")
+            castBar:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
+            castBar:RegisterEvent("UNIT_SPELLCAST_CHANNEL_UPDATE")
+            castBar:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
+            castBar:RegisterUnitEvent("UNIT_SPELLCAST_START", unit)
+            castBar:RegisterUnitEvent("UNIT_SPELLCAST_STOP", unit)
+            castBar:RegisterUnitEvent("UNIT_SPELLCAST_FAILED", unit)
+            castBar:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", unit)
+            castBar:SetScript("OnEvent", Castbar.OnEvent)
+            castBar:SetScript("OnUpdate", Castbar.OnUpdate)
+            castBar.fadeOut = nil
+            self:CAST_STOP(unit)
+            --Castbar.OnEvent(castBar, "PLAYER_ENTERING_WORLD")
+        end
     end
 end
 
 function Castbar:ResetUnit(unit)
     local castBar = self.frames[unit]
-    castBar:UnregisterEvent("UNIT_SPELLCAST_INTERRUPTED")
-    castBar:UnregisterEvent("UNIT_SPELLCAST_DELAYED")
-    castBar:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_START")
-    castBar:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_UPDATE")
-    castBar:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
-    castBar:UnregisterEvent("UNIT_SPELLCAST_START")
-    castBar:UnregisterEvent("UNIT_SPELLCAST_STOP")
-    castBar:UnregisterEvent("UNIT_SPELLCAST_FAILED")
+    castBar:UnregisterAllEvents()
     castBar:SetScript("OnEvent", nil)
     castBar:SetScript("OnUpdate", nil)
     castBar.fadeOut = nil
     self:CAST_STOP(unit)
+end
+
+function Castbar:Reset()
+    self.test = nil
 end
 
 ---------------------------
@@ -482,25 +482,30 @@ end
 ---------------------------
 
 function Castbar:Test(unit)
-    local spell, _, icon, value, maxValue, event, endTime, startTime
+    self.test = true
+    if Gladdy.db.castBarEnabled then
+        local spell, _, icon, value, maxValue, event, endTime, startTime
 
-    if (unit == "arena2") then
-        spell, _, icon = GetSpellInfo(27072)
-        value, maxValue, event = 0, 40, "cast"
-    elseif (unit == "arena1") then
-        spell, _, icon = GetSpellInfo(27220)
-        endTime = GetTime() * 1000 + 60*1000
-        startTime = GetTime() * 1000
-        value = (endTime / 1000) - GetTime()
-        maxValue = (endTime - startTime) / 1000
-        event = "channel"
-    elseif (unit == "arena3") then
-        spell, _, icon = GetSpellInfo(20770)
-        value, maxValue, event = 0, 60, "cast"
-    end
+        if (unit == "arena2") then
+            spell, _, icon = GetSpellInfo(27072)
+            value, maxValue, event = 0, 40, "cast"
+        elseif (unit == "arena1") then
+            spell, _, icon = GetSpellInfo(27220)
+            endTime = GetTime() * 1000 + 60*1000
+            startTime = GetTime() * 1000
+            value = (endTime / 1000) - GetTime()
+            maxValue = (endTime - startTime) / 1000
+            event = "channel"
+        else
+            spell, _, icon = GetSpellInfo(20770)
+            value, maxValue, event = 0, 60, "cast"
+        end
 
-    if (spell) then
-        self:CAST_START(unit, spell, icon, value, maxValue, event)
+        if (spell) then
+            self:CAST_START(unit, spell, icon, value, maxValue, event)
+        end
+    else
+        self:CAST_STOP(unit)
     end
 end
 
@@ -541,11 +546,17 @@ function Castbar:GetOptions()
             name = L["Cast Bar"],
             order = 2,
         },
+        castBarEnabled = option({
+            type = "toggle",
+            name = L["Enabled"],
+            desc = L["If test is running, type \"/gladdy test\" again"],
+            order = 3,
+        }),
         group = {
             type = "group",
             childGroups = "tree",
             name = L["Frame"],
-            order = 3,
+            order = 4,
             args = {
                 barFrame = {
                     type = "group",
@@ -565,6 +576,7 @@ function Castbar:GetOptions()
                             min = 0,
                             max = 50,
                             step = 1,
+                            width = "full",
                         }),
                         castBarWidth = option({
                             type = "range",
@@ -574,6 +586,7 @@ function Castbar:GetOptions()
                             min = 0,
                             max = 300,
                             step = 1,
+                            width = "full",
                         }),
                         headerTexture = {
                             type = "header",
@@ -614,6 +627,7 @@ function Castbar:GetOptions()
                             min = 0.5,
                             max = Gladdy.db.castBarHeight/2,
                             step = 0.5,
+                            width = "full",
                         }),
                         castBarBorderStyle = option({
                             type = "select",
@@ -647,6 +661,7 @@ function Castbar:GetOptions()
                             min = 0,
                             max = 100,
                             step = 1,
+                            width = "full",
                         }),
                         headerBorder = {
                             type = "header",
@@ -723,6 +738,7 @@ function Castbar:GetOptions()
                             order = 4,
                             min = 1,
                             max = 20,
+                            width = "full",
                         }),
                         headerFormat = {
                             type = "header",
@@ -781,6 +797,7 @@ function Castbar:GetOptions()
                             min = -400,
                             max = 400,
                             step = 0.1,
+                            width = "full",
                         }),
                         castBarYOffset = option({
                             type = "range",
@@ -789,6 +806,7 @@ function Castbar:GetOptions()
                             min = -400,
                             max = 400,
                             step = 0.1,
+                            width = "full",
                         }),
                     }
                 },

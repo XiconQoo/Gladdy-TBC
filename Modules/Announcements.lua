@@ -47,6 +47,7 @@ function Announcements:Initialize()
     self:RegisterMessage("UNIT_HEALTH")
     self:RegisterMessage("TRINKET_USED")
     self:RegisterMessage("TRINKET_READY")
+    self:RegisterMessage("SHADOWSIGHT")
 end
 
 function Announcements:Reset()
@@ -146,6 +147,10 @@ function Announcements:CheckDrink(unit, aura)
     if (aura == self.DRINK_AURA) then
         self:Send(L["DRINKING: %s (%s)"]:format(button.name, button.classLoc), 3, RAID_CLASS_COLORS[button.class])
     end
+end
+
+function Announcements:SHADOWSIGHT(msg)
+    self:Send(msg, 2)
 end
 
 function Announcements:Send(msg, throttle, color)

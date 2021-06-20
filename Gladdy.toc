@@ -1,6 +1,6 @@
 ## Interface: 20501
 ## Title: Gladdy - TBC
-## Version: 1.12-Beta
+## Version: 1.13-Beta
 ## Notes: The most powerful arena AddOn for WoW 2.5.1
 ## Author: XiconQoo, DnB_Junkee, Knall
 ## X-Email: contact me on discord Knall#1751
@@ -22,6 +22,7 @@ Modules\Powerbar.lua
 Modules\Auras.lua
 Modules\Castbar.lua
 Modules\Classicon.lua
+Modules\Clicks.lua
 Modules\Diminishings.lua
 Modules\Highlight.lua
 Modules\TotemPlates.lua
@@ -35,4 +36,6 @@ Modules\XiconProfiles.lua
 Modules\Pets.lua
 Modules\ExportImport.lua
 Modules\CombatIndicator.lua
+Modules\RangeCheck.lua
+Modules\ShadowsightTimer.lua
 EventListener.lua

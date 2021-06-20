@@ -89,18 +89,19 @@ function Highlight:UpdateFrame(unit)
         return
     end
 
+    local powerBarHeight = Gladdy.db.powerBarEnabled and (Gladdy.db.powerBarHeight + 1) or 0
     local borderSize = Gladdy.db.highlightBorderSize
     local borderOffset = borderSize
-    local iconSize = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight + 1
+    local hpAndPowerHeight = Gladdy.db.healthBarHeight + powerBarHeight
     local width = Gladdy.db.barWidth + (Gladdy.db.highlightInset and 0 or borderSize * 2)
-    local height = iconSize + (Gladdy.db.highlightInset and 0 or borderSize * 2)
+    local height = hpAndPowerHeight + (Gladdy.db.highlightInset and 0 or borderSize * 2)
 
     button.targetBorder:SetWidth(width)
     button.targetBorder:SetHeight(height)
     button.targetBorder:ClearAllPoints()
     if Gladdy.db.highlightInset then
         button.targetBorder:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT", -(borderOffset/Gladdy.db.statusbarBorderOffset), (borderOffset/Gladdy.db.statusbarBorderOffset))
-        button.targetBorder:SetPoint("BOTTOMRIGHT", button.powerBar, "BOTTOMRIGHT", (borderOffset/Gladdy.db.statusbarBorderOffset), -(borderOffset/Gladdy.db.statusbarBorderOffset))
+        button.targetBorder:SetPoint("BOTTOMRIGHT",  Gladdy.db.powerBarEnabled and button.powerBar or button.healthBar, "BOTTOMRIGHT", (borderOffset/Gladdy.db.statusbarBorderOffset), -(borderOffset/Gladdy.db.statusbarBorderOffset))
     else
         button.targetBorder:SetPoint("TOP", button.healthBar, "TOP", 0, (Gladdy.db.highlightInset and 0 or borderSize))
     end
@@ -113,7 +114,7 @@ function Highlight:UpdateFrame(unit)
     button.focusBorder:ClearAllPoints()
     if Gladdy.db.highlightInset then
         button.focusBorder:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT", -(borderOffset/Gladdy.db.statusbarBorderOffset), (borderOffset/Gladdy.db.statusbarBorderOffset))
-        button.focusBorder:SetPoint("BOTTOMRIGHT", button.powerBar, "BOTTOMRIGHT", (borderOffset/Gladdy.db.statusbarBorderOffset), -(borderOffset/Gladdy.db.statusbarBorderOffset))
+        button.focusBorder:SetPoint("BOTTOMRIGHT", Gladdy.db.powerBarEnabled and button.powerBar or button.healthBar, "BOTTOMRIGHT", (borderOffset/Gladdy.db.statusbarBorderOffset), -(borderOffset/Gladdy.db.statusbarBorderOffset))
     else
         button.focusBorder:SetPoint("TOP", button.healthBar, "TOP", 0, (Gladdy.db.highlightInset and 0 or borderSize))
     end
@@ -156,7 +157,7 @@ function Highlight:Test(unit)
     elseif (unit == "arena2") then
         self:Toggle(unit, "target", true)
     elseif (unit == "arena3") then
-        self:Toggle(unit, "leader", true)
+        --self:Toggle(unit, "leader", true)
     end
 end
 
@@ -214,6 +215,7 @@ function Highlight:GetOptions()
             min = 1,
             max = 20,
             step = 1,
+            width = "full",
         }),
         highlightBorderStyle = Gladdy:option({
             type = "select",

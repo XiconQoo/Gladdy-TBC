@@ -7,6 +7,7 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
 local Powerbar = Gladdy:NewModule("Power Bar", 90, {
+    powerBarEnabled = true,
     powerBarFont = "DorisPP",
     powerBarHeight = 20,
     powerBarTexture = "Smooth",
@@ -113,17 +114,24 @@ function Powerbar:SetPower(powerBar, power, powerMax, powerType)
         end
     end
 
-    if (powerType == 1) then
+    if (powerType == 1 and powerBar.powerType ~= powerType) then
         powerBar.energy:SetStatusBarColor(1, 0, 0, 1)
-    elseif (powerType == 3) then
+        powerBar.powerColor = {r = 1, g = 0, b = 0}
+        powerBar.powerType = powerType
+    elseif (powerType == 3 and powerBar.powerType ~= powerType) then
         powerBar.energy:SetStatusBarColor(1, 1, 0, 1)
-    else
+        powerBar.powerColor = {r = 1, g = 1, b = 0}
+        powerBar.powerType = powerType
+    elseif powerBar.powerType ~= powerType then
         powerBar.energy:SetStatusBarColor(.18, .44, .75, 1)
+        powerBar.powerColor = {r = .18, g = .44, b = .75}
+        powerBar.powerType = powerType
     end
 
     powerBar.powerText:SetText(powerText)
     powerBar.energy:SetMinMaxValues(0, powerMax)
     powerBar.energy:SetValue(power)
+
 end
 
 function Powerbar:UpdateFrame(unit)
@@ -135,6 +143,12 @@ function Powerbar:UpdateFrame(unit)
     local healthBar = Gladdy.modules["Health Bar"].frames[unit]
 
 
+    if not Gladdy.db.powerBarEnabled then
+        powerBar:Hide()
+        return
+    else
+        powerBar:Show()
+    end
     powerBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
     powerBar.bg:SetVertexColor(Gladdy.db.powerBarBgColor.r, Gladdy.db.powerBarBgColor.g, Gladdy.db.powerBarBgColor.b, Gladdy.db.powerBarBgColor.a)
 
@@ -169,6 +183,8 @@ function Powerbar:ResetUnit(unit)
     powerBar.raceText:SetText("")
     powerBar.powerText:SetText("")
     powerBar.energy:SetValue(0)
+    powerBar.powerType = ""
+    powerBar.powerColor = {r = 1, g = 1, b = 1}
 end
 
 function Powerbar:Test(unit)
@@ -252,10 +268,13 @@ function Powerbar:UNIT_POWER(unit, power, powerMax, powerType)
 
     if (powerType == 1) then
         powerBar.energy:SetStatusBarColor(1, 0, 0, 1)
+        powerBar.powerColor = {r = 1, g = 0, b = 0}
     elseif (powerType == 3) then
         powerBar.energy:SetStatusBarColor(1, 1, 0, 1)
+        powerBar.powerColor = {r = 1, g = 1, b = 0}
     else
         powerBar.energy:SetStatusBarColor(.18, .44, .75, 1)
+        powerBar.powerColor = {r = .18, g = .44, b = .75}
     end
 
     powerBar.powerText:SetText(powerText)
@@ -315,11 +334,16 @@ function Powerbar:GetOptions()
             name = L["Power Bar"],
             order = 2,
         },
+        powerBarEnabled = Gladdy:option({
+            type = "toggle",
+            name = L["Enabled"],
+            order = 3,
+        }),
         group = {
             type = "group",
             childGroups = "tree",
             name = L["Frame"],
-            order = 3,
+            order = 4,
             args = {
                 general = {
                     type = "group",
@@ -339,6 +363,7 @@ function Powerbar:GetOptions()
                             min = 0,
                             max = 50,
                             step = 1,
+                            width = "full",
                         }),
                         powerBarTexture = option({
                             type = "select",
@@ -390,6 +415,7 @@ function Powerbar:GetOptions()
                             step = 0.1,
                             min = 1,
                             max = 20,
+                            width = "full",
                         }),
                     },
                 },
@@ -418,6 +444,7 @@ function Powerbar:GetOptions()
                             min = 0.5,
                             max = Gladdy.db.powerBarHeight/2,
                             step = 0.5,
+                            width = "full",
                         }),
                         powerBarBorderColor = Gladdy:colorOption({
                             type = "color",

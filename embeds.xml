@@ -14,4 +14,5 @@
     <Include file="libs\AceGUI-3.0-SharedMediaWidgets\widget.xml"/>
     <Include file="libs\DRData-1.0\DRData-1.0.xml"/>
     <Include file="libs\LibClassAuras-1.0\lib.xml"/>
+    <Include file="libs\LibSpellRange-1.0\lib.xml"/>
 </Ui>

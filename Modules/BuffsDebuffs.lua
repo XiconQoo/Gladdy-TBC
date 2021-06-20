@@ -2,19 +2,8 @@ local GetSpellInfo = GetSpellInfo
 local CreateFrame = CreateFrame
 local GetTime = GetTime
 local select, lower, ceil, tremove, tinsert, pairs, ipairs, tostring = select, string.lower, ceil, tremove, tinsert, pairs, ipairs, tostring
-local auraTypeColor = { }
 local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
 local auraTypes = {AURA_TYPE_BUFF, AURA_TYPE_DEBUFF}
-
-auraTypeColor["none"]     = { r = 0.80, g = 0, b = 0 , a = 1}
-auraTypeColor["magic"]    = { r = 0.20, g = 0.60, b = 1.00, a = 1}
-auraTypeColor["curse"]    = { r = 0.60, g = 0.00, b = 1.00, a = 1 }
-auraTypeColor["disease"]  = { r = 0.60, g = 0.40, b = 0, a = 1 }
-auraTypeColor["poison"]   = { r = 0.00, g = 0.60, b = 0, a = 1 }
-auraTypeColor["immune"]   = { r = 1.00, g = 0.02, b = 0.99, a = 1 }
-auraTypeColor["form"]     = auraTypeColor["none"]
-auraTypeColor["aura"]     = auraTypeColor["none"]
-auraTypeColor[""]         = auraTypeColor["none"]
 
 ---------------------------
 -- Module init
@@ -55,14 +44,14 @@ local BuffsDebuffs = Gladdy:NewModule("Buffs and Debuffs", nil, {
     buffsBorderColorsEnabled = true,
     trackedDebuffs = defaultTrackedDebuffs,
     trackedBuffs = defaultTrackedBuffs,
-    buffsBorderColorCurse = auraTypeColor["curse"],
-    buffsBorderColorMagic = auraTypeColor["magic"],
-    buffsBorderColorPoison = auraTypeColor["poison"],
-    buffsBorderColorPhysical = auraTypeColor["none"],
-    buffsBorderColorImmune = auraTypeColor["immune"],
-    buffsBorderColorDisease = auraTypeColor["disease"],
-    buffsBorderColorForm = auraTypeColor["form"],
-    buffsBorderColorAura = auraTypeColor["aura"]
+    buffsBorderColorCurse = Gladdy:GetAuraTypeColor()["curse"],
+    buffsBorderColorMagic = Gladdy:GetAuraTypeColor()["magic"],
+    buffsBorderColorPoison = Gladdy:GetAuraTypeColor()["poison"],
+    buffsBorderColorPhysical = Gladdy:GetAuraTypeColor()["none"],
+    buffsBorderColorImmune = Gladdy:GetAuraTypeColor()["immune"],
+    buffsBorderColorDisease = Gladdy:GetAuraTypeColor()["disease"],
+    buffsBorderColorForm = Gladdy:GetAuraTypeColor()["form"],
+    buffsBorderColorAura = Gladdy:GetAuraTypeColor()["aura"]
 })
 
 local spellSchoolToOptionValueTable
@@ -148,21 +137,24 @@ function BuffsDebuffs:Test(unit)
         if unit == "arena1" or unit == "arena3" then
             BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_DEBUFF)
             BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_BUFF)
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 1943, select(1, GetSpellInfo(1943)), select(3, GetSpellInfo(1943)), 10, GetTime() + 10, 1, "physical")
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 18647, select(1, GetSpellInfo(18647)), select(3, GetSpellInfo(18647)), 10, GetTime() + 10, 1, "immune")
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 27218, select(1, GetSpellInfo(27218)), select(3, GetSpellInfo(27218)), 24, GetTime() + 20, 1, "curse")
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 27216, select(1, GetSpellInfo(27216)), select(3, GetSpellInfo(27216)), 18, GetTime() + 18, 1, "magic")
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 27189, select(1, GetSpellInfo(27189)), select(3, GetSpellInfo(27189)), 12, GetTime() + 12, 5, "poison")
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_BUFF, 33076, select(1, GetSpellInfo(33076)), select(3, GetSpellInfo(33076)), 20, GetTime() + 20, 1, "magic")
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_BUFF, 26980, select(1, GetSpellInfo(26980)), select(3, GetSpellInfo(26980)), 20, GetTime() + 20, 5, "magic")
-        elseif unit == "arena2" then
+
+            BuffsDebuffs:AddOrRefreshAura(unit, 1943, AURA_TYPE_DEBUFF, 12, 12, 1, "physical", select(3, GetSpellInfo(1943)), 1)
+            BuffsDebuffs:AddOrRefreshAura(unit, 18647, AURA_TYPE_DEBUFF, 10, 10, 1, "immune", select(3, GetSpellInfo(18647)), 2)
+            BuffsDebuffs:AddOrRefreshAura(unit, 27218, AURA_TYPE_DEBUFF, 9, 9, 1, "curse", select(3, GetSpellInfo(27218)), 3)
+            BuffsDebuffs:AddOrRefreshAura(unit, 27216, AURA_TYPE_DEBUFF, 9, 9, 1, "magic", select(3, GetSpellInfo(27216)), 4)
+            BuffsDebuffs:AddOrRefreshAura(unit, 27189, AURA_TYPE_DEBUFF, 9, 9, 5, "poison", select(3, GetSpellInfo(27189)), 5)
+
+            BuffsDebuffs:AddOrRefreshAura(unit, 33076, AURA_TYPE_BUFF, 15, 15, 1, "magic", select(3, GetSpellInfo(33076)), 1)
+            BuffsDebuffs:AddOrRefreshAura(unit, 26980, AURA_TYPE_BUFF, 12, 12, 5, "magic", select(3, GetSpellInfo(26980)), 2)
+        else
             BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_DEBUFF)
             BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_BUFF)
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 1943, select(1, GetSpellInfo(1943)), select(3, GetSpellInfo(1943)), 10, GetTime() + 10, 1, "physical")
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 1, select(1, GetSpellInfo(1)), select(3, GetSpellInfo(1)), 20, GetTime() + 20, 5, "poison")
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_BUFF, 27009, select(1, GetSpellInfo(27009)), select(3, GetSpellInfo(27009)), 20, GetTime() + 15, 1, "magic")
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_BUFF, 11426, select(1, GetSpellInfo(11426)), select(3, GetSpellInfo(11426)), 10, GetTime() + 10, 1, "magic")
 
+            BuffsDebuffs:AddOrRefreshAura(unit, 1, AURA_TYPE_BUFF, 12, 12, 1, "poison", select(3, GetSpellInfo(1943)), 1)
+            BuffsDebuffs:AddOrRefreshAura(unit, 1, AURA_TYPE_BUFF, 10, 10, 2, "magic", select(3, GetSpellInfo(1)), 2)
+
+            BuffsDebuffs:AddOrRefreshAura(unit, 5, AURA_TYPE_DEBUFF, 12, 12, 3, "physical", select(3, GetSpellInfo(27009)), 1)
+            BuffsDebuffs:AddOrRefreshAura(unit, 5, AURA_TYPE_DEBUFF, 11, 11, 4, "disease", select(3, GetSpellInfo(11426)), 2)
         end
     end
 end
@@ -280,6 +272,7 @@ function BuffsDebuffs:UpdateFrame(unit)
     self.frames[unit].debuffFrame:ClearAllPoints()
 
     --DEBUFFS
+    local powerBarHeight = Gladdy.db.powerBarEnabled and (Gladdy.db.powerBarHeight + 1) or 0
     local horizontalMargin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize)
     local verticalMargin = -(Gladdy.db.powerBarHeight)/2
     if Gladdy.db.buffsCooldownPos == "TOP" then
@@ -298,9 +291,9 @@ function BuffsDebuffs:UpdateFrame(unit)
             verticalMargin = verticalMargin + Gladdy.db.cooldownSize
         end
         if Gladdy.db.buffsCooldownGrowDirection == "LEFT" then
-            self.frames[unit].debuffFrame:SetPoint("TOPLEFT", Gladdy.buttons[unit].powerBar, "BOTTOMRIGHT", Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset -verticalMargin)
+            self.frames[unit].debuffFrame:SetPoint("TOPLEFT", Gladdy.buttons[unit].healthBar, "BOTTOMRIGHT", Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset -verticalMargin - powerBarHeight)
         else
-            self.frames[unit].debuffFrame:SetPoint("TOPRIGHT", Gladdy.buttons[unit].powerBar, "BOTTOMLEFT", Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset -verticalMargin)
+            self.frames[unit].debuffFrame:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "BOTTOMLEFT", Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset -verticalMargin - powerBarHeight)
         end
     elseif Gladdy.db.buffsCooldownPos == "LEFT" then
         horizontalMargin = horizontalMargin - 1 + Gladdy.db.padding
@@ -342,9 +335,9 @@ function BuffsDebuffs:UpdateFrame(unit)
             verticalMargin = verticalMargin + Gladdy.db.cooldownSize
         end
         if Gladdy.db.buffsBuffsCooldownGrowDirection == "LEFT" then
-            self.frames[unit].buffFrame:SetPoint("TOPLEFT", Gladdy.buttons[unit].powerBar, "BOTTOMRIGHT", Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset -verticalMargin)
+            self.frames[unit].buffFrame:SetPoint("TOPLEFT", Gladdy.buttons[unit].healthBar, "BOTTOMRIGHT", Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset -verticalMargin - powerBarHeight)
         else
-            self.frames[unit].buffFrame:SetPoint("TOPRIGHT", Gladdy.buttons[unit].powerBar, "BOTTOMLEFT", Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset -verticalMargin)
+            self.frames[unit].buffFrame:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "BOTTOMLEFT", Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset -verticalMargin - powerBarHeight)
         end
     elseif Gladdy.db.buffsBuffsCooldownPos == "LEFT" then
         horizontalMargin = horizontalMargin - 1 + Gladdy.db.padding
@@ -662,6 +655,7 @@ function BuffsDebuffs:GetOptions()
                                     min = 5,
                                     max = 50,
                                     step = 1,
+                                    width = "full",
                                 }),
                                 buffsBuffsWidthFactor = Gladdy:option({
                                     type = "range",
@@ -671,6 +665,7 @@ function BuffsDebuffs:GetOptions()
                                     min = 0.5,
                                     max = 2,
                                     step = 0.05,
+                                    width = "full",
                                 }),
                                 buffsBuffsIconPadding = Gladdy:option({
                                     type = "range",
@@ -680,6 +675,7 @@ function BuffsDebuffs:GetOptions()
                                     min = 0,
                                     max = 10,
                                     step = 0.1,
+                                    width = "full",
                                 }),
                             },
                         },
@@ -722,6 +718,7 @@ function BuffsDebuffs:GetOptions()
                                     min = -400,
                                     max = 400,
                                     step = 0.1,
+                                    width = "full",
                                 }),
                                 buffsBuffsYOffset = Gladdy:option({
                                     type = "range",
@@ -730,6 +727,7 @@ function BuffsDebuffs:GetOptions()
                                     min = -400,
                                     max = 400,
                                     step = 0.1,
+                                    width = "full",
                                 }),
                             },
                         },
@@ -750,6 +748,7 @@ function BuffsDebuffs:GetOptions()
                                     min = 0,
                                     max = 1,
                                     step = 0.05,
+                                    width = "full",
                                 }),
                             }
                         }
@@ -778,6 +777,7 @@ function BuffsDebuffs:GetOptions()
                                     min = 5,
                                     max = 50,
                                     step = 1,
+                                    width = "full",
                                 }),
                                 buffsWidthFactor = Gladdy:option({
                                     type = "range",
@@ -787,6 +787,7 @@ function BuffsDebuffs:GetOptions()
                                     min = 0.5,
                                     max = 2,
                                     step = 0.05,
+                                    width = "full",
                                 }),
                                 buffsIconPadding = Gladdy:option({
                                     type = "range",
@@ -796,6 +797,7 @@ function BuffsDebuffs:GetOptions()
                                     min = 0,
                                     max = 10,
                                     step = 0.1,
+                                    width = "full",
                                 }),
                             },
                         },
@@ -838,6 +840,7 @@ function BuffsDebuffs:GetOptions()
                                     min = -400,
                                     max = 400,
                                     step = 0.1,
+                                    width = "full",
                                 }),
                                 buffsYOffset = Gladdy:option({
                                     type = "range",
@@ -846,6 +849,7 @@ function BuffsDebuffs:GetOptions()
                                     min = -400,
                                     max = 400,
                                     step = 0.1,
+                                    width = "full",
                                 }),
                             },
                         },
@@ -866,6 +870,7 @@ function BuffsDebuffs:GetOptions()
                                     min = 0,
                                     max = 1,
                                     step = 0.05,
+                                    width = "full",
                                 }),
                             }
                         }
@@ -894,6 +899,7 @@ function BuffsDebuffs:GetOptions()
                             max = 1,
                             step = 0.1,
                             order = 10,
+                            width = "full",
                         }),
                     },
                 },
@@ -923,6 +929,7 @@ function BuffsDebuffs:GetOptions()
                             min = 0.1,
                             max = 2,
                             step = 0.1,
+                            width = "full",
                         }),
                         buffsDynamicColor = Gladdy:option({
                             type = "toggle",

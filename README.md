@@ -1,7 +1,7 @@
 # Gladdy - TBC
 
 ### The most powerful arena addon for WoW TBC 2.5.1
-## [v1.12-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v1.12-Beta/Gladdy_TBC-Classic_v1.12-Beta.zip)
+## [v1.13-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v1.13-Beta/Gladdy_TBC-Classic_v1.13-Beta.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -26,6 +26,8 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 - Highlight (highlights focus and target)
 - Pets (show arena pets)
 - Racial Spells
+- Range Check
+- Shadowsight Timer
 - TotemPlates (show totem icons instead of normal nameplates)
 - Trinket (tracks trinket usage)
 - VersionCheck (checks if you use an older version that your teammate)
@@ -37,7 +39,36 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 <img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/sample2.jpg" align="right" width="48.5%">
 <img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/sample3.png" width="48.5%">
 
+## Special Thanks
+
+- **Schaka** - the original author of Gladdy! (thanks for letting me continue Gladdy and all the work you put into the TBC community)
+- **Macumba** (thanks for all the support, your feedback and your dedication for the TBC community)
+- **RMO** (without you I would not have modified Gladdy at all and thanks for all the suggestions and active feedback)
+- **Ur0b0r0s aka DrainTheLock** (thanks for testing, giving feedback and correcting/adding wrong CDs)
+- **Klimp** (thanks for all the suggestions and active feedback)
+- **the whole TBC addons 2.4.3 discord** (thanks for the support and great community, especially the MVPs)
+- **Hydra** (thanks for constructive feedback and suggestions)
+
 ### Changes
+
+### v1.13-Beta
+- frames behave now to mouseover macros
+- added Range Check module (configurable which spell is used for range check)
+- added Shadowsight Timer module (with announce)
+- added Clicks module
+- added Interrupt Tracker in Aura module (border color by spell school locked)
+- TotemPlates compatible with Plater, NeatPlates, KUI, ThreatPlates, ElvUI, TukUI
+- added a new Classic Profile in XiconProfiles
+- hide blizzard arena frames option added in General
+- castbar enable/disable
+- powerbar enable/disable
+- added some auras (Blackout, Improved Hamstring, Mace Stun, Stormherald Stun, Shadowsight Buff)
+- added Swiftmend and Berserker Rage cooldowns
+- changed textures for Mace Stun, Charge Stun and Intercept Stun
+- reduced BLP size by 80%
+- show XiconProfiles on first login
+- DR bigger icons possible
+- minor fixes
 
 ### v1.12-Beta
 - fix classic profile

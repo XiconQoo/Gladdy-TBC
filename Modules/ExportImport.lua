@@ -21,8 +21,6 @@ end
 local ExportImport = Gladdy:NewModule("Export Import", nil, {
 })
 
-
-
 local export = AceGUI:Create("Frame")
 export:SetWidth(550)
 export.sizer_se:Hide()

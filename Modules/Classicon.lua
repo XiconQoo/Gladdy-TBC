@@ -215,6 +215,7 @@ function Classicon:GetOptions()
                             max = 100,
                             step = 1,
                             order = 3,
+                            width = "full",
                         }),
                         classIconWidthFactor = Gladdy:option({
                             type = "range",
@@ -223,6 +224,7 @@ function Classicon:GetOptions()
                             max = 2,
                             step = 0.05,
                             order = 4,
+                            width = "full",
                         }),
                     },
                 },

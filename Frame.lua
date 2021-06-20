@@ -26,6 +26,8 @@ Gladdy.BUTTON_DEFAULTS = {
     damaged = 0,
     click = false,
     stealthed = false,
+    classColors = {},
+    lastState = 0,
 }
 
 function Gladdy:CreateFrame()
@@ -107,12 +109,17 @@ end
 
 function Gladdy:UpdateFrame()
 
+    if (InCombatLockdown()) then
+        return
+    end
+
     if (not self.frame) then
         self:CreateFrame()
     end
     local teamSize = self.curBracket or 0
 
     local highlightBorderSize = (self.db.highlightInset and 0 or self.db.highlightBorderSize * 2)
+    local powerBarHeight = self.db.powerBarEnabled and (self.db.powerBarHeight + 1) or 0
     local leftSize = 0
     local rightSize = 0
     --Trinket + Racial
@@ -140,9 +147,9 @@ function Gladdy:UpdateFrame()
         rightSize = rightSize + self.db.highlightBorderSize
     end
 
-    local margin = self.db.powerBarHeight + 1
+    local margin = powerBarHeight
     local width = self.db.barWidth + leftSize + rightSize
-    local height = (self.db.healthBarHeight + self.db.powerBarHeight + 1) * teamSize
+    local height = (self.db.healthBarHeight + powerBarHeight) * teamSize
             + (self.db.highlightInset and 0 or self.db.highlightBorderSize * 2 * teamSize)
             + self.db.bottomMargin * (teamSize - 1)
 
@@ -173,7 +180,7 @@ function Gladdy:UpdateFrame()
     -- GrowDirection
     if (self.db.growDirection == "LEFT" or self.db.growDirection == "RIGHT") then
         width = self.db.barWidth * teamSize + (leftSize + rightSize) * teamSize + self.db.bottomMargin * (teamSize - 1)
-        height = self.db.healthBarHeight + self.db.powerBarHeight + 1
+        height = self.db.healthBarHeight + powerBarHeight
     end
 
     self.frame:SetScale(self.db.frameScale)
@@ -214,13 +221,13 @@ function Gladdy:UpdateFrame()
         button:SetWidth(self.db.barWidth)
         button:SetHeight(self.db.healthBarHeight)
         button.secure:SetWidth(self.db.barWidth)
-        button.secure:SetHeight(self.db.healthBarHeight + self.db.powerBarHeight + 1)
+        button.secure:SetHeight(self.db.healthBarHeight + powerBarHeight)
 
         button:ClearAllPoints()
         button.secure:ClearAllPoints()
         if (self.db.growDirection == "TOP") then
             if (i == 1) then
-                button:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", leftSize, self.db.powerBarHeight + 1)
+                button:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", leftSize, powerBarHeight)
                 button.secure:SetPoint("TOPLEFT", button.powerBar, "TOPLEFT")
             else
                 button:SetPoint("BOTTOMLEFT", self.buttons["arena" .. (i - 1)], "TOPLEFT", 0, margin + self.db.bottomMargin)
@@ -254,7 +261,7 @@ function Gladdy:UpdateFrame()
 
 
         for _, v in self:IterModules() do
-            self:Call(v, "UpdateFrame", button.unit)
+            self:Call(v, "UpdateFrame", "arena" .. i)
         end
     end
     for _, v in self:IterModules() do
@@ -271,7 +278,6 @@ end
 
 function Gladdy:ToggleFrame(i)
     self:Reset()
-
     if (self.frame and self.frame:IsShown() and i == self.curBracket) then
         self:HideFrame()
     else
@@ -287,6 +293,8 @@ function Gladdy:ToggleFrame(i)
                 self:CreateButton(o)
             end
         end
+        self:Reset()
+        self.curBracket = i
         self:UpdateFrame()
         self:Test()
         self.frame:Show()
@@ -305,28 +313,38 @@ function Gladdy:CreateButton(i)
     --button.texture:SetAllPoints(button)
     --button.texture:SetTexture("Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp")
 
-    local secure = CreateFrame("Button", "GladdyButton" .. i, button, "SecureActionButtonTemplate")
+    local secure = CreateFrame("Button", "GladdyButton" .. i, button, "SecureActionButtonTemplate, SecureHandlerEnterLeaveTemplate")
     secure:RegisterForClicks("AnyUp")
-    secure:RegisterForClicks("AnyUp")
-    secure:SetAttribute("*type1", "target")
-    secure:SetAttribute("*type2", "focus")
+    secure:RegisterForClicks("AnyDown")
+
+    secure:SetAttribute("target", "arena" .. i)
+    secure:SetAttribute("focus", "arena" .. i)
     secure:SetAttribute("unit", "arena" .. i)
+
+    --[[
+    secure:SetAttribute("target", i == 1 and "player" or "focus")
+    secure:SetAttribute("focus", i == 1 and "player" or "focus")
+    secure:SetAttribute("unit", i == 1 and "player" or "focus")
+    --]]
+
     --secure.texture = secure:CreateTexture(nil, "OVERLAY")
     --secure.texture:SetAllPoints(secure)
     --secure.texture:SetTexture("Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp")
 
     button.id = i
+    --button.unit = i == 1 and "player" or "focus"
     button.unit = "arena" .. i
     button.secure = secure
 
 
-    self:ResetButton(button.unit)
+    self:ResetButton("arena" .. i)
 
-    self.buttons[button.unit] = button
+    self.buttons["arena" .. i] = button
 
     for _, v in self:IterModules() do
-        self:Call(v, "CreateFrame", button.unit)
+        self:Call(v, "CreateFrame", "arena" .. i)
     end
+    self:ResetButton("arena" .. i)
 end
 
 function Gladdy:GetAnchor(unit, position)
