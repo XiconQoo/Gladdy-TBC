@@ -109,6 +109,10 @@ end
 
 function Gladdy:UpdateFrame()
 
+    if (InCombatLockdown()) then
+        return
+    end
+
     if (not self.frame) then
         self:CreateFrame()
     end
@@ -312,11 +316,17 @@ function Gladdy:CreateButton(i)
     local secure = CreateFrame("Button", "GladdyButton" .. i, button, "SecureActionButtonTemplate, SecureHandlerEnterLeaveTemplate")
     secure:RegisterForClicks("AnyUp")
     secure:RegisterForClicks("AnyDown")
-    --secure:SetAttribute("*type*", "macro")
-    --secure:SetAttribute("*type1", "target")
-    --secure:SetAttribute("*type2", "focus")
+
+    secure:SetAttribute("target", "arena" .. i)
+    secure:SetAttribute("focus", "arena" .. i)
     secure:SetAttribute("unit", "arena" .. i)
-    --secure:SetAttribute("unit", i == 1 and "player" or "focus")
+
+    --[[
+    secure:SetAttribute("target", i == 1 and "player" or "focus")
+    secure:SetAttribute("focus", i == 1 and "player" or "focus")
+    secure:SetAttribute("unit", i == 1 and "player" or "focus")
+    --]]
+
     --secure.texture = secure:CreateTexture(nil, "OVERLAY")
     --secure.texture:SetAllPoints(secure)
     --secure.texture:SetTexture("Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp")

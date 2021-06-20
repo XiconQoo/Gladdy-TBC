@@ -224,5 +224,6 @@ function Clicks:GetOptions()
 end
 
 function Clicks:UpdateFrame(unit)
-    Clicks:SetupAttributes(unit)
+    self:SetupAttributes(unit)
+    self:JOINED_ARENA()
 end
