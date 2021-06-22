@@ -95,7 +95,7 @@ function CombatIndicator.OnEvent(self, elapsed)
     if (self.lastTimeUpdated > self.updateInterval) then
         for i=1,Gladdy.curBracket do
             local unit = "arena" .. i
-            if CombatIndicator.test or (UnitExists(unit) and UnitAffectingCombat(unit)) then
+            if Gladdy.db.ciEnabled and (CombatIndicator.test or (UnitExists(unit) and UnitAffectingCombat(unit))) then
                 CombatIndicator.frames[unit]:Show()
             else
                 CombatIndicator.frames[unit]:Hide()
