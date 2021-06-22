@@ -185,9 +185,15 @@ function RangeCheck:ENEMY_STEALTH(unit, stealth)
     button.lastState = 0
     if stealth then
         button.classColors = { r = 0.66, g = 0.66, b = 0.66 }
+        if not Gladdy.db.rangeCheckEnabled then
+            button.healthBar.hp:SetStatusBarColor(0.66, 0.66, 0.66, 1)
+        end
     else
         if button.class then
             button.classColors = { r = RAID_CLASS_COLORS[button.class].r, g = RAID_CLASS_COLORS[button.class].g, b = RAID_CLASS_COLORS[button.class].b }
+            if not Gladdy.db.rangeCheckEnabled then
+                button.healthBar.hp:SetStatusBarColor(RAID_CLASS_COLORS[button.class].r, RAID_CLASS_COLORS[button.class].g, RAID_CLASS_COLORS[button.class].b, 1)
+            end
         end
     end
 end
