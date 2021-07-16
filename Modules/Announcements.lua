@@ -177,9 +177,9 @@ function Announcements:Send(msg, throttle, color)
         RaidNotice_AddMessage(RaidBossEmoteFrame, msg, color)
     elseif (dest == "fct" and IsAddOnLoaded("Blizzard_CombatText")) then
         CombatText_AddMessage(msg, nil, color.r, color.g, color.b, "crit", 1)
-    --[[elseif (dest == "msbt" and IsAddOnLoaded("MikScrollingBattleText")) then
-        MikSBT.DisplayMessage(msg, MikSBT.DISPLAYTYPE_NOTIFICATION, true, color.r * 255, color.g * 255, color.b * 255)
-    elseif (dest == "sct" and IsAddOnLoaded("sct")) then
+    elseif (dest == "msbt" and IsAddOnLoaded("MikScrollingBattleText")) then
+        MikSBT.Animations.DisplayMessage(msg, MikSBT.DISPLAYTYPE_NOTIFICATION, true, color.r * 255, color.g * 255, color.b * 255)
+    --[[elseif (dest == "sct" and IsAddOnLoaded("sct")) then
         SCT:DisplayText(msg, color, true, "event", 1)
     elseif (dest == "parrot" and IsAddOnLoaded("parrot")) then
         Parrot:ShowMessage(msg, "Notification", true, color.r, color.g, color.b)--]]
@@ -211,6 +211,7 @@ function Announcements:GetOptions()
         ["party"] = L["Party"],
         ["rw"] = L["Raid Warning"],
         ["fct"] = L["Blizzard's Floating Combat Text"],
+        ["msbt"] = L["MikScrollingBattleText"],
     }
 
     return {
