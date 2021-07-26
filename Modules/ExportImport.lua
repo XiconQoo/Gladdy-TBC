@@ -100,7 +100,7 @@ function ExportImport:CheckDeserializedOptions(tbl, refTbl, str)
     end
     for k,v in pairs(tbl) do
         if refTbl[k] == nil then
-            return false, str .. "." .. k .. " does not exist"
+            --return false, str .. "." .. k .. " does not exist"
         else
             if type(v) ~= type(refTbl[k]) then
                 return false, str .. "." .. k .. " type error. Expected " .. type(refTbl[k]) .. " found " .. type(v)
