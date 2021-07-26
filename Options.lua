@@ -1,4 +1,6 @@
-local type, pairs, tinsert, tsort, tostring, str_match, tonumber = type, pairs, table.insert, table.sort, tostring, string.match, tonumber
+local type, pairs, tinsert, tsort = type, pairs, table.insert, table.sort
+local tostring, str_match, tonumber, string_format = tostring, string.match, tonumber, string.format
+local ceil, floor = ceil, floor
 
 local InterfaceOptionsFrame_OpenToFrame = InterfaceOptionsFrame_OpenToFrame
 local GetSpellInfo = GetSpellInfo
@@ -6,9 +8,37 @@ local LOCALIZED_CLASS_NAMES_MALE = LOCALIZED_CLASS_NAMES_MALE
 local CLASS_ICON_TCOORDS = CLASS_ICON_TCOORDS
 local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
 
+
 local Gladdy = LibStub("Gladdy")
 local LibClassAuras = LibStub("LibClassAuras-1.0")
 local L = Gladdy.L
+
+Gladdy.TIMER_FORMAT = { tenths = "tenths", seconds = "seconds",
+                       values = {
+                           ["tenths"] = "xx:xx Miliseconds",
+                           ["seconds"] = "xx Seconds"
+                       }}
+
+function Gladdy:FormatTimer(fontString, timeLeft, milibreakpoint, showSeconds)
+    if timeLeft < 0 then
+        fontString:SetText("")
+        return
+    end
+    local time = timeLeft >= 0.0 and timeLeft or 0.0
+    if Gladdy.db.timerFormat == Gladdy.TIMER_FORMAT.tenths and milibreakpoint then
+        fontString:SetFormattedText("%.1f", time)
+    else
+        if time >= 60 then
+            if showSeconds then
+                fontString:SetText(floor(timeLeft / 60) .. ":" .. string_format("%02.f", floor(timeLeft - floor(timeLeft / 60) * 60)))
+            else
+                fontString:SetText(ceil(ceil(time / 60)) .. "m")
+            end
+        else
+            fontString:SetFormattedText("%d", ceil(time))
+        end
+    end
+end
 
 Gladdy.defaults = {
     profile = {
@@ -23,6 +53,8 @@ Gladdy.defaults = {
         barWidth = 180,
         bottomMargin = 2,
         statusbarBorderOffset = 6,
+        timerFormat = Gladdy.TIMER_FORMAT.tenths,
+        backgroundColor = {r = 0, g = 0, b = 0, a = 0},
     },
 }
 
@@ -194,12 +226,6 @@ function Gladdy:SetupOptions()
                         desc = L["Toggle if frame can be moved"],
                         order = 1,
                     },
-                    growUp = {
-                        type = "toggle",
-                        name = L["Grow frame upwards"],
-                        desc = L["If enabled the frame will grow upwards instead of downwards"],
-                        order = 2,
-                    },
                     growDirection = {
                         type = "select",
                         name = L["Grow Direction"],
@@ -273,6 +299,15 @@ function Gladdy:SetupOptions()
                                         max = 200,
                                         step = 1,
                                     },
+                                    backgroundColor = {
+                                        type = "color",
+                                        name = L["Background color"],
+                                        desc = L["Background Color of the frame"],
+                                        order = 8,
+                                        hasAlpha = true,
+                                        get = getColorOpt,
+                                        set = setColorOpt,
+                                    },
                                 }
                             },
                             cooldownGeneral = {
@@ -343,6 +378,12 @@ function Gladdy:SetupOptions()
                                             Gladdy:UpdateFrame()
                                         end
                                     },
+                                    timerFormat = Gladdy:option({
+                                        type = "select",
+                                        name = L["Timer Format"],
+                                        order = 11,
+                                        values = Gladdy.TIMER_FORMAT.values
+                                    })
                                 },
                             },
                             fontGeneral = {

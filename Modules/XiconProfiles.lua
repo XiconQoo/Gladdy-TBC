@@ -54,6 +54,16 @@ function XiconProfiles:ApplyBlizz()
     Gladdy:ToggleFrame(3)
 end
 
+function XiconProfiles:ApplyRukk()
+    local deserialized = Gladdy.modules["Export Import"]:Decode(Gladdy:GetRukkProfile())
+    if deserialized then
+        Gladdy.modules["Export Import"]:ApplyImport(deserialized, Gladdy.db)
+    end
+    Gladdy:Reset()
+    Gladdy:HideFrame()
+    Gladdy:ToggleFrame(3)
+end
+
 function XiconProfiles:GetOptions()
     return {
         headerProfileBlizzard = {
@@ -151,6 +161,24 @@ function XiconProfiles:GetOptions()
             width = "full",
             order = 11,
         },
-
+        headerProfileRukk = {
+            type = "header",
+            name = "Rukk1's " .. L["Profile"],
+            order = 12,
+        },
+        rukkProfile = {
+            type = "execute",
+            func = function()
+                Gladdy.dbi:ResetProfile(Gladdy.dbi:GetCurrentProfile())
+                XiconProfiles:ApplyRukk()
+            end,
+            name = " ",
+            desc = "Rukk1's " .. L["Profile"],
+            image = "Interface\\AddOns\\Gladdy\\Images\\BasicProfiles\\Rukk1.blp",
+            imageWidth = 350,
+            imageHeight = 175,
+            width = "full",
+            order = 13,
+        },
     }
 end

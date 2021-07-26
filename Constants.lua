@@ -508,6 +508,13 @@ local importantAuras = {
         priority = 20,
         spellID = 31224,
     },
+    -- Evasion
+    [GetSpellInfo(26669)] = {
+        track = AURA_TYPE_BUFF,
+        duration = 15,
+        priority = 10,
+        spellID = 26669,
+    },
 
 
     -- Fear
@@ -526,6 +533,13 @@ local importantAuras = {
         duration = 3,
         priority = 40,
         spellID = 27223,
+    },
+    --Banish
+    [GetSpellInfo(710)] = {
+        track = AURA_TYPE_DEBUFF,
+        duration = 10,
+        priority = 40,
+        spellID = 710,
     },
     -- Shadowfury
     [GetSpellInfo(30283)] = {

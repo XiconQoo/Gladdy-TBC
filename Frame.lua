@@ -32,6 +32,12 @@ Gladdy.BUTTON_DEFAULTS = {
 
 function Gladdy:CreateFrame()
     self.frame = CreateFrame("Frame", "GladdyFrame", UIParent)
+
+    self.frame.background = CreateFrame("Frame", nil, self.frame, BackdropTemplateMixin and "BackdropTemplate")
+    self.frame.background:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = false, tileSize = 16})
+    self.frame.background:SetFrameStrata("BACKGROUND")
+    self.frame.background:SetBackdropColor(self.db.backgroundColor.r, self.db.backgroundColor.g, self.db.backgroundColor.b, self.db.backgroundColor.a)
+    self.frame.background:SetAllPoints(self.frame)
     --self.frame.texture = self.frame:CreateTexture(nil, "OVERLAY")
     --self.frame.texture:SetAllPoints(self.frame)
     --self.frame.texture:SetTexture("Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp")
@@ -104,7 +110,7 @@ function Gladdy:CreateFrame()
         self.anchor:Hide()
     end
 
-    self.frame:Hide()
+    self.frame:SetAlpha(0)
 end
 
 function Gladdy:UpdateFrame()
@@ -186,6 +192,8 @@ function Gladdy:UpdateFrame()
     self.frame:SetScale(self.db.frameScale)
     self.frame:SetWidth(width)
     self.frame:SetHeight(height)
+    self.frame:ClearAllPoints()
+    self.frame.background:SetBackdropColor(self.db.backgroundColor.r, self.db.backgroundColor.g, self.db.backgroundColor.b, self.db.backgroundColor.a)
     --self.frame:SetBackdropColor(self.db.frameColor.r, self.db.frameColor.g, self.db.frameColor.b, self.db.frameColor.a)
     self.frame:ClearAllPoints()
     if (self.db.x == 0 and self.db.y == 0) then
@@ -271,7 +279,7 @@ end
 
 function Gladdy:HideFrame()
     if (self.frame) then
-        self.frame:Hide()
+        self.frame:SetAlpha(0)
         self.frame.testing = nil
     end
 end
@@ -297,7 +305,7 @@ function Gladdy:ToggleFrame(i)
         self.curBracket = i
         self:UpdateFrame()
         self:Test()
-        self.frame:Show()
+        self.frame:SetAlpha(1)
     end
 end
 

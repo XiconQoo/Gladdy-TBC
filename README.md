@@ -1,7 +1,7 @@
 # Gladdy - TBC
 
 ### The most powerful arena addon for WoW TBC 2.5.1
-## [v1.16-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v1.16-Beta/Gladdy_TBC-Classic_v1.16-Beta.zip)
+## [v1.17-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v1.17-Beta/Gladdy_TBC-Classic_v1.17-Beta.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -61,6 +61,22 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 - **Hydra** (thanks for constructive feedback and suggestions)
 
 ### Changes
+
+### v1.17-Beta
+- option TimerFormat added (seconds or seconds + milliseconds) (General > Cooldown General > Timer Format)
+- hide blizzard arena frames without cvars
+- fix Gladdy bugging out on arena join when in combat
+- fix some TotemPlates issues
+- fix Feign Death causing to reset DR and Aura tracking
+- ArenaX option in Healthbar module now only shows the number
+- add background for all frames (General > Frame General > Background Color)
+- add evasion and banish to Aura
+- add MSBT to Announcement module
+- Shadowsight timer can be locked now
+- add "All" modifier to Clicks module
+- updated testmode for BuffsDebuffs (show only from enabled set)
+- updated Klimp's profile
+- added a new Profile in XiconProfiles -> Rukk1
 
 ### v1.16-Beta
 - unit gray in stealth when rangecheck module disabled

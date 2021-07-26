@@ -106,7 +106,7 @@ function Auras:CreateFrame(unit)
                 Auras:AURA_FADE(self.unit, self.track)
             else
                 self.timeLeft = self.timeLeft - elapsed
-                self.text:SetFormattedText("%.1f", self.timeLeft >= 0.0 and self.timeLeft or 0.0)
+                Gladdy:FormatTimer(self.text, self.timeLeft, self.timeLeft < 10)
             end
         else
             self:SetAlpha(0.01)
@@ -170,11 +170,11 @@ function Auras:CreateInterrupt(unit)
                 self.active = false
                 self.priority = nil
                 self.spellSchool = nil
-                self.cooldown:SetCooldown(GetTime(), 0)
+                self.cooldown:Clear()
                 self:SetAlpha(0.01)
             else
                 self.timeLeft = self.timeLeft - elapsed
-                self.text:SetFormattedText("%.1f", self.timeLeft >= 0.0 and self.timeLeft or 0.0)
+                Gladdy:FormatTimer(self.text, self.timeLeft, self.timeLeft < 10)
             end
         else
             self:SetAlpha(0.01)
@@ -282,12 +282,12 @@ function Auras:Test(unit)
         self:AURA_GAIN(unit,AURA_TYPE_DEBUFF, 27010, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
         self:SPELL_INTERRUPT(unit,19244, select(1, GetSpellInfo(19244)), "physical", 25396, select(1, GetSpellInfo(25396)), 64)
     elseif (unit == "arena3") then
-        spellName, _, icon = GetSpellInfo(31224)
+        spellName, _, icon = GetSpellInfo(34709)
         self:AURA_FADE(unit, AURA_TYPE_BUFF)
-        self:AURA_GAIN(unit,AURA_TYPE_BUFF, 31224, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
+        self:AURA_GAIN(unit,AURA_TYPE_BUFF, 34709, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
         spellName, _, icon = GetSpellInfo(18425)
-        self:AURA_FADE(unit, AURA_TYPE_DEBUFF)
-        self:AURA_GAIN(unit,AURA_TYPE_DEBUFF, 18425, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
+        --self:AURA_FADE(unit, AURA_TYPE_DEBUFF)
+        --self:AURA_GAIN(unit,AURA_TYPE_DEBUFF, 18425, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
     end
 end
 
@@ -348,7 +348,7 @@ function Auras:AURA_FADE(unit, auraType)
         return
     end
     if auraFrame.active then
-        auraFrame.cooldown:SetCooldown(GetTime(), 0)
+        auraFrame.cooldown:Clear()
     end
     --auraFrame.cooldown:Hide()
     auraFrame.active = false

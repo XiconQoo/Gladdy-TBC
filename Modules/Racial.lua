@@ -45,33 +45,22 @@ local function iconTimer(self,elapsed)
         local timeLeft = ceil(self.timeLeft)
 
         if timeLeft >= 60 then
-            -- more than 1 minute
             self.cooldownFont:SetTextColor(1, 1, 0)
-            self.cooldownFont:SetText(floor(timeLeft / 60) .. ":" .. string_format("%02.f", floor(timeLeft - floor(timeLeft / 60) * 60)))
             self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.racialFont), (self:GetWidth()/2 - 0.15* self:GetWidth()) * Gladdy.db.racialFontScale, "OUTLINE")
-        elseif timeLeft < 60 and timeLeft >= 21 then
-            -- between 60s and 21s (green)
-            self.cooldownFont:SetTextColor(0.7, 1, 0)
-            self.cooldownFont:SetText(timeLeft)
+        elseif timeLeft < 60 and timeLeft >= 30 then
+            self.cooldownFont:SetTextColor(1, 1, 0)
             self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.racialFont), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
-        elseif timeLeft < 20.9 and timeLeft >= 11 then
-            -- between 20s and 11s (green)
-            self.cooldownFont:SetTextColor(0, 1, 0)
-            self.cooldownFont:SetText(timeLeft)
-            self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.racialFont), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
-        elseif timeLeft <= 10 and timeLeft >= 5 then
-            -- between 10s and 5s (orange)
+        elseif timeLeft < 30 and timeLeft >= 11 then
             self.cooldownFont:SetTextColor(1, 0.7, 0)
-            self.cooldownFont:SetFormattedText("%.1f", self.timeLeft)
+            self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.racialFont), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
+        elseif timeLeft < 10 and timeLeft >= 5 then
+            self.cooldownFont:SetTextColor(1, 0.7, 0)
             self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.racialFont), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
         elseif timeLeft < 5 and timeLeft > 0 then
-            -- between 5s and 1s (red)
             self.cooldownFont:SetTextColor(1, 0, 0)
-            self.cooldownFont:SetFormattedText("%.1f", self.timeLeft >= 0.0 and self.timeLeft or 0.0)
             self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.racialFont), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
-        else
-            self.cooldownFont:SetText("")
         end
+        Gladdy:FormatTimer(self.cooldownFont, self.timeLeft, self.timeLeft < 10, true)
     end
 end
 

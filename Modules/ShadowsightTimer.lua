@@ -5,6 +5,7 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local ShadowsightTimer = Gladdy:NewModule("Shadowsight Timer", nil, {
     shadowsightTimerEnabled = true,
+    shadowsightTimerLocked = false,
     shadowsightTimerScale = 1,
     shadowsightTimerRelPoint1 = "CENTER",
     shadowsightTimerRelPoint2 = "CENTER",
@@ -94,7 +95,8 @@ function ShadowsightTimer:CreateTimerFrame()
     self.timerFrame:Hide()
 end
 
-function ShadowsightTimer:UpdateFrame()
+function ShadowsightTimer:UpdateFrameOnce()
+    self.timerFrame:EnableMouse(not Gladdy.db.shadowsightTimerLocked)
     if Gladdy.db.shadowsightTimerEnabled then
         self.timerFrame:SetScale(Gladdy.db.shadowsightTimerScale)
         self.timerFrame:ClearAllPoints()
@@ -109,7 +111,7 @@ function ShadowsightTimer:UpdateFrame()
 end
 
 function ShadowsightTimer:Start()
-    self.timerFrame.endTime = 92
+    self.timerFrame.endTime = 91
     self.timerFrame.timeSinceLastUpdate = 0
     self.timerFrame:SetScript("OnUpdate", ShadowsightTimer.OnUpdate)
 end
@@ -149,17 +151,24 @@ function ShadowsightTimer:GetOptions()
             order = 3,
             width = "full",
         }),
+        shadowsightTimerLocked = Gladdy:option({
+            type = "toggle",
+            name = L["Locked"],
+            --desc = L["Turns countdown before the start of an arena match on/off."],
+            order = 4,
+            width = "full",
+        }),
         shadowsightAnnounce = Gladdy:option({
             type = "toggle",
             name = L["Announce"],
             --desc = L["Turns countdown before the start of an arena match on/off."],
-            order = 4,
+            order = 5,
             width = "full",
         }),
         shadowsightTimerScale = Gladdy:option({
             type = "range",
             name = L["Scale"],
-            order = 5,
+            order = 6,
             min = 0.1,
             max = 5,
             step = 0.1,

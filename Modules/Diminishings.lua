@@ -93,11 +93,7 @@ function Diminishings:CreateFrame(unit)
                     Diminishings:Positionate(unit)
                 else
                     self.timeLeft = self.timeLeft - elapsed
-                    if self.timeLeft >=5 then
-                        self.timeText:SetFormattedText("%d", self.timeLeft)
-                    else
-                        self.timeText:SetFormattedText("%.1f", self.timeLeft >= 0.0 and self.timeLeft or 0.0)
-                    end
+                    Gladdy:FormatTimer(self.text, self.timeLeft, self.timeLeft < 5)
                 end
             end
         end)

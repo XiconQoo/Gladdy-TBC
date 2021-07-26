@@ -1,7 +1,7 @@
 local GetSpellInfo = GetSpellInfo
 local CreateFrame = CreateFrame
 local GetTime = GetTime
-local select, lower, ceil, tremove, tinsert, pairs, ipairs, tostring = select, string.lower, ceil, tremove, tinsert, pairs, ipairs, tostring
+local select, lower, ceil, tremove, tinsert, pairs, ipairs, tostring, random = select, string.lower, ceil, tremove, tinsert, pairs, ipairs, tostring, math.random
 local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
 local auraTypes = {AURA_TYPE_BUFF, AURA_TYPE_DEBUFF}
 
@@ -134,27 +134,30 @@ end
 
 function BuffsDebuffs:Test(unit)
     if Gladdy.db.buffsEnabled then
-        if unit == "arena1" or unit == "arena3" then
-            BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_DEBUFF)
-            BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_BUFF)
+        local spellSchools = { "physical", "magic", "curse", "poison", "disease", "immune" }
 
-            BuffsDebuffs:AddOrRefreshAura(unit, 1943, AURA_TYPE_DEBUFF, 12, 12, 1, "physical", select(3, GetSpellInfo(1943)), 1)
-            BuffsDebuffs:AddOrRefreshAura(unit, 18647, AURA_TYPE_DEBUFF, 10, 10, 1, "immune", select(3, GetSpellInfo(18647)), 2)
-            BuffsDebuffs:AddOrRefreshAura(unit, 27218, AURA_TYPE_DEBUFF, 9, 9, 1, "curse", select(3, GetSpellInfo(27218)), 3)
-            BuffsDebuffs:AddOrRefreshAura(unit, 27216, AURA_TYPE_DEBUFF, 9, 9, 1, "magic", select(3, GetSpellInfo(27216)), 4)
-            BuffsDebuffs:AddOrRefreshAura(unit, 27189, AURA_TYPE_DEBUFF, 9, 9, 5, "poison", select(3, GetSpellInfo(27189)), 5)
+        BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_DEBUFF)
+        BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_BUFF)
 
-            BuffsDebuffs:AddOrRefreshAura(unit, 33076, AURA_TYPE_BUFF, 15, 15, 1, "magic", select(3, GetSpellInfo(33076)), 1)
-            BuffsDebuffs:AddOrRefreshAura(unit, 26980, AURA_TYPE_BUFF, 12, 12, 5, "magic", select(3, GetSpellInfo(26980)), 2)
-        else
-            BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_DEBUFF)
-            BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_BUFF)
-
-            BuffsDebuffs:AddOrRefreshAura(unit, 1, AURA_TYPE_BUFF, 12, 12, 1, "poison", select(3, GetSpellInfo(1943)), 1)
-            BuffsDebuffs:AddOrRefreshAura(unit, 1, AURA_TYPE_BUFF, 10, 10, 2, "magic", select(3, GetSpellInfo(1)), 2)
-
-            BuffsDebuffs:AddOrRefreshAura(unit, 5, AURA_TYPE_DEBUFF, 12, 12, 3, "physical", select(3, GetSpellInfo(27009)), 1)
-            BuffsDebuffs:AddOrRefreshAura(unit, 5, AURA_TYPE_DEBUFF, 11, 11, 4, "disease", select(3, GetSpellInfo(11426)), 2)
+        local i = 1
+        for spellID, enabled in pairs(Gladdy.db.trackedDebuffs) do
+            if i > 4 then
+                break
+            end
+            if enabled then
+                BuffsDebuffs:AddOrRefreshAura(unit, spellID, AURA_TYPE_DEBUFF, 15, 15, random(1,5), spellSchools[random(1,6)], select(3, GetSpellInfo(spellID)), i)
+                i = i + 1
+            end
+        end
+        i = 1
+        for spellID, enabled in pairs(Gladdy.db.trackedBuffs) do
+            if i > 4 then
+                break
+            end
+            if enabled then
+                BuffsDebuffs:AddOrRefreshAura(unit, spellID, AURA_TYPE_BUFF, 15, 15, random(1,5), spellSchools[random(1,6)], select(3, GetSpellInfo(spellID)), i)
+                i = i + 1
+            end
         end
     end
 end
@@ -469,28 +472,23 @@ local function iconTimer(auraFrame, elapsed)
         local timeLeftMilliSec = auraFrame.endtime - GetTime()
         local timeLeftSec = ceil(timeLeftMilliSec)
         auraFrame.timeLeft = timeLeftMilliSec
-        --auraFrame.cooldowncircle:SetCooldown(auraFrame.startTime, auraFrame.endtime)
-        if timeLeftSec >= 60 then
-            if Gladdy.db.buffsDynamicColor then auraFrame.cooldown:SetTextColor(0.7, 1, 0) end
-            auraFrame.cooldown:SetFormattedText("%dm", ceil(timeLeftSec / 60))
-        elseif timeLeftSec < 60 and timeLeftSec >= 11 then
-            --if it's less than 60s
-            if Gladdy.db.buffsDynamicColor then auraFrame.cooldown:SetTextColor(0.7, 1, 0) end
-            auraFrame.cooldown:SetFormattedText("%d", timeLeftSec)
-        elseif timeLeftSec <= 10 and timeLeftSec >= 5 then
-            if Gladdy.db.buffsDynamicColor then auraFrame.cooldown:SetTextColor(1, 0.7, 0) end
-            auraFrame.cooldown:SetFormattedText("%d", timeLeftSec)
-        elseif timeLeftSec <= 4 and timeLeftSec >= 3 then
-            if Gladdy.db.buffsDynamicColor then auraFrame.cooldown:SetTextColor(1, 0, 0) end
-            auraFrame.cooldown:SetFormattedText("%d", timeLeftSec)
-        elseif timeLeftMilliSec <= 3 and timeLeftMilliSec > 0 then
-            if Gladdy.db.buffsDynamicColor then auraFrame.cooldown:SetTextColor(1, 0, 0) end
-            auraFrame.cooldown:SetFormattedText("%.1f", timeLeftMilliSec >= 0.0 and timeLeftMilliSec or 0.0)
-        elseif timeLeftMilliSec <= 0 and timeLeftMilliSec > -0.05 then -- 50ms ping max wait for SPELL_AURA_REMOVED event
-            auraFrame.cooldown:SetText("")
-        else -- fallback in case SPELL_AURA_REMOVED is not fired
+        if Gladdy.db.buffsDynamicColor then
+            if timeLeftSec >= 60 then
+                auraFrame.cooldown:SetTextColor(0.7, 1, 0)
+            elseif timeLeftSec < 60 and timeLeftSec >= 11 then
+                auraFrame.cooldown:SetTextColor(0.7, 1, 0)
+            elseif timeLeftSec <= 10 and timeLeftSec >= 5 then
+                auraFrame.cooldown:SetTextColor(1, 0.7, 0)
+            elseif timeLeftSec <= 4 and timeLeftSec >= 3 then
+                auraFrame.cooldown:SetTextColor(1, 0, 0)
+            elseif timeLeftMilliSec <= 3 and timeLeftMilliSec > 0 then
+                auraFrame.cooldown:SetTextColor(1, 0, 0)
+            end
+        end
+        if timeLeftMilliSec < 0 then
             auraFrame:Hide()
         end
+        Gladdy:FormatTimer(auraFrame.cooldown, timeLeftMilliSec, timeLeftMilliSec <= 3)
     else
         auraFrame.cooldown:SetText("")
     end
