@@ -184,10 +184,10 @@ function Castbar:UpdateFrame(unit)
         end
     end
 
-    castBar.spellText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.auraFont), Gladdy.db.castBarFontSize)
+    castBar.spellText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.castBarFont), Gladdy.db.castBarFontSize)
     castBar.spellText:SetTextColor(Gladdy.db.castBarFontColor.r, Gladdy.db.castBarFontColor.g, Gladdy.db.castBarFontColor.b, Gladdy.db.castBarFontColor.a)
 
-    castBar.timeText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.auraFont), Gladdy.db.castBarFontSize)
+    castBar.timeText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.castBarFont), Gladdy.db.castBarFontSize)
     castBar.timeText:SetTextColor(Gladdy.db.castBarFontColor.r, Gladdy.db.castBarFontColor.g, Gladdy.db.castBarFontColor.b, Gladdy.db.castBarFontColor.a)
 
     castBar.icon.texture.overlay:SetTexture(Gladdy.db.castBarIconStyle)
