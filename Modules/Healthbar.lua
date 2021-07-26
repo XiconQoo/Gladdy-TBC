@@ -234,7 +234,7 @@ function Healthbar:JOINED_ARENA()
     if Gladdy.db.healthNameToArenaId and Gladdy.db.healthName then
         for i=1,Gladdy.curBracket do
             local healthBar = self.frames["arena" .. i]
-            healthBar.nameText:SetText("Arena" .. i)
+            healthBar.nameText:SetText(i)
         end
     end
 end
@@ -499,7 +499,7 @@ function Healthbar:GetOptions()
                         healthNameToArenaId = option({
                             type = "toggle",
                             name = L["Show ArenaX"],
-                            desc = L["Show Arena1-5 as name instead"],
+                            desc = L["Show 1-5 as name instead"],
                             order = 3,
                             width = "full",
                             disabled = function() return not Gladdy.db.healthName end

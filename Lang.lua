@@ -427,7 +427,7 @@ elseif GetLocale() == "deDE" then
     L["Show name text"] = "Namen zeigen"
     L["Show the units name"] = "Zeige den Namen des Gegners"
     L["Show ArenaX"] = "ArenaX zeigen"
-    L["Show Arena1-5 as name instead"] = "Zeigt Arena1-5 anstatt des Namens"
+    L["Show 1-5 as name instead"] = "Zeigt 1-5 anstatt des Namens"
     L["Show the actual health"] = "Zeige die momentane Gesundheit"
     L["Show the actual health on the health bar"] = "Zeigt die momentane Gesundheit"
     L["Show max health"] = "Zeige maximale Gesundheit"
