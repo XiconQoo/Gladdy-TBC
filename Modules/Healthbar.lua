@@ -132,7 +132,7 @@ function Healthbar:SetHealthText(healthBar, health, healthMax)
     local healthText
     local healthPercentage = floor(health * 100 / healthMax)
 
-    if health == 0 then
+    if health == 0 and UnitExists(healthBar.unit) and UnitIsDeadOrGhost(healthBar.unit) then
         self:UNIT_DEATH(healthBar.unit)
         return
     end
