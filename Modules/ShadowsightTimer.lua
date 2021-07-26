@@ -97,9 +97,6 @@ end
 
 function ShadowsightTimer:UpdateFrameOnce()
     self.timerFrame:EnableMouse(not Gladdy.db.shadowsightTimerLocked)
-end
-
-function ShadowsightTimer:UpdateFrame()
     if Gladdy.db.shadowsightTimerEnabled then
         self.timerFrame:SetScale(Gladdy.db.shadowsightTimerScale)
         self.timerFrame:ClearAllPoints()
