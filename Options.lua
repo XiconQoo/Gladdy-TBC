@@ -53,7 +53,8 @@ Gladdy.defaults = {
         barWidth = 180,
         bottomMargin = 2,
         statusbarBorderOffset = 6,
-        timerFormat = Gladdy.TIMER_FORMAT.tenths
+        timerFormat = Gladdy.TIMER_FORMAT.tenths,
+        backgroundColor = {r = 0, g = 0, b = 0, a = 0},
     },
 }
 
@@ -225,12 +226,6 @@ function Gladdy:SetupOptions()
                         desc = L["Toggle if frame can be moved"],
                         order = 1,
                     },
-                    growUp = {
-                        type = "toggle",
-                        name = L["Grow frame upwards"],
-                        desc = L["If enabled the frame will grow upwards instead of downwards"],
-                        order = 2,
-                    },
                     growDirection = {
                         type = "select",
                         name = L["Grow Direction"],
@@ -303,6 +298,15 @@ function Gladdy:SetupOptions()
                                         min = -200,
                                         max = 200,
                                         step = 1,
+                                    },
+                                    backgroundColor = {
+                                        type = "color",
+                                        name = L["Background color"],
+                                        desc = L["Background Color of the frame"],
+                                        order = 8,
+                                        hasAlpha = true,
+                                        get = getColorOpt,
+                                        set = setColorOpt,
                                     },
                                 }
                             },
