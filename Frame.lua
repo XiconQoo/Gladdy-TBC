@@ -104,7 +104,7 @@ function Gladdy:CreateFrame()
         self.anchor:Hide()
     end
 
-    self.frame:Hide()
+    self.frame:SetAlpha(0)
 end
 
 function Gladdy:UpdateFrame()
@@ -271,7 +271,7 @@ end
 
 function Gladdy:HideFrame()
     if (self.frame) then
-        self.frame:Hide()
+        self.frame:SetAlpha(0)
         self.frame.testing = nil
     end
 end
@@ -297,7 +297,7 @@ function Gladdy:ToggleFrame(i)
         self.curBracket = i
         self:UpdateFrame()
         self:Test()
-        self.frame:Show()
+        self.frame:SetAlpha(1)
     end
 end
 

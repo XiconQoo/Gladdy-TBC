@@ -53,8 +53,8 @@ BINDING_NAME_GLADDYBUTTON3_BUTTON5 = L["Button5 Click Enemy 3"]
 BINDING_NAME_GLADDYBUTTON4_BUTTON5 = L["Button5 Click Enemy 4"]
 BINDING_NAME_GLADDYBUTTON5_BUTTON5 = L["Button5 Click Enemy 5"]
 
-function Clicks:Initialise()
-    self:RegisterMessage("JOINED_ARENA")
+function Clicks:Initialize()
+    --
 end
 
 function Clicks:Reset()
@@ -62,21 +62,14 @@ function Clicks:Reset()
 end
 
 function Clicks:ResetUnit(unit)
-    local button = Gladdy.buttons[unit]
-    if (not button) then
-        return
-    end
-
-    for k, v in pairs(Gladdy.db.attributes) do
-        button.secure:SetAttribute(v.modifier .. "macrotext" .. v.button, "")
-    end
+    --
 end
 
-function Clicks:Test()
-    Clicks:JOINED_ARENA()
+function Clicks:UpdateFrame(unit)
+    self:SetupAttributes(unit)
 end
 
-function Clicks:JOINED_ARENA()
+function Clicks:UpdateFrameOnce()
     for k, v in pairs(Gladdy.buttons) do
         local left = GetBindingKey(("GLADDYBUTTON%d_LEFT"):format(v.id))
         local right = GetBindingKey(("GLADDYBUTTON%d_RIGHT"):format(v.id))
@@ -221,9 +214,4 @@ function Clicks:GetOptions()
         options[tostring(i)] = SetupAttributeOption(i)
     end
     return options
-end
-
-function Clicks:UpdateFrame(unit)
-    self:SetupAttributes(unit)
-    self:JOINED_ARENA()
 end
