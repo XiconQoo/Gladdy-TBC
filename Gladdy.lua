@@ -251,11 +251,12 @@ function Gladdy:OnEnable()
     self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
 
-    if (IsAddOnLoaded("Clique")) then
-        for i = 1, 5 do
-            self:CreateButton(i)
-        end
+    for i = 1, 5 do
+        self:CreateButton(i)
+    end
+    self:UpdateFrame()
 
+    if (IsAddOnLoaded("Clique")) then
         ClickCastFrames = ClickCastFrames or {}
         ClickCastFrames[self.buttons.arena1.secure] = true
         ClickCastFrames[self.buttons.arena2.secure] = true
@@ -424,14 +425,7 @@ function Gladdy:JoinedArena()
         self.curBracket = 2
     end
 
-    for i = 1, self.curBracket do
-        if (not self.buttons["arena" .. i]) then
-            self:CreateButton(i)
-        end
-    end
-
     self:SendMessage("JOINED_ARENA")
-    self:UpdateFrame()
     self.frame:Show()
     for i=1, self.curBracket do
         self.buttons["arena" .. i]:SetAlpha(1)
