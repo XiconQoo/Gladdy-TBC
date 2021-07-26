@@ -508,6 +508,13 @@ local importantAuras = {
         priority = 20,
         spellID = 31224,
     },
+    -- Evasion
+    [GetSpellInfo(26669)] = {
+        track = AURA_TYPE_BUFF,
+        duration = 15,
+        priority = 10,
+        spellID = 26669,
+    },
 
 
     -- Fear
