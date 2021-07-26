@@ -1,7 +1,7 @@
 local GetSpellInfo = GetSpellInfo
 local CreateFrame = CreateFrame
 local GetTime = GetTime
-local select, lower, ceil, tremove, tinsert, pairs, ipairs, tostring = select, string.lower, ceil, tremove, tinsert, pairs, ipairs, tostring
+local select, lower, ceil, tremove, tinsert, pairs, ipairs, tostring, random = select, string.lower, ceil, tremove, tinsert, pairs, ipairs, tostring, math.random
 local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
 local auraTypes = {AURA_TYPE_BUFF, AURA_TYPE_DEBUFF}
 
@@ -134,28 +134,30 @@ end
 
 function BuffsDebuffs:Test(unit)
     if Gladdy.db.buffsEnabled then
-        if unit == "arena1" or unit == "arena3" then
-            BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_DEBUFF)
-            BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_BUFF)
+        local spellSchools = { "physical", "magic", "curse", "poison", "disease", "immune" }
 
-            BuffsDebuffs:AddOrRefreshAura(unit, 1943, AURA_TYPE_DEBUFF, 12, 12, 1, "physical", select(3, GetSpellInfo(1943)), 1)
-            BuffsDebuffs:AddOrRefreshAura(unit, 18647, AURA_TYPE_DEBUFF, 10, 10, 1, "immune", select(3, GetSpellInfo(18647)), 2)
-            BuffsDebuffs:AddOrRefreshAura(unit, 27218, AURA_TYPE_DEBUFF, 9, 9, 1, "curse", select(3, GetSpellInfo(27218)), 3)
-            BuffsDebuffs:AddOrRefreshAura(unit, 27216, AURA_TYPE_DEBUFF, 9, 9, 1, "magic", select(3, GetSpellInfo(27216)), 4)
-            BuffsDebuffs:AddOrRefreshAura(unit, 27189, AURA_TYPE_DEBUFF, 9, 9, 5, "poison", select(3, GetSpellInfo(27189)), 5)
+        BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_DEBUFF)
+        BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_BUFF)
 
-            BuffsDebuffs:AddOrRefreshAura(unit, 33076, AURA_TYPE_BUFF, 15, 15, 1, "magic", select(3, GetSpellInfo(33076)), 1)
-            BuffsDebuffs:AddOrRefreshAura(unit, 26980, AURA_TYPE_BUFF, 12, 12, 5, "magic", select(3, GetSpellInfo(26980)), 2)
-        else
-            BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_DEBUFF)
-            BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_BUFF)
-
-            BuffsDebuffs:AddOrRefreshAura(unit, 1, AURA_TYPE_BUFF, 12, 12, 1, "poison", select(3, GetSpellInfo(1943)), 1)
-            BuffsDebuffs:AddOrRefreshAura(unit, 1, AURA_TYPE_BUFF, 10, 10, 2, "magic", select(3, GetSpellInfo(1)), 2)
-
-            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_BUFF, 28093, select(1, GetSpellInfo(28093)), select(3, GetSpellInfo(28093)), 10, GetTime() + 10, 1, "physical")
-            BuffsDebuffs:AddOrRefreshAura(unit, 5, AURA_TYPE_DEBUFF, 12, 12, 3, "physical", select(3, GetSpellInfo(27009)), 1)
-            BuffsDebuffs:AddOrRefreshAura(unit, 5, AURA_TYPE_DEBUFF, 11, 11, 4, "disease", select(3, GetSpellInfo(11426)), 2)
+        local i = 1
+        for spellID, enabled in pairs(Gladdy.db.trackedDebuffs) do
+            if i > 4 then
+                break
+            end
+            if enabled then
+                BuffsDebuffs:AddOrRefreshAura(unit, spellID, AURA_TYPE_DEBUFF, 15, 15, random(1,5), spellSchools[random(1,6)], select(3, GetSpellInfo(spellID)), i)
+                i = i + 1
+            end
+        end
+        i = 1
+        for spellID, enabled in pairs(Gladdy.db.trackedBuffs) do
+            if i > 4 then
+                break
+            end
+            if enabled then
+                BuffsDebuffs:AddOrRefreshAura(unit, spellID, AURA_TYPE_BUFF, 15, 15, random(1,5), spellSchools[random(1,6)], select(3, GetSpellInfo(spellID)), i)
+                i = i + 1
+            end
         end
     end
 end
