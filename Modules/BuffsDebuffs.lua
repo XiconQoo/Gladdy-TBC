@@ -153,6 +153,7 @@ function BuffsDebuffs:Test(unit)
             BuffsDebuffs:AddOrRefreshAura(unit, 1, AURA_TYPE_BUFF, 12, 12, 1, "poison", select(3, GetSpellInfo(1943)), 1)
             BuffsDebuffs:AddOrRefreshAura(unit, 1, AURA_TYPE_BUFF, 10, 10, 2, "magic", select(3, GetSpellInfo(1)), 2)
 
+            BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_BUFF, 28093, select(1, GetSpellInfo(28093)), select(3, GetSpellInfo(28093)), 10, GetTime() + 10, 1, "physical")
             BuffsDebuffs:AddOrRefreshAura(unit, 5, AURA_TYPE_DEBUFF, 12, 12, 3, "physical", select(3, GetSpellInfo(27009)), 1)
             BuffsDebuffs:AddOrRefreshAura(unit, 5, AURA_TYPE_DEBUFF, 11, 11, 4, "disease", select(3, GetSpellInfo(11426)), 2)
         end
@@ -469,28 +470,23 @@ local function iconTimer(auraFrame, elapsed)
         local timeLeftMilliSec = auraFrame.endtime - GetTime()
         local timeLeftSec = ceil(timeLeftMilliSec)
         auraFrame.timeLeft = timeLeftMilliSec
-        --auraFrame.cooldowncircle:SetCooldown(auraFrame.startTime, auraFrame.endtime)
-        if timeLeftSec >= 60 then
-            if Gladdy.db.buffsDynamicColor then auraFrame.cooldown:SetTextColor(0.7, 1, 0) end
-            auraFrame.cooldown:SetFormattedText("%dm", ceil(timeLeftSec / 60))
-        elseif timeLeftSec < 60 and timeLeftSec >= 11 then
-            --if it's less than 60s
-            if Gladdy.db.buffsDynamicColor then auraFrame.cooldown:SetTextColor(0.7, 1, 0) end
-            auraFrame.cooldown:SetFormattedText("%d", timeLeftSec)
-        elseif timeLeftSec <= 10 and timeLeftSec >= 5 then
-            if Gladdy.db.buffsDynamicColor then auraFrame.cooldown:SetTextColor(1, 0.7, 0) end
-            auraFrame.cooldown:SetFormattedText("%d", timeLeftSec)
-        elseif timeLeftSec <= 4 and timeLeftSec >= 3 then
-            if Gladdy.db.buffsDynamicColor then auraFrame.cooldown:SetTextColor(1, 0, 0) end
-            auraFrame.cooldown:SetFormattedText("%d", timeLeftSec)
-        elseif timeLeftMilliSec <= 3 and timeLeftMilliSec > 0 then
-            if Gladdy.db.buffsDynamicColor then auraFrame.cooldown:SetTextColor(1, 0, 0) end
-            auraFrame.cooldown:SetFormattedText("%.1f", timeLeftMilliSec >= 0.0 and timeLeftMilliSec or 0.0)
-        elseif timeLeftMilliSec <= 0 and timeLeftMilliSec > -0.05 then -- 50ms ping max wait for SPELL_AURA_REMOVED event
-            auraFrame.cooldown:SetText("")
-        else -- fallback in case SPELL_AURA_REMOVED is not fired
+        if Gladdy.db.buffsDynamicColor then
+            if timeLeftSec >= 60 then
+                auraFrame.cooldown:SetTextColor(0.7, 1, 0)
+            elseif timeLeftSec < 60 and timeLeftSec >= 11 then
+                auraFrame.cooldown:SetTextColor(0.7, 1, 0)
+            elseif timeLeftSec <= 10 and timeLeftSec >= 5 then
+                auraFrame.cooldown:SetTextColor(1, 0.7, 0)
+            elseif timeLeftSec <= 4 and timeLeftSec >= 3 then
+                auraFrame.cooldown:SetTextColor(1, 0, 0)
+            elseif timeLeftMilliSec <= 3 and timeLeftMilliSec > 0 then
+                auraFrame.cooldown:SetTextColor(1, 0, 0)
+            end
+        end
+        if timeLeftMilliSec < 0 then
             auraFrame:Hide()
         end
+        Gladdy:FormatTimer(auraFrame.cooldown, timeLeftMilliSec, timeLeftMilliSec <= 3)
     else
         auraFrame.cooldown:SetText("")
     end

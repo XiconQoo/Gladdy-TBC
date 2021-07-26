@@ -295,19 +295,13 @@ function Cooldowns:CooldownStart(button, spellId, duration)
                 self.timeLeft = self.timeLeft - elapsed
                 local timeLeft = ceil(self.timeLeft)
                 if timeLeft >= 540 then
-                    self.cooldownFont:SetText(ceil(timeLeft / 60) .. "m")
                     self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), Gladdy.db.cooldownSize / 3.1 * Gladdy.db.cooldownFontScale, "OUTLINE")
                 elseif timeLeft < 540 and timeLeft >= 60 then
-                    -- more than 1 minute
-                    self.cooldownFont:SetText(ceil(timeLeft / 60) .. "m")
                     self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), Gladdy.db.cooldownSize / 2.15 * Gladdy.db.cooldownFontScale, "OUTLINE")
                 elseif timeLeft < 60 and timeLeft > 0 then
-                    -- between 60s and 21s (green)
                     self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), Gladdy.db.cooldownSize / 2.15 * Gladdy.db.cooldownFontScale, "OUTLINE")
-                    self.cooldownFont:SetText(timeLeft)
-                else
-                    self.cooldownFont:SetText("")
                 end
+                Gladdy:FormatTimer(self.cooldownFont, self.timeLeft, self.timeLeft < 0)
                 if (self.timeLeft <= 0) then
                     Cooldowns:CooldownReady(button, spellId, frame)
                 end
