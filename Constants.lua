@@ -534,6 +534,13 @@ local importantAuras = {
         priority = 40,
         spellID = 27223,
     },
+    --Banish
+    [GetSpellInfo(710)] = {
+        track = AURA_TYPE_DEBUFF,
+        duration = 10,
+        priority = 40,
+        spellID = 710,
+    },
     -- Shadowfury
     [GetSpellInfo(30283)] = {
         track = AURA_TYPE_DEBUFF,
