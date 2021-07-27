@@ -257,7 +257,9 @@ function Healthbar:ENEMY_SPOTTED(unit)
         healthBar.nameText:SetText(button.name)
     end
 
-    healthBar.hp:SetStatusBarColor(RAID_CLASS_COLORS[button.class].r, RAID_CLASS_COLORS[button.class].g, RAID_CLASS_COLORS[button.class].b, 1)
+    if button.class then
+        healthBar.hp:SetStatusBarColor(RAID_CLASS_COLORS[button.class].r, RAID_CLASS_COLORS[button.class].g, RAID_CLASS_COLORS[button.class].b, 1)
+    end
 end
 
 function Healthbar:UNIT_HEALTH(unit, health, healthMax)
