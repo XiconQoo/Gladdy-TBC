@@ -64,6 +64,7 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 
 ### v1.19-Beta
 - fix gladdy frames not showing v2
+- minor bug fixes
 
 ### v1.18-Beta
 - castbar font now working properly
