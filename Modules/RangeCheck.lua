@@ -25,7 +25,7 @@ local classSpells = {
     ["SHAMAN"] = 10414,
     ["PALADIN"] = 10308,
     ["WARLOCK"] = 5782,
-    ["WARRIOR"] = 20252,
+    ["WARRIOR"] = 25275,
     ["HUNTER"] = 27018,
     ["ROGUE"] = 36554,
 }
