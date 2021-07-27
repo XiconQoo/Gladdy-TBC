@@ -110,7 +110,7 @@ function Gladdy:CreateFrame()
         self.anchor:Hide()
     end
 
-    self.frame:SetAlpha(0)
+    self.frame:Hide()
 end
 
 function Gladdy:UpdateFrame()
@@ -279,7 +279,13 @@ end
 
 function Gladdy:HideFrame()
     if (self.frame) then
-        self.frame:SetAlpha(0)
+        if InCombatLockdown() then
+            self.startTest = nil
+            self.hideFrame = true
+        else
+            self.frame:Hide()
+        end
+
         self.frame.testing = nil
     end
 end
@@ -304,8 +310,14 @@ function Gladdy:ToggleFrame(i)
         self:Reset()
         self.curBracket = i
         self:UpdateFrame()
-        self:Test()
-        self.frame:SetAlpha(1)
+        if InCombatLockdown() then
+            Gladdy:Print("Gladdy frames show as soon as you leave combat")
+            self.showFrame = true
+            self.startTest = true
+        else
+            self:Test()
+            self.frame:Show()
+        end
     end
 end
 

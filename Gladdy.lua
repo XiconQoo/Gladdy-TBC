@@ -25,7 +25,7 @@ local MAJOR, MINOR = "Gladdy", 4
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
 Gladdy.version_major_num = 1
-Gladdy.version_minor_num = 0.18
+Gladdy.version_minor_num = 0.19
 Gladdy.version_num = Gladdy.version_major_num + Gladdy.version_minor_num
 Gladdy.version_releaseType = RELEASE_TYPES.beta
 Gladdy.version = PREFIX .. Gladdy.version_num .. "-" .. Gladdy.version_releaseType
@@ -250,16 +250,13 @@ end
 function Gladdy:OnEnable()
     self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
-
-    self:CreateFrame()
-    for i = 1, 5 do
-        self:CreateButton(i)
-    end
-    self.curBracket = 5
-    self:UpdateFrame()
-    self:Reset()
+    self:RegisterEvent("PLAYER_REGEN_ENABLED")
 
     if (IsAddOnLoaded("Clique")) then
+        for i = 1, 5 do
+            self:CreateButton(i)
+        end
+
         ClickCastFrames = ClickCastFrames or {}
         ClickCastFrames[self.buttons.arena1.secure] = true
         ClickCastFrames[self.buttons.arena2.secure] = true
@@ -301,22 +298,24 @@ end
 
 function Gladdy:Test()
     self.frame.testing = true
-    for i = 1, self.curBracket do
-        local unit = "arena" .. i
-        if (not self.buttons[unit]) then
-            self:CreateButton(i)
-        end
-        local button = self.buttons[unit]
+    if self.curBracket then
+        for i = 1, self.curBracket do
+            local unit = "arena" .. i
+            if (not self.buttons[unit]) then
+                self:CreateButton(i)
+            end
+            local button = self.buttons[unit]
 
-        for k, v in pairs(self.testData[unit]) do
-            button[k] = v
-        end
+            for k, v in pairs(self.testData[unit]) do
+                button[k] = v
+            end
 
-        for k, v in self:IterModules() do
-            self:Call(v, "Test", unit)
-        end
+            for k, v in self:IterModules() do
+                self:Call(v, "Test", unit)
+            end
 
-        button:SetAlpha(1)
+            button:SetAlpha(1)
+        end
     end
 end
 
@@ -348,6 +347,23 @@ function Gladdy:UPDATE_BATTLEFIELD_STATUS(_, index)
     if (status == "active" and teamSize > 0 and IsActiveBattlefieldArena()) then
         self.curBracket = teamSize
         self:JoinedArena()
+    end
+end
+
+function Gladdy:PLAYER_REGEN_ENABLED()
+    if self.showFrame then
+        self:UpdateFrame()
+        if self.startTest then
+            self:Test()
+            self.startTest = nil
+        end
+        self.frame:Show()
+        self.showFrame = nil
+    end
+    if self.hideFrame then
+        self:Reset()
+        self.frame:Hide()
+        self.hideFrame = nil
     end
 end
 
@@ -428,8 +444,20 @@ function Gladdy:JoinedArena()
         self.curBracket = 2
     end
 
-    Gladdy:SendMessage("JOINED_ARENA")
-    self.frame:SetAlpha(1)
+    for i = 1, self.curBracket do
+        if (not self.buttons["arena" .. i]) then
+            self:CreateButton(i)
+        end
+    end
+
+    self:SendMessage("JOINED_ARENA")
+    if InCombatLockdown() then
+        Gladdy:Print("Gladdy frames show as soon as you leave combat")
+        self.showFrame = true
+    else
+        self:UpdateFrame()
+        self.frame:Show()
+    end
     for i=1, self.curBracket do
         self.buttons["arena" .. i]:SetAlpha(1)
     end
