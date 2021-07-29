@@ -101,7 +101,9 @@ function ShadowsightTimer:UpdateFrameOnce()
         self.timerFrame:SetScale(Gladdy.db.shadowsightTimerScale)
         self.timerFrame:ClearAllPoints()
         self.timerFrame:SetPoint(Gladdy.db.shadowsightTimerRelPoint1, nil, Gladdy.db.shadowsightTimerRelPoint2, Gladdy.db.shadowsightTimerX, Gladdy.db.shadowsightTimerY)
-        self.timerFrame:Show()
+        if Gladdy.frame.testing or Gladdy.curBracket then
+            self.timerFrame:Show()
+        end
     else
         self.timerFrame:SetScale(Gladdy.db.shadowsightTimerScale)
         self.timerFrame:ClearAllPoints()
