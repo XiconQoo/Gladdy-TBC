@@ -266,7 +266,7 @@ function Auras:ResetUnit(unit)
 end
 
 function Auras:Test(unit)
-    local spellName, spellid, icon, limit, i
+    local spellName, spellid, icon, limit
 
     self:AURA_FADE(unit, AURA_TYPE_BUFF)
     self:AURA_FADE(unit, AURA_TYPE_DEBUFF)
