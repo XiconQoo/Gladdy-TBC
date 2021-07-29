@@ -406,6 +406,8 @@ elseif GetLocale() == "deDE" then
     L["Categories"] = "Kategorien"
     L["Force Icon"] = "Erzwinge Symbol"
     L["Icon of the DR"] = "Symbol des DR"
+    L["DR Duration"] = "DR Dauer"
+    L["Change the DR Duration in seconds (DR is dynamic between 15-20s)"] = "Verändere die DR Dauer in Sekunden (DR ist dynamisch zwischen 15-20s)"
 
     -- ExportImport.lua
     L["Export Import"] = "Exportieren Importieren"

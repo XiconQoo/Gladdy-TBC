@@ -1,8 +1,6 @@
 local select = select
 local pairs,ipairs,tbl_sort,tinsert,format = pairs,ipairs,table.sort,tinsert,format
 
-local drDuration = 18
-
 local GetSpellInfo = GetSpellInfo
 local CreateFrame = CreateFrame
 local GetTime = GetTime
@@ -47,7 +45,8 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drQuarterColor = {r = 1, g = 0.7, b = 0, a = 1 },
     drNullColor = {r = 1, g = 0, b = 0, a = 1 },
     drWidthFactor = 1,
-    drCategories = defaultCategories()
+    drCategories = defaultCategories(),
+    drDuration = 18
 })
 
 local function getDiminishColor(dr)
@@ -296,14 +295,14 @@ function Diminishings:AuraFade(unit, spellID)
         end
     end
     lastIcon.dr = drCat
-    lastIcon.timeLeft = drDuration
+    lastIcon.timeLeft = Gladdy.db.drDuration
     lastIcon.diminishing = DRData:NextDR(lastIcon.diminishing)
     if Gladdy.db.drBorderColorsEnabled then
         lastIcon.border:SetVertexColor(getDiminishColor(lastIcon.diminishing))
     else
         lastIcon.border:SetVertexColor(Gladdy.db.drBorderColor.r, Gladdy.db.drBorderColor.g, Gladdy.db.drBorderColor.b, Gladdy.db.drBorderColor.a)
     end
-    lastIcon.cooldown:SetCooldown(GetTime(), drDuration)
+    lastIcon.cooldown:SetCooldown(GetTime(), Gladdy.db.drDuration)
     if Gladdy.db.drCategories[drCat].forceIcon then
         lastIcon.texture:SetTexture(Gladdy.db.drCategories[drCat].icon)
     else
@@ -359,11 +358,20 @@ function Diminishings:GetOptions()
             desc = L["Enabled DR module"],
             order = 3,
         }),
+        drDuration = Gladdy:option({
+            type = "range",
+            name = L["DR Duration"],
+            desc = L["Change the DR Duration in seconds (DR is dynamic between 15-20s)"],
+            order = 4,
+            min = 15,
+            max = 20,
+            step = .1,
+        }),
         group = {
             type = "group",
             childGroups = "tree",
             name = L["Frame"],
-            order = 4,
+            order = 5,
             args = {
                 icon = {
                     type = "group",
