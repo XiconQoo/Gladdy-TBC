@@ -270,7 +270,7 @@ function Gladdy:SetupOptions()
                                         order = 4,
                                         min = .1,
                                         max = 2,
-                                        step = .1,
+                                        step = .01,
                                     },
                                     padding = {
                                         type = "range",
