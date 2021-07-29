@@ -35,12 +35,12 @@ function Pets:Initialize()
 end
 
 function Pets:JOINED_ARENA()
-    for k,v in pairs(self.frames) do
+    for _,v in pairs(self.frames) do
         v.healthBar:SetAlpha(0)
     end
     if Gladdy.db.petEnabled then
         self:RegisterEvent("UNIT_PET")
-        self:SetScript("OnEvent", function(self, event, unitId)
+        self:SetScript("OnEvent", function(_, event, unitId)
             if event == "UNIT_PET" then
                 local unit = Gladdy.guids[UnitGUID(unitId)]
                 if unit then

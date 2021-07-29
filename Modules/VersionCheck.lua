@@ -1,11 +1,11 @@
-local str_match, tonumber, tostring = string.match, tonumber, tostring
+local tonumber, tostring = tonumber, tostring
 
 local UnitName = UnitName
 local IsInGroup, IsInRaid = IsInGroup, IsInRaid
 local LE_PARTY_CATEGORY_HOME, LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_HOME, LE_PARTY_CATEGORY_INSTANCE
 
 local Gladdy = LibStub("Gladdy")
-local L = Gladdy.L
+
 local VersionCheck = Gladdy:NewModule("VersionCheck", 1, {
 })
 LibStub("AceComm-3.0"):Embed(VersionCheck)

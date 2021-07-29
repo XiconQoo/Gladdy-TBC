@@ -1,4 +1,4 @@
-local floor, str_len, tostring, str_sub, str_find, pairs = math.floor, string.len, tostring, string.sub, string.find, pairs
+local floor, str_find, pairs = math.floor, string.find, pairs
 local CreateFrame = CreateFrame
 
 local Gladdy = LibStub("Gladdy")

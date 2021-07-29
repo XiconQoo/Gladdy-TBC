@@ -70,7 +70,7 @@ function Clicks:UpdateFrame(unit)
 end
 
 function Clicks:UpdateFrameOnce()
-    for k, v in pairs(Gladdy.buttons) do
+    for _, v in pairs(Gladdy.buttons) do
         local left = GetBindingKey(("GLADDYBUTTON%d_LEFT"):format(v.id))
         local right = GetBindingKey(("GLADDYBUTTON%d_RIGHT"):format(v.id))
         local middle = GetBindingKey(("GLADDYBUTTON%d_MIDDLE"):format(v.id))
@@ -107,7 +107,7 @@ function Clicks:SetupAttributes(unit)
         return
     end
 
-    for k, v in pairs(Gladdy.db.attributes) do
+    for _, v in pairs(Gladdy.db.attributes) do
         self:SetupAttribute(button, v.button, v.modifier, v.action, v.spell)
     end
 end

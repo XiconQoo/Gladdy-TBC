@@ -167,8 +167,6 @@ function Healthbar:UpdateFrame(unit)
         return
     end
 
-    local iconSize = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight
-
     healthBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.healthBarTexture))
     healthBar.bg:SetVertexColor(Gladdy.db.healthBarBgColor.r, Gladdy.db.healthBarBgColor.g, Gladdy.db.healthBarBgColor.b, Gladdy.db.healthBarBgColor.a)
 

@@ -36,9 +36,9 @@ local L = Gladdy.L
 
 local function getDefaultCooldown()
     local cooldowns = {}
-    for class, t in pairs(Gladdy:GetCooldownList()) do
-        for spellId, v in pairs(t) do
-            local spellName, _, texture = GetSpellInfo(spellId)
+    for _,spellTable in pairs(Gladdy:GetCooldownList()) do
+        for spellId,_ in pairs(spellTable) do
+            local spellName = GetSpellInfo(spellId)
             if spellName then
                 cooldowns[tostring(spellId)] = true
             else
@@ -72,14 +72,14 @@ local Cooldowns = Gladdy:NewModule("Cooldowns", nil, {
 function Cooldowns:Initialize()
     self.cooldownSpellIds = {}
     self.spellTextures = {}
-    for class, t in pairs(Gladdy:GetCooldownList()) do
-        for k, v in pairs(t) do
-            local spellName, _, texture = GetSpellInfo(k)
+    for _,spellTable in pairs(Gladdy:GetCooldownList()) do
+        for spellId,_ in pairs(spellTable) do
+            local spellName, _, texture = GetSpellInfo(spellId)
             if spellName then
-                self.cooldownSpellIds[spellName] = k
-                self.spellTextures[k] = texture
+                self.cooldownSpellIds[spellName] = spellId
+                self.spellTextures[spellId] = texture
             else
-                Gladdy:Print("spellid does not exist  " .. k)
+                Gladdy:Print("spellid does not exist  " .. spellId)
             end
         end
     end
@@ -261,13 +261,12 @@ function Cooldowns:UpdateTestCooldowns(unit)
         button.test = true
 
         -- use class spells
-        for k, v in pairs(Gladdy:GetCooldownList()[button.class]) do
-            --k is spellId
-            self:CooldownUsed(unit, button.class, k, nil)
+        for spellId,_ in pairs(Gladdy:GetCooldownList()[button.class]) do
+            self:CooldownUsed(unit, button.class, spellId)
         end
         -- use race spells
-        for k, v in pairs(Gladdy:GetCooldownList()[button.race]) do
-            self:CooldownUsed(unit, button.race, k, nil)
+        for spellId,_ in pairs(Gladdy:GetCooldownList()[button.race]) do
+            self:CooldownUsed(unit, button.race, spellId)
         end
     end
 end
@@ -353,7 +352,6 @@ function Cooldowns:DetectSpec(unit, spec)
     ]]
     if (Gladdy.db.cooldown) then
         local class = Gladdy.buttons[unit].class
-        local race = Gladdy.buttons[unit].race
         for k, v in pairs(Gladdy:GetCooldownList()[class]) do
             if Gladdy.db.cooldownCooldowns[tostring(k)] then
                 --if (self.db.cooldownList[k] ~= false and self.db.cooldownList[class] ~= false) then
@@ -484,7 +482,7 @@ function Cooldowns:UpdateCooldowns(button)
     end
 end
 
-function Cooldowns:CooldownUsed(unit, unitClass, spellId, spellName)
+function Cooldowns:CooldownUsed(unit, unitClass, spellId)
     local button = Gladdy.buttons[unit]
     if not button then
         return
@@ -502,8 +500,8 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId, spellName)
 
         -- check if we need to reset other cooldowns because of this spell
         if (cooldown.resetCD ~= nil) then
-            for k, v in pairs(cooldown.resetCD) do
-                self:CooldownReady(button, k, false)
+            for spellID,_ in pairs(cooldown.resetCD) do
+                self:CooldownReady(button, spellID, false)
             end
         end
 
@@ -519,9 +517,9 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId, spellName)
         if (cooldown.sharedCD ~= nil) then
             local sharedCD = cooldown.sharedCD.cd and cooldown.sharedCD.cd or cd
 
-            for k, v in pairs(cooldown.sharedCD) do
-                if (k ~= "cd") then
-                    self:CooldownStart(button, k, sharedCD)
+            for spellID,_ in pairs(cooldown.sharedCD) do
+                if (spellID ~= "cd") then
+                    self:CooldownStart(button, spellID, sharedCD)
                 end
             end
         end
@@ -816,10 +814,10 @@ function Cooldowns:GetCooldownOptions()
                 order = o,
                 width = "full",
                 image = select(3, GetSpellInfo(spellId)),
-                get = function(info)
+                get = function()
                     return Gladdy.db.cooldownCooldowns[tostring(spellId)]
                 end,
-                set = function(info, value)
+                set = function(_, value)
                     Gladdy.db.cooldownCooldowns[tostring(spellId)] = value
                     Gladdy:UpdateFrame()
                 end
@@ -845,10 +843,10 @@ function Cooldowns:GetCooldownOptions()
                 order = o,
                 width = "full",
                 image = select(3, GetSpellInfo(spellId)),
-                get = function(info)
+                get = function()
                     return Gladdy.db.cooldownCooldowns[tostring(spellId)]
                 end,
-                set = function(info, value)
+                set = function(_, value)
                     Gladdy.db.cooldownCooldowns[tostring(spellId)] = value
                     Gladdy:UpdateFrame()
                 end
@@ -870,13 +868,13 @@ function Gladdy:UpdateTestCooldowns(i)
         Cooldowns:DetectSpec(unit, button.testSpec)
 
         -- use class spells
-        for k, v in pairs(Gladdy:GetCooldownList()[button.class]) do
+        for spellID,_ in pairs(Gladdy:GetCooldownList()[button.class]) do
             --k is spellId
-            Cooldowns:CooldownUsed(unit, button.class, k, nil)
+            Cooldowns:CooldownUsed(unit, button.class, spellID)
         end
         -- use race spells
-        for k, v in pairs(Gladdy:GetCooldownList()[button.race]) do
-            Cooldowns:CooldownUsed(unit, button.race, k, nil)
+        for spellID,_ in pairs(Gladdy:GetCooldownList()[button.race]) do
+            Cooldowns:CooldownUsed(unit, button.race, spellID)
         end
     end
 end

@@ -131,8 +131,8 @@ function Gladdy:Call(module, func, ...)
     end
 end
 function Gladdy:SendMessage(message, ...)
-    for k, v in self:IterModules() do
-        self:Call(v, v.messages[message], ...)
+    for _, module in self:IterModules() do
+        self:Call(module, module.messages[message], ...)
     end
 end
 
@@ -224,8 +224,8 @@ function Gladdy:OnInitialize()
 
     self:SetupOptions()
 
-    for k, v in self:IterModules() do
-        self:Call(v, "Initialize") -- B.E > A.E :D
+    for _, module in self:IterModules() do
+        self:Call(module, "Initialize") -- B.E > A.E :D
     end
     self:DeleteUnknownOptions(self.db, self.defaults.profile)
     if Gladdy.db.hideBlizzard == "always" then
@@ -304,8 +304,8 @@ function Gladdy:Test()
                 button[k] = v
             end
 
-            for k, v in self:IterModules() do
-                self:Call(v, "Test", unit)
+            for _, module in self:IterModules() do
+                self:Call(module, "Test", unit)
             end
 
             button:SetAlpha(1)
@@ -369,7 +369,7 @@ end
 
 function Gladdy:Reset()
     if type(self.guids) == "table" then
-        for k, v in pairs(self.guids) do
+        for k,_ in pairs(self.guids) do
             self.guids[k] = nil
         end
     end
@@ -377,8 +377,8 @@ function Gladdy:Reset()
     self.curBracket = nil
     self.curUnit = 1
 
-    for k1, v1 in self:IterModules() do
-        self:Call(v1, "Reset")
+    for _, module in self:IterModules() do
+        self:Call(module, "Reset")
     end
 
     for unit in pairs(self.buttons) do
@@ -398,8 +398,8 @@ function Gladdy:ResetUnit(unit)
     button:SetAlpha(0)
     self:ResetButton(unit)
 
-    for k2, v2 in self:IterModules() do
-        self:Call(v2, "ResetUnit", unit)
+    for _, module in self:IterModules() do
+        self:Call(module, "ResetUnit", unit)
     end
 end
 

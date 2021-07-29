@@ -178,8 +178,8 @@ function Classicon:GetOptions()
             name = L["Show Spec Icon"],
             desc = L["Shows Spec Icon once spec is detected"],
             order = 3,
-            get = function(info) return Gladdy.db.classIconSpecIcon end,
-            set = function(info, value)
+            get = function() return Gladdy.db.classIconSpecIcon end,
+            set = function(_, value)
                 Gladdy.db.classIconSpecIcon = value
                 if Gladdy.curBracket and Gladdy.curBracket > 0 then
                     for i=1,Gladdy.curBracket do

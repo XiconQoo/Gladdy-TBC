@@ -8,7 +8,7 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local function defaultSpells(auraType)
     local spells = {}
-    for k,v in pairs(Gladdy:GetImportantAuras()) do
+    for _,v in pairs(Gladdy:GetImportantAuras()) do
         if not auraType or auraType == v.track then
             spells[tostring(v.spellID)] = {}
             spells[tostring(v.spellID)].enabled = true
@@ -20,7 +20,7 @@ local function defaultSpells(auraType)
 end
 local function defaultInterrupts()
     local spells = {}
-    for k,v in pairs(Gladdy:GetInterrupts()) do
+    for _,v in pairs(Gladdy:GetInterrupts()) do
         spells[tostring(v.spellID)] = {}
         spells[tostring(v.spellID)].enabled = true
         spells[tostring(v.spellID)].priority = v.priority
@@ -327,10 +327,10 @@ function Auras:Test(unit)
 end
 
 function Auras:JOINED_ARENA()
-    for i=1, Gladdy.curBracket do
-        --self.frames["arena" .. i]:RegisterUnitEvent("UNIT_AURA", "arena" .. i)
-        --self.frames["arena" .. i]:SetScript("OnEvent", Auras.OnEvent)
-    end
+    --[[for i=1, Gladdy.curBracket do
+        self.frames["arena" .. i]:RegisterUnitEvent("UNIT_AURA", "arena" .. i)
+        self.frames["arena" .. i]:SetScript("OnEvent", Auras.OnEvent)
+    end--]]
 end
 
 function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, expirationTime, count, debuffType)
@@ -498,7 +498,7 @@ function Auras:GetOptions()
             order = i + 13,
             hasAlpha = true,
             width = "0.8",
-            set = function(info, r, g, b, a)
+            set = function(_, r, g, b, a)
                 Gladdy.db.auraInterruptColors[v.key].r = r
                 Gladdy.db.auraInterruptColors[v.key].g = g
                 Gladdy.db.auraInterruptColors[v.key].b = b
@@ -626,8 +626,8 @@ function Auras:GetAuraOptions(auraType)
             width = "0.7",
             name = L["Check All"],
             type = "execute",
-            func = function(info)
-                for k,v in pairs(defaultSpells(auraType)) do
+            func = function()
+                for k,_ in pairs(defaultSpells(auraType)) do
                     Gladdy.db.auraListDefault[k].enabled = true
                 end
             end,
@@ -637,15 +637,15 @@ function Auras:GetAuraOptions(auraType)
             width = "0.7",
             name = L["Uncheck All"],
             type = "execute",
-            func = function(info)
-                for k,v in pairs(defaultSpells(auraType)) do
+            func = function()
+                for k,_ in pairs(defaultSpells(auraType)) do
                     Gladdy.db.auraListDefault[k].enabled = false
                 end
             end,
         },
     }
     local auras = {}
-    for k,v in pairs(Gladdy:GetImportantAuras()) do
+    for _,v in pairs(Gladdy:GetImportantAuras()) do
         if v.track == auraType then
             tinsert(auras, v.spellID)
         end
@@ -670,10 +670,10 @@ function Auras:GetAuraOptions(auraType)
                     type = "toggle",
                     image = Gladdy:GetImportantAuras()[GetSpellInfo(k)] and Gladdy:GetImportantAuras()[GetSpellInfo(k)].texture or select(3, GetSpellInfo(k)),
                     width = "2",
-                    set = function(info, value)
+                    set = function(_, value)
                         Gladdy.db.auraListDefault[tostring(k)].enabled = value
                     end,
-                    get = function(info)
+                    get = function()
                         return Gladdy.db.auraListDefault[tostring(k)].enabled
                     end
                 },
@@ -685,10 +685,10 @@ function Auras:GetAuraOptions(auraType)
                     max = 50,
                     width = "2",
                     step = 1,
-                    get = function(info)
+                    get = function()
                         return Gladdy.db.auraListDefault[tostring(k)].priority
                     end,
-                    set = function(info, value)
+                    set = function(_, value)
                         Gladdy.db.auraListDefault[tostring(k)].priority = value
                     end,
                     width = "full",
@@ -706,8 +706,8 @@ function Auras:GetInterruptOptions()
             width = "0.7",
             name = L["Check All"],
             type = "execute",
-            func = function(info)
-                for k,v in pairs(defaultInterrupts()) do
+            func = function()
+                for k,_ in pairs(defaultInterrupts()) do
                     Gladdy.db.auraListInterrupts[k].enabled = true
                 end
             end,
@@ -717,15 +717,15 @@ function Auras:GetInterruptOptions()
             width = "0.7",
             name = L["Uncheck All"],
             type = "execute",
-            func = function(info)
-                for k,v in pairs(defaultInterrupts()) do
+            func = function()
+                for k,_ in pairs(defaultInterrupts()) do
                     Gladdy.db.auraListInterrupts[k].enabled = false
                 end
             end,
         },
     }
     local auras = {}
-    for k,v in pairs(Gladdy:GetInterrupts()) do
+    for _,v in pairs(Gladdy:GetInterrupts()) do
         tinsert(auras, v.spellID)
     end
     tbl_sort(auras, function(a, b) return GetSpellInfo(a) < GetSpellInfo(b) end)
@@ -745,10 +745,10 @@ function Auras:GetInterruptOptions()
                     type = "toggle",
                     image = Gladdy:GetInterrupts()[GetSpellInfo(k)] and Gladdy:GetInterrupts()[GetSpellInfo(k)].texture or select(3, GetSpellInfo(k)),
                     width = "2",
-                    set = function(info, value)
+                    set = function(_, value)
                         Gladdy.db.auraListInterrupts[tostring(k)].enabled = value
                     end,
-                    get = function(info)
+                    get = function()
                         return Gladdy.db.auraListInterrupts[tostring(k)].enabled
                     end
                 },
@@ -760,10 +760,10 @@ function Auras:GetInterruptOptions()
                     max = 50,
                     width = "2",
                     step = 1,
-                    get = function(info)
+                    get = function()
                         return Gladdy.db.auraListInterrupts[tostring(k)].priority
                     end,
-                    set = function(info, value)
+                    set = function(_, value)
                         Gladdy.db.auraListInterrupts[tostring(k)].priority = value
                     end,
                     width = "full",

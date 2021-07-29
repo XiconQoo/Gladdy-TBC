@@ -1,4 +1,4 @@
-local ceil, floor, string_format, tonumber = ceil, floor, string.format, tonumber
+local ceil = ceil
 local C_PvP = C_PvP
 
 local CreateFrame = CreateFrame

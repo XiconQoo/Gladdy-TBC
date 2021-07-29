@@ -15,7 +15,7 @@ local function defaultCategories()
         tinsert(indexList, {spellID = k, category = v})
     end
     tbl_sort(indexList, function(a, b) return a.spellID < b.spellID end)
-    for i,v in ipairs(indexList) do
+    for _,v in ipairs(indexList) do
         if not categories[v.category] then
             categories[v.category] = {
                 enabled = true,
@@ -596,11 +596,11 @@ end
 function Diminishings:CategoryOptions()
     local categories = {}
     local indexList = {}
-    for k,v in pairs(DRData:GetCategories()) do
+    for k,_ in pairs(DRData:GetCategories()) do
         tinsert(indexList, k)
     end
     tbl_sort(indexList)
-    for i, k in ipairs(indexList) do
+    for i,k in ipairs(indexList) do
         categories[k] = {
             type = "group",
             name = DRData:GetCategoryName(k),
@@ -611,10 +611,10 @@ function Diminishings:CategoryOptions()
                     type = "toggle",
                     name = L["Enabled"],
                     order = 1,
-                    get = function(info)
+                    get = function()
                         return Gladdy.db.drCategories[k].enabled
                     end,
-                    set = function(info, value)
+                    set = function(_, value)
                         Gladdy.db.drCategories[k].enabled = value
                     end,
                 },
@@ -622,10 +622,10 @@ function Diminishings:CategoryOptions()
                     type = "toggle",
                     name = L["Force Icon"],
                     order = 2,
-                    get = function(info)
+                    get = function()
                         return Gladdy.db.drCategories[k].forceIcon
                     end,
-                    set = function(info, value)
+                    set = function(_, value)
                         Gladdy.db.drCategories[k].forceIcon = value
                     end,
                 },
@@ -635,10 +635,10 @@ function Diminishings:CategoryOptions()
                     desc = L["Icon of the DR"],
                     order = 4,
                     values = Diminishings:GetDRIcons(k),
-                    get = function(info)
+                    get = function()
                         return Gladdy.db.drCategories[k].icon
                     end,
-                    set = function(info, value)
+                    set = function(_, value)
                         Gladdy.db.drCategories[k].icon = value
                         Gladdy.options.args.Diminishings.args.categories.args[k].icon = value
                     end,

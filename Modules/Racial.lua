@@ -1,9 +1,7 @@
-local ceil, floor, string_format, tonumber = ceil, floor, string.format, tonumber
+local ceil = ceil
 
 local CreateFrame = CreateFrame
 local GetTime = GetTime
-
-
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
@@ -123,7 +121,6 @@ function Racial:UpdateFrame(unit)
     racial.texture.overlay:SetVertexColor(Gladdy.db.racialBorderColor.r, Gladdy.db.racialBorderColor.g, Gladdy.db.racialBorderColor.b, Gladdy.db.racialBorderColor.a)
 
     racial:ClearAllPoints()
-    local margin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
     local parent = Gladdy.buttons[unit][Gladdy.db.racialAnchor]
     if (Gladdy.db.racialPos == "RIGHT") then
         racial:SetPoint(ANCHORS[Gladdy.db.racialPos], parent, Gladdy.db.racialPos, Gladdy.db.padding + Gladdy.db.racialXOffset, Gladdy.db.racialYOffset)
