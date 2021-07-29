@@ -3,7 +3,7 @@ local UnitExists, UnitIsUnit, UnitName, UnitIsEnemy = UnitExists, UnitIsUnit, Un
 local C_NamePlate = C_NamePlate
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
-local GetSpellInfo, CreateFrame, GetCVar = GetSpellInfo, CreateFrame, GetCVar
+local GetSpellInfo, CreateFrame = GetSpellInfo, CreateFrame
 
 ---------------------------------------------------
 
@@ -117,8 +117,8 @@ local function GetTotemColorDefaultOptions()
                     desc = "Enable " .. format("|T%s:20|t %s", indexedList[i].texture, select(1, GetSpellInfo(indexedList[i].id))),
                     type = "toggle",
                     width = "full",
-                    get = function(info) return Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].enabled end,
-                    set = function(info, value)
+                    get = function() return Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].enabled end,
+                    set = function(_, value)
                         Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].enabled = value
                         Gladdy:UpdateFrame()
                     end
@@ -130,15 +130,13 @@ local function GetTotemColorDefaultOptions()
                     order = 3,
                     hasAlpha = true,
                     width = "full",
-                    get = function(info)
-                        local key = info.arg or info[#info]
+                    get = function()
                         return Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].color.r,
                         Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].color.g,
                         Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].color.b,
                         Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].color.a
                     end,
-                    set = function(info, r, g, b, a)
-                        local key = info.arg or info[#info]
+                    set = function(_, r, g, b, a)
                         Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].color.r,
                         Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].color.g,
                         Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].color.b,
@@ -154,10 +152,10 @@ local function GetTotemColorDefaultOptions()
                     max = 1,
                     step = 0.1,
                     width = "full",
-                    get = function(info)
+                    get = function()
                         return Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].alpha
                     end,
-                    set = function(info, value)
+                    set = function(_, value)
                         Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].alpha = value
                         Gladdy:UpdateFrame()
                     end
@@ -167,22 +165,13 @@ local function GetTotemColorDefaultOptions()
                     name = L["Custom totem name"],
                     order = 5,
                     width = "full",
-                    get = function(info) return Gladdy.db.npTotemColors["totem" .. indexedList[i].id].customText end,
-                    set = function(info, value) Gladdy.db.npTotemColors["totem" .. indexedList[i].id].customText = value Gladdy:UpdateFrame() end
+                    get = function() return Gladdy.db.npTotemColors["totem" .. indexedList[i].id].customText end,
+                    set = function(_, value) Gladdy.db.npTotemColors["totem" .. indexedList[i].id].customText = value Gladdy:UpdateFrame() end
                 },
             }
         }
     end
     return defaultDB, options, indexedList
-end
-
-local function GetTotemOptions()
-    local indexedList = select(3, GetTotemColorDefaultOptions())
-    local colorList = {}
-    for i=1, #indexedList do
-        tinsert(colorList, Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id])
-    end
-    return colorList
 end
 
 function Gladdy:GetTotemColors()
@@ -394,11 +383,11 @@ function TotemPlates:ToggleAddon(nameplate, show)
     local addonFrames = { self:GetAddonFrame(nameplate) }
     if addonFrames and #addonFrames > 0 then
         if show then
-            for i,v in ipairs(addonFrames) do
+            for _,v in ipairs(addonFrames) do
                 v:Show()
             end
         else
-            for i,v in ipairs(addonFrames) do
+            for _,v in ipairs(addonFrames) do
                 v:Hide()
             end
         end
@@ -665,19 +654,23 @@ function TotemPlates:GetOptions()
                             step = 0.1,
                             width = "full",
                             order = 23,
-                            get = function(info)
-                                local alphas = GetTotemOptions()
-                                for i=2, #alphas do
-                                    if alphas[i].alpha ~= alphas[1].alpha then
-                                        return ""
+                            get = function()
+                                local alpha, i = nil, 1
+                                for _,v in pairs(Gladdy.dbi.profile.npTotemColors) do
+                                    if i == 1 then
+                                        alpha = v.alpha
+                                        i = i + 1
+                                    else
+                                        if v.alpha ~= alpha then
+                                            return ""
+                                        end
                                     end
                                 end
-                                return alphas[1].alpha
+                                return alpha
                             end,
-                            set = function(info, value)
-                                local alphas = GetTotemOptions()
-                                for i=1, #alphas do
-                                    alphas[i].alpha = value
+                            set = function(_, value)
+                                for _,v in pairs(Gladdy.dbi.profile.npTotemColors) do
+                                    v.alpha = value
                                 end
                                 Gladdy:UpdateFrame()
                             end,
@@ -705,23 +698,27 @@ function TotemPlates:GetOptions()
                             name = L["All totem border color"],
                             order = 42,
                             hasAlpha = true,
-                            get = function(info)
-                                local colors = GetTotemOptions()
-                                local color = colors[1].color
-                                for i=2, #colors do
-                                    if colors[i].r ~= color.r or colors[i].color.r ~= color.r or colors[i].color.r ~= color.r or colors[i].color.r ~= color.r then
-                                        return 0, 0, 0, 0
+                            get = function()
+                                local color
+                                local i = 1
+                                for _,v in pairs(Gladdy.dbi.profile.npTotemColors) do
+                                    if i == 1 then
+                                        color = v.color
+                                        i = i + 1
+                                    else
+                                        if v.color.r ~= color.r or v.color.g ~= color.g or v.color.b ~= color.b or v.color.a ~= color.a then
+                                            return 0, 0, 0, 0
+                                        end
                                     end
                                 end
                                 return color.r, color.g, color.b, color.a
                             end,
-                            set = function(info, r, g, b, a)
-                                local colors = GetTotemOptions()
-                                for i=1, #colors do
-                                    colors[i].color.r = r
-                                    colors[i].color.g = g
-                                    colors[i].color.b = b
-                                    colors[i].color.a = a
+                            set = function(_, r, g, b, a)
+                                for _,v in pairs(Gladdy.dbi.profile.npTotemColors) do
+                                    v.color.r = r
+                                    v.color.g = g
+                                    v.color.b = b
+                                    v.color.a = a
                                 end
                                 Gladdy:UpdateFrame()
                             end,
