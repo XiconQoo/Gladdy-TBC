@@ -257,17 +257,17 @@ end
 
 function Diminishings:Test(unit)
     if Gladdy.db.drEnabled then
-        local spells = { 33786, 118, 8643, 8983 }
-        for i = 1, 4 do
-            if i == 1 then
-                self:AuraFade(unit, spells[i])
-            elseif i == 2 then
-                self:AuraFade(unit, spells[i])
-                self:AuraFade(unit, spells[i])
-            else
-                self:AuraFade(unit, spells[i])
-                self:AuraFade(unit, spells[i])
-                self:AuraFade(unit, spells[i])
+        local limit = {}
+        for spellID,category in pairs(DRData:GetSpells()) do
+            if Gladdy.db.drCategories[category].enabled then
+                if not limit[category] then
+                    limit[category] = { count = 1, limit = math.random(1,3) }
+                else
+                    limit[category].count = limit[category].count + 1
+                end
+                if limit[category].count <= limit[category].limit then
+                    self:AuraFade(unit, spellID)
+                end
             end
         end
     end
