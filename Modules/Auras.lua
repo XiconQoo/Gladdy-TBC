@@ -272,56 +272,57 @@ function Auras:Test(unit)
     self:AURA_FADE(unit, AURA_TYPE_DEBUFF)
 
     --Auras
-    local enabledAuras = 0
-    for _,value in pairs(Gladdy.db.auraListDefault) do
+    local enabledDebuffs, enabledBuffs, testauras = {}, {}
+    for spellIdStr,value in pairs(Gladdy.db.auraListDefault) do
         if value.enabled then
-            enabledAuras = enabledAuras + 1
+            if value.track == AURA_TYPE_BUFF then
+                tinsert(enabledBuffs, {value = value, spellIdStr = spellIdStr})
+            else
+                tinsert(enabledDebuffs, {value = value, spellIdStr = spellIdStr})
+            end
         end
     end
-    if enabledAuras > 0 then
-        limit, i = rand(1, enabledAuras), 1
-        for spellIdStr,value in pairs(Gladdy.db.auraListDefault) do
-            if i > limit then break end
-            if value.enabled then
-                spellid = tonumber(spellIdStr)
-                spellName = select(1, GetSpellInfo(tonumber(spellIdStr)))
-                icon = select(3, GetSpellInfo(tonumber(spellIdStr)))
-                if Gladdy.exceptionNames[spellid] then
-                    spellName = Gladdy.exceptionNames[spellid]
-                end
-                self:AURA_GAIN(unit,value.track, spellid, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
-                i = i + 1
+    if unit == "arena2" then
+        testauras = enabledBuffs
+    else
+        testauras = enabledDebuffs
+    end
+
+    if #testauras > 0 then
+        limit = rand(1, #testauras)
+        local v = testauras[rand(1, #testauras)]
+        spellid = tonumber(v.spellIdStr)
+        spellName = select(1, GetSpellInfo(tonumber(v.spellIdStr)))
+        icon = select(3, GetSpellInfo(tonumber(v.spellIdStr)))
+        if Gladdy.exceptionNames[spellid] then
+            spellName = Gladdy.exceptionNames[spellid]
+        end
+        if (unit == "arena2") then
+            if (v.value.track == AURA_TYPE_BUFF) then
+                self:AURA_GAIN(unit,v.value.track, spellid, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
             end
+        else
+            self:AURA_GAIN(unit,v.value.track, spellid, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
         end
     end
 
     --Interrupts
-    local spellSchools = {}
-    for k,_ in pairs(Gladdy:GetSpellSchoolColors()) do
-        tinsert(spellSchools, k)
-    end
-    enabledAuras = 0
-    for _, value in pairs(Gladdy.db.auraListInterrupts) do
-        if value.enabled then
-            enabledAuras = enabledAuras + 1
+    if (unit == "arena1" or unit == "arena3") then
+        local enabledInterrupts = {}
+        local spellSchools = {}
+        for k,_ in pairs(Gladdy:GetSpellSchoolColors()) do
+            tinsert(spellSchools, k)
         end
-    end
-    if enabledAuras > 0 then
-        limit, i = rand(1, enabledAuras), 1
-        local extraSpellSchool
         for spellIdStr, value in pairs(Gladdy.db.auraListInterrupts) do
-            if i > limit then break end
             if value.enabled then
-                enabledAuras = enabledAuras + 1
+                tinsert(enabledInterrupts, spellIdStr)
             end
-            spellid = tonumber(spellIdStr)
-            if (unit == "arena1" or unit == "arena2") then
-                extraSpellSchool = spellSchools[rand(1, #spellSchools)]
-                spellName = select(1, GetSpellInfo(spellid))
-                Gladdy:Print(spellName, extraSpellSchool)
-                self:SPELL_INTERRUPT(unit,spellid, spellName, "physical", spellid, spellName, extraSpellSchool)
-            end
-            i = i + 1
+        end
+        if #enabledInterrupts > 0 then
+            local extraSpellSchool = spellSchools[rand(1, #spellSchools)]
+            spellid = tonumber(enabledInterrupts[rand(1, #enabledInterrupts)])
+            spellName = select(1, GetSpellInfo(spellid))
+            self:SPELL_INTERRUPT(unit,spellid, spellName, "physical", spellid, spellName, extraSpellSchool)
         end
     end
 end

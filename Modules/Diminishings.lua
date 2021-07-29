@@ -257,17 +257,32 @@ end
 
 function Diminishings:Test(unit)
     if Gladdy.db.drEnabled then
-        local limit = {}
-        for spellID,category in pairs(DRData:GetSpells()) do
-            if Gladdy.db.drCategories[category].enabled then
-                if not limit[category] then
-                    limit[category] = { count = 1, limit = rand(1,3) }
-                else
-                    limit[category].count = limit[category].count + 1
-                end
-                if limit[category].count <= limit[category].limit then
-                    self:AuraFade(unit, spellID)
-                end
+        local enabledCategories = {}
+        for cat,val in pairs(Gladdy.db.drCategories) do
+            if (val.enabled) then
+                tinsert(enabledCategories, {cat = cat , spellIDs = {}})
+                enabledCategories[cat] = #enabledCategories
+            end
+        end
+        for spellId,cat in pairs(DRData:GetSpells()) do
+            if enabledCategories[cat] then
+                tinsert(enabledCategories[enabledCategories[cat]].spellIDs, spellId)
+            end
+        end
+
+        --shuffle
+        for i = #enabledCategories, 2, -1 do
+            local j = rand(i)
+            enabledCategories[i], enabledCategories[j] = enabledCategories[j], enabledCategories[i]
+        end
+
+        --execute test
+        local index, amount = 0,0
+        for i=1, (#enabledCategories < 4 and #enabledCategories) or 4 do
+            amount = rand(1,3)
+            index = rand(1, #enabledCategories[i].spellIDs)
+            for _=1, amount do
+                self:AuraFade(unit, enabledCategories[i].spellIDs[index])
             end
         end
     end
@@ -294,6 +309,7 @@ function Diminishings:AuraFade(unit, spellID)
             lastIcon.diminishing = 1.0
         end
     end
+    if not lastIcon then return end
     lastIcon.dr = drCat
     lastIcon.timeLeft = Gladdy.db.drDuration
     lastIcon.diminishing = DRData:NextDR(lastIcon.diminishing)
