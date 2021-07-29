@@ -229,13 +229,7 @@ function Gladdy:OnInitialize()
     end
     self:DeleteUnknownOptions(self.db, self.defaults.profile)
     if Gladdy.db.hideBlizzard == "always" then
-        if IsAddOnLoaded("Blizzard_ArenaUI") then
-            ArenaEnemyFrame1:SetAlpha(0)
-            ArenaEnemyFrame2:SetAlpha(0)
-            ArenaEnemyFrame3:SetAlpha(0)
-            ArenaEnemyFrame4:SetAlpha(0)
-            ArenaEnemyFrame5:SetAlpha(0)
-        end
+        Gladdy:BlizzArenaSetAlpha(0)
     end
 end
 
@@ -391,13 +385,7 @@ function Gladdy:Reset()
         self:ResetUnit(unit)
     end
     if Gladdy.db.hideBlizzard == "never" or Gladdy.db.hideBlizzard == "arena" then
-        if IsAddOnLoaded("Blizzard_ArenaUI") then
-            ArenaEnemyFrame1:SetAlpha(1)
-            ArenaEnemyFrame2:SetAlpha(1)
-            ArenaEnemyFrame3:SetAlpha(1)
-            ArenaEnemyFrame4:SetAlpha(1)
-            ArenaEnemyFrame5:SetAlpha(1)
-        end
+        Gladdy:BlizzArenaSetAlpha(1)
     end
 end
 
@@ -462,12 +450,28 @@ function Gladdy:JoinedArena()
         self.buttons["arena" .. i]:SetAlpha(1)
     end
     if Gladdy.db.hideBlizzard == "arena" or Gladdy.db.hideBlizzard == "always" then
-        if IsAddOnLoaded("Blizzard_ArenaUI") then
-            ArenaEnemyFrame1:SetAlpha(0)
-            ArenaEnemyFrame2:SetAlpha(0)
-            ArenaEnemyFrame3:SetAlpha(0)
-            ArenaEnemyFrame4:SetAlpha(0)
-            ArenaEnemyFrame5:SetAlpha(0)
-        end
+        Gladdy:BlizzArenaSetAlpha(0)
+    end
+end
+
+---------------------------
+
+-- BLIZZARD FRAMES
+
+---------------------------
+
+function Gladdy:BlizzArenaSetAlpha(alpha)
+    if IsAddOnLoaded("Blizzard_ArenaUI") then
+        ArenaEnemyFrames:SetAlpha(alpha)
+        ArenaEnemyFrame1:SetAlpha(alpha)
+        ArenaEnemyFrame1PetFrame:SetAlpha(alpha)
+        ArenaEnemyFrame2:SetAlpha(alpha)
+        ArenaEnemyFrame2PetFrame:SetAlpha(alpha)
+        ArenaEnemyFrame3:SetAlpha(alpha)
+        ArenaEnemyFrame3PetFrame:SetAlpha(alpha)
+        ArenaEnemyFrame4:SetAlpha(alpha)
+        ArenaEnemyFrame4PetFrame:SetAlpha(alpha)
+        ArenaEnemyFrame5:SetAlpha(alpha)
+        ArenaEnemyFrame5PetFrame:SetAlpha(alpha)
     end
 end

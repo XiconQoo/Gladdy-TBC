@@ -275,6 +275,17 @@ function Gladdy:UpdateFrame()
     for _, v in self:IterModules() do
         self:Call(v, "UpdateFrameOnce")
     end
+    if Gladdy.db.hideBlizzard == "always" then
+        Gladdy:BlizzArenaSetAlpha(0)
+    elseif Gladdy.db.hideBlizzard == "arena" then
+        if Gladdy.curBracket then
+            Gladdy:BlizzArenaSetAlpha(0)
+        else
+            Gladdy:BlizzArenaSetAlpha(1)
+        end
+    elseif Gladdy.db.hideBlizzard == "never" then
+        Gladdy:BlizzArenaSetAlpha(1)
+    end
 end
 
 function Gladdy:HideFrame()
