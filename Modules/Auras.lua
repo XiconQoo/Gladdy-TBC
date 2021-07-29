@@ -1,4 +1,4 @@
-local pairs, ipairs, select, tinsert, tbl_sort, tostring = pairs, ipairs, select, tinsert, table.sort, tostring
+local pairs, ipairs, select, tinsert, tbl_sort, tostring, tonumber, rand = pairs, ipairs, select, tinsert, table.sort, tostring, tonumber, math.random
 
 local GetSpellInfo = GetSpellInfo
 local CreateFrame, GetTime = CreateFrame, GetTime
@@ -266,28 +266,63 @@ function Auras:ResetUnit(unit)
 end
 
 function Auras:Test(unit)
-    local spellName, _, icon
+    local spellName, spellid, icon, limit, i
 
-    if (unit == "arena1") then
-        spellName, _, icon = GetSpellInfo(7922)
-        self:AURA_FADE(unit, AURA_TYPE_BUFF)
-        self:AURA_FADE(unit, AURA_TYPE_DEBUFF)
-        self:AURA_GAIN(unit,AURA_TYPE_DEBUFF, 7922, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
-        self:SPELL_INTERRUPT(unit,19244, select(1, GetSpellInfo(19244)), "physical", 25396, select(1, GetSpellInfo(25396)), 64)
-    elseif (unit == "arena2") then
-        spellName = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689))
-        _, _, icon = GetSpellInfo(27010)
-        self:AURA_FADE(unit, AURA_TYPE_BUFF)
-        self:AURA_FADE(unit,AURA_TYPE_DEBUFF)
-        self:AURA_GAIN(unit,AURA_TYPE_DEBUFF, 27010, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
-        self:SPELL_INTERRUPT(unit,19244, select(1, GetSpellInfo(19244)), "physical", 25396, select(1, GetSpellInfo(25396)), 64)
-    elseif (unit == "arena3") then
-        spellName, _, icon = GetSpellInfo(34709)
-        self:AURA_FADE(unit, AURA_TYPE_BUFF)
-        self:AURA_GAIN(unit,AURA_TYPE_BUFF, 34709, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
-        spellName, _, icon = GetSpellInfo(18425)
-        --self:AURA_FADE(unit, AURA_TYPE_DEBUFF)
-        --self:AURA_GAIN(unit,AURA_TYPE_DEBUFF, 18425, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
+    self:AURA_FADE(unit, AURA_TYPE_BUFF)
+    self:AURA_FADE(unit, AURA_TYPE_DEBUFF)
+
+    --Auras
+    local enabledAuras = 0
+    for _,value in pairs(Gladdy.db.auraListDefault) do
+        if value.enabled then
+            enabledAuras = enabledAuras + 1
+        end
+    end
+    if enabledAuras > 0 then
+        limit, i = rand(1, enabledAuras), 1
+        for spellIdStr,value in pairs(Gladdy.db.auraListDefault) do
+            if i > limit then break end
+            if value.enabled then
+                spellid = tonumber(spellIdStr)
+                spellName = select(1, GetSpellInfo(tonumber(spellIdStr)))
+                icon = select(3, GetSpellInfo(tonumber(spellIdStr)))
+                if Gladdy.exceptionNames[spellid] then
+                    spellName = Gladdy.exceptionNames[spellid]
+                end
+                self:AURA_GAIN(unit,value.track, spellid, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
+                i = i + 1
+            end
+        end
+    end
+
+    --Interrupts
+    local spellSchools = {}
+    for k,_ in pairs(Gladdy:GetSpellSchoolColors()) do
+        tinsert(spellSchools, k)
+    end
+    enabledAuras = 0
+    for _, value in pairs(Gladdy.db.auraListInterrupts) do
+        if value.enabled then
+            enabledAuras = enabledAuras + 1
+        end
+    end
+    if enabledAuras > 0 then
+        limit, i = rand(1, enabledAuras), 1
+        local extraSpellSchool
+        for spellIdStr, value in pairs(Gladdy.db.auraListInterrupts) do
+            if i > limit then break end
+            if value.enabled then
+                enabledAuras = enabledAuras + 1
+            end
+            spellid = tonumber(spellIdStr)
+            if (unit == "arena1" or unit == "arena2") then
+                extraSpellSchool = spellSchools[rand(1, #spellSchools)]
+                spellName = select(1, GetSpellInfo(spellid))
+                Gladdy:Print(spellName, extraSpellSchool)
+                self:SPELL_INTERRUPT(unit,spellid, spellName, "physical", spellid, spellName, extraSpellSchool)
+            end
+            i = i + 1
+        end
     end
 end
 

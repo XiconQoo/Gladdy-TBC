@@ -1,5 +1,5 @@
 local select = select
-local pairs,ipairs,tbl_sort,tinsert,format = pairs,ipairs,table.sort,tinsert,format
+local pairs,ipairs,tbl_sort,tinsert,format,rand = pairs,ipairs,table.sort,tinsert,format,math.random
 
 local GetSpellInfo = GetSpellInfo
 local CreateFrame = CreateFrame
@@ -261,7 +261,7 @@ function Diminishings:Test(unit)
         for spellID,category in pairs(DRData:GetSpells()) do
             if Gladdy.db.drCategories[category].enabled then
                 if not limit[category] then
-                    limit[category] = { count = 1, limit = math.random(1,3) }
+                    limit[category] = { count = 1, limit = rand(1,3) }
                 else
                     limit[category].count = limit[category].count + 1
                 end

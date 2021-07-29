@@ -167,7 +167,7 @@ function EventListener:ARENA_OPPONENT_UPDATE(unit, updateReason)
     end
 end
 
-local exceptionNames = { -- TODO MOVE ME TO CLASSBUFFS LIB
+Gladdy.exceptionNames = { -- TODO MOVE ME TO CLASSBUFFS LIB
     [31117] = GetSpellInfo(30405) .. " Silence", -- Unstable Affliction Silence
     [43523] = GetSpellInfo(30405) .. " Silence",
     [24131] = select(1, GetSpellInfo(19386)) .. " Dot", -- Wyvern Sting Dot
@@ -207,8 +207,8 @@ function EventListener:UNIT_AURA(unit)
                     Gladdy:DetectSpec(unit, Gladdy.specBuffs[spellName])
                 end
             end
-            if exceptionNames[spellID] then
-                spellName = exceptionNames[spellID]
+            if Gladdy.exceptionNames[spellID] then
+                spellName = Gladdy.exceptionNames[spellID]
             end
             Gladdy:SendMessage("AURA_GAIN", unit, auraType, spellID, spellName, texture, duration, expirationTime, count, debuffType, i)
             Gladdy:Call("Announcements", "CheckDrink", unit, spellName)
