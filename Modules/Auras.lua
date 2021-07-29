@@ -702,7 +702,7 @@ end
 
 function Auras:GetInterruptOptions()
     local options = {
-        ckeckAll = {
+        checkAll = {
             order = 1,
             width = "0.7",
             name = L["Check All"],

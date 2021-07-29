@@ -610,7 +610,30 @@ function Diminishings:GetOptions()
 end
 
 function Diminishings:CategoryOptions()
-    local categories = {}
+    local categories = {
+        checkAll = {
+            order = 1,
+            width = "0.7",
+            name = L["Check All"],
+            type = "execute",
+            func = function()
+                for k,_ in pairs(defaultCategories()) do
+                    Gladdy.db.drCategories[k].enabled = true
+                end
+            end,
+        },
+        uncheckAll = {
+            order = 2,
+            width = "0.7",
+            name = L["Uncheck All"],
+            type = "execute",
+            func = function()
+                for k,_ in pairs(defaultCategories()) do
+                    Gladdy.db.drCategories[k].enabled = false
+                end
+            end,
+        },
+    }
     local indexList = {}
     for k,_ in pairs(DRData:GetCategories()) do
         tinsert(indexList, k)
