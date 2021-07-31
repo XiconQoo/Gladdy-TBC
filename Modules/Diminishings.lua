@@ -645,7 +645,12 @@ function Diminishings:GetDRIcons(category)
     local icons = {}
     for k,v in pairs(DRData:GetSpells()) do
         if v == category then
-            icons[select(3, GetSpellInfo(k))] = format("|T%s:20|t %s", select(3, GetSpellInfo(k)), select(1, GetSpellInfo(k)))
+            local icon = select(3, GetSpellInfo(k))
+            if icon then
+                icons[icon] = format("|T%s:20|t %s", tostring(icon or "nil"), tostring(select(1, GetSpellInfo(k)) or "nil"))
+            else
+                print("Gladdy Diminishings.lua: nil icon for key: "..tostring(k or "nil").."; value: "..tostring(v or "nil"))
+            end
         end
     end
     return icons
