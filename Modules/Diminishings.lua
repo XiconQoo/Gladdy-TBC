@@ -650,6 +650,7 @@ function Diminishings:GetDRIcons(category)
                 icons[icon] = format("|T%s:20|t %s", tostring(icon or "nil"), tostring(select(1, GetSpellInfo(k)) or "nil"))
             else
                 print("Gladdy Diminishings.lua: nil icon for key: "..tostring(k or "nil").."; value: "..tostring(v or "nil"))
+                print("Gladdy: Do you have a conflicting and incorrect copy of DRData?")
             end
         end
     end
