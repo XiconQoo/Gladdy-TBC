@@ -1,4 +1,4 @@
-local major = "DRData-1.0"
+local major = "DRData-1.0-BCC"
 local minor = tonumber(string.match("$Revision: 793$", "(%d+)") or 1)
 
 assert(LibStub, string.format("%s requires LibStub.", major))
@@ -139,6 +139,9 @@ Data.spells = {
 	
 	-- Revenge Stun
 	[12798] = "rndstun",
+
+	-- Pyroclasm
+	[18093] = "rndstun",
 	
 	--[[ CYCLONE ]]--
 	-- Blind
@@ -166,6 +169,15 @@ Data.spells = {
 	[9852] = "root",
 	[9853] = "root",
 	[26989] = "root",
+
+	-- Nature's Grasp
+	[19975] = "root",
+	[19974] = "root",
+	[19973] = "root",
+	[19972] = "root",
+	[19971] = "root",
+	[19970] = "root",
+	[27010] = "root",
 
 	--[[ RANDOM ROOTS ]]--
 	-- Improved Hamstring
