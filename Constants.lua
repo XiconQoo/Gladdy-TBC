@@ -1,6 +1,7 @@
 local tbl_sort, select = table.sort, select
 
 local GetSpellInfo = GetSpellInfo
+local GetItemInfo = GetItemInfo
 local GetLocale = GetLocale
 
 local Gladdy = LibStub("Gladdy")
@@ -711,6 +712,28 @@ local importantAuras = {
         magic = true,
         spellID = 34709,
     },
+    -- Net-o-Matic
+    [GetSpellInfo(13120)] = {
+        track = AURA_TYPE_DEBUFF,
+        duration = 10,
+        priority = 30,
+        spellID = 13120,
+    },
+    -- Nigh Invulnerability Shield
+    [GetSpellInfo(30458)] = {
+        track = AURA_TYPE_BUFF,
+        duration = 8,
+        priority = 15,
+        spellID = 30458,
+        texture = select(10, GetItemInfo(23825))
+    },
+    -- Nigh Invulnerability Belt Backfire
+    [GetSpellInfo(30457)] = {
+        track = AURA_TYPE_DEBUFF,
+        duration = 8,
+        priority = 15,
+        spellID = 30457,
+    },
 }
 function Gladdy:GetImportantAuras()
     return importantAuras
@@ -1063,9 +1086,9 @@ local arenaTimer = {
         [0] = "Der Arenakampf hat begonnen!",
     },
     ["frFR"] = {
-        [60] = "Le combat d'arène commence dans une minute\194\160!",
-        [30] = "Le combat d'arène commence dans trente secondes\194\160!",
-        [15] = "Le combat d'arène commence dans quinze secondes\194\160!",
+        [61] = "Le combat d'arène commence dans une minute\194\160!",
+        [31] = "Le combat d'arène commence dans trente secondes\194\160!",
+        [16] = "Le combat d'arène commence dans quinze secondes\194\160!",
         [0] = "Le combat d'arène commence\194\160!",
     },
     ["ruRU"] = {
