@@ -20,7 +20,8 @@ Debuff({ 15286 } ,{ buffType = "magic" }, "PRIEST") -- Vampiric Embrace
 Debuff({ 15407, 17311, 17312, 17313, 17314, 18807, 25387 }, { buffType = "magic" }, "PRIEST") -- Mind Flay
 Debuff({ 605, 10911, 10912 }, { buffType = "magic" }, "PRIEST") -- Mind Control
 Debuff({ 8122, 8124, 10888, 10890 }, { buffType = "magic", }, "PRIEST") -- Psychic Scream
-Debuff({ 15269 }, { buffType = "magic"}, "PRIEST")
+Debuff({ 15269 }, { buffType = "magic"}, "PRIEST") -- Blackout
+Debuff({ 44041, 44043, 44044, 44045, 44046, 44047 }, { buffType = "magic"}, "PRIEST") -- Chastise
 
 ---------------
 -- DRUID
