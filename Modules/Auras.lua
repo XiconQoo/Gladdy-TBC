@@ -1,6 +1,7 @@
 local pairs, ipairs, select, tinsert, tbl_sort, tostring, tonumber, rand = pairs, ipairs, select, tinsert, table.sort, tostring, tonumber, math.random
 
 local GetSpellInfo = GetSpellInfo
+local GetSpellDescription = GetSpellDescription
 local CreateFrame, GetTime = CreateFrame, GetTime
 local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
 
@@ -668,6 +669,7 @@ function Auras:GetAuraOptions(auraType)
                 enabled = {
                     order = 1,
                     name = L["Enabled"],
+                    desc = GetSpellDescription(k),
                     type = "toggle",
                     image = Gladdy:GetImportantAuras()[GetSpellInfo(k)] and Gladdy:GetImportantAuras()[GetSpellInfo(k)].texture or select(3, GetSpellInfo(k)),
                     width = "2",
