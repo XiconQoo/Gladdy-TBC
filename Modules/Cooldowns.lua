@@ -338,6 +338,9 @@ function Cooldowns:DetectSpec(unit, spec)
     if (not button or not spec or button.spec) then
         return
     end
+    if button.class == "PALADIN" and (spec ~= L["Holy"] or spec ~= L["Retribution"]) then
+        return
+    end
 
     button.spec = spec
     if not button.test then
