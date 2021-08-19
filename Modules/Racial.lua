@@ -171,7 +171,7 @@ end
 
 function Racial:ENEMY_SPOTTED(unit)
     local racial = self.frames[unit]
-    if (not racial) then
+    if (not racial or not Gladdy.buttons[unit].race) then
         return
     end
     racial.texture:SetTexture(Gladdy:Racials()[Gladdy.buttons[unit].race].texture)

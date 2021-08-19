@@ -48,6 +48,9 @@ end
 
 function Gladdy:SpotEnemy(unit, auraScan)
     local button = self.buttons[unit]
+    if not unit or not button then
+        return
+    end
     button.raceLoc = UnitRace(unit)
     button.race = select(2, UnitRace(unit))
     button.classLoc = select(1, UnitClass(unit))
@@ -55,7 +58,9 @@ function Gladdy:SpotEnemy(unit, auraScan)
     button.name = UnitName(unit)
     button.stealthed = false
     Gladdy.guids[UnitGUID(unit)] = unit
-    Gladdy:SendMessage("ENEMY_SPOTTED", unit)
+    if button.class and button.race then
+        Gladdy:SendMessage("ENEMY_SPOTTED", unit)
+    end
     if auraScan and not button.spec then
         for n = 1, 30 do
             local spellName,_,_,_,_,_,unitCaster = UnitAura(unit, n, "HELPFUL")
@@ -88,7 +93,7 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
             Gladdy:SendMessage("UNIT_DEATH", destUnit)
         end
         -- spec detection
-        if not Gladdy.buttons[destUnit].class then
+        if not Gladdy.buttons[destUnit].class or not Gladdy.buttons[destUnit].race then
             Gladdy:SpotEnemy(destUnit, true)
         end
         --interrupt detection
@@ -119,7 +124,7 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
             end
         end
 
-        if not Gladdy.buttons[srcUnit].class then
+        if not Gladdy.buttons[srcUnit].class or not Gladdy.buttons[srcUnit].race then
             Gladdy:SpotEnemy(srcUnit, true)
         end
         if not Gladdy.buttons[srcUnit].spec then
@@ -138,7 +143,7 @@ function EventListener:ARENA_OPPONENT_UPDATE(unit, updateReason)
             -- ENEMY_SPOTTED
             if button then
                 Gladdy:SendMessage("ENEMY_STEALTH", unit, false)
-                if not button.class then
+                if not button.class or not button.race then
                     Gladdy:SpotEnemy(unit, true)
                 end
             end
@@ -189,7 +194,7 @@ function EventListener:UNIT_AURA(unit)
         return
     end
     for i = 1, 2 do
-        if not Gladdy.buttons[unit].class then
+        if not Gladdy.buttons[unit].class or not Gladdy.buttons[unit].race then
             Gladdy:SpotEnemy(unit, false)
         end
         local filter = (i == 1 and "HELPFUL" or "HARMFUL")
