@@ -211,12 +211,12 @@ function RangeCheck.CheckRange(self)
 
     local spell = Gladdy.db.rangeCheckDefaultSpells[RangeCheck.playerClass].min
 
-    if( not UnitIsConnected(button.unit) or not UnitInPhase(button.unit) ) then
+    if (not UnitIsConnected(button.unit) or not UnitInPhase(button.unit)) then
         RangeCheck:SetRangeAlpha(button, false)
-    elseif( spell ) then
+    elseif (spell) then
         RangeCheck:SetRangeAlpha(button, LSR.IsSpellInRange(spell, button.unit) == 1)
         -- That didn't work, but they are grouped lets try the actual API for this, it's a bit flaky though and not that useful generally
-    elseif( UnitInRaid(button.unit) or UnitInParty(button.unit) ) then
+    elseif (UnitInRaid(button.unit) or UnitInParty(button.unit)) then
         RangeCheck:SetRangeAlpha(button, UnitInRange(button.unit, "player"))
         -- Nope, fall back to interaction :(
     else
