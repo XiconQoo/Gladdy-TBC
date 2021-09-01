@@ -21,6 +21,7 @@ end
 function ShadowsightTimer:Initialize()
     self.locale = Gladdy:GetArenaTimer()
     self:RegisterMessage("JOINED_ARENA")
+    self:RegisterMessage("AURA_GAIN")
     self:CreateTimerFrame()
 end
 
@@ -30,6 +31,12 @@ function ShadowsightTimer:JOINED_ARENA()
     self.timerFrame.font:SetText("1:30")
     self.timerFrame.font:SetTextColor(1, 0.8, 0)
     self.timerFrame:Show()
+end
+
+function ShadowsightTimer:AURA_GAIN(unit, auraType, spellID)
+    if (spellID == 34709) then
+        --TODO reset timer after 15s
+    end
 end
 
 function ShadowsightTimer:CHAT_MSG_BG_SYSTEM_NEUTRAL(msg)
