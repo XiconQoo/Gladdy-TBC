@@ -5,6 +5,7 @@ local select = select
 local pairs = pairs
 local tinsert = table.insert
 local tsort = table.sort
+local GetTime = GetTime
 local CreateFrame = CreateFrame
 local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
 local IsAddOnLoaded = IsAddOnLoaded
@@ -474,4 +475,25 @@ function Gladdy:BlizzArenaSetAlpha(alpha)
         ArenaEnemyFrame5:SetAlpha(alpha)
         ArenaEnemyFrame5PetFrame:SetAlpha(alpha)
     end
+end
+
+---------------------------
+
+-- FONT/STATUSBAR/BORDER
+
+---------------------------
+
+local defaults = {["statusbar"] = "Smooth", ["border"] = "Gladdy Tooltip round", ["font"] = "DorisPP"}
+
+local lastWarning = {}
+function Gladdy:SMFetch(lsmType, key, dbEntry)
+    local smMediaType = self.LSM:Fetch(lsmType, key)
+    if (smMediaType == nil and key ~= "None") then
+        if not lastWarning[dbEntry] or GetTime() - lastWarning[dbEntry] > 120 then
+            lastWarning[dbEntry] = GetTime()
+            Gladdy:Warn("Could not find", "\"" .. lsmType .. "\"", key, "for", "\"" .. dbEntry .. "\"", "- setting it to", "\"" .. defaults[lsmType] .. "\"")
+        end
+        return self.LSM:Fetch(lsmType, defaults[lsmType])
+    end
+    return smMediaType
 end

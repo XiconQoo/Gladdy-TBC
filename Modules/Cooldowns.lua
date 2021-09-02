@@ -120,7 +120,7 @@ function Cooldowns:CreateFrame(unit)
         icon.border:SetVertexColor(Gladdy.db.cooldownBorderColor.r, Gladdy.db.cooldownBorderColor.g, Gladdy.db.cooldownBorderColor.b, Gladdy.db.cooldownBorderColor.a)
 
         icon.cooldownFont = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
-        icon.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), Gladdy.db.cooldownSize / 2  * Gladdy.db.cooldownFontScale, "OUTLINE")
+        icon.cooldownFont:SetFont(Gladdy:SMFetch("font", Gladdy.db.cooldownFont, "cooldownFont"), Gladdy.db.cooldownSize / 2  * Gladdy.db.cooldownFontScale, "OUTLINE")
         icon.cooldownFont:SetTextColor(Gladdy.db.cooldownFontColor.r, Gladdy.db.cooldownFontColor.g, Gladdy.db.cooldownFontColor.b, Gladdy.db.cooldownFontColor.a)
         icon.cooldownFont:SetAllPoints(icon)
 
@@ -172,7 +172,7 @@ function Cooldowns:UpdateFrame(unit)
             local icon = button.spellCooldownFrame["icon" .. j]
             icon:SetHeight(Gladdy.db.cooldownSize)
             icon:SetWidth(Gladdy.db.cooldownSize * Gladdy.db.cooldownWidthFactor)
-            icon.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), Gladdy.db.cooldownSize / 2 * Gladdy.db.cooldownFontScale, "OUTLINE")
+            icon.cooldownFont:SetFont(Gladdy:SMFetch("font", Gladdy.db.cooldownFont, "cooldownFont"), Gladdy.db.cooldownSize / 2 * Gladdy.db.cooldownFontScale, "OUTLINE")
             icon.cooldownFont:SetTextColor(Gladdy.db.cooldownFontColor.r, Gladdy.db.cooldownFontColor.g, Gladdy.db.cooldownFontColor.b, Gladdy.db.cooldownFontColor.a)
             icon:ClearAllPoints()
             if (Gladdy.db.cooldownXPos == "RIGHT") then
@@ -220,7 +220,7 @@ function Cooldowns:UpdateFrame(unit)
             icon.cooldown:SetPoint("CENTER", icon, "CENTER")
             icon.cooldown:SetAlpha(Gladdy.db.cooldownCooldownAlpha)
 
-            icon.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), (icon:GetWidth()/2 - 1) * Gladdy.db.cooldownFontScale, "OUTLINE")
+            icon.cooldownFont:SetFont(Gladdy:SMFetch("font", Gladdy.db.cooldownFont, "cooldownFont"), (icon:GetWidth()/2 - 1) * Gladdy.db.cooldownFontScale, "OUTLINE")
             icon.cooldownFont:SetTextColor(Gladdy.db.cooldownFontColor.r, Gladdy.db.cooldownFontColor.g, Gladdy.db.cooldownFontColor.b, Gladdy.db.cooldownFontColor.a)
 
             icon.border:SetTexture(Gladdy.db.cooldownBorderStyle)
@@ -294,11 +294,11 @@ function Cooldowns:CooldownStart(button, spellId, duration)
                 self.timeLeft = self.timeLeft - elapsed
                 local timeLeft = ceil(self.timeLeft)
                 if timeLeft >= 540 then
-                    self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), Gladdy.db.cooldownSize / 3.1 * Gladdy.db.cooldownFontScale, "OUTLINE")
+                    self.cooldownFont:SetFont(Gladdy:SMFetch("font", Gladdy.db.cooldownFont, "cooldownFont"), Gladdy.db.cooldownSize / 3.1 * Gladdy.db.cooldownFontScale, "OUTLINE")
                 elseif timeLeft < 540 and timeLeft >= 60 then
-                    self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), Gladdy.db.cooldownSize / 2.15 * Gladdy.db.cooldownFontScale, "OUTLINE")
+                    self.cooldownFont:SetFont(Gladdy:SMFetch("font", Gladdy.db.cooldownFont, "cooldownFont"), Gladdy.db.cooldownSize / 2.15 * Gladdy.db.cooldownFontScale, "OUTLINE")
                 elseif timeLeft < 60 and timeLeft > 0 then
-                    self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), Gladdy.db.cooldownSize / 2.15 * Gladdy.db.cooldownFontScale, "OUTLINE")
+                    self.cooldownFont:SetFont(Gladdy:SMFetch("font", Gladdy.db.cooldownFont, "cooldownFont"), Gladdy.db.cooldownSize / 2.15 * Gladdy.db.cooldownFontScale, "OUTLINE")
                 end
                 Gladdy:FormatTimer(self.cooldownFont, self.timeLeft, self.timeLeft < 0)
                 if (self.timeLeft <= 0) then

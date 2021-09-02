@@ -264,9 +264,9 @@ local function styleIcon(aura, auraType)
 
     aura.border:SetTexture(Gladdy.db.buffsBorderStyle)
     aura.border:SetVertexColor(spellSchoolToOptionValue(aura.spellSchool))
-    aura.cooldown:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.buffsFont), (Gladdy.db.buffsIconSize/2 - 1) * Gladdy.db.buffsFontScale, "OUTLINE")
+    aura.cooldown:SetFont(Gladdy:SMFetch("font", Gladdy.db.buffsFont, "buffsFont"), (Gladdy.db.buffsIconSize/2 - 1) * Gladdy.db.buffsFontScale, "OUTLINE")
     aura.cooldown:SetTextColor(Gladdy.db.buffsFontColor.r, Gladdy.db.buffsFontColor.g, Gladdy.db.buffsFontColor.b, Gladdy.db.buffsFontColor.a)
-    aura.stacks:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.buffsFont), (Gladdy.db.buffsIconSize/3 - 1) * Gladdy.db.buffsFontScale, "OUTLINE")
+    aura.stacks:SetFont(Gladdy:SMFetch("font", Gladdy.db.buffsFont, "buffsFont"), (Gladdy.db.buffsIconSize/3 - 1) * Gladdy.db.buffsFontScale, "OUTLINE")
     aura.stacks:SetTextColor(Gladdy.db.buffsFontColor.r, Gladdy.db.buffsFontColor.g, Gladdy.db.buffsFontColor.b, Gladdy.db.buffsFontColor.a)
 end
 
