@@ -213,12 +213,31 @@ function Gladdy:SetupOptions()
         get = getOpt,
         set = setOpt,
         args = {
+            test = {
+                order = 1,
+                width = "0.7",
+                name = L["Test"],
+                type = "execute",
+                func = function()
+                    Gladdy:ToggleFrame(3)
+                end,
+            },
+            hide = {
+                order = 2,
+                width = "0.7",
+                name = L["Hide"],
+                type = "execute",
+                func = function()
+                    Gladdy:Reset()
+                    Gladdy:HideFrame()
+                end,
+            },
             general = {
                 type = "group",
                 name = L["General"],
                 desc = L["General settings"],
                 childGroups = "tab",
-                order = 1,
+                order = 3,
                 args = {
                     locked = {
                         type = "toggle",
@@ -699,7 +718,7 @@ function Gladdy:SetupOptions()
         },
     }
 
-    local order = 2
+    local order = 4
     for k, v in pairsByKeys(self.modules) do
         self:SetupModule(k, v, order)
         order = order + 1
