@@ -30,13 +30,13 @@ function ACDFrame:Initialize()
     local ACDNumTens = ACDNumFrame:CreateTexture("ACDNumTens", "HIGH")
     ACDNumTens:SetWidth(256)
     ACDNumTens:SetHeight(256)
-    ACDNumTens:SetPoint("CENTER", ACDNumFrame, "CENTER", -48, 0)
+    ACDNumTens:SetPoint("CENTER", ACDNumFrame, "CENTER", -50, 0)
     self.ACDNumTens = ACDNumTens
 
     local ACDNumOnes = ACDNumFrame:CreateTexture("ACDNumOnes", "HIGH")
     ACDNumOnes:SetWidth(256)
     ACDNumOnes:SetHeight(256)
-    ACDNumOnes:SetPoint("CENTER", ACDNumFrame, "CENTER", 48, 0)
+    ACDNumOnes:SetPoint("CENTER", ACDNumFrame, "CENTER", 50, 0)
     self.ACDNumOnes = ACDNumOnes
 
     local ACDNumOne = ACDNumFrame:CreateTexture("ACDNumOne", "HIGH")
