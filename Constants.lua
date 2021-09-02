@@ -734,6 +734,14 @@ local importantAuras = {
         priority = 15,
         spellID = 30457,
     },
+    -- Flee (Skull of impending Doom) -- 5024
+    [GetSpellInfo(5024)] = {
+        track = AURA_TYPE_BUFF,
+        duration = 8,
+        priority = 15,
+        spellID = 5024,
+        altName = select(1, GetSpellInfo(5024)) .. " - " .. select(1, GetItemInfo(4984)),
+    },
 }
 function Gladdy:GetImportantAuras()
     return importantAuras
