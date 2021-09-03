@@ -1,6 +1,7 @@
 local type, pairs, tinsert, tsort = type, pairs, table.insert, table.sort
 local tostring, str_match, tonumber, string_format = tostring, string.match, tonumber, string.format
 local ceil, floor = ceil, floor
+local ReloadUI = ReloadUI
 
 local InterfaceOptionsFrame_OpenToFrame = InterfaceOptionsFrame_OpenToFrame
 local GetSpellInfo = GetSpellInfo
@@ -232,12 +233,21 @@ function Gladdy:SetupOptions()
                     Gladdy:HideFrame()
                 end,
             },
+            reload = {
+                order = 3,
+                width = "0.7",
+                name = L["ReloadUI"],
+                type = "execute",
+                func = function()
+                    ReloadUI()
+                end,
+            },
             general = {
                 type = "group",
                 name = L["General"],
                 desc = L["General settings"],
                 childGroups = "tab",
-                order = 3,
+                order = 4,
                 args = {
                     locked = {
                         type = "toggle",
@@ -718,7 +728,7 @@ function Gladdy:SetupOptions()
         },
     }
 
-    local order = 4
+    local order = 5
     for k, v in pairsByKeys(self.modules) do
         self:SetupModule(k, v, order)
         order = order + 1
