@@ -264,9 +264,9 @@ local function styleIcon(aura, auraType)
 
     aura.border:SetTexture(Gladdy.db.buffsBorderStyle)
     aura.border:SetVertexColor(spellSchoolToOptionValue(aura.spellSchool))
-    aura.cooldown:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.buffsFont), (Gladdy.db.buffsIconSize/2 - 1) * Gladdy.db.buffsFontScale, "OUTLINE")
+    aura.cooldown:SetFont(Gladdy:SMFetch("font", "buffsFont"), (Gladdy.db.buffsIconSize/2 - 1) * Gladdy.db.buffsFontScale, "OUTLINE")
     aura.cooldown:SetTextColor(Gladdy.db.buffsFontColor.r, Gladdy.db.buffsFontColor.g, Gladdy.db.buffsFontColor.b, Gladdy.db.buffsFontColor.a)
-    aura.stacks:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.buffsFont), (Gladdy.db.buffsIconSize/3 - 1) * Gladdy.db.buffsFontScale, "OUTLINE")
+    aura.stacks:SetFont(Gladdy:SMFetch("font", "buffsFont"), (Gladdy.db.buffsIconSize/3 - 1) * Gladdy.db.buffsFontScale, "OUTLINE")
     aura.stacks:SetTextColor(Gladdy.db.buffsFontColor.r, Gladdy.db.buffsFontColor.g, Gladdy.db.buffsFontColor.b, Gladdy.db.buffsFontColor.a)
 end
 
@@ -903,7 +903,7 @@ function BuffsDebuffs:GetOptions()
                 },
                 font = {
                     type = "group",
-                    name = "Font",
+                    name = L["Font"],
                     order = 4,
                     args = {
                         header = {
@@ -946,7 +946,7 @@ function BuffsDebuffs:GetOptions()
                 },
                 border = {
                     type = "group",
-                    name = "Border",
+                    name = L["Border"],
                     order = 5,
                     args = {
                         header = {
@@ -1033,7 +1033,7 @@ function BuffsDebuffs:GetOptions()
             },
         },
         debuffList = {
-            name = "Debuff Lists",
+            name = L["Debuff Lists"],
             type = "group",
             order = 11,
             childGroups = "tree",
@@ -1048,7 +1048,7 @@ function BuffsDebuffs:GetOptions()
             end,
         },
         buffList = {
-            name = "Buff Lists",
+            name = L["Buff Lists"],
             type = "group",
             order = 12,
             childGroups = "tree",

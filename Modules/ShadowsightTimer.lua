@@ -1,4 +1,4 @@
-local floor, str_len, tostring, str_sub, str_find, pairs = math.floor, string.len, tostring, string.sub, string.find, pairs
+local floor, str_find, pairs = math.floor, string.find, pairs
 local CreateFrame = CreateFrame
 
 local Gladdy = LibStub("Gladdy")
@@ -21,6 +21,7 @@ end
 function ShadowsightTimer:Initialize()
     self.locale = Gladdy:GetArenaTimer()
     self:RegisterMessage("JOINED_ARENA")
+    self:RegisterMessage("AURA_GAIN")
     self:CreateTimerFrame()
 end
 
@@ -30,6 +31,12 @@ function ShadowsightTimer:JOINED_ARENA()
     self.timerFrame.font:SetText("1:30")
     self.timerFrame.font:SetTextColor(1, 0.8, 0)
     self.timerFrame:Show()
+end
+
+function ShadowsightTimer:AURA_GAIN(unit, auraType, spellID)
+    if (spellID == 34709) then
+        --TODO reset timer after 15s
+    end
 end
 
 function ShadowsightTimer:CHAT_MSG_BG_SYSTEM_NEUTRAL(msg)
@@ -101,7 +108,9 @@ function ShadowsightTimer:UpdateFrameOnce()
         self.timerFrame:SetScale(Gladdy.db.shadowsightTimerScale)
         self.timerFrame:ClearAllPoints()
         self.timerFrame:SetPoint(Gladdy.db.shadowsightTimerRelPoint1, nil, Gladdy.db.shadowsightTimerRelPoint2, Gladdy.db.shadowsightTimerX, Gladdy.db.shadowsightTimerY)
-        self.timerFrame:Show()
+        if Gladdy.frame.testing or Gladdy.curBracket then
+            self.timerFrame:Show()
+        end
     else
         self.timerFrame:SetScale(Gladdy.db.shadowsightTimerScale)
         self.timerFrame:ClearAllPoints()

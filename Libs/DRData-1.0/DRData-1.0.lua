@@ -1,4 +1,4 @@
-local major = "DRData-1.0"
+local major = "DRData-1.0-BCC"
 local minor = tonumber(string.match("$Revision: 793$", "(%d+)") or 1)
 
 assert(LibStub, string.format("%s requires LibStub.", major))
@@ -139,6 +139,9 @@ Data.spells = {
 	
 	-- Revenge Stun
 	[12798] = "rndstun",
+
+	-- Pyroclasm
+	[18093] = "rndstun",
 	
 	--[[ CYCLONE ]]--
 	-- Blind
@@ -167,6 +170,15 @@ Data.spells = {
 	[9853] = "root",
 	[26989] = "root",
 
+	-- Nature's Grasp
+	[19975] = "root",
+	[19974] = "root",
+	[19973] = "root",
+	[19972] = "root",
+	[19971] = "root",
+	[19970] = "root",
+	[27010] = "root",
+
 	--[[ RANDOM ROOTS ]]--
 	-- Improved Hamstring
 	[23694] = "rndroot",
@@ -181,10 +193,10 @@ Data.spells = {
 	[18658] = "sleep",
 	
 	-- Wyvern Sting
-	[19386] = "sleep",
-	[24132] = "sleep",
-	[24133] = "sleep",
-	[27068] = "sleep",
+	[19386] = "disorient",
+	[24132] = "disorient",
+	[24133] = "disorient",
+	[27068] = "disorient",
 	
 	--[[ MISC ]]--
 	-- Chastise (Maybe this shares DR with Imp HS?)
@@ -201,15 +213,15 @@ Data.spells = {
 	[33042] = "dragonsbreath", -- Dragon's Breath
 	[33043] = "dragonsbreath", -- Dragon's Breath
 	-- Repentance
-	[20066] = "repentance",
+	[20066] = "disorient",
 
 	-- Scatter Shot
 	[19503] = "scatters",
 	
 	-- Freezing Trap
-	[3355] = "freezetrap",
-	[14308] = "freezetrap",
-	[14309] = "freezetrap",
+	[3355] = "disorient",
+	[14308] = "disorient",
+	[14309] = "disorient",
 	
 	-- Improved Conc Shot
 	[19410] = "impconc",

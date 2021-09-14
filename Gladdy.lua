@@ -5,6 +5,7 @@ local select = select
 local pairs = pairs
 local tinsert = table.insert
 local tsort = table.sort
+local GetTime = GetTime
 local CreateFrame = CreateFrame
 local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
 local IsAddOnLoaded = IsAddOnLoaded
@@ -25,9 +26,9 @@ local MAJOR, MINOR = "Gladdy", 4
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
 Gladdy.version_major_num = 1
-Gladdy.version_minor_num = 0.19
+Gladdy.version_minor_num = 0.20
 Gladdy.version_num = Gladdy.version_major_num + Gladdy.version_minor_num
-Gladdy.version_releaseType = RELEASE_TYPES.beta
+Gladdy.version_releaseType = RELEASE_TYPES.release
 Gladdy.version = PREFIX .. Gladdy.version_num .. "-" .. Gladdy.version_releaseType
 Gladdy.VERSION_REGEX = VERSION_REGEX
 
@@ -131,8 +132,8 @@ function Gladdy:Call(module, func, ...)
     end
 end
 function Gladdy:SendMessage(message, ...)
-    for k, v in self:IterModules() do
-        self:Call(v, v.messages[message], ...)
+    for _, module in self:IterModules() do
+        self:Call(module, module.messages[message], ...)
     end
 end
 
@@ -224,18 +225,12 @@ function Gladdy:OnInitialize()
 
     self:SetupOptions()
 
-    for k, v in self:IterModules() do
-        self:Call(v, "Initialize") -- B.E > A.E :D
+    for _, module in self:IterModules() do
+        self:Call(module, "Initialize") -- B.E > A.E :D
     end
     self:DeleteUnknownOptions(self.db, self.defaults.profile)
     if Gladdy.db.hideBlizzard == "always" then
-        if IsAddOnLoaded("Blizzard_ArenaUI") then
-            ArenaEnemyFrame1:SetAlpha(0)
-            ArenaEnemyFrame2:SetAlpha(0)
-            ArenaEnemyFrame3:SetAlpha(0)
-            ArenaEnemyFrame4:SetAlpha(0)
-            ArenaEnemyFrame5:SetAlpha(0)
-        end
+        Gladdy:BlizzArenaSetAlpha(0)
     end
 end
 
@@ -310,8 +305,8 @@ function Gladdy:Test()
                 button[k] = v
             end
 
-            for k, v in self:IterModules() do
-                self:Call(v, "Test", unit)
+            for _, module in self:IterModules() do
+                self:Call(module, "Test", unit)
             end
 
             button:SetAlpha(1)
@@ -375,7 +370,7 @@ end
 
 function Gladdy:Reset()
     if type(self.guids) == "table" then
-        for k, v in pairs(self.guids) do
+        for k,_ in pairs(self.guids) do
             self.guids[k] = nil
         end
     end
@@ -383,21 +378,15 @@ function Gladdy:Reset()
     self.curBracket = nil
     self.curUnit = 1
 
-    for k1, v1 in self:IterModules() do
-        self:Call(v1, "Reset")
+    for _, module in self:IterModules() do
+        self:Call(module, "Reset")
     end
 
     for unit in pairs(self.buttons) do
         self:ResetUnit(unit)
     end
     if Gladdy.db.hideBlizzard == "never" or Gladdy.db.hideBlizzard == "arena" then
-        if IsAddOnLoaded("Blizzard_ArenaUI") then
-            ArenaEnemyFrame1:SetAlpha(1)
-            ArenaEnemyFrame2:SetAlpha(1)
-            ArenaEnemyFrame3:SetAlpha(1)
-            ArenaEnemyFrame4:SetAlpha(1)
-            ArenaEnemyFrame5:SetAlpha(1)
-        end
+        Gladdy:BlizzArenaSetAlpha(1)
     end
 end
 
@@ -410,8 +399,8 @@ function Gladdy:ResetUnit(unit)
     button:SetAlpha(0)
     self:ResetButton(unit)
 
-    for k2, v2 in self:IterModules() do
-        self:Call(v2, "ResetUnit", unit)
+    for _, module in self:IterModules() do
+        self:Call(module, "ResetUnit", unit)
     end
 end
 
@@ -462,12 +451,49 @@ function Gladdy:JoinedArena()
         self.buttons["arena" .. i]:SetAlpha(1)
     end
     if Gladdy.db.hideBlizzard == "arena" or Gladdy.db.hideBlizzard == "always" then
-        if IsAddOnLoaded("Blizzard_ArenaUI") then
-            ArenaEnemyFrame1:SetAlpha(0)
-            ArenaEnemyFrame2:SetAlpha(0)
-            ArenaEnemyFrame3:SetAlpha(0)
-            ArenaEnemyFrame4:SetAlpha(0)
-            ArenaEnemyFrame5:SetAlpha(0)
-        end
+        Gladdy:BlizzArenaSetAlpha(0)
     end
+end
+
+---------------------------
+
+-- BLIZZARD FRAMES
+
+---------------------------
+
+function Gladdy:BlizzArenaSetAlpha(alpha)
+    if IsAddOnLoaded("Blizzard_ArenaUI") then
+        ArenaEnemyFrames:SetAlpha(alpha)
+        ArenaEnemyFrame1:SetAlpha(alpha)
+        ArenaEnemyFrame1PetFrame:SetAlpha(alpha)
+        ArenaEnemyFrame2:SetAlpha(alpha)
+        ArenaEnemyFrame2PetFrame:SetAlpha(alpha)
+        ArenaEnemyFrame3:SetAlpha(alpha)
+        ArenaEnemyFrame3PetFrame:SetAlpha(alpha)
+        ArenaEnemyFrame4:SetAlpha(alpha)
+        ArenaEnemyFrame4PetFrame:SetAlpha(alpha)
+        ArenaEnemyFrame5:SetAlpha(alpha)
+        ArenaEnemyFrame5PetFrame:SetAlpha(alpha)
+    end
+end
+
+---------------------------
+
+-- FONT/STATUSBAR/BORDER
+
+---------------------------
+
+local defaults = {["statusbar"] = "Smooth", ["border"] = "Gladdy Tooltip round", ["font"] = "DorisPP"}
+
+local lastWarning = {}
+function Gladdy:SMFetch(lsmType, key)
+    local smMediaType = self.LSM:Fetch(lsmType, Gladdy.db[key])
+    if (smMediaType == nil and Gladdy.db[key] ~= "None") then
+        if not lastWarning[key] or GetTime() - lastWarning[key] > 120 then
+            lastWarning[key] = GetTime()
+            Gladdy:Warn("Could not find", "\"" .. lsmType .. "\" \"", Gladdy.db[key], " \" for", "\"" .. key .. "\"", "- setting it to", "\"" .. defaults[lsmType] .. "\"")
+        end
+        return self.LSM:Fetch(lsmType, defaults[lsmType])
+    end
+    return smMediaType
 end

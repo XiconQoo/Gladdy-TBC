@@ -210,9 +210,14 @@ function Announcements:GetOptions()
         ["self"] = L["Self"],
         ["party"] = L["Party"],
         ["rw"] = L["Raid Warning"],
-        ["fct"] = L["Blizzard's Floating Combat Text"],
-        ["msbt"] = L["MikScrollingBattleText"],
     }
+
+    if IsAddOnLoaded("Blizzard_CombatText") then
+        destValues["fct"] = L["Blizzard's Floating Combat Text"]
+    end
+    if IsAddOnLoaded("MikScrollingBattleText") then
+        destValues["msbt"] = L["MikScrollingBattleText"]
+    end
 
     return {
         headerAnnouncements = {

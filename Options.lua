@@ -1,6 +1,7 @@
 local type, pairs, tinsert, tsort = type, pairs, table.insert, table.sort
 local tostring, str_match, tonumber, string_format = tostring, string.match, tonumber, string.format
 local ceil, floor = ceil, floor
+local ReloadUI = ReloadUI
 
 local InterfaceOptionsFrame_OpenToFrame = InterfaceOptionsFrame_OpenToFrame
 local GetSpellInfo = GetSpellInfo
@@ -207,18 +208,52 @@ end
 function Gladdy:SetupOptions()
     self.options = {
         type = "group",
-        name = "Gladdy",
+        name = L["Gladdy"],
         plugins = {},
         childGroups = "tree",
         get = getOpt,
         set = setOpt,
         args = {
+            test = {
+                order = 1,
+                width = 0.7,
+                name = L["Test"],
+                type = "execute",
+                func = function()
+                    Gladdy:ToggleFrame(3)
+                end,
+            },
+            hide = {
+                order = 2,
+                width = 0.7,
+                name = L["Hide"],
+                type = "execute",
+                func = function()
+                    Gladdy:Reset()
+                    Gladdy:HideFrame()
+                end,
+            },
+            reload = {
+                order = 3,
+                width = 0.7,
+                name = L["ReloadUI"],
+                type = "execute",
+                func = function()
+                    ReloadUI()
+                end,
+            },
+            version = {
+                order = 4,
+                width = 1,
+                type = "description",
+                name = "     Gladdy v" .. Gladdy.version_num .. "-" .. Gladdy.version_releaseType
+            },
             general = {
                 type = "group",
                 name = L["General"],
                 desc = L["General settings"],
                 childGroups = "tab",
-                order = 1,
+                order = 5,
                 args = {
                     locked = {
                         type = "toggle",
@@ -270,7 +305,7 @@ function Gladdy:SetupOptions()
                                         order = 4,
                                         min = .1,
                                         max = 2,
-                                        step = .1,
+                                        step = .01,
                                     },
                                     padding = {
                                         type = "range",
@@ -699,19 +734,19 @@ function Gladdy:SetupOptions()
         },
     }
 
-    local order = 2
+    local order = 6
     for k, v in pairsByKeys(self.modules) do
         self:SetupModule(k, v, order)
         order = order + 1
     end
 
     local options = {
-        name = "Gladdy",
+        name = L["Gladdy"],
         type = "group",
         args = {
             load = {
-                name = "Load configuration",
-                desc = "Load configuration options",
+                name = L["Load configuration"],
+                desc = L["Load configuration options"],
                 type = "execute",
                 func = function()
                     HideUIPanel(InterfaceOptionsFrame)
@@ -738,7 +773,7 @@ function Gladdy:GetAuras(auraType)
         ckeckAll = {
             order = 1,
             width = "0.7",
-            name = "Check All",
+            name = L["Check All"],
             type = "execute",
             func = function(info)
                 if auraType == AURA_TYPE_DEBUFF then
@@ -755,7 +790,7 @@ function Gladdy:GetAuras(auraType)
         uncheckAll = {
             order = 2,
             width = "0.7",
-            name = "Uncheck All",
+            name = L["Uncheck All"],
             type = "execute",
             func = function(info)
                 if auraType == AURA_TYPE_DEBUFF then

@@ -12,8 +12,8 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 
 local attributes = {
-    { name = "Target", button = "1", modifier = "", action = "target", spell = "" },
-    { name = "Focus", button = "2", modifier = "", action = "focus", spell = "" },
+    { name = L["Target"], button = "1", modifier = "", action = "target", spell = "" },
+    { name = L["Focus"], button = "2", modifier = "", action = "focus", spell = "" },
 }
 for i = 3, 10 do
     tinsert(attributes, { name = L["Action #%d"]:format(i), button = "", modifier = "", action = "disabled", spell = "" })
@@ -70,7 +70,7 @@ function Clicks:UpdateFrame(unit)
 end
 
 function Clicks:UpdateFrameOnce()
-    for k, v in pairs(Gladdy.buttons) do
+    for _, v in pairs(Gladdy.buttons) do
         local left = GetBindingKey(("GLADDYBUTTON%d_LEFT"):format(v.id))
         local right = GetBindingKey(("GLADDYBUTTON%d_RIGHT"):format(v.id))
         local middle = GetBindingKey(("GLADDYBUTTON%d_MIDDLE"):format(v.id))
@@ -107,7 +107,7 @@ function Clicks:SetupAttributes(unit)
         return
     end
 
-    for k, v in pairs(Gladdy.db.attributes) do
+    for _, v in pairs(Gladdy.db.attributes) do
         self:SetupAttribute(button, v.button, v.modifier, v.action, v.spell)
     end
 end

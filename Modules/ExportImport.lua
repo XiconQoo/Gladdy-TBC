@@ -1,4 +1,4 @@
-local type, pairs = type, pairs
+local type, pairs, str_match = type, pairs, string.match
 
 local Gladdy = LibStub("Gladdy")
 local AceSerializer = LibStub("AceSerializer-3.0")
@@ -6,12 +6,23 @@ local L = Gladdy.L
 local AceGUI = LibStub("AceGUI-3.0")
 local LibDeflate = LibStub:GetLibrary("LibDeflate")
 
-local function table_copy(t)
+
+local function table_copy(t, str)
     local t2 = {};
+    if str == nil then
+        str = "Gladdy.db"
+    end
     for k,v in pairs(t) do
         if type(v) == "table" then
-            t2[k] = table_copy(v);
+            if k == "drCategories" then
+                for key,val in pairs(v) do
+                    --Gladdy:Print("TableCopy", str .. "." .. key)
+                end
+            end
+
+            t2[k] = table_copy(v, str .. "." .. k);
         else
+
             t2[k] = v;
         end
     end
@@ -84,8 +95,26 @@ import:AddChild(importClearButton)
 import.clearButton = importClearButton
 
 local deletedOptions = { --TODO backward compatibility Imports on deleted options
-    growUp = true
+    growUp = true,
+    freezetrap = true,
+    repentance = true
 }
+
+local function checkIsDeletedOption(k, str, msg, errorFound, errorMsg)
+    local isDeleted
+    for key, _ in pairs(deletedOptions) do
+        if str_match(k, key) then
+            isDeleted = true
+            Gladdy:Warn("found deleted option =", str .. "." .. k)
+        end
+    end
+    if errorFound then
+        return errorFound, errorMsg
+    end
+    if not isDeleted then
+        return true, msg or str .. "." .. k .. " does not exist"
+    end
+end
 
 function ExportImport:CheckDeserializedOptions(tbl, refTbl, str)
     if str == nil and not tbl.version_major_num then
@@ -98,16 +127,28 @@ function ExportImport:CheckDeserializedOptions(tbl, refTbl, str)
         str = "Gladdy.db"
         tbl.version_major_num = nil
     end
-    for k,v in pairs(tbl) do
-        if refTbl[k] == nil then
-            --return false, str .. "." .. k .. " does not exist"
-        else
-            if type(v) ~= type(refTbl[k]) then
-                return false, str .. "." .. k .. " type error. Expected " .. type(refTbl[k]) .. " found " .. type(v)
+    local res, msg
+    local errorFound, errorMsg
+    if refTbl == nil then
+        return false, str .. "does not exist"
+    else
+        for k,v in pairs(tbl) do
+            if refTbl[k] == nil then
+                errorFound, errorMsg = checkIsDeletedOption(k, str, nil, errorFound, errorMsg)
+            elseif type(v) ~= type(refTbl[k]) then
+                errorFound = true
+                errorMsg = str .. "." .. k .. " type error. Expected " .. type(refTbl[k]) .. " found " .. type(v)
             elseif type(v) == "table" then
-                ExportImport:CheckDeserializedOptions(v, refTbl[k], str .. "." .. k)
+                res, msg = ExportImport:CheckDeserializedOptions(v, refTbl[k], str .. "." .. k)
+                if not res then
+                    errorFound, errorMsg = checkIsDeletedOption(msg, str, msg, errorFound, errorMsg)
+                end
             end
         end
+    end
+
+    if errorFound then
+        return false, errorMsg
     end
     return true
 end
@@ -135,8 +176,8 @@ function ExportImport:GetOptions()
                 export.eb:HighlightText(0, export.eb.editBox:GetNumLetters())
                 export:SetStatusText("Copy this string to share your configuration with others.")
             end,
-            name = "Export",
-            desc = "Export your current profile to share with others or your various accounts.",
+            name = L["Export"],
+            desc = L["Export your current profile to share with others or your various accounts."],
             order = 3,
         },
         import = {
@@ -159,17 +200,25 @@ function ExportImport:GetOptions()
                     import.deserializedTable = deserialized
                 end)
             end,
-            name = "Import",
-            desc = "This will overwrite your current profile!",
+            name = L["Import"],
+            desc = L["This will overwrite your current profile!"],
             order = 4,
         },
     }
 end
 
-function ExportImport:ApplyImport(t, table)
+function ExportImport:ApplyImport(t, table, str)
+    if str == nil then
+        str = "Gladdy.db"
+    end
     for k,v in pairs(t) do
         if type(v) == "table" then
-            ExportImport:ApplyImport(v, table[k])
+            if (table[k] ~= nil) then
+                ExportImport:ApplyImport(v, table[k], str .. "." .. k)
+            else
+                Gladdy:Warn("ApplyImport failed for", str .. "." .. k)
+            end
+
         else
             table[k] = v
         end

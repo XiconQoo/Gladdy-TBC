@@ -1,14 +1,12 @@
 local select = select
-local pairs,ipairs,tbl_sort,tinsert,format = pairs,ipairs,table.sort,tinsert,format
-
-local drDuration = 18
+local pairs,ipairs,tbl_sort,tinsert,format,rand = pairs,ipairs,table.sort,tinsert,format,math.random
 
 local GetSpellInfo = GetSpellInfo
 local CreateFrame = CreateFrame
 local GetTime = GetTime
 
 local Gladdy = LibStub("Gladdy")
-local DRData = LibStub("DRData-1.0")
+local DRData = LibStub("DRData-1.0-BCC")
 local L = Gladdy.L
 local function defaultCategories()
     local categories = {}
@@ -17,7 +15,7 @@ local function defaultCategories()
         tinsert(indexList, {spellID = k, category = v})
     end
     tbl_sort(indexList, function(a, b) return a.spellID < b.spellID end)
-    for i,v in ipairs(indexList) do
+    for _,v in ipairs(indexList) do
         if not categories[v.category] then
             categories[v.category] = {
                 enabled = true,
@@ -47,7 +45,8 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drQuarterColor = {r = 1, g = 0.7, b = 0, a = 1 },
     drNullColor = {r = 1, g = 0, b = 0, a = 1 },
     drWidthFactor = 1,
-    drCategories = defaultCategories()
+    drCategories = defaultCategories(),
+    drDuration = 18
 })
 
 local function getDiminishColor(dr)
@@ -117,7 +116,7 @@ function Diminishings:CreateFrame(unit)
 
         icon.text = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
         icon.text:SetDrawLayer("OVERLAY")
-        icon.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), 10, "OUTLINE")
+        icon.text:SetFont(Gladdy:SMFetch("font", "drFont"), 10, "OUTLINE")
         icon.text:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
         icon.text:SetShadowOffset(1, -1)
         icon.text:SetShadowColor(0, 0, 0, 1)
@@ -126,7 +125,7 @@ function Diminishings:CreateFrame(unit)
 
         icon.timeText = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
         icon.timeText:SetDrawLayer("OVERLAY")
-        icon.timeText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), 10, "OUTLINE")
+        icon.timeText:SetFont(Gladdy:SMFetch("font", "drFont"), 10, "OUTLINE")
         icon.timeText:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
         icon.timeText:SetShadowOffset(1, -1)
         icon.timeText:SetShadowColor(0, 0, 0, 1)
@@ -185,9 +184,9 @@ function Diminishings:UpdateFrame(unit)
         icon:SetWidth(Gladdy.db.drIconSize * Gladdy.db.drWidthFactor)
         icon:SetHeight(Gladdy.db.drIconSize)
 
-        icon.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, "OUTLINE")
+        icon.text:SetFont(Gladdy:SMFetch("font", "drFont"), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, "OUTLINE")
         icon.text:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
-        icon.timeText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, "OUTLINE")
+        icon.timeText:SetFont(Gladdy:SMFetch("font", "drFont"), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, "OUTLINE")
         icon.timeText:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
 
         icon.cooldown:SetWidth(icon:GetWidth() - icon:GetWidth()/16)
@@ -258,17 +257,32 @@ end
 
 function Diminishings:Test(unit)
     if Gladdy.db.drEnabled then
-        local spells = { 33786, 118, 8643, 8983 }
-        for i = 1, 4 do
-            if i == 1 then
-                self:AuraFade(unit, spells[i])
-            elseif i == 2 then
-                self:AuraFade(unit, spells[i])
-                self:AuraFade(unit, spells[i])
-            else
-                self:AuraFade(unit, spells[i])
-                self:AuraFade(unit, spells[i])
-                self:AuraFade(unit, spells[i])
+        local enabledCategories = {}
+        for cat,val in pairs(Gladdy.db.drCategories) do
+            if (val.enabled) then
+                tinsert(enabledCategories, {cat = cat , spellIDs = {}})
+                enabledCategories[cat] = #enabledCategories
+            end
+        end
+        for spellId,cat in pairs(DRData:GetSpells()) do
+            if enabledCategories[cat] then
+                tinsert(enabledCategories[enabledCategories[cat]].spellIDs, spellId)
+            end
+        end
+
+        --shuffle
+        for i = #enabledCategories, 2, -1 do
+            local j = rand(i)
+            enabledCategories[i], enabledCategories[j] = enabledCategories[j], enabledCategories[i]
+        end
+
+        --execute test
+        local index, amount = 0,0
+        for i=1, (#enabledCategories < 4 and #enabledCategories) or 4 do
+            amount = rand(1,3)
+            index = rand(1, #enabledCategories[i].spellIDs)
+            for _=1, amount do
+                self:AuraFade(unit, enabledCategories[i].spellIDs[index])
             end
         end
     end
@@ -295,15 +309,16 @@ function Diminishings:AuraFade(unit, spellID)
             lastIcon.diminishing = 1.0
         end
     end
+    if not lastIcon then return end
     lastIcon.dr = drCat
-    lastIcon.timeLeft = drDuration
+    lastIcon.timeLeft = Gladdy.db.drDuration
     lastIcon.diminishing = DRData:NextDR(lastIcon.diminishing)
     if Gladdy.db.drBorderColorsEnabled then
         lastIcon.border:SetVertexColor(getDiminishColor(lastIcon.diminishing))
     else
         lastIcon.border:SetVertexColor(Gladdy.db.drBorderColor.r, Gladdy.db.drBorderColor.g, Gladdy.db.drBorderColor.b, Gladdy.db.drBorderColor.a)
     end
-    lastIcon.cooldown:SetCooldown(GetTime(), drDuration)
+    lastIcon.cooldown:SetCooldown(GetTime(), Gladdy.db.drDuration)
     if Gladdy.db.drCategories[drCat].forceIcon then
         lastIcon.texture:SetTexture(Gladdy.db.drCategories[drCat].icon)
     else
@@ -359,11 +374,20 @@ function Diminishings:GetOptions()
             desc = L["Enabled DR module"],
             order = 3,
         }),
+        drDuration = Gladdy:option({
+            type = "range",
+            name = L["DR Duration"],
+            desc = L["Change the DR Duration in seconds (DR is dynamic between 15-20s)"],
+            order = 4,
+            min = 15,
+            max = 20,
+            step = .1,
+        }),
         group = {
             type = "group",
             childGroups = "tree",
             name = L["Frame"],
-            order = 4,
+            order = 5,
             args = {
                 icon = {
                     type = "group",
@@ -586,16 +610,39 @@ function Diminishings:GetOptions()
 end
 
 function Diminishings:CategoryOptions()
-    local categories = {}
+    local categories = {
+        checkAll = {
+            order = 1,
+            width = "0.7",
+            name = L["Check All"],
+            type = "execute",
+            func = function()
+                for k,_ in pairs(defaultCategories()) do
+                    Gladdy.db.drCategories[k].enabled = true
+                end
+            end,
+        },
+        uncheckAll = {
+            order = 2,
+            width = "0.7",
+            name = L["Uncheck All"],
+            type = "execute",
+            func = function()
+                for k,_ in pairs(defaultCategories()) do
+                    Gladdy.db.drCategories[k].enabled = false
+                end
+            end,
+        },
+    }
     local indexList = {}
-    for k,v in pairs(DRData:GetCategories()) do
+    for k,_ in pairs(DRData:GetCategories()) do
         tinsert(indexList, k)
     end
     tbl_sort(indexList)
-    for i, k in ipairs(indexList) do
+    for i,k in ipairs(indexList) do
         categories[k] = {
             type = "group",
-            name = DRData:GetCategoryName(k),
+            name = L[DRData:GetCategoryName(k)],
             order = i,
             icon = Gladdy.db.drCategories[k].icon,
             args = {
@@ -603,10 +650,10 @@ function Diminishings:CategoryOptions()
                     type = "toggle",
                     name = L["Enabled"],
                     order = 1,
-                    get = function(info)
+                    get = function()
                         return Gladdy.db.drCategories[k].enabled
                     end,
-                    set = function(info, value)
+                    set = function(_, value)
                         Gladdy.db.drCategories[k].enabled = value
                     end,
                 },
@@ -614,10 +661,10 @@ function Diminishings:CategoryOptions()
                     type = "toggle",
                     name = L["Force Icon"],
                     order = 2,
-                    get = function(info)
+                    get = function()
                         return Gladdy.db.drCategories[k].forceIcon
                     end,
-                    set = function(info, value)
+                    set = function(_, value)
                         Gladdy.db.drCategories[k].forceIcon = value
                     end,
                 },
@@ -627,10 +674,10 @@ function Diminishings:CategoryOptions()
                     desc = L["Icon of the DR"],
                     order = 4,
                     values = Diminishings:GetDRIcons(k),
-                    get = function(info)
+                    get = function()
                         return Gladdy.db.drCategories[k].icon
                     end,
-                    set = function(info, value)
+                    set = function(_, value)
                         Gladdy.db.drCategories[k].icon = value
                         Gladdy.options.args.Diminishings.args.categories.args[k].icon = value
                     end,

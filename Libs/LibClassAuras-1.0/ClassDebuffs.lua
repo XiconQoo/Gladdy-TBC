@@ -20,7 +20,8 @@ Debuff({ 15286 } ,{ buffType = "magic" }, "PRIEST") -- Vampiric Embrace
 Debuff({ 15407, 17311, 17312, 17313, 17314, 18807, 25387 }, { buffType = "magic" }, "PRIEST") -- Mind Flay
 Debuff({ 605, 10911, 10912 }, { buffType = "magic" }, "PRIEST") -- Mind Control
 Debuff({ 8122, 8124, 10888, 10890 }, { buffType = "magic", }, "PRIEST") -- Psychic Scream
-Debuff({ 15269 }, { buffType = "magic"}, "PRIEST")
+Debuff({ 15269 }, { buffType = "magic"}, "PRIEST") -- Blackout
+Debuff({ 44041, 44043, 44044, 44045, 44046, 44047 }, { buffType = "magic"}, "PRIEST") -- Chastise
 
 ---------------
 -- DRUID
@@ -44,6 +45,8 @@ Debuff({ 1822, 1823, 1824, 9904, 27003 }, { stacking = true, buffType = "physica
 Debuff({ 1079, 9492, 9493, 9752, 9894, 9896, 27008 }, { stacking = true, buffType = "physical", preEvent = "SPELL_CAST_SUCCESS" }, "DRUID") -- Rip
 Debuff({ 5570, 24974, 24975, 24976, 24977, 27013 }, { stacking = true, buffType = "magic", preEvent = "SPELL_CAST_SUCCESS" }, "DRUID") -- Insect Swarm
 Debuff({ 33745 }, { stacking = true, buffType = "physical", preEvent = "SPELL_CAST_SUCCESS" }, "DRUID") -- Lacerate
+Debuff({ 33878, 33986, 33987 }, { buffType = "physical" }, "DRUID") -- Mangle (Bear)
+Debuff({ 33876, 33982, 33983 }, { buffType = "physical" }, "DRUID") -- Mangle (Cat)
 
 -------------
 -- WARRIOR

@@ -55,17 +55,17 @@ function Highlight:CreateFrame(unit)
     local healthBar = Gladdy.modules["Health Bar"].frames[unit]
 
     local targetBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
-    targetBorder:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.highlightBorderStyle), edgeSize = Gladdy.db.highlightBorderSize })
+    targetBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = Gladdy.db.highlightBorderSize })
     --targetBorder:SetFrameStrata("MEDIUM")
     targetBorder:Hide()
 
     local focusBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
-    focusBorder:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.highlightBorderStyle), edgeSize = Gladdy.db.highlightBorderSize })
+    focusBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = Gladdy.db.highlightBorderSize })
     --focusBorder:SetFrameStrata("MEDIUM")
     focusBorder:Hide()
 
     local leaderBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
-    leaderBorder:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.highlightBorderStyle), edgeSize = Gladdy.db.highlightBorderSize })
+    leaderBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = Gladdy.db.highlightBorderSize })
     --leaderBorder:SetFrameStrata("MEDIUM")
     leaderBorder:Hide()
 
@@ -106,7 +106,7 @@ function Highlight:UpdateFrame(unit)
         button.targetBorder:SetPoint("TOP", button.healthBar, "TOP", 0, (Gladdy.db.highlightInset and 0 or borderSize))
     end
 
-    button.targetBorder:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.highlightBorderStyle), edgeSize = borderSize })
+    button.targetBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = borderSize })
     button.targetBorder:SetBackdropBorderColor(Gladdy.db.targetBorderColor.r, Gladdy.db.targetBorderColor.g, Gladdy.db.targetBorderColor.b, Gladdy.db.targetBorderColor.a)
 
     button.focusBorder:SetWidth(width)
@@ -119,7 +119,7 @@ function Highlight:UpdateFrame(unit)
         button.focusBorder:SetPoint("TOP", button.healthBar, "TOP", 0, (Gladdy.db.highlightInset and 0 or borderSize))
     end
 
-    button.focusBorder:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.highlightBorderStyle), edgeSize = borderSize })
+    button.focusBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = borderSize })
     button.focusBorder:SetBackdropBorderColor(Gladdy.db.focusBorderColor.r, Gladdy.db.focusBorderColor.g, Gladdy.db.focusBorderColor.b, Gladdy.db.focusBorderColor.a)
 
     button.leaderBorder:SetWidth(width)
@@ -132,7 +132,7 @@ function Highlight:UpdateFrame(unit)
         button.leaderBorder:SetPoint("TOP", button.healthBar, "TOP", 0, (Gladdy.db.highlightInset and 0 or borderSize))
     end
 
-    button.leaderBorder:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.highlightBorderStyle), edgeSize = borderSize })
+    button.leaderBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = borderSize })
     button.leaderBorder:SetBackdropBorderColor(Gladdy.db.leaderBorderColor.r, Gladdy.db.leaderBorderColor.g, Gladdy.db.leaderBorderColor.b, Gladdy.db.leaderBorderColor.a)
     if Gladdy.frame.testing then
         Highlight:Test(unit)

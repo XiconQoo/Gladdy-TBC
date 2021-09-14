@@ -64,6 +64,16 @@ function XiconProfiles:ApplyRukk()
     Gladdy:ToggleFrame(3)
 end
 
+function XiconProfiles:ApplyMir()
+    local deserialized = Gladdy.modules["Export Import"]:Decode(Gladdy:GetMirProfile())
+    if deserialized then
+        Gladdy.modules["Export Import"]:ApplyImport(deserialized, Gladdy.db)
+    end
+    Gladdy:Reset()
+    Gladdy:HideFrame()
+    Gladdy:ToggleFrame(3)
+end
+
 function XiconProfiles:GetOptions()
     return {
         headerProfileBlizzard = {
@@ -106,7 +116,7 @@ function XiconProfiles:GetOptions()
         },
         headerProfileClassicNoPet = {
             type = "header",
-            name = "Classic " .. L["Profile"] .. " No Pet",
+            name = "Classic " .. L["Profile"] .. L[" No Pet"],
             order = 6,
         },
         classicProfileNoPet = {
@@ -116,7 +126,7 @@ function XiconProfiles:GetOptions()
                 XiconProfiles:ApplyClassicNoPet()
             end,
             name = " ",
-            desc = "Classic " .. L["Profile"] .. " No Pet",
+            desc = "Classic " .. L["Profile"] .. L[" No Pet"],
             image = "Interface\\AddOns\\Gladdy\\Images\\BasicProfiles\\Classic2.blp",
             imageWidth = 350,
             imageHeight = 175,
@@ -179,6 +189,25 @@ function XiconProfiles:GetOptions()
             imageHeight = 175,
             width = "full",
             order = 13,
+        },
+        headerProfileMir = {
+            type = "header",
+            name = "Mir's " .. L["Profile"],
+            order = 14,
+        },
+        mirProfile = {
+            type = "execute",
+            func = function()
+                Gladdy.dbi:ResetProfile(Gladdy.dbi:GetCurrentProfile())
+                XiconProfiles:ApplyMir()
+            end,
+            name = " ",
+            desc = "Mir's " .. L["Profile"],
+            image = "Interface\\AddOns\\Gladdy\\Images\\BasicProfiles\\Mir1.blp",
+            imageWidth = 350,
+            imageHeight = 175,
+            width = "full",
+            order = 15,
         },
     }
 end

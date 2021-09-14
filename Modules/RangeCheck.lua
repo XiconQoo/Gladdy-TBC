@@ -211,12 +211,12 @@ function RangeCheck.CheckRange(self)
 
     local spell = Gladdy.db.rangeCheckDefaultSpells[RangeCheck.playerClass].min
 
-    if( not UnitIsConnected(button.unit) or not UnitInPhase(button.unit) ) then
+    if (not UnitIsConnected(button.unit) or not UnitInPhase(button.unit)) then
         RangeCheck:SetRangeAlpha(button, false)
-    elseif( spell ) then
+    elseif (spell) then
         RangeCheck:SetRangeAlpha(button, LSR.IsSpellInRange(spell, button.unit) == 1)
         -- That didn't work, but they are grouped lets try the actual API for this, it's a bit flaky though and not that useful generally
-    elseif( UnitInRaid(button.unit) or UnitInParty(button.unit) ) then
+    elseif (UnitInRaid(button.unit) or UnitInParty(button.unit)) then
         RangeCheck:SetRangeAlpha(button, UnitInRange(button.unit, "player"))
         -- Nope, fall back to interaction :(
     else
@@ -349,7 +349,7 @@ function RangeCheck:GetSpells()
     local group = {
         description = {
             type = "description",
-            name = "Changing the spellID only applies to your player class!\n\nExample: If you are a Paladin and wish to change your range check spell to Repentance, edit the Paladin spellID to 20066.",
+            name = L["Changing the spellID only applies to your player class!\n\nExample: If you are a Paladin and wish to change your range check spell to Repentance, edit the Paladin spellID to 20066."],
             order = 1,
         },
     }
@@ -363,7 +363,7 @@ function RangeCheck:GetSpells()
             args = {
                 headerMin = {
                     type = "header",
-                    name = GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min) and format("|T%s:20|t %s - %dyds", select(3, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(1, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(6, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)))
+                    name = GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min) and format("|T%s:20|t %s - %d" .. L["yds"], select(3, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(1, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(6, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)))
                             or "nil",
                     order = 1,
                 },
@@ -385,7 +385,7 @@ function RangeCheck:GetSpells()
                         Gladdy.db.rangeCheckDefaultSpells[class].min = tonumber(value)
                         --Gladdy.options.args["Range Check"].args.oorSpells.args[class].args.min.name = GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min) and format("|T%s:20|t %s", select(3, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(1, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)))
                         --        or "nil"
-                        Gladdy.options.args["Range Check"].args.oorSpells.args[class].args.headerMin.name = GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min) and format("|T%s:20|t %s - %dyds", select(3, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(1, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(6, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)))
+                        Gladdy.options.args["Range Check"].args.oorSpells.args[class].args.headerMin.name = GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min) and format("|T%s:20|t %s - %d" .. L["yds"], select(3, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(1, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(6, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)))
                                 or "nil"
                     end
                 },

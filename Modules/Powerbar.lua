@@ -38,24 +38,24 @@ function Powerbar:CreateFrame(unit)
 
     local powerBar = CreateFrame("Frame", nil, Gladdy.buttons[unit], BackdropTemplateMixin and "BackdropTemplate")
     powerBar:EnableMouse(false)
-    powerBar:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.powerBarBorderStyle),
+    powerBar:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "powerBarBorderStyle"),
                                   edgeSize = Gladdy.db.powerBarBorderSize })
     powerBar:SetBackdropBorderColor(Gladdy.db.powerBarBorderColor.r, Gladdy.db.powerBarBorderColor.g, Gladdy.db.powerBarBorderColor.b, Gladdy.db.powerBarBorderColor.a)
     powerBar:SetFrameLevel(1)
 
     powerBar.energy = CreateFrame("StatusBar", nil, powerBar)
-    powerBar.energy:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
+    powerBar.energy:SetStatusBarTexture(Gladdy:SMFetch("statusbar", "powerBarTexture"))
     powerBar.energy:SetMinMaxValues(0, 100)
     powerBar.energy:SetFrameLevel(0)
 
     powerBar.bg = powerBar.energy:CreateTexture(nil, "BACKGROUND")
-    powerBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
+    powerBar.bg:SetTexture(Gladdy:SMFetch("statusbar", "powerBarTexture"))
     powerBar.bg:ClearAllPoints()
     powerBar.bg:SetAllPoints(powerBar.energy)
     powerBar.bg:SetVertexColor(Gladdy.db.powerBarBgColor.r, Gladdy.db.powerBarBgColor.g, Gladdy.db.powerBarBgColor.b, Gladdy.db.powerBarBgColor.a)
 
     powerBar.raceText = powerBar:CreateFontString(nil, "LOW")
-    powerBar.raceText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.powerBarFont), Gladdy.db.powerBarFontSize)
+    powerBar.raceText:SetFont(Gladdy:SMFetch("font", "powerBarFont"), Gladdy.db.powerBarFontSize)
     powerBar.raceText:SetTextColor(Gladdy.db.powerBarFontColor.r, Gladdy.db.powerBarFontColor.g, Gladdy.db.powerBarFontColor.b, Gladdy.db.powerBarFontColor.a)
     powerBar.raceText:SetShadowOffset(1, -1)
     powerBar.raceText:SetShadowColor(0, 0, 0, 1)
@@ -63,7 +63,7 @@ function Powerbar:CreateFrame(unit)
     powerBar.raceText:SetPoint("LEFT", 5, 1)
 
     powerBar.powerText = powerBar:CreateFontString(nil, "LOW")
-    powerBar.powerText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.powerBarFont), Gladdy.db.powerBarFontSize)
+    powerBar.powerText:SetFont(Gladdy:SMFetch("font", "powerBarFont"), Gladdy.db.powerBarFontSize)
     powerBar.powerText:SetTextColor(Gladdy.db.powerBarFontColor.r, Gladdy.db.powerBarFontColor.g, Gladdy.db.powerBarFontColor.b, Gladdy.db.powerBarFontColor.a)
     powerBar.powerText:SetShadowOffset(1, -1)
     powerBar.powerText:SetShadowColor(0, 0, 0, 1)
@@ -149,7 +149,7 @@ function Powerbar:UpdateFrame(unit)
     else
         powerBar:Show()
     end
-    powerBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
+    powerBar.bg:SetTexture(Gladdy:SMFetch("statusbar", "powerBarTexture"))
     powerBar.bg:SetVertexColor(Gladdy.db.powerBarBgColor.r, Gladdy.db.powerBarBgColor.g, Gladdy.db.powerBarBgColor.b, Gladdy.db.powerBarBgColor.a)
 
     powerBar:SetWidth(healthBar:GetWidth())
@@ -158,18 +158,18 @@ function Powerbar:UpdateFrame(unit)
     powerBar:ClearAllPoints()
     powerBar:SetPoint("TOPLEFT", healthBar, "BOTTOMLEFT", 0, -1)
 
-    powerBar:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.powerBarBorderStyle),
+    powerBar:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "powerBarBorderStyle"),
                                   edgeSize = Gladdy.db.powerBarBorderSize })
     powerBar:SetBackdropBorderColor(Gladdy.db.powerBarBorderColor.r, Gladdy.db.powerBarBorderColor.g, Gladdy.db.powerBarBorderColor.b, Gladdy.db.powerBarBorderColor.a)
 
-    powerBar.energy:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
+    powerBar.energy:SetStatusBarTexture(Gladdy:SMFetch("statusbar", "powerBarTexture"))
     powerBar.energy:ClearAllPoints()
     powerBar.energy:SetPoint("TOPLEFT", powerBar, "TOPLEFT", (Gladdy.db.powerBarBorderSize/Gladdy.db.statusbarBorderOffset), -(Gladdy.db.powerBarBorderSize/Gladdy.db.statusbarBorderOffset))
     powerBar.energy:SetPoint("BOTTOMRIGHT", powerBar, "BOTTOMRIGHT", -(Gladdy.db.powerBarBorderSize/Gladdy.db.statusbarBorderOffset), (Gladdy.db.powerBarBorderSize/Gladdy.db.statusbarBorderOffset))
 
-    powerBar.raceText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.powerBarFont), Gladdy.db.powerBarFontSize)
+    powerBar.raceText:SetFont(Gladdy:SMFetch("font", "powerBarFont"), Gladdy.db.powerBarFontSize)
     powerBar.raceText:SetTextColor(Gladdy.db.powerBarFontColor.r, Gladdy.db.powerBarFontColor.g, Gladdy.db.powerBarFontColor.b, Gladdy.db.powerBarFontColor.a)
-    powerBar.powerText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.powerBarFont), Gladdy.db.powerBarFontSize)
+    powerBar.powerText:SetFont(Gladdy:SMFetch("font", "powerBarFont"), Gladdy.db.powerBarFontSize)
     powerBar.powerText:SetTextColor(Gladdy.db.powerBarFontColor.r, Gladdy.db.powerBarFontColor.g, Gladdy.db.powerBarFontColor.b, Gladdy.db.powerBarFontColor.a)
 end
 

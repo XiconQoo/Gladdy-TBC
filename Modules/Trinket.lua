@@ -1,4 +1,4 @@
-local ceil, floor, string_format, tonumber = ceil, floor, string.format, tonumber
+local ceil = ceil
 local C_PvP = C_PvP
 
 local CreateFrame = CreateFrame
@@ -40,19 +40,19 @@ local function iconTimer(self, elapsed)
 
         if timeLeft >= 60 then
             self.cooldownFont:SetTextColor(1, 1, 0)
-            self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (self:GetWidth()/2 - 0.15*self:GetWidth()) * Gladdy.db.trinketFontScale, "OUTLINE")
+            self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 0.15*self:GetWidth()) * Gladdy.db.trinketFontScale, "OUTLINE")
         elseif timeLeft < 60 and timeLeft >= 30 then
             self.cooldownFont:SetTextColor(1, 1, 0)
-            self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
+            self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
         elseif timeLeft < 30 and timeLeft >= 11 then
             self.cooldownFont:SetTextColor(1, 0.7, 0)
-            self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
+            self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
         elseif timeLeft <= 10 and timeLeft >= 5 then
             self.cooldownFont:SetTextColor(1, 0.7, 0)
-            self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
+            self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
         elseif timeLeft < 5 and timeLeft > 0 then
             self.cooldownFont:SetTextColor(1, 0, 0)
-            self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
+            self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
         end
         Gladdy:FormatTimer(self.cooldownFont, self.timeLeft, self.timeLeft < 10, true)
     end
@@ -76,7 +76,7 @@ function Trinket:CreateFrame(unit)
     trinket.cooldownFrame:SetPoint("BOTTOMRIGHT", trinket, "BOTTOMRIGHT")
 
     trinket.cooldownFont = trinket.cooldownFrame:CreateFontString(nil, "OVERLAY")
-    trinket.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), 20, "OUTLINE")
+    trinket.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), 20, "OUTLINE")
     --trinket.cooldownFont:SetAllPoints(trinket.cooldown)
     trinket.cooldownFont:SetJustifyH("CENTER")
     trinket.cooldownFont:SetPoint("CENTER")

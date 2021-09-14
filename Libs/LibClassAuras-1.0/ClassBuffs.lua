@@ -140,7 +140,8 @@ Buff( { 25782 }, { buffType = "magic"}, "PALADIN") -- Greater Blessing of Might
 Buff( { 25895 }, { buffType = "magic"}, "PALADIN") -- Greater Blessing of Salvation
 Buff( { 25899 }, { buffType = "magic"}, "PALADIN") -- Greater Blessing of Sanctuary
 Buff( { 25894 }, { buffType = "magic"}, "PALADIN") -- Greater Blessing of Wisdom
-Buff( { 642 }, { buffType = "magic"}, "PALADIN") -- Divine Shield
+Buff( { 642 }, { buffType = "immune"}, "PALADIN") -- Divine Shield
+Buff( { 31884 }, { buffType = "magic"}, "PALADIN") -- Avenging Wrath
 --Auras
 Buff( { 465, 10290, 643, 10291, 1032, 10292, 10293, 27149 }, { buffType = "aura"}, "PALADIN") -- Devotion Aura
 Buff( { 7294 }, { buffType = "aura"}, "PALADIN") -- Retribution Aura
@@ -167,6 +168,8 @@ Buff( { 21082 }, { buffType = "magic"}, "PALADIN") -- Seal of the Crusade
 -------------
 
 Buff( { 5384 }, { buffType = "physical"}, "HUNTER") -- Feign Death
+Buff( { 19263 }, { buffType = "physical"}, "HUNTER") -- Deterrence
+Buff( { 3045 }, { buffType = "physical"}, "HUNTER") -- Rapid Fire
 --local FEIGN_DEATH = GetSpellInfo(5384) -- Localized name for Feign Death
 
 
