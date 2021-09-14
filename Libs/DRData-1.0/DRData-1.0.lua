@@ -193,10 +193,10 @@ Data.spells = {
 	[18658] = "sleep",
 	
 	-- Wyvern Sting
-	[19386] = "sleep",
-	[24132] = "sleep",
-	[24133] = "sleep",
-	[27068] = "sleep",
+	[19386] = "disorient",
+	[24132] = "disorient",
+	[24133] = "disorient",
+	[27068] = "disorient",
 	
 	--[[ MISC ]]--
 	-- Chastise (Maybe this shares DR with Imp HS?)
@@ -213,15 +213,15 @@ Data.spells = {
 	[33042] = "dragonsbreath", -- Dragon's Breath
 	[33043] = "dragonsbreath", -- Dragon's Breath
 	-- Repentance
-	[20066] = "repentance",
+	[20066] = "disorient",
 
 	-- Scatter Shot
 	[19503] = "scatters",
 	
 	-- Freezing Trap
-	[3355] = "freezetrap",
-	[14308] = "freezetrap",
-	[14309] = "freezetrap",
+	[3355] = "disorient",
+	[14308] = "disorient",
+	[14309] = "disorient",
 	
 	-- Improved Conc Shot
 	[19410] = "impconc",
