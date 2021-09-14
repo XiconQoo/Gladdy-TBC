@@ -642,7 +642,7 @@ function Diminishings:CategoryOptions()
     for i,k in ipairs(indexList) do
         categories[k] = {
             type = "group",
-            name = DRData:GetCategoryName(k),
+            name = L[DRData:GetCategoryName(k)],
             order = i,
             icon = Gladdy.db.drCategories[k].icon,
             args = {
