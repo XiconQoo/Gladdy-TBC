@@ -216,7 +216,7 @@ function Gladdy:SetupOptions()
         args = {
             test = {
                 order = 1,
-                width = "0.7",
+                width = 0.7,
                 name = L["Test"],
                 type = "execute",
                 func = function()
@@ -225,7 +225,7 @@ function Gladdy:SetupOptions()
             },
             hide = {
                 order = 2,
-                width = "0.7",
+                width = 0.7,
                 name = L["Hide"],
                 type = "execute",
                 func = function()
@@ -235,19 +235,25 @@ function Gladdy:SetupOptions()
             },
             reload = {
                 order = 3,
-                width = "0.7",
+                width = 0.7,
                 name = L["ReloadUI"],
                 type = "execute",
                 func = function()
                     ReloadUI()
                 end,
             },
+            version = {
+                order = 4,
+                width = 1,
+                type = "description",
+                name = "     Gladdy v" .. Gladdy.version_num .. "-" .. Gladdy.version_releaseType
+            },
             general = {
                 type = "group",
                 name = L["General"],
                 desc = L["General settings"],
                 childGroups = "tab",
-                order = 4,
+                order = 5,
                 args = {
                     locked = {
                         type = "toggle",
@@ -728,7 +734,7 @@ function Gladdy:SetupOptions()
         },
     }
 
-    local order = 5
+    local order = 6
     for k, v in pairsByKeys(self.modules) do
         self:SetupModule(k, v, order)
         order = order + 1
