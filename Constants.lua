@@ -740,7 +740,7 @@ local importantAuras = {
         duration = 8,
         priority = 15,
         spellID = 5024,
-        altName = select(1, GetSpellInfo(5024)) .. " - " .. select(1, GetItemInfo(4984)),
+        altName = select(1, GetSpellInfo(5024)) .. " - " .. (select(1, GetItemInfo(4984)) or "Skull of Impending Doom"),
     },
 }
 function Gladdy:GetImportantAuras()
