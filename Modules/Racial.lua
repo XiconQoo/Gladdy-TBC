@@ -44,19 +44,19 @@ local function iconTimer(self,elapsed)
 
         if timeLeft >= 60 then
             self.cooldownFont:SetTextColor(1, 1, 0)
-            self.cooldownFont:SetFont(Gladdy:SMFetch("font", Gladdy.db.racialFont, "racialFont"), (self:GetWidth()/2 - 0.15* self:GetWidth()) * Gladdy.db.racialFontScale, "OUTLINE")
+            self.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), (self:GetWidth()/2 - 0.15* self:GetWidth()) * Gladdy.db.racialFontScale, "OUTLINE")
         elseif timeLeft < 60 and timeLeft >= 30 then
             self.cooldownFont:SetTextColor(1, 1, 0)
-            self.cooldownFont:SetFont(Gladdy:SMFetch("font", Gladdy.db.racialFont, "racialFont"), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
+            self.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
         elseif timeLeft < 30 and timeLeft >= 11 then
             self.cooldownFont:SetTextColor(1, 0.7, 0)
-            self.cooldownFont:SetFont(Gladdy:SMFetch("font", Gladdy.db.racialFont, "racialFont"), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
+            self.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
         elseif timeLeft < 10 and timeLeft >= 5 then
             self.cooldownFont:SetTextColor(1, 0.7, 0)
-            self.cooldownFont:SetFont(Gladdy:SMFetch("font", Gladdy.db.racialFont, "racialFont"), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
+            self.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
         elseif timeLeft < 5 and timeLeft > 0 then
             self.cooldownFont:SetTextColor(1, 0, 0)
-            self.cooldownFont:SetFont(Gladdy:SMFetch("font", Gladdy.db.racialFont, "racialFont"), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
+            self.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
         end
         Gladdy:FormatTimer(self.cooldownFont, self.timeLeft, self.timeLeft < 10, true)
     end
@@ -80,7 +80,7 @@ function Racial:CreateFrame(unit)
     racial.cooldownFrame:SetPoint("BOTTOMRIGHT", racial, "BOTTOMRIGHT")
 
     racial.cooldownFont = racial.cooldownFrame:CreateFontString(nil, "OVERLAY")
-    racial.cooldownFont:SetFont(Gladdy:SMFetch("font", Gladdy.db.racialFont, "racialFont"), 20, "OUTLINE")
+    racial.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), 20, "OUTLINE")
     --trinket.cooldownFont:SetAllPoints(trinket.cooldown)
     racial.cooldownFont:SetJustifyH("CENTER")
     racial.cooldownFont:SetPoint("CENTER")

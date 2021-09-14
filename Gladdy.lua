@@ -486,12 +486,12 @@ end
 local defaults = {["statusbar"] = "Smooth", ["border"] = "Gladdy Tooltip round", ["font"] = "DorisPP"}
 
 local lastWarning = {}
-function Gladdy:SMFetch(lsmType, key, dbEntry)
-    local smMediaType = self.LSM:Fetch(lsmType, key)
-    if (smMediaType == nil and key ~= "None") then
-        if not lastWarning[dbEntry] or GetTime() - lastWarning[dbEntry] > 120 then
-            lastWarning[dbEntry] = GetTime()
-            Gladdy:Warn("Could not find", "\"" .. lsmType .. "\"", key, "for", "\"" .. dbEntry .. "\"", "- setting it to", "\"" .. defaults[lsmType] .. "\"")
+function Gladdy:SMFetch(lsmType, key)
+    local smMediaType = self.LSM:Fetch(lsmType, Gladdy.db[key])
+    if (smMediaType == nil and Gladdy.db[key] ~= "None") then
+        if not lastWarning[key] or GetTime() - lastWarning[key] > 120 then
+            lastWarning[key] = GetTime()
+            Gladdy:Warn("Could not find", "\"" .. lsmType .. "\" \"", Gladdy.db[key], " \" for", "\"" .. key .. "\"", "- setting it to", "\"" .. defaults[lsmType] .. "\"")
         end
         return self.LSM:Fetch(lsmType, defaults[lsmType])
     end

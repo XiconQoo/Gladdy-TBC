@@ -88,7 +88,7 @@ function Auras:CreateFrame(unit)
     auraFrame:SetAllPoints(classIcon)
 
     auraFrame.text = auraFrame.cooldownFrame:CreateFontString(nil, "OVERLAY")
-    auraFrame.text:SetFont(Gladdy:SMFetch("font", Gladdy.db.auraFont, "auraFont"), 10, "OUTLINE")
+    auraFrame.text:SetFont(Gladdy:SMFetch("font", "auraFont"), 10, "OUTLINE")
     auraFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
     --auraFrame.text:SetShadowOffset(1, -1)
     --auraFrame.text:SetShadowColor(0, 0, 0, 1)
@@ -152,7 +152,7 @@ function Auras:CreateInterrupt(unit)
     interruptFrame:SetAllPoints(classIcon)
 
     interruptFrame.text = interruptFrame.cooldownFrame:CreateFontString(nil, "OVERLAY")
-    interruptFrame.text:SetFont(Gladdy:SMFetch("font", Gladdy.db.auraFont, "auraFont"), 10, "OUTLINE")
+    interruptFrame.text:SetFont(Gladdy:SMFetch("font", "auraFont"), 10, "OUTLINE")
     interruptFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
     --auraFrame.text:SetShadowOffset(1, -1)
     --auraFrame.text:SetShadowColor(0, 0, 0, 1)
@@ -205,7 +205,7 @@ function Auras:UpdateFrame(unit)
     auraFrame.cooldown:SetPoint("CENTER", auraFrame, "CENTER")
     auraFrame.cooldown:SetAlpha(Gladdy.db.auraCooldownAlpha)
 
-    auraFrame.text:SetFont(Gladdy:SMFetch("font", Gladdy.db.auraFont, "auraFont"), (width/2 - 1) * Gladdy.db.auraFontSizeScale, "OUTLINE")
+    auraFrame.text:SetFont(Gladdy:SMFetch("font", "auraFont"), (width/2 - 1) * Gladdy.db.auraFontSizeScale, "OUTLINE")
     auraFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
 
     auraFrame.icon.overlay:SetTexture(Gladdy.db.auraBorderStyle)
@@ -243,7 +243,7 @@ function Auras:UpdateInterruptFrame(unit)
     interruptFrame.cooldown:SetPoint("CENTER", interruptFrame, "CENTER")
     interruptFrame.cooldown:SetAlpha(Gladdy.db.auraCooldownAlpha)
 
-    interruptFrame.text:SetFont(Gladdy:SMFetch("font", Gladdy.db.auraFont, "auraFont"), (width/2 - 1) * Gladdy.db.auraFontSizeScale, "OUTLINE")
+    interruptFrame.text:SetFont(Gladdy:SMFetch("font", "auraFont"), (width/2 - 1) * Gladdy.db.auraFontSizeScale, "OUTLINE")
     interruptFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
 
     interruptFrame.icon.overlay:SetTexture(Gladdy.db.auraBorderStyle)
@@ -496,7 +496,7 @@ function Auras:GetOptions()
     for i,v in ipairs(list) do
         borderArgs["auraSpellSchool" .. v.key] = {
             type = "color",
-            name = v.val.type,
+            name = L[v.val.type],
             order = i + 13,
             hasAlpha = true,
             width = "0.8",
@@ -600,21 +600,21 @@ function Auras:GetOptions()
         debuffList = {
             type = "group",
             childGroups = "tree",
-            name = "Debuffs",
+            name = L["Debuffs"],
             order = 4,
             args = Auras:GetAuraOptions(AURA_TYPE_DEBUFF)
         },
         buffList = {
             type = "group",
             childGroups = "tree",
-            name = "Buffs",
+            name = L["Buffs"],
             order = 5,
             args = Auras:GetAuraOptions(AURA_TYPE_BUFF)
         },
         interruptList = {
             type = "group",
             childGroups = "tree",
-            name = "Interrupts",
+            name = L["Interrupts"],
             order = 6,
             args = Auras:GetInterruptOptions()
         }
