@@ -1,7 +1,7 @@
 # Gladdy - TBC
 
 ### The most powerful arena addon for WoW TBC 2.5.1
-## [v1.19-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v1.19-Beta/Gladdy_TBC-Classic_v1.19-Beta.zip)
+## [v1.20-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v1.20-Release/Gladdy_TBC-Classic_v1.20-Release.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -61,6 +61,25 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 - **Hydra** (thanks for constructive feedback and suggestions)
 
 ### Changes
+
+### v1.20-Release
+- configurable DR duration
+- scale in 0.01 percent steps
+- added Net-o-Matic, Nigh Invulnerablility Shield, Nigh Invulnerablility Backfire & Flee (Skull of Impending Doom) to Auras
+- added Mangle, Chastise, Avenging Wrath, Rapid Fire to BuffsDebuffs
+- improved testmode to only activate Auras/Buffs/Debuffs/Dr's that are actually enabled
+- added Mir's profile to XiconProfiles
+- added zhTW localization
+- added buttons for Test, Hide & Reload in the config
+- added version in config
+- ArenaCountdown upgrade
+- Repentance, Freezing Trap & Wyvern Sting are now disorients
+- import string now ignores errors on deleted options
+- added (un)checkAll button in DR-Categories in Diminishing Module
+- totemplates fix option to alter all colors/alphas
+- hide blizzard arena pets as well
+- fix shadowsight timer showing when not in arena or testmode
+- some minor refactoring / optimization
 
 ### v1.19-Beta
 - fix gladdy frames not showing v2

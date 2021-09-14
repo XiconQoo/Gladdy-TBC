@@ -1,6 +1,6 @@
-## Interface: 20501
+## Interface: 20502
 ## Title: Gladdy - TBC
-## Version: 1.19-Beta
+## Version: 1.20-Release
 ## Notes: The most powerful arena AddOn for WoW 2.5.1
 ## Author: XiconQoo, DnB_Junkee, Knall
 ## X-Email: contact me on discord Knall#1751
