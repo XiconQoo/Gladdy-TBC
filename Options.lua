@@ -208,7 +208,7 @@ end
 function Gladdy:SetupOptions()
     self.options = {
         type = "group",
-        name = "Gladdy",
+        name = L["Gladdy"],
         plugins = {},
         childGroups = "tree",
         get = getOpt,
@@ -735,12 +735,12 @@ function Gladdy:SetupOptions()
     end
 
     local options = {
-        name = "Gladdy",
+        name = L["Gladdy"],
         type = "group",
         args = {
             load = {
-                name = "Load configuration",
-                desc = "Load configuration options",
+                name = L["Load configuration"],
+                desc = L["Load configuration options"],
                 type = "execute",
                 func = function()
                     HideUIPanel(InterfaceOptionsFrame)
@@ -767,7 +767,7 @@ function Gladdy:GetAuras(auraType)
         ckeckAll = {
             order = 1,
             width = "0.7",
-            name = "Check All",
+            name = L["Check All"],
             type = "execute",
             func = function(info)
                 if auraType == AURA_TYPE_DEBUFF then
@@ -784,7 +784,7 @@ function Gladdy:GetAuras(auraType)
         uncheckAll = {
             order = 2,
             width = "0.7",
-            name = "Uncheck All",
+            name = L["Uncheck All"],
             type = "execute",
             func = function(info)
                 if auraType == AURA_TYPE_DEBUFF then

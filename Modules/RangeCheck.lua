@@ -349,7 +349,7 @@ function RangeCheck:GetSpells()
     local group = {
         description = {
             type = "description",
-            name = "Changing the spellID only applies to your player class!\n\nExample: If you are a Paladin and wish to change your range check spell to Repentance, edit the Paladin spellID to 20066.",
+            name = L["Changing the spellID only applies to your player class!\n\nExample: If you are a Paladin and wish to change your range check spell to Repentance, edit the Paladin spellID to 20066."],
             order = 1,
         },
     }
@@ -363,7 +363,7 @@ function RangeCheck:GetSpells()
             args = {
                 headerMin = {
                     type = "header",
-                    name = GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min) and format("|T%s:20|t %s - %dyds", select(3, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(1, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(6, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)))
+                    name = GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min) and format("|T%s:20|t %s - %d" .. L["yds"], select(3, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(1, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(6, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)))
                             or "nil",
                     order = 1,
                 },
@@ -385,7 +385,7 @@ function RangeCheck:GetSpells()
                         Gladdy.db.rangeCheckDefaultSpells[class].min = tonumber(value)
                         --Gladdy.options.args["Range Check"].args.oorSpells.args[class].args.min.name = GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min) and format("|T%s:20|t %s", select(3, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(1, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)))
                         --        or "nil"
-                        Gladdy.options.args["Range Check"].args.oorSpells.args[class].args.headerMin.name = GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min) and format("|T%s:20|t %s - %dyds", select(3, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(1, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(6, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)))
+                        Gladdy.options.args["Range Check"].args.oorSpells.args[class].args.headerMin.name = GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min) and format("|T%s:20|t %s - %d" .. L["yds"], select(3, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(1, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(6, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)))
                                 or "nil"
                     end
                 },

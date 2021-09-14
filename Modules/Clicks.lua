@@ -12,8 +12,8 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 
 local attributes = {
-    { name = "Target", button = "1", modifier = "", action = "target", spell = "" },
-    { name = "Focus", button = "2", modifier = "", action = "focus", spell = "" },
+    { name = L["Target"], button = "1", modifier = "", action = "target", spell = "" },
+    { name = L["Focus"], button = "2", modifier = "", action = "focus", spell = "" },
 }
 for i = 3, 10 do
     tinsert(attributes, { name = L["Action #%d"]:format(i), button = "", modifier = "", action = "disabled", spell = "" })
