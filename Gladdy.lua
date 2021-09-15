@@ -463,17 +463,39 @@ end
 
 function Gladdy:BlizzArenaSetAlpha(alpha)
     if IsAddOnLoaded("Blizzard_ArenaUI") then
-        ArenaEnemyFrames:SetAlpha(alpha)
-        ArenaEnemyFrame1:SetAlpha(alpha)
-        ArenaEnemyFrame1PetFrame:SetAlpha(alpha)
-        ArenaEnemyFrame2:SetAlpha(alpha)
-        ArenaEnemyFrame2PetFrame:SetAlpha(alpha)
-        ArenaEnemyFrame3:SetAlpha(alpha)
-        ArenaEnemyFrame3PetFrame:SetAlpha(alpha)
-        ArenaEnemyFrame4:SetAlpha(alpha)
-        ArenaEnemyFrame4PetFrame:SetAlpha(alpha)
-        ArenaEnemyFrame5:SetAlpha(alpha)
-        ArenaEnemyFrame5PetFrame:SetAlpha(alpha)
+        if (ArenaEnemyFrames) then
+            ArenaEnemyFrames:SetAlpha(alpha)
+        end
+        if ArenaEnemyFrame1 then
+            ArenaEnemyFrame1:SetAlpha(alpha)
+        end
+        if ArenaEnemyFrame1PetFrame then
+            ArenaEnemyFrame1PetFrame:SetAlpha(alpha)
+        end
+        if ArenaEnemyFrame2 then
+            ArenaEnemyFrame2:SetAlpha(alpha)
+        end
+        if ArenaEnemyFrame2PetFrame then
+            ArenaEnemyFrame2PetFrame:SetAlpha(alpha)
+        end
+        if ArenaEnemyFrame3 then
+            ArenaEnemyFrame3:SetAlpha(alpha)
+        end
+        if ArenaEnemyFrame3PetFrame then
+            ArenaEnemyFrame3PetFrame:SetAlpha(alpha)
+        end
+        if ArenaEnemyFrame4 then
+            ArenaEnemyFrame4:SetAlpha(alpha)
+        end
+        if ArenaEnemyFrame4PetFrame then
+            ArenaEnemyFrame4PetFrame:SetAlpha(alpha)
+        end
+        if ArenaEnemyFrame5 then
+            ArenaEnemyFrame5:SetAlpha(alpha)
+        end
+        if ArenaEnemyFrame5PetFrame then
+            ArenaEnemyFrame5PetFrame:SetAlpha(alpha)
+        end
     end
 end
 
