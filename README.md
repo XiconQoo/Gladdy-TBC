@@ -1,7 +1,7 @@
 # Gladdy - TBC
 
 ### The most powerful arena addon for WoW TBC 2.5.1
-## [v1.20-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v1.20-Release/Gladdy_TBC-Classic_v1.20-Release.zip)
+## [v1.21-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v1.21-Release/Gladdy_TBC-Classic_v1.21-Release.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -61,6 +61,10 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 - **Hydra** (thanks for constructive feedback and suggestions)
 
 ### Changes
+
+### v1.21-Release
+- fixed error when hiding blizzard frames ArenaEnemyFrames related to ElvUI
+- added Pummel cooldown
 
 ### v1.20-Release
 - configurable DR duration
