@@ -890,12 +890,12 @@ local cooldownList = {
 
     -- Warrior
     ["WARRIOR"] = {
-        --[[6552] 	= { cd = 10,                              -- Pummel
+        [6552] 	= { cd = 10,                              -- Pummel
            sharedCD = {
               [72] = true,
            },
         },
-        [72] 	   = { cd = 12,                              -- Shield Bash
+        --[[72] 	   = { cd = 12,                              -- Shield Bash
            sharedCD = {
               [6552] = true,
            },
