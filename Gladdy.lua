@@ -26,7 +26,7 @@ local MAJOR, MINOR = "Gladdy", 4
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
 Gladdy.version_major_num = 1
-Gladdy.version_minor_num = 0.20
+Gladdy.version_minor_num = 0.21
 Gladdy.version_num = Gladdy.version_major_num + Gladdy.version_minor_num
 Gladdy.version_releaseType = RELEASE_TYPES.release
 Gladdy.version = PREFIX .. Gladdy.version_num .. "-" .. Gladdy.version_releaseType
