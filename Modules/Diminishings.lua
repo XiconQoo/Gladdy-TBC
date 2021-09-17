@@ -44,6 +44,9 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drHalfColor = {r = 1, g = 1, b = 0, a = 1 },
     drQuarterColor = {r = 1, g = 0.7, b = 0, a = 1 },
     drNullColor = {r = 1, g = 0, b = 0, a = 1 },
+	drLevelTextEnabled = false,
+	drLevelTextFont = "DorisPP",
+    drLevelTextFontScale = 1,
     drWidthFactor = 1,
     drCategories = defaultCategories(),
     drDuration = 18
@@ -56,6 +59,16 @@ local function getDiminishColor(dr)
         return Gladdy.db.drQuarterColor.r, Gladdy.db.drQuarterColor.g, Gladdy.db.drQuarterColor.b, Gladdy.db.drQuarterColor.a
     else
         return Gladdy.db.drNullColor.r, Gladdy.db.drNullColor.g, Gladdy.db.drNullColor.b, Gladdy.db.drNullColor.a
+    end
+end
+
+local function getDiminishText(dr)
+    if dr == 0.5 then
+        return "½"
+    elseif dr == 0.25 then
+        return "¼"
+    else
+        return "ø"
     end
 end
 
@@ -131,6 +144,15 @@ function Diminishings:CreateFrame(unit)
         icon.timeText:SetShadowColor(0, 0, 0, 1)
         icon.timeText:SetJustifyH("CENTER")
         icon.timeText:SetPoint("CENTER", icon, "CENTER", 0, 1)
+		
+		icon.drLevelText = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
+        icon.drLevelText:SetDrawLayer("OVERLAY")
+        icon.drLevelText:SetFont(Gladdy:SMFetch("font", "drLevelTextFont"), 10, "OUTLINE")
+        icon.drLevelText:SetTextColor(getDiminishColor(1))
+        icon.drLevelText:SetShadowOffset(1, -1)
+        icon.drLevelText:SetShadowColor(0, 0, 0, 1)
+        icon.drLevelText:SetJustifyH("CENTER")
+        icon.drLevelText:SetPoint("BOTTOM", icon, "BOTTOM", 0, 0)
 
         icon.diminishing = 1
 
@@ -188,6 +210,8 @@ function Diminishings:UpdateFrame(unit)
         icon.text:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
         icon.timeText:SetFont(Gladdy:SMFetch("font", "drFont"), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, "OUTLINE")
         icon.timeText:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
+		icon.drLevelText:SetFont(Gladdy:SMFetch("font", "drLevelTextFont"), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drLevelTextFontScale, "OUTLINE")
+        icon.drLevelText:SetTextColor(getDiminishColor(icon.diminishing))
 
         icon.cooldown:SetWidth(icon:GetWidth() - icon:GetWidth()/16)
         icon.cooldown:SetHeight(icon:GetHeight() - icon:GetHeight()/16)
@@ -204,6 +228,13 @@ function Diminishings:UpdateFrame(unit)
         else
             icon.border:SetVertexColor(Gladdy.db.drBorderColor.r, Gladdy.db.drBorderColor.g, Gladdy.db.drBorderColor.b, Gladdy.db.drBorderColor.a)
         end
+		
+		if Gladdy.db.drLevelTextEnabled then
+			icon.drLevelText:Show()
+			icon.drLevelText:SetText(getDiminishText(icon.diminishing))
+		else
+			icon.drLevelText:Hide()
+		end
 
         icon:ClearAllPoints()
         if (Gladdy.db.drCooldownPos == "LEFT") then
@@ -540,10 +571,47 @@ function Diminishings:GetOptions()
                         }),
                     },
                 },
+				level = {
+                    type = "group",
+                    name = "Level Text",
+                    order = 5,
+                    args = {
+                        headerBorder = {
+                            type = "header",
+                            name = "DR Level",
+                            order = 30,
+                        },
+						drLevelTextEnabled = Gladdy:option({
+                            type = "toggle",
+                            name = "DR Level Text Enabled",
+                            desc = "Shows the current DR Level in the bottom right corner of the DR icon.",
+                            order = 1,
+                            width = "full",
+                        }),
+						drLevelTextFont = Gladdy:option({
+                            type = "select",
+                            name = L["Font"],
+                            desc = L["Font of the cooldown"],
+                            order = 11,
+                            dialogControl = "LSM30_Font",
+                            values = AceGUIWidgetLSMlists.font,
+                        }),
+                        drLevelTextFontScale = Gladdy:option({
+                            type = "range",
+                            name = L["Font scale"],
+                            desc = L["Scale of the text"],
+                            order = 33,
+                            min = 0.1,
+                            max = 2,
+                            step = 0.1,
+                            width = "full",
+                        }),
+                    },
+                },
                 border = {
                     type = "group",
                     name = L["Border"],
-                    order = 5,
+                    order = 6,
                     args = {
                         headerBorder = {
                             type = "header",
