@@ -14,12 +14,6 @@ local function table_copy(t, str)
     end
     for k,v in pairs(t) do
         if type(v) == "table" then
-            if k == "drCategories" then
-                for key,val in pairs(v) do
-                    --Gladdy:Print("TableCopy", str .. "." .. key)
-                end
-            end
-
             t2[k] = table_copy(v, str .. "." .. k);
         else
 
@@ -94,7 +88,7 @@ end)
 import:AddChild(importClearButton)
 import.clearButton = importClearButton
 
-local deletedOptions = { --TODO backward compatibility Imports on deleted options
+local deletedOptions = { -- backwards compatibility
     growUp = true,
     freezetrap = true,
     repentance = true
