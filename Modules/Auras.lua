@@ -106,8 +106,12 @@ function Auras:CreateFrame(unit)
             if (self.timeLeft <= 0) then
                 Auras:AURA_FADE(self.unit, self.track)
             else
+                if self.spellID == 8178 then
+                    self.text:SetText("")
+                else
+                    Gladdy:FormatTimer(self.text, self.timeLeft, self.timeLeft < 10)
+                end
                 self.timeLeft = self.timeLeft - elapsed
-                Gladdy:FormatTimer(self.text, self.timeLeft, self.timeLeft < 10)
             end
         else
             self:SetAlpha(0.01)
@@ -359,7 +363,8 @@ function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, exp
     auraFrame.startTime = expirationTime - duration
     auraFrame.endTime = expirationTime
     auraFrame.name = spellName
-    auraFrame.timeLeft = expirationTime - GetTime()
+    auraFrame.spellID = spellID
+    auraFrame.timeLeft = spellID == 8178 and 45 or expirationTime - GetTime()
     auraFrame.priority = Gladdy.db.auraListDefault[tostring(self.auras[spellName].spellID)].priority
     auraFrame.icon:SetTexture(Gladdy:GetImportantAuras()[GetSpellInfo(self.auras[spellName].spellID)] and Gladdy:GetImportantAuras()[GetSpellInfo(self.auras[spellName].spellID)].texture or icon)
     auraFrame.track = auraType
@@ -373,9 +378,11 @@ function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, exp
     else
         auraFrame.icon.overlay:SetVertexColor(Gladdy.db.frameBorderColor.r, Gladdy.db.frameBorderColor.g, Gladdy.db.frameBorderColor.b, Gladdy.db.frameBorderColor.a)
     end
-    if not Gladdy.db.auraDisableCircle then
+    if not Gladdy.db.auraDisableCircle and spellID ~= 8178 then
         auraFrame.cooldown:Show()
         auraFrame.cooldown:SetCooldown(auraFrame.startTime, duration)
+    else
+        auraFrame.cooldown:Hide()
     end
 end
 

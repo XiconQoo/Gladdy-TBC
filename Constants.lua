@@ -649,7 +649,7 @@ local importantAuras = {
     -- Grounding Totem Effect
     [GetSpellInfo(8178)] = {
         track = AURA_TYPE_BUFF,
-        duration = 4,
+        duration = 0,
         priority = 20,
         spellID = 8178
     },
