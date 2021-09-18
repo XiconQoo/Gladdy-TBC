@@ -138,7 +138,8 @@ function BuffsDebuffs:Test(unit)
 
         BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_DEBUFF)
         BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_BUFF)
-
+        --BuffsDebuffs:AURA_GAIN(unit, AURA_TYPE_BUFF, 1243, select(1, GetSpellInfo(1243)), select(3, GetSpellInfo(1243)), 10, GetTime() + 10, 1, "physical")
+        --self:AURA_GAIN(unit, AURA_TYPE_DEBUFF, 31117, select(1, GetSpellInfo(31117)), select(3, GetSpellInfo(31117)), 10, GetTime() + 10, 1, "physical")
         local i = 1
         for spellID, enabled in pairs(Gladdy.db.trackedDebuffs) do
             if i > 4 then
@@ -197,13 +198,24 @@ function BuffsDebuffs:AURA_GAIN(unit, auraType, spellID, spellName, texture, dur
         return
     end
     local auraFrame = self.frames[unit]
+    spellName = LibClassAuras.GetAltName(spellID) or spellName
     local aura = Gladdy:GetImportantAuras()[spellName] and Gladdy.db.auraListDefault[tostring(Gladdy:GetImportantAuras()[spellName].spellID)].enabled
     if aura and Gladdy.db.buffsShowAuraDebuffs then
         aura = false
     end
     local auraNames = LibClassAuras.GetSpellNameToId(auraType)
-    local spellId = auraNames[spellName] and auraNames[spellName].id[1]
-    if not aura and spellID and spellId and expirationTime and (Gladdy.db.trackedBuffs[tostring(spellId)] or Gladdy.db.trackedDebuffs[tostring(spellId)]) then
+    local spellId
+    local isTracked = false
+    if auraNames[spellName] then
+        for _, spellInfo in ipairs(auraNames[spellName]) do
+            spellId = spellInfo.id[1]
+            if (Gladdy.db.trackedBuffs[tostring(spellId)] or Gladdy.db.trackedDebuffs[tostring(spellId)]) then
+                isTracked = true
+                break
+            end
+        end
+    end
+    if not aura and spellID and expirationTime and isTracked then
         local index
         if auraType == AURA_TYPE_DEBUFF then
             auraFrame.numDebuffs = auraFrame.numDebuffs + 1
