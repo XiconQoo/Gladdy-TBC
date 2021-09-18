@@ -557,6 +557,22 @@ function Auras:GetOptions()
                             order = 4,
                             width = "full",
                         }),
+                        auraCooldownNumberAlpha = {
+                            type = "range",
+                            name = L["Cooldown number alpha"],
+                            min = 0,
+                            max = 1,
+                            step = 0.1,
+                            order = 5,
+                            width = "full",
+                            set = function(info, value)
+                                Gladdy.db.auraFontColor.a = value
+                                Gladdy:UpdateFrame()
+                            end,
+                            get = function(info)
+                                return Gladdy.db.auraFontColor.a
+                            end,
+                        },
                     }
                 },
                 font = {

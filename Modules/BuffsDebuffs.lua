@@ -279,7 +279,7 @@ local function styleIcon(aura, auraType)
     aura.cooldown:SetFont(Gladdy:SMFetch("font", "buffsFont"), (Gladdy.db.buffsIconSize/2 - 1) * Gladdy.db.buffsFontScale, "OUTLINE")
     aura.cooldown:SetTextColor(Gladdy.db.buffsFontColor.r, Gladdy.db.buffsFontColor.g, Gladdy.db.buffsFontColor.b, Gladdy.db.buffsFontColor.a)
     aura.stacks:SetFont(Gladdy:SMFetch("font", "buffsFont"), (Gladdy.db.buffsIconSize/3 - 1) * Gladdy.db.buffsFontScale, "OUTLINE")
-    aura.stacks:SetTextColor(Gladdy.db.buffsFontColor.r, Gladdy.db.buffsFontColor.g, Gladdy.db.buffsFontColor.b, Gladdy.db.buffsFontColor.a)
+    aura.stacks:SetTextColor(Gladdy.db.buffsFontColor.r, Gladdy.db.buffsFontColor.g, Gladdy.db.buffsFontColor.b, 1)
 end
 
 function BuffsDebuffs:UpdateFrame(unit)
@@ -486,15 +486,15 @@ local function iconTimer(auraFrame, elapsed)
         auraFrame.timeLeft = timeLeftMilliSec
         if Gladdy.db.buffsDynamicColor then
             if timeLeftSec >= 60 then
-                auraFrame.cooldown:SetTextColor(0.7, 1, 0)
+                auraFrame.cooldown:SetTextColor(0.7, 1, 0, Gladdy.db.buffsFontColor.a)
             elseif timeLeftSec < 60 and timeLeftSec >= 11 then
-                auraFrame.cooldown:SetTextColor(0.7, 1, 0)
+                auraFrame.cooldown:SetTextColor(0.7, 1, 0, Gladdy.db.buffsFontColor.a)
             elseif timeLeftSec <= 10 and timeLeftSec >= 5 then
-                auraFrame.cooldown:SetTextColor(1, 0.7, 0)
+                auraFrame.cooldown:SetTextColor(1, 0.7, 0, Gladdy.db.buffsFontColor.a)
             elseif timeLeftSec <= 4 and timeLeftSec >= 3 then
-                auraFrame.cooldown:SetTextColor(1, 0, 0)
+                auraFrame.cooldown:SetTextColor(1, 0, 0, Gladdy.db.buffsFontColor.a)
             elseif timeLeftMilliSec <= 3 and timeLeftMilliSec > 0 then
-                auraFrame.cooldown:SetTextColor(1, 0, 0)
+                auraFrame.cooldown:SetTextColor(1, 0, 0, Gladdy.db.buffsFontColor.a)
             end
         end
         if timeLeftMilliSec < 0 then
@@ -911,6 +911,22 @@ function BuffsDebuffs:GetOptions()
                             order = 10,
                             width = "full",
                         }),
+                        buffsCooldownNumberAlpha = {
+                            type = "range",
+                            name = L["Cooldown number alpha"],
+                            min = 0,
+                            max = 1,
+                            step = 0.1,
+                            order = 11,
+                            width = "full",
+                            set = function(info, value)
+                                Gladdy.db.buffsFontColor.a = value
+                                Gladdy:UpdateFrame()
+                            end,
+                            get = function(info)
+                                return Gladdy.db.buffsFontColor.a
+                            end,
+                        },
                     },
                 },
                 font = {

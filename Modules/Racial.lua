@@ -19,6 +19,7 @@ local Racial = Gladdy:NewModule("Racial", nil, {
     racialBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     racialDisableCircle = false,
     racialCooldownAlpha = 1,
+    racialCooldownNumberAlpha = 1,
 })
 
 local ANCHORS = { ["LEFT"] = "RIGHT", ["RIGHT"] = "LEFT", ["BOTTOM"] = "TOP", ["TOP"] = "BOTTOM"}
@@ -43,19 +44,19 @@ local function iconTimer(self,elapsed)
         local timeLeft = ceil(self.timeLeft)
 
         if timeLeft >= 60 then
-            self.cooldownFont:SetTextColor(1, 1, 0)
+            self.cooldownFont:SetTextColor(1, 1, 0, Gladdy.db.racialCooldownNumberAlpha)
             self.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), (self:GetWidth()/2 - 0.15* self:GetWidth()) * Gladdy.db.racialFontScale, "OUTLINE")
         elseif timeLeft < 60 and timeLeft >= 30 then
-            self.cooldownFont:SetTextColor(1, 1, 0)
+            self.cooldownFont:SetTextColor(1, 1, 0, Gladdy.db.racialCooldownNumberAlpha)
             self.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
         elseif timeLeft < 30 and timeLeft >= 11 then
-            self.cooldownFont:SetTextColor(1, 0.7, 0)
+            self.cooldownFont:SetTextColor(1, 0.7, 0, Gladdy.db.racialCooldownNumberAlpha)
             self.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
         elseif timeLeft < 10 and timeLeft >= 5 then
-            self.cooldownFont:SetTextColor(1, 0.7, 0)
+            self.cooldownFont:SetTextColor(1, 0.7, 0, Gladdy.db.racialCooldownNumberAlpha)
             self.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
         elseif timeLeft < 5 and timeLeft > 0 then
-            self.cooldownFont:SetTextColor(1, 0, 0)
+            self.cooldownFont:SetTextColor(1, 0, 0, Gladdy.db.racialCooldownNumberAlpha)
             self.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
         end
         Gladdy:FormatTimer(self.cooldownFont, self.timeLeft, self.timeLeft < 10, true)
@@ -268,6 +269,15 @@ function Racial:GetOptions()
                             max = 1,
                             step = 0.1,
                             order = 8,
+                            width = "full",
+                        }),
+                        racialCooldownNumberAlpha = Gladdy:option({
+                            type = "range",
+                            name = L["Cooldown number alpha"],
+                            min = 0,
+                            max = 1,
+                            step = 0.1,
+                            order = 9,
                             width = "full",
                         }),
                     },
