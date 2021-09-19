@@ -456,6 +456,22 @@ function Diminishings:GetOptions()
                             order = 9,
                             width = "full",
                         }),
+                        drCooldownNumberAlpha = {
+                            type = "range",
+                            name = L["Cooldown number alpha"],
+                            min = 0,
+                            max = 1,
+                            step = 0.1,
+                            order = 10,
+                            width = "full",
+                            set = function(info, value)
+                                Gladdy.db.drFontColor.a = value
+                                Gladdy:UpdateFrame()
+                            end,
+                            get = function(info)
+                                return Gladdy.db.drFontColor.a
+                            end,
+                        },
                     },
                 },
                 font = {

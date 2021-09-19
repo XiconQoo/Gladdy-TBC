@@ -7,6 +7,7 @@ LibClassAuras.debuffs = {}
 LibClassAuras.debuffToId = {}
 LibClassAuras.buffs = {}
 LibClassAuras.buffToId = {}
+LibClassAuras.altNames = {}
 
 local function Spell(id, opts, class, spellTable, idTable)
     if not opts or not class then
@@ -26,9 +27,20 @@ local function Spell(id, opts, class, spellTable, idTable)
         return
     end
     if opts.altName then
-        idTable[opts.altName] = {id = id , class = class}
+        for _,v in ipairs(id) do
+            LibClassAuras.altNames[v] = opts.altName
+        end
+        if idTable[opts.altName] then
+            tinsert(idTable[opts.altName], {id = id , class = class})
+        else
+            idTable[opts.altName] = {[1] = {id = id , class = class}}
+        end
     else
-        idTable[spellName] = {id = id , class = class}
+        if idTable[spellName] then
+            tinsert(idTable[spellName], {id = id , class = class})
+        else
+            idTable[spellName] = {[1] = {id = id , class = class}}
+        end
     end
 
     if type(id) == "table" then
@@ -54,9 +66,11 @@ LibClassAuras.Buff = Buff
 
 local function getClassDebuffs(class)
     local classSpells = {}
-    for k,v in pairs(LibClassAuras.debuffToId) do
-        if v.class == class then
-            tinsert(classSpells, {name = k, id = v.id})
+    for name, spells in pairs(LibClassAuras.debuffToId) do
+        for _, spellInfo in ipairs(spells) do
+            if spellInfo.class == class then
+                tinsert(classSpells, {name = name, id = spellInfo.id})
+            end
         end
     end
     return classSpells
@@ -65,9 +79,11 @@ LibClassAuras.GetClassDebuffs = getClassDebuffs
 
 local function getClassBuffs(class)
     local classSpells = {}
-    for k,v in pairs(LibClassAuras.buffToId) do
-        if v.class == class then
-            tinsert(classSpells, {name = k, id = v.id})
+    for name, spells in pairs(LibClassAuras.buffToId) do
+        for _, spellInfo in ipairs(spells) do
+            if spellInfo.class == class then
+                tinsert(classSpells, {name = name, id = spellInfo.id})
+            end
         end
     end
     return classSpells
@@ -83,3 +99,8 @@ local function getSpellNameToId(auraType)
 end
 
 LibClassAuras.GetSpellNameToId = getSpellNameToId
+
+local function getAltName(spellID)
+    return LibClassAuras.altNames[spellID]
+end
+LibClassAuras.GetAltName = getAltName

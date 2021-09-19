@@ -17,6 +17,7 @@ local Trinket = Gladdy:NewModule("Trinket", nil, {
     trinketBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     trinketDisableCircle = false,
     trinketCooldownAlpha = 1,
+    trinketCooldownNumberAlpha = 1,
 })
 LibStub("AceComm-3.0"):Embed(Trinket)
 
@@ -39,19 +40,19 @@ local function iconTimer(self, elapsed)
         local timeLeft = ceil(self.timeLeft)
 
         if timeLeft >= 60 then
-            self.cooldownFont:SetTextColor(1, 1, 0)
+            self.cooldownFont:SetTextColor(1, 1, 0, Gladdy.db.trinketCooldownNumberAlpha)
             self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 0.15*self:GetWidth()) * Gladdy.db.trinketFontScale, "OUTLINE")
         elseif timeLeft < 60 and timeLeft >= 30 then
-            self.cooldownFont:SetTextColor(1, 1, 0)
+            self.cooldownFont:SetTextColor(1, 1, 0, Gladdy.db.trinketCooldownNumberAlpha)
             self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
         elseif timeLeft < 30 and timeLeft >= 11 then
-            self.cooldownFont:SetTextColor(1, 0.7, 0)
+            self.cooldownFont:SetTextColor(1, 0.7, 0, Gladdy.db.trinketCooldownNumberAlpha)
             self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
         elseif timeLeft <= 10 and timeLeft >= 5 then
-            self.cooldownFont:SetTextColor(1, 0.7, 0)
+            self.cooldownFont:SetTextColor(1, 0.7, 0, Gladdy.db.trinketCooldownNumberAlpha)
             self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
         elseif timeLeft < 5 and timeLeft > 0 then
-            self.cooldownFont:SetTextColor(1, 0, 0)
+            self.cooldownFont:SetTextColor(1, 0, 0, Gladdy.db.trinketCooldownNumberAlpha)
             self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
         end
         Gladdy:FormatTimer(self.cooldownFont, self.timeLeft, self.timeLeft < 10, true)
@@ -274,6 +275,15 @@ function Trinket:GetOptions()
                             max = 1,
                             step = 0.1,
                             order = 8,
+                            width = "full",
+                        }),
+                        trinketCooldownNumberAlpha = Gladdy:option({
+                            type = "range",
+                            name = L["Cooldown number alpha"],
+                            min = 0,
+                            max = 1,
+                            step = 0.1,
+                            order = 9,
                             width = "full",
                         }),
                     },

@@ -663,6 +663,22 @@ function Cooldowns:GetOptions()
                             order = 9,
                             width = "full",
                         }),
+                        cooldownCooldownNumberAlpha = {
+                            type = "range",
+                            name = L["Cooldown number alpha"],
+                            min = 0,
+                            max = 1,
+                            step = 0.1,
+                            order = 10,
+                            width = "full",
+                            set = function(info, value)
+                                Gladdy.db.cooldownFontColor.a = value
+                                Gladdy:UpdateFrame()
+                            end,
+                            get = function(info)
+                                return Gladdy.db.cooldownFontColor.a
+                            end,
+                        },
                     },
                 },
                 font = {
