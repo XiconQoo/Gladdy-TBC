@@ -573,18 +573,18 @@ function Diminishings:GetOptions()
                 },
 				level = {
                     type = "group",
-                    name = "Level Text",
+                    name = L["Level Text"],
                     order = 5,
                     args = {
                         headerBorder = {
                             type = "header",
-                            name = "DR Level",
+                            name = L["DR Level"],
                             order = 30,
                         },
 						drLevelTextEnabled = Gladdy:option({
                             type = "toggle",
-                            name = "DR Level Text Enabled",
-                            desc = "Shows the current DR Level in the bottom right corner of the DR icon.",
+                            name = L["DR Level Text Enabled"],
+                            desc = L["Shows the current DR Level on the DR icon."],
                             order = 1,
                             width = "full",
                         }),
