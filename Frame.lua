@@ -190,6 +190,7 @@ function Gladdy:UpdateFrame()
     end
 
     self.frame:SetScale(self.db.frameScale)
+    self:PixelPerfectScale(false)
     self.frame:SetWidth(width)
     self.frame:SetHeight(height)
     self.frame:ClearAllPoints()

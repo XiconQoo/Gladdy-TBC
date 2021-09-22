@@ -5,6 +5,7 @@ local select = select
 local pairs = pairs
 local tinsert = table.insert
 local tsort = table.sort
+local str_lower = string.lower
 local GetTime = GetTime
 local CreateFrame = CreateFrame
 local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
@@ -66,10 +67,20 @@ end
 Gladdy.events = CreateFrame("Frame")
 Gladdy.events.registered = {}
 Gladdy.events:RegisterEvent("PLAYER_LOGIN")
+Gladdy.events:RegisterEvent("CVAR_UPDATE")
+hooksecurefunc("VideoOptionsFrameOkay_OnClick", function(self, button, down, apply)
+    if (self:GetName() == "VideoOptionsFrameApply") then
+        Gladdy:PixelPerfectScale(true)
+    end
+end)
 Gladdy.events:SetScript("OnEvent", function(self, event, ...)
     if (event == "PLAYER_LOGIN") then
         Gladdy:OnInitialize()
         Gladdy:OnEnable()
+    elseif (event == "CVAR_UPDATE") then
+        if (str_lower(select(1, ...)) == "uiscale") then
+            Gladdy:PixelPerfectScale(true)
+        end
     else
         local func = self.registered[event]
 
@@ -183,6 +194,21 @@ function Gladdy:DeleteUnknownOptions(tbl, refTbl, str)
                 Gladdy:DeleteUnknownOptions(v, refTbl[k], str .. "." .. k)
             end
         end
+    end
+end
+
+function Gladdy:PixelPerfectScale(update)
+    local physicalWidth, physicalHeight = GetPhysicalScreenSize()
+    local perfectUIScale = 768/physicalHeight--768/select(2, strsplit("x",({ GetScreenResolutions()})[GetCurrentResolution()]))
+    if self.db and self.db.pixelPerfect and self.frame then
+        self.frame:SetIgnoreParentScale(true)
+        self.frame:SetScale(perfectUIScale)
+        --self.db.frameScale = perfectUIScale --(GetCVar("useUiScale") == "1" and 1 + perfectUIScale - GetCVar("UIScale") or perfectUIScale)
+        if update then
+            self:UpdateFrame()
+        end
+    elseif self.frame then
+        self.frame:SetIgnoreParentScale(false)
     end
 end
 
