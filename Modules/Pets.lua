@@ -23,6 +23,8 @@ local Pets = Gladdy:NewModule("Pets", nil, {
     petHealthPercentage = true,
     petXOffset = 1,
     petYOffset = -62,
+    petGroup = false,
+    petMargin = 1,
 })
 
 function Pets:Initialize()
@@ -251,6 +253,18 @@ function Pets:UpdateFrame(unitId)
     self.frames[unit]:SetWidth(Gladdy.db.petWidth)
     self.frames[unit]:SetHeight(Gladdy.db.petHeight)
     self.frames[unit]:SetPoint("LEFT", Gladdy.buttons[unitId].healthBar, "RIGHT", Gladdy.db.petXOffset, Gladdy.db.petYOffset)
+    if (Gladdy.db.petGroup) then
+        if (unit == "arenapet1") then
+            self.frames[unit]:SetPoint("LEFT", Gladdy.buttons[unitId].healthBar, "RIGHT", Gladdy.db.petXOffset, Gladdy.db.petYOffset)
+        else
+            local previousPet = "arenapet" .. string_gsub(unit, "arenapet", "") - 1
+            self.frames[unit]:ClearAllPoints()
+            self.frames[unit]:SetPoint("TOPLEFT", self.frames[previousPet], "BOTTOMLEFT", 0, - Gladdy.db.petMargin)
+        end
+    else
+        self.frames[unit]:ClearAllPoints()
+        self.frames[unit]:SetPoint("LEFT", Gladdy.buttons[unitId].healthBar, "RIGHT", Gladdy.db.petXOffset, Gladdy.db.petYOffset)
+    end
 
     healthBar.portrait:SetHeight(Gladdy.db.petHeight)
     healthBar.portrait:SetWidth(Gladdy.db.petHeight)
@@ -384,11 +398,28 @@ function Pets:GetOptions()
                             step = 1,
                             width = "full",
                         }),
+                        petGroup = option({
+                            type = "toggle",
+                            name = L["Group Pets"],
+                            order = 5,
+                        }),
+                        petMargin = option({
+                            type = "range",
+                            name = L["Margin"],
+                            desc = L["Height of the bar"],
+                            order = 6,
+                            disabled = function()
+                                return not Gladdy.db.petGroup
+                            end,
+                            min = 0,
+                            max = 50,
+                            step = .1,
+                        }),
                         petHealthBarTexture = option({
                             type = "select",
                             name = L["Bar texture"],
                             desc = L["Texture of the bar"],
-                            order = 5,
+                            order = 7,
                             dialogControl = "LSM30_Statusbar",
                             values = AceGUIWidgetLSMlists.statusbar,
                         }),
@@ -396,14 +427,14 @@ function Pets:GetOptions()
                             type = "color",
                             name = L["Health color"],
                             desc = L["Color of the status bar"],
-                            order = 6,
+                            order = 8,
                             hasAlpha = true,
                         }),
                         petHealthBarBgColor = Gladdy:colorOption({
                             type = "color",
                             name = L["Background color"],
                             desc = L["Color of the status bar background"],
-                            order = 7,
+                            order = 9,
                             hasAlpha = true,
                         }),
                     },
