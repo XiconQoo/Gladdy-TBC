@@ -38,6 +38,7 @@ function CombatIndicator:CreateFrame(unit)
     end
     local ciFrame = CreateFrame("Frame", "GladdyCombatindicator" .. unit, button)
     ciFrame:EnableMouse(false)
+    ciFrame:SetMovable(true)
     ciFrame:SetFrameStrata("HIGH")
     ciFrame:SetHeight(Gladdy.db.ciSize)
     ciFrame:SetWidth(Gladdy.db.ciSize * Gladdy.db.ciWidthFactor)
@@ -76,6 +77,9 @@ function CombatIndicator:UpdateFrame(unit)
         ciFrame:Hide()
     else
         ciFrame:Show()
+    end
+    if (unit == "arena1") then
+        Gladdy:CreateMover(ciFrame, "ciXOffset", "ciYOffset", L["Combat Indicator"], {"BOTTOMLEFT", "TOPLEFT"})
     end
 end
 

@@ -59,6 +59,7 @@ end
 function Castbar:CreateFrame(unit)
     local castBar = CreateFrame("Frame", nil, Gladdy.buttons[unit], BackdropTemplateMixin and "BackdropTemplate")
     castBar:EnableMouse(false)
+    castBar:SetMovable(true)
     castBar.unit = unit
 
     castBar:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "castBarBorderStyle"),
@@ -191,6 +192,10 @@ function Castbar:UpdateFrame(unit)
 
     castBar.icon.texture.overlay:SetTexture(Gladdy.db.castBarIconStyle)
     castBar.icon.texture.overlay:SetVertexColor(Gladdy.db.castBarIconColor.r, Gladdy.db.castBarIconColor.g, Gladdy.db.castBarIconColor.b, Gladdy.db.castBarIconColor.a)
+
+    if (unit == "arena1") then
+        Gladdy:CreateMover(castBar, "castBarXOffset", "castBarYOffset", L["Cast Bar"], {"BOTTOMLEFT", "TOPLEFT"})
+    end
 end
 
 ---------------------------

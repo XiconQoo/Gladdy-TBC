@@ -94,6 +94,7 @@ function Cooldowns:CreateFrame(unit)
     -- Cooldown frame
     local spellCooldownFrame = CreateFrame("Frame", nil, button)
     spellCooldownFrame:EnableMouse(false)
+    spellCooldownFrame:SetMovable(true)
     for x = 1, 14 do
         local icon = CreateFrame("Frame", nil, spellCooldownFrame)
         icon:EnableMouse(false)
@@ -166,6 +167,9 @@ function Cooldowns:UpdateFrame(unit)
         button.spellCooldownFrame:SetHeight(Gladdy.db.cooldownSize)
         button.spellCooldownFrame:SetWidth(1)
         button.spellCooldownFrame:Show()
+        if (unit == "arena1") then
+            Gladdy:CreateMover(button.spellCooldownFrame, "cooldownXOffset", "cooldownYOffset", L["Cooldown"], {"BOTTOMLEFT", "TOPLEFT"})
+        end
         -- Update each cooldown icon
         local o = 1
         for j = 1, 14 do

@@ -6,6 +6,7 @@ local pairs = pairs
 local tinsert = table.insert
 local tsort = table.sort
 local str_lower = string.lower
+local math_abs = math.abs
 local GetTime = GetTime
 local CreateFrame = CreateFrame
 local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
@@ -170,6 +171,56 @@ function Gladdy:NewModule(name, priority, defaults)
     self.modules[name] = module
 
     return module
+end
+
+function Gladdy:CreateMover(frame, x, y, name, points)
+    if not frame.mover then
+        frame.mover = CreateFrame("Frame", nil, frame, BackdropTemplateMixin and "BackdropTemplate")
+        frame.mover:SetFrameStrata("TOOLTIP")
+        frame.mover:SetPoint(points[1], frame, points[2], 0, 0)
+        local backdrop = {
+            bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+            edgeFile = "",
+            tile = true, tileSize = 16, edgeSize = 10,
+            insets = {left = 0, right = 0, top = 0, bottom = 0}
+        }
+
+        frame.mover:SetBackdrop(backdrop)
+        frame.mover:SetBackdropColor(0,0,0,0.8)
+        frame.mover:SetHeight(15)
+        frame.mover:SetWidth(60)
+        frame.mover.text = frame.mover:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+        frame.mover.text:SetText(name)
+        frame.mover.text:SetPoint("CENTER")
+
+        frame.mover:SetMovable(true)
+        frame.mover:EnableMouse(true)
+
+        frame.mover:SetScript("OnMouseDown", function(self)
+            self.point = { frame:GetPoint() }
+            self.start = { frame:GetCenter() }
+            frame:StartMoving()
+            self:StartMoving()
+        end)
+        frame.mover:SetScript("OnMouseUp", function(self)
+            frame:StopMovingOrSizing()
+            self:StopMovingOrSizing()
+            self.stop = { frame:GetCenter() }
+            local diffX = math_abs(self.start[1] - self.stop[1])
+            diffX = self.start[1] > self.stop[1] and -diffX or diffX
+            local diffY = math_abs(self.start[2] - self.stop[2])
+            diffY = self.start[2] > self.stop[2] and -diffY or diffY
+            frame:ClearAllPoints()
+            frame:SetPoint(self.point[1], self.point[2], self.point[3], self.point[4] + diffX, self.point[5] + diffY)
+            Gladdy.db[x] = self.point[4] + diffX
+            Gladdy.db[y] = self.point[5] + diffY
+            Gladdy:UpdateFrame()
+        end)
+    else
+        frame.mover:ClearAllPoints()
+        frame.mover:SetPoint(points[1], frame, points[2], 0, 0)
+    end
+
 end
 
 ---------------------------

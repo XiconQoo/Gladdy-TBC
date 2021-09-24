@@ -235,11 +235,13 @@ end
 function BuffsDebuffs:CreateFrame(unit)
     local verticalMargin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
     local debuffFrame = CreateFrame("Frame", "GladdyDebuffs" .. unit, Gladdy.buttons[unit])
+    debuffFrame:SetMovable(true)
     debuffFrame:SetHeight(Gladdy.db.buffsIconSize)
     debuffFrame:SetWidth(1)
     debuffFrame:SetPoint("BOTTOMLEFT", Gladdy.buttons[unit].healthBar, "TOPLEFT", 0, verticalMargin)
     debuffFrame.unit = unit
     local buffFrame = CreateFrame("Frame", "GladdyBuffs" .. unit, Gladdy.buttons[unit])
+    buffFrame:SetMovable(true)
     buffFrame:SetHeight(Gladdy.db.buffsIconSize)
     buffFrame:SetWidth(1)
     buffFrame:SetPoint("BOTTOMLEFT", Gladdy.buttons[unit].healthBar, "TOPLEFT", 0, verticalMargin)
@@ -327,6 +329,9 @@ function BuffsDebuffs:UpdateFrame(unit)
         else
             self.frames[unit].debuffFrame:SetPoint("LEFT", anchor, "RIGHT", horizontalMargin + Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset)
         end
+    end
+    if (unit == "arena1") then
+        Gladdy:CreateMover(self.frames[unit].debuffFrame, "buffsXOffset", "buffsYOffset", L["Debuffs"], {"BOTTOMLEFT", "TOPLEFT"})
     end
 
     --BUFFS
@@ -422,6 +427,10 @@ function BuffsDebuffs:UpdateFrame(unit)
             self.frames[unit].buffFrame:SetPoint("LEFT", anchor, "RIGHT", Gladdy.db.padding + Gladdy.db.buffsBuffsXOffset, Gladdy.db.buffsBuffsYOffset)
         end
     end
+    if (unit == "arena1") then
+        Gladdy:CreateMover(self.frames[unit].buffFrame, "buffsBuffsXOffset", "buffsBuffsYOffset", L["Buffs"], {"BOTTOMLEFT", "TOPLEFT"})
+    end
+
     for i=1, #self.frames[unit].auras[AURA_TYPE_BUFF] do
         styleIcon(self.frames[unit].auras[AURA_TYPE_BUFF][i], AURA_TYPE_BUFF)
     end
