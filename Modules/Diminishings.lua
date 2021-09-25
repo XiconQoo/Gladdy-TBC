@@ -180,7 +180,11 @@ function Diminishings:UpdateFrame(unit)
     drFrame:SetHeight(Gladdy.db.drIconSize)
     if (unit == "arena1") then
         Gladdy:CreateMover(drFrame, "drXOffset", "drYOffset", L["Diminishings"],
-                Gladdy.db.drCooldownPos == "RIGHT" and {"BOTTOMLEFT", "TOPLEFT"} or {"BOTTOMRIGHT", "TOPRIGHT"})
+                Gladdy.db.drCooldownPos == "RIGHT" and {"TOPLEFT", "TOPLEFT"} or {"TOPRIGHT", "TOPRIGHT"}, --point
+                Gladdy.db.drIconSize * Gladdy.db.drWidthFactor, -- width
+                Gladdy.db.drIconSize,
+                0, --xoffset
+                0) --yoffset
     end
 
     for i = 1, 16 do

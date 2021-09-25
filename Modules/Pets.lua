@@ -305,7 +305,7 @@ function Pets:UpdateFrame(unitId)
     healthBar.nameText:SetTextColor(Gladdy.db.petHealthBarFontColor.r, Gladdy.db.petHealthBarFontColor.g, Gladdy.db.petHealthBarFontColor.b, Gladdy.db.petHealthBarFontColor.a)
     healthBar.healthText:SetTextColor(Gladdy.db.petHealthBarFontColor.r, Gladdy.db.petHealthBarFontColor.g, Gladdy.db.petHealthBarFontColor.b, Gladdy.db.petHealthBarFontColor.a)
     if (unit == "arenapet1") then
-        Gladdy:CreateMover(self.frames[unit], "petXOffset", "petYOffset", L["Pets"], {"BOTTOMLEFT", "TOPLEFT"})
+        Gladdy:CreateMover(self.frames[unit], "petXOffset", "petYOffset", L["Pets"], {"TOPLEFT", "TOPLEFT"})
     end
 end
 

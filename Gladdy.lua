@@ -8,10 +8,10 @@ local tsort = table.sort
 local str_lower = string.lower
 local math_abs = math.abs
 local GetTime = GetTime
+local InCombatLockdown = InCombatLockdown
 local CreateFrame = CreateFrame
 local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
 local IsAddOnLoaded = IsAddOnLoaded
-local IsInInstance = IsInInstance
 local GetBattlefieldStatus = GetBattlefieldStatus
 local IsActiveBattlefieldArena = IsActiveBattlefieldArena
 local RELEASE_TYPES = { alpha = "Alpha", beta = "Beta", release = "Release"}
@@ -173,23 +173,28 @@ function Gladdy:NewModule(name, priority, defaults)
     return module
 end
 
-function Gladdy:CreateMover(frame, x, y, name, points)
+function Gladdy:CreateMover(frame, xConfig, yConfig, name, points, width, height, xOffset, yOffset)
     if not frame.mover then
         frame.mover = CreateFrame("Frame", nil, frame, BackdropTemplateMixin and "BackdropTemplate")
-        frame.mover:SetFrameStrata("TOOLTIP")
-        frame.mover:SetPoint(points[1], frame, points[2], 0, 0)
+        frame.mover:SetFrameStrata("DIALOG")
+        frame.mover:SetPoint(points[1], frame, points[2], xOffset or 0, yOffset or 0)
+        frame.mover:SetHeight(height or frame:GetHeight())
+        frame.mover:SetWidth(width or frame:GetWidth())
+
         local backdrop = {
             bgFile = "Interface/Tooltips/UI-Tooltip-Background",
             edgeFile = "",
             tile = true, tileSize = 16, edgeSize = 10,
             insets = {left = 0, right = 0, top = 0, bottom = 0}
         }
-
         frame.mover:SetBackdrop(backdrop)
-        frame.mover:SetBackdropColor(0,0,0,0.8)
-        frame.mover:SetHeight(15)
-        frame.mover:SetWidth(60)
-        frame.mover.text = frame.mover:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+        frame.mover:SetBackdropColor(0,1,0,0.5)
+        frame.mover.border = CreateFrame("Frame", nil, frame.mover, BackdropTemplateMixin and "BackdropTemplate")
+        frame.mover.border:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = 2 })
+        frame.mover.border:SetAllPoints(frame.mover)
+        frame.mover.border:SetBackdropBorderColor(0,1,0,1)
+
+        frame.mover.text = frame.mover.border:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
         frame.mover.text:SetText(name)
         frame.mover.text:SetPoint("CENTER")
 
@@ -212,15 +217,21 @@ function Gladdy:CreateMover(frame, x, y, name, points)
             diffY = self.start[2] > self.stop[2] and -diffY or diffY
             frame:ClearAllPoints()
             frame:SetPoint(self.point[1], self.point[2], self.point[3], self.point[4] + diffX, self.point[5] + diffY)
-            Gladdy.db[x] = self.point[4] + diffX
-            Gladdy.db[y] = self.point[5] + diffY
+            Gladdy.db[xConfig] = self.point[4] + diffX
+            Gladdy.db[yConfig] = self.point[5] + diffY
             Gladdy:UpdateFrame()
         end)
     else
         frame.mover:ClearAllPoints()
-        frame.mover:SetPoint(points[1], frame, points[2], 0, 0)
+        frame.mover:SetPoint(points[1], frame, points[2], xOffset or 0, yOffset or 0)
+        frame.mover:SetHeight(height or frame:GetHeight())
+        frame.mover:SetWidth(width or frame:GetWidth())
     end
-
+    if self.frame and self.frame.testing then
+        frame.mover:Show()
+    else
+        frame.mover:Hide()
+    end
 end
 
 ---------------------------
@@ -298,7 +309,6 @@ function Gladdy:OnInitialize()
     self.guids = {}
     self.curBracket = nil
     self.curUnit = 1
-    self.lastInstance = nil
 
     self:SetupOptions()
 
@@ -402,16 +412,10 @@ function Gladdy:PLAYER_ENTERING_WORLD()
         LibStub("AceConfigDialog-3.0"):Open("Gladdy", nil, LibStub("AceConfigDialog-3.0"):SelectGroup("Gladdy", "XiconProfiles"))
         self.showConfig = nil
     end
-    local instance = select(2, IsInInstance())
-    if (instance ~= "arena" and self.frame and self.frame:IsVisible() and not self.frame.testing) then
+    if (self.frame and self.frame:IsVisible()) then
         self:Reset()
         self:HideFrame()
     end
-    if (instance == "arena") then
-        self:Reset()
-        self:HideFrame()
-    end
-    self.lastInstance = instance
 end
 
 function Gladdy:UPDATE_BATTLEFIELD_STATUS(_, index)

@@ -331,7 +331,10 @@ function BuffsDebuffs:UpdateFrame(unit)
         end
     end
     if (unit == "arena1") then
-        Gladdy:CreateMover(self.frames[unit].debuffFrame, "buffsXOffset", "buffsYOffset", L["Debuffs"], {"BOTTOMLEFT", "TOPLEFT"})
+        Gladdy:CreateMover(self.frames[unit].debuffFrame, "buffsXOffset", "buffsYOffset", L["Debuffs"],
+                Gladdy.db.buffsCooldownGrowDirection == "LEFT" and {"TOPRIGHT", "TOPRIGHT"} or {"TOPLEFT", "TOPLEFT"},
+                Gladdy.db.buffsIconSize * Gladdy.db.buffsWidthFactor,
+                Gladdy.db.buffsIconSize, Gladdy.db.buffsCooldownGrowDirection == "LEFT"and -1 or 1, 0)
     end
 
     --BUFFS
@@ -428,7 +431,10 @@ function BuffsDebuffs:UpdateFrame(unit)
         end
     end
     if (unit == "arena1") then
-        Gladdy:CreateMover(self.frames[unit].buffFrame, "buffsBuffsXOffset", "buffsBuffsYOffset", L["Buffs"], {"BOTTOMLEFT", "TOPLEFT"})
+        Gladdy:CreateMover(self.frames[unit].buffFrame, "buffsBuffsXOffset", "buffsBuffsYOffset", L["Buffs"],
+                Gladdy.db.buffsBuffsCooldownGrowDirection == "LEFT" and {"TOPRIGHT", "TOPRIGHT"} or {"TOPLEFT", "TOPLEFT"},
+                Gladdy.db.buffsBuffsIconSize * Gladdy.db.buffsBuffsWidthFactor,
+                Gladdy.db.buffsBuffsIconSize, Gladdy.db.buffsBuffsCooldownGrowDirection == "LEFT"and -1 or 1, 0)
     end
 
     for i=1, #self.frames[unit].auras[AURA_TYPE_BUFF] do

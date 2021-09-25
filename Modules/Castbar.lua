@@ -194,7 +194,7 @@ function Castbar:UpdateFrame(unit)
     castBar.icon.texture.overlay:SetVertexColor(Gladdy.db.castBarIconColor.r, Gladdy.db.castBarIconColor.g, Gladdy.db.castBarIconColor.b, Gladdy.db.castBarIconColor.a)
 
     if (unit == "arena1") then
-        Gladdy:CreateMover(castBar, "castBarXOffset", "castBarYOffset", L["Cast Bar"], {"BOTTOMLEFT", "TOPLEFT"})
+        Gladdy:CreateMover(castBar, "castBarXOffset", "castBarYOffset", L["Cast Bar"], {"TOPLEFT", "TOPLEFT"}, Gladdy.db.castBarWidth, Gladdy.db.castBarHeight, 0, 0)
     end
 end
 

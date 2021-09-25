@@ -305,6 +305,7 @@ end
 function Gladdy:ToggleFrame(i)
     self:Reset()
     if (self.frame and self.frame:IsShown() and i == self.curBracket) then
+        self.frame.testing = nil
         self:HideFrame()
     else
         self.curBracket = i
@@ -312,6 +313,7 @@ function Gladdy:ToggleFrame(i)
         if (not self.frame) then
             self:CreateFrame()
         end
+        self.frame.testing = true
 
         for o = 1, self.curBracket do
             local unit = "arena" .. o
