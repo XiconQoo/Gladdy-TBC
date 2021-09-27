@@ -49,6 +49,15 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 <img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/sample2.jpg" align="right" width="48.5%">
 <img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/sample3.png" width="48.5%">
 
+## Contributors
+
+- [ManneN1](https://github.com/ManneN1)
+- [AlexFolland](https://github.com/AlexFolland)
+- [dfherr](https://github.com/dfherr)
+- [miraage](https://github.com/miraage)
+
+Thank you!
+
 ## Special Thanks
 
 - **miraage** - the origininal author of Gladdy! Your work set the foundation for this edit. Thanks!
