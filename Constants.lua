@@ -264,6 +264,16 @@ local importantAuras = {
         onDamage = true,
         spellID = 19503,
     },
+    -- Scare Beast
+    [GetSpellInfo(14327)] = {
+        track = AURA_TYPE_DEBUFF,
+        duration = 8,
+        priority = 40,
+        onDamage = true,
+        fear = true,
+        magic = true,
+        spellID = 14327,
+    },
     -- Silencing Shot
     [GetSpellInfo(34490)] = {
         track = AURA_TYPE_DEBUFF,
@@ -915,6 +925,7 @@ local cooldownList = {
     -- Hunter
     ["HUNTER"] = {
         [19503] = 30, -- Scatter Shot
+        [14327] = 30, -- Scare Beast
         [19263] = 300, -- Deterrence; not on BM but can't do 2 specs
         [14311] = { cd = 30, -- Freezing Trap
                     sharedCD = {
