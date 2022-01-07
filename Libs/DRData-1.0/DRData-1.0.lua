@@ -188,9 +188,9 @@ Data.spells = {
 
 	--[[ SLEEPS ]]--
 	-- Hibernate
-	[2637] = "sleep",
-	[18657] = "sleep",
-	[18658] = "sleep",
+	[2637] = "disorient",
+	[18657] = "disorient",
+	[18658] = "disorient",
 	
 	-- Wyvern Sting
 	[19386] = "disorient",
