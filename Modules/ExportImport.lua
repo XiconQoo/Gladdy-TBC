@@ -133,8 +133,8 @@ function ExportImport:CheckDeserializedOptions(tbl, refTbl, str)
     if str == nil and not tbl.version_major_num then
         return false, "Version conflict: version_major_num not seen"
     end
-    if str == nil and tbl.version_major_num ~= Gladdy.version_major_num then
-        return false, "Version conflict: " .. tbl.version_major_num .. " ~= " .. Gladdy.version_major_num
+    if str == nil and tbl.version_major_num > Gladdy.version_major_num then
+        return false, "Version conflict: Major v" .. tbl.version_major_num .. " ~= v" .. Gladdy.version_major_num
     end
     if str == nil then
         str = "Gladdy.db"
