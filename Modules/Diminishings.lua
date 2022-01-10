@@ -221,7 +221,6 @@ function Diminishings:UpdateFrame(unit)
         icon.timeText:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
 
         icon.drLevelText:SetFont(Gladdy:SMFetch("font", "drLevelTextFont"), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drLevelTextFontScale, "OUTLINE")
-        icon.drLevelText:SetTextColor(getDiminishColor(icon.diminishing))
 
         icon.cooldown:SetWidth(icon:GetWidth() - icon:GetWidth()/16)
         icon.cooldown:SetHeight(icon:GetHeight() - icon:GetHeight()/16)
@@ -241,7 +240,6 @@ function Diminishings:UpdateFrame(unit)
 
         if Gladdy.db.drLevelTextEnabled then
             icon.drLevelText:Show()
-            icon.drLevelText:SetText(getDiminishText(icon.diminishing))
         else
             icon.drLevelText:Hide()
         end
@@ -368,6 +366,8 @@ function Diminishings:AuraFade(unit, spellID)
     lastIcon.active = true
     self:Positionate(unit)
     lastIcon:Show()
+    lastIcon.drLevelText:SetText(getDiminishText(lastIcon.diminishing))
+    lastIcon.drLevelText:SetTextColor(getDiminishColor(lastIcon.diminishing))
 end
 
 function Diminishings:Positionate(unit)
