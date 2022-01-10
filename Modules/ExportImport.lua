@@ -89,7 +89,11 @@ import:AddChild(importClearButton)
 import.clearButton = importClearButton
 
 local deletedOptions = { -- backwards compatibility
-    growUp = true,
+    --deleted DR-categories
+    repentance = true,
+    sleep = true,
+    impconc = true,
+    dragonsbreath = true,
     freezetrap = true,
     repentance = true
 }
