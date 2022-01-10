@@ -338,13 +338,24 @@ function Cooldowns:CooldownReady(button, spellId, frame)
     end
 end
 
+local function notIn(spec, list)
+    for _,v in ipairs(list) do
+        if spec == v then
+            return false
+        end
+    end
+    return true
+end
+
 function Cooldowns:DetectSpec(unit, spec)
 
     local button = Gladdy.buttons[unit]
     if (not button or not spec or button.spec) then
         return
     end
-    if button.class == "PALADIN" and (spec ~= L["Holy"] or spec ~= L["Retribution"]) then
+    if button.class == "PALADIN" and notIn(spec, {L["Holy"], L["Retribution"], L["Protection"]})
+            or button.class == "SHAMAN" and notIn(spec, {L["Restoration"], L["Enhancement"], L["Elemental"]})
+            or button.class == "WARRIOR" and notIn(spec, {L["Arms"], L["Protection"], L["Fury"]}) then
         return
     end
 
