@@ -58,7 +58,7 @@ function Gladdy:CreateFrame()
 
             local scale = f:GetEffectiveScale()
             self.db.x = f:GetLeft() * scale
-            self.db.y = (self.db.growUp and f:GetBottom() or f:GetTop()) * scale
+            self.db.y = (self.db.growDirection == "TOP" and f:GetBottom() or f:GetTop()) * scale
         end
     end)
 
@@ -82,7 +82,7 @@ function Gladdy:CreateFrame()
 
             local scale = self.frame:GetEffectiveScale()
             self.db.x = self.frame:GetLeft() * scale
-            self.db.y = (self.db.growUp and self.frame:GetBottom() or self.frame:GetTop()) * scale
+            self.db.y = (self.db.growDirection == "TOP" and self.frame:GetBottom() or self.frame:GetTop()) * scale
         end
     end)
     self.anchor:SetScript("OnClick", function()
