@@ -33,6 +33,16 @@ function EventListener:JOINED_ARENA()
     self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
     self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
     self:SetScript("OnEvent", EventListener.OnEvent)
+
+    -- in case arena has started already we check for units
+    for i=1,Gladdy.curBracket do
+        if UnitExists("arena" .. i) then
+            Gladdy:SpotEnemy("arena" .. i, true)
+        end
+        if UnitExists("arenapet" .. i) then
+            Gladdy:SendMessage("PET_SPOTTED", "arenapet" .. i)
+        end
+    end
 end
 
 function EventListener:Reset()
