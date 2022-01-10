@@ -37,6 +37,8 @@ Gladdy.version_releaseType = RELEASE_TYPES.release
 Gladdy.version = PREFIX .. Gladdy.version_num .. "-" .. Gladdy.version_releaseType
 Gladdy.VERSION_REGEX = VERSION_REGEX
 
+Gladdy.debug = false
+
 LibStub("AceTimer-3.0"):Embed(Gladdy)
 LibStub("AceComm-3.0"):Embed(Gladdy)
 Gladdy.modules = {}
@@ -58,6 +60,17 @@ function Gladdy:Print(...)
 end
 
 function Gladdy:Warn(...)
+    local text = "|cfff29f05Gladdy|r:"
+    local val
+    for i = 1, select("#", ...) do
+        val = select(i, ...)
+        if (type(val) == 'boolean') then val = val and "true" or false end
+        text = text .. " " .. tostring(val)
+    end
+    DEFAULT_CHAT_FRAME:AddMessage(text)
+end
+
+function Gladdy:Error(...)
     local text = "|cfffc0303Gladdy|r:"
     local val
     for i = 1, select("#", ...) do
@@ -66,6 +79,18 @@ function Gladdy:Warn(...)
         text = text .. " " .. tostring(val)
     end
     DEFAULT_CHAT_FRAME:AddMessage(text)
+end
+
+function Gladdy:Debug(lvl, ...)
+    if Gladdy.debug then
+        if lvl == "INFO" then
+            Gladdy:Print(...)
+        elseif lvl == "WARN" then
+            Gladdy:Warn(...)
+        elseif lvl == "ERROR" then
+            Gladdy:Error(...)
+        end
+    end
 end
 
 Gladdy.events = CreateFrame("Frame")
