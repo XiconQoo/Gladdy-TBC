@@ -8,6 +8,7 @@ local tsort = table.sort
 local str_lower = string.lower
 local math_abs = math.abs
 local GetTime = GetTime
+local GetPhysicalScreenSize = GetPhysicalScreenSize
 local InCombatLockdown = InCombatLockdown
 local CreateFrame = CreateFrame
 local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
@@ -290,15 +291,17 @@ end
 
 function Gladdy:PixelPerfectScale(update)
     local physicalWidth, physicalHeight = GetPhysicalScreenSize()
-    local perfectUIScale = 768/physicalHeight--768/select(2, strsplit("x",({ GetScreenResolutions()})[GetCurrentResolution()]))
+    local perfectUIScale = 768.0/physicalHeight--768/select(2, strsplit("x",({ GetScreenResolutions()})[GetCurrentResolution()]))
     if self.db and self.db.pixelPerfect and self.frame then
         self.frame:SetIgnoreParentScale(true)
         self.frame:SetScale(perfectUIScale)
-        --self.db.frameScale = perfectUIScale --(GetCVar("useUiScale") == "1" and 1 + perfectUIScale - GetCVar("UIScale") or perfectUIScale)
+        --local adaptiveScale = (GetCVar("useUiScale") == "1" and 1.0 + perfectUIScale - GetCVar("UIScale") or perfectUIScale)
+        --self.frame:SetScale(adaptiveScale)
         if update then
             self:UpdateFrame()
         end
     elseif self.frame then
+        self.frame:SetScale(self.db.frameScale)
         self.frame:SetIgnoreParentScale(false)
     end
 end
