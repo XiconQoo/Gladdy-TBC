@@ -14,6 +14,8 @@ local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
 local IsAddOnLoaded = IsAddOnLoaded
 local GetBattlefieldStatus = GetBattlefieldStatus
 local IsActiveBattlefieldArena = IsActiveBattlefieldArena
+local IsInInstance = IsInInstance
+local GetNumArenaOpponents = GetNumArenaOpponents
 local RELEASE_TYPES = { alpha = "Alpha", beta = "Beta", release = "Release"}
 local PREFIX = "TBC-Classic_v"
 local VERSION_REGEX = PREFIX .. "(%d+%.%d+)%-(%a)"
@@ -422,7 +424,9 @@ end
 
 function Gladdy:UPDATE_BATTLEFIELD_STATUS(_, index)
     local status, mapName, instanceID, levelRangeMin, levelRangeMax, teamSize, isRankedArena, suspendedQueue, bool, queueType = GetBattlefieldStatus(index)
-    if (status == "active" and teamSize > 0 and IsActiveBattlefieldArena()) then
+    local instanceType = select(2, IsInInstance())
+    Gladdy:Debug("INFO", "UPDATE_BATTLEFIELD_STATUS", instanceType, status, teamSize)
+    if ((instanceType == "arena" or GetNumArenaOpponents() > 0) and status == "active" and teamSize > 0) then
         self.curBracket = teamSize
         self:JoinedArena()
     end
