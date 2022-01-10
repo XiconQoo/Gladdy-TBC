@@ -1,7 +1,6 @@
 local select = select
 local UnitExists, UnitAffectingCombat, GetSpellInfo = UnitExists, UnitAffectingCombat, GetSpellInfo
 local CreateFrame = CreateFrame
-local ANCHORS = { ["LEFT"] = "RIGHT", ["RIGHT"] = "LEFT", ["BOTTOM"] = "TOP", ["TOP"] = "BOTTOM"}
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
@@ -11,8 +10,6 @@ local CombatIndicator = Gladdy:NewModule("Combat Indicator", nil, {
     ciSize = 20,
     ciAlpha = 1,
     ciWidthFactor = 1,
-    ciAnchor = "healthBar",
-    ciPos = "TOP",
     ciXOffset = 0,
     ciYOffset = -31,
     ciBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
@@ -68,8 +65,7 @@ function CombatIndicator:UpdateFrame(unit)
     ciFrame.border:SetTexture(Gladdy.db.ciBorderStyle)
     ciFrame.border:SetVertexColor(Gladdy.db.ciBorderColor.r, Gladdy.db.ciBorderColor.g, Gladdy.db.ciBorderColor.b, Gladdy.db.ciBorderColor.a)
 
-    ciFrame:ClearAllPoints()
-    ciFrame:SetPoint(ANCHORS[Gladdy.db.ciPos], Gladdy.buttons[unit][Gladdy.db.ciAnchor], Gladdy.db.ciPos, Gladdy.db.ciXOffset, Gladdy.db.ciYOffset)
+    Gladdy:SetPosition(ciFrame, unit, "ciXOffset", "ciYOffset", CombatIndicator:LegacySetPosition(ciFrame, unit), CombatIndicator)
 
     ciFrame:SetAlpha(Gladdy.db.ciAlpha)
 
@@ -177,30 +173,6 @@ function CombatIndicator:GetOptions()
                             name = L["Position"],
                             order = 4,
                         },
-                        ciAnchor = Gladdy:option({
-                            type = "select",
-                            name = L["Anchor"],
-                            desc = L["This changes the anchor of the ci icon"],
-                            order = 20,
-                            values = {
-                                ["trinket"] = L["Trinket"],
-                                ["classIcon"] = L["Class Icon"],
-                                ["healthBar"] = L["Health Bar"],
-                                ["powerBar"] = L["Power Bar"],
-                            },
-                        }),
-                        ciPos = Gladdy:option({
-                            type = "select",
-                            name = L["Position"],
-                            desc = L["This changes position relative to its anchor of the ci icon"],
-                            order = 21,
-                            values = {
-                                ["LEFT"] = L["Left"],
-                                ["RIGHT"] = L["Right"],
-                                ["TOP"] = L["Top"],
-                                ["BOTTOM"] = L["Bottom"],
-                            },
-                        }),
                         ciXOffset = Gladdy:option({
                             type = "range",
                             name = L["Horizontal offset"],
@@ -249,4 +221,24 @@ function CombatIndicator:GetOptions()
             },
         },
     }
+end
+
+---------------------------
+
+-- LAGACY HANDLER
+
+---------------------------
+
+function CombatIndicator:LegacySetPosition(ciFrame, unit)
+    if Gladdy.db.newLayout then
+        return Gladdy.db.newLayout
+    end
+    -- LEGACY options
+    local ANCHORS = { ["LEFT"] = "RIGHT", ["RIGHT"] = "LEFT", ["BOTTOM"] = "TOP", ["TOP"] = "BOTTOM"}
+    local ciAnchor = Gladdy.db.ciAnchor or Gladdy.legacy.ciAnchor
+    local ciPos = Gladdy.db.ciPos
+
+    ciFrame:ClearAllPoints()
+    ciFrame:SetPoint(ANCHORS[ciPos], Gladdy.buttons[unit][ciAnchor], ciPos, Gladdy.db.ciXOffset, Gladdy.db.ciYOffset)
+    return Gladdy.db.newLayout
 end

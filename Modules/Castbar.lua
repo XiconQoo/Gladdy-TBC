@@ -34,7 +34,6 @@ local Castbar = Gladdy:NewModule("Cast Bar", 70, {
     castBarBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     castBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
     castBarGuesses = true,
-    castBarPos = "LEFT",
     castBarXOffset = 0,
     castBarYOffset = 0,
     castBarIconPos = "LEFT",
@@ -57,15 +56,17 @@ end
 ---------------------------
 
 function Castbar:CreateFrame(unit)
-    local castBar = CreateFrame("Frame", nil, Gladdy.buttons[unit], BackdropTemplateMixin and "BackdropTemplate")
+    local castBar = CreateFrame("Frame", nil, Gladdy.buttons[unit])
     castBar:EnableMouse(false)
     castBar:SetMovable(true)
     castBar.unit = unit
 
-    castBar:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "castBarBorderStyle"),
+    castBar.backdrop = CreateFrame("Frame", nil, castBar, BackdropTemplateMixin and "BackdropTemplate")
+    castBar.backdrop:SetAllPoints(castBar)
+    castBar.backdrop:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "castBarBorderStyle"),
                                  edgeSize = Gladdy.db.castBarBorderSize })
-    castBar:SetBackdropBorderColor(Gladdy.db.castBarBorderColor.r, Gladdy.db.castBarBorderColor.g, Gladdy.db.castBarBorderColor.b, Gladdy.db.castBarBorderColor.a)
-    castBar:SetFrameLevel(1)
+    castBar.backdrop:SetBackdropBorderColor(Gladdy.db.castBarBorderColor.r, Gladdy.db.castBarBorderColor.g, Gladdy.db.castBarBorderColor.b, Gladdy.db.castBarBorderColor.a)
+    castBar.backdrop:SetFrameLevel(1)
 
     castBar.bar = CreateFrame("StatusBar", nil, castBar)
     castBar.bar:SetStatusBarTexture(Gladdy:SMFetch("statusbar", "castBarTexture"))
@@ -130,9 +131,9 @@ function Castbar:UpdateFrame(unit)
 
     castBar:SetWidth(Gladdy.db.castBarWidth)
     castBar:SetHeight(Gladdy.db.castBarHeight)
-    castBar:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "castBarBorderStyle"),
+    castBar.backdrop:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "castBarBorderStyle"),
                                  edgeSize = Gladdy.db.castBarBorderSize })
-    castBar:SetBackdropBorderColor(Gladdy.db.castBarBorderColor.r, Gladdy.db.castBarBorderColor.g, Gladdy.db.castBarBorderColor.b, Gladdy.db.castBarBorderColor.a)
+    castBar.backdrop:SetBackdropBorderColor(Gladdy.db.castBarBorderColor.r, Gladdy.db.castBarBorderColor.g, Gladdy.db.castBarBorderColor.b, Gladdy.db.castBarBorderColor.a)
 
     castBar.bar:SetStatusBarTexture(Gladdy:SMFetch("statusbar", "castBarTexture"))
     castBar.bar:ClearAllPoints()
@@ -165,24 +166,7 @@ function Castbar:UpdateFrame(unit)
         leftMargin = Gladdy.db.castBarIconSize + 1
     end
 
-    castBar:ClearAllPoints()
-    local horizontalMargin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
-    if (Gladdy.db.castBarPos == "LEFT") then
-        local anchor = Gladdy:GetAnchor(unit, "LEFT")
-        if anchor == Gladdy.buttons[unit].healthBar then
-            castBar:SetPoint("RIGHT", anchor, "LEFT", -horizontalMargin - leftMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset)
-        else
-            castBar:SetPoint("RIGHT", anchor, "LEFT", -Gladdy.db.padding - leftMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset)
-        end
-    end
-    if (Gladdy.db.castBarPos == "RIGHT") then
-        local anchor = Gladdy:GetAnchor(unit, "RIGHT")
-        if anchor == Gladdy.buttons[unit].healthBar then
-            castBar:SetPoint("LEFT", anchor, "RIGHT", horizontalMargin + rightMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset)
-        else
-            castBar:SetPoint("LEFT", anchor, "RIGHT", Gladdy.db.padding + rightMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset)
-        end
-    end
+    Gladdy:SetPosition(castBar, unit, "castBarXOffset", "castBarYOffset", Castbar:LegacySetPosition(castBar, unit, leftMargin, rightMargin), Castbar)
 
     castBar.spellText:SetFont(Gladdy:SMFetch("font", "castBarFont"), Gladdy.db.castBarFontSize)
     castBar.spellText:SetTextColor(Gladdy.db.castBarFontColor.r, Gladdy.db.castBarFontColor.g, Gladdy.db.castBarFontColor.b, Gladdy.db.castBarFontColor.a)
@@ -410,7 +394,10 @@ function Castbar:CAST_START(unit, spell, icon, value, maxValue, test)
     castBar.spellText:SetText(spell)
     castBar.timeText:SetText(maxValue)
     castBar.bg:Show()
-    castBar:Show()
+    castBar.backdrop:Show()
+    if Gladdy.db.castBarSparkEnabled then
+        castBar.spark:Show()
+    end
     castBar:SetAlpha(1)
     castBar.icon:Show()
 end
@@ -430,7 +417,8 @@ function Castbar:CAST_STOP(unit, ...)
         castBar.timeText:SetText("")
         castBar.bar:SetValue(0)
         castBar.bg:Hide()
-        castBar:Hide()
+        castBar.backdrop:Hide()
+        castBar.spark:Hide()
         castBar.icon:Hide()
     else
         castBar.bar:SetStatusBarColor(...)
@@ -771,15 +759,6 @@ function Castbar:GetOptions()
                             name = L["Position"],
                             order = 1,
                         },
-                        castBarPos = option({
-                            type = "select",
-                            name = L["Castbar position"],
-                            order = 2,
-                            values = {
-                                ["LEFT"] = L["Left"],
-                                ["RIGHT"] = L["Right"],
-                            },
-                        }),
                         castBarIconPos = option( {
                             type = "select",
                             name = L["Icon position"],
@@ -817,4 +796,35 @@ function Castbar:GetOptions()
             },
         },
     }
+end
+
+---------------------------
+
+-- LAGACY HANDLER
+
+---------------------------
+
+function Castbar:LegacySetPosition(castBar, unit, leftMargin, rightMargin)
+    if Gladdy.db.newLayout then
+        return Gladdy.db.newLayout
+    end
+    castBar:ClearAllPoints()
+    local horizontalMargin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
+    if (Gladdy.db.castBarPos == "LEFT") then
+        local anchor = Gladdy:GetAnchor(unit, "LEFT")
+        if anchor == Gladdy.buttons[unit].healthBar then
+            castBar:SetPoint("RIGHT", anchor, "LEFT", -horizontalMargin - leftMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset)
+        else
+            castBar:SetPoint("RIGHT", anchor, "LEFT", -Gladdy.db.padding - leftMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset)
+        end
+    end
+    if (Gladdy.db.castBarPos == "RIGHT") then
+        local anchor = Gladdy:GetAnchor(unit, "RIGHT")
+        if anchor == Gladdy.buttons[unit].healthBar then
+            castBar:SetPoint("LEFT", anchor, "RIGHT", horizontalMargin + rightMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset)
+        else
+            castBar:SetPoint("LEFT", anchor, "RIGHT", Gladdy.db.padding + rightMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset)
+        end
+    end
+    return Gladdy.db.newLayout
 end

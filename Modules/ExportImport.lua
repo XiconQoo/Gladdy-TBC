@@ -95,7 +95,21 @@ local deletedOptions = { -- backwards compatibility
     impconc = true,
     dragonsbreath = true,
     freezetrap = true,
-    repentance = true
+    --deleted db options
+    castBarPos = true,
+    buffsCooldownPos = true,
+    buffsBuffsCooldownPos = true,
+    classIconPos = true,
+    ciAnchor = true,
+    ciPos = true,
+    cooldownYPos = true,
+    cooldownXPos = true,
+    drCooldownPos = true,
+    racialAnchor = true,
+    racialPos = true,
+    trinketPos = true,
+    padding = true,
+    growUp = true,
 }
 
 local function checkIsDeletedOption(k, str, msg, errorFound, errorMsg)
@@ -208,6 +222,9 @@ end
 function ExportImport:ApplyImport(t, table, str)
     if str == nil then
         str = "Gladdy.db"
+        if (not t.newLayout) then
+            table.newLayout = false
+        end
     end
     for k,v in pairs(t) do
         if type(v) == "table" then

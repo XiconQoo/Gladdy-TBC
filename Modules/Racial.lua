@@ -5,14 +5,12 @@ local GetTime = GetTime
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
-local Racial = Gladdy:NewModule("Racial", nil, {
+local Racial = Gladdy:NewModule("Racial", 79, {
     racialFont = "DorisPP",
     racialFontScale = 1,
     racialEnabled = true,
     racialSize = 60 + 20 + 1,
     racialWidthFactor = 0.9,
-    racialAnchor = "trinket",
-    racialPos = "RIGHT",
     racialXOffset = 0,
     racialYOffset = 0,
     racialBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
@@ -22,7 +20,6 @@ local Racial = Gladdy:NewModule("Racial", nil, {
     racialCooldownNumberAlpha = 1,
 })
 
-local ANCHORS = { ["LEFT"] = "RIGHT", ["RIGHT"] = "LEFT", ["BOTTOM"] = "TOP", ["TOP"] = "BOTTOM"}
 
 function Racial:Initialize()
     self.frames = {}
@@ -121,16 +118,15 @@ function Racial:UpdateFrame(unit)
     racial.texture.overlay:SetTexture(Gladdy.db.racialBorderStyle)
     racial.texture.overlay:SetVertexColor(Gladdy.db.racialBorderColor.r, Gladdy.db.racialBorderColor.g, Gladdy.db.racialBorderColor.b, Gladdy.db.racialBorderColor.a)
 
-    racial:ClearAllPoints()
-    local parent = Gladdy.buttons[unit][Gladdy.db.racialAnchor]
-    if (Gladdy.db.racialPos == "RIGHT") then
-        racial:SetPoint(ANCHORS[Gladdy.db.racialPos], parent, Gladdy.db.racialPos, Gladdy.db.padding + Gladdy.db.racialXOffset, Gladdy.db.racialYOffset)
-    elseif (Gladdy.db.racialPos == "LEFT") then
-        racial:SetPoint(ANCHORS[Gladdy.db.racialPos], parent, Gladdy.db.racialPos, -Gladdy.db.padding + Gladdy.db.racialXOffset, Gladdy.db.racialYOffset)
-    elseif (Gladdy.db.racialPos == "TOP") then
-        racial:SetPoint(ANCHORS[Gladdy.db.racialPos], parent, Gladdy.db.racialPos, Gladdy.db.racialXOffset, Gladdy.db.padding + Gladdy.db.racialYOffset)
-    elseif (Gladdy.db.racialPos == "BOTTOM") then
-        racial:SetPoint(ANCHORS[Gladdy.db.racialPos], parent, Gladdy.db.racialPos, Gladdy.db.racialXOffset, -Gladdy.db.padding + Gladdy.db.racialYOffset)
+    Gladdy:SetPosition(racial, unit, "racialXOffset", "racialYOffset", Racial:LegacySetPosition(racial, unit), Racial)
+
+    if (unit == "arena1") then
+        Gladdy:CreateMover(racial,"racialXOffset", "racialYOffset", L["Racial"],
+                {"TOPLEFT", "TOPLEFT"},
+                Gladdy.db.racialSize * Gladdy.db.racialWidthFactor,
+                Gladdy.db.racialSize,
+                0,
+                0)
     end
 
     if (Gladdy.db.racialEnabled == false) then
@@ -394,4 +390,30 @@ function Racial:GetOptions()
             },
         },
     }
+end
+
+---------------------------
+
+-- LAGACY HANDLER
+
+---------------------------
+
+function Racial:LegacySetPosition(racial, unit)
+    if Gladdy.db.newLayout then
+        return Gladdy.db.newLayout
+    end
+
+    local ANCHORS = { ["LEFT"] = "RIGHT", ["RIGHT"] = "LEFT", ["BOTTOM"] = "TOP", ["TOP"] = "BOTTOM"}
+    racial:ClearAllPoints()
+    local parent = Gladdy.buttons[unit][Gladdy.db.racialAnchor]
+    if (Gladdy.db.racialPos == "RIGHT") then
+        racial:SetPoint(ANCHORS[Gladdy.db.racialPos], parent, Gladdy.db.racialPos, Gladdy.db.padding + Gladdy.db.racialXOffset, Gladdy.db.racialYOffset)
+    elseif (Gladdy.db.racialPos == "LEFT") then
+        racial:SetPoint(ANCHORS[Gladdy.db.racialPos], parent, Gladdy.db.racialPos, -Gladdy.db.padding + Gladdy.db.racialXOffset, Gladdy.db.racialYOffset)
+    elseif (Gladdy.db.racialPos == "TOP") then
+        racial:SetPoint(ANCHORS[Gladdy.db.racialPos], parent, Gladdy.db.racialPos, Gladdy.db.racialXOffset, Gladdy.db.padding + Gladdy.db.racialYOffset)
+    elseif (Gladdy.db.racialPos == "BOTTOM") then
+        racial:SetPoint(ANCHORS[Gladdy.db.racialPos], parent, Gladdy.db.racialPos, Gladdy.db.racialXOffset, -Gladdy.db.padding + Gladdy.db.racialYOffset)
+    end
+    return Gladdy.db.newLayout
 end

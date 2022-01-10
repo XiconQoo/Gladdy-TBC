@@ -6,18 +6,19 @@ local GetTime = GetTime
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
-local Trinket = Gladdy:NewModule("Trinket", nil, {
+local Trinket = Gladdy:NewModule("Trinket", 80, {
     trinketFont = "DorisPP",
     trinketFontScale = 1,
     trinketEnabled = true,
     trinketSize = 60 + 20 + 1,
     trinketWidthFactor = 0.9,
-    trinketPos = "RIGHT",
     trinketBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     trinketBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     trinketDisableCircle = false,
     trinketCooldownAlpha = 1,
     trinketCooldownNumberAlpha = 1,
+    trinketXOffset = 0,
+    trinketYOffset = 0,
 })
 LibStub("AceComm-3.0"):Embed(Trinket)
 
@@ -119,20 +120,15 @@ function Trinket:UpdateFrame(unit)
     trinket.texture.overlay:SetTexture(Gladdy.db.trinketBorderStyle)
     trinket.texture.overlay:SetVertexColor(Gladdy.db.trinketBorderColor.r, Gladdy.db.trinketBorderColor.g, Gladdy.db.trinketBorderColor.b, Gladdy.db.trinketBorderColor.a)
 
-    trinket:ClearAllPoints()
-    local margin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
-    if (Gladdy.db.classIconPos == "LEFT") then
-        if (Gladdy.db.trinketPos == "RIGHT") then
-            trinket:SetPoint("TOPLEFT", Gladdy.buttons[unit].healthBar, "TOPRIGHT", margin, 0)
-        else
-            trinket:SetPoint("TOPRIGHT", Gladdy.buttons[unit].classIcon, "TOPLEFT", -Gladdy.db.padding, 0)
-        end
-    else
-        if (Gladdy.db.trinketPos == "RIGHT") then
-            trinket:SetPoint("TOPLEFT", Gladdy.buttons[unit].classIcon, "TOPRIGHT", Gladdy.db.padding, 0)
-        else
-            trinket:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -margin, 0)
-        end
+    Gladdy:SetPosition(trinket, unit, "trinketXOffset", "trinketYOffset", Trinket:LegacySetPosition(trinket, unit), Trinket)
+
+    if (unit == "arena1") then
+        Gladdy:CreateMover(trinket,"trinketXOffset", "trinketYOffset", L["Trinket"],
+                {"TOPLEFT", "TOPLEFT"},
+                Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor,
+                Gladdy.db.trinketSize,
+                0,
+                0)
     end
 
     if (Gladdy.db.trinketEnabled == false) then
@@ -368,4 +364,31 @@ function Trinket:GetOptions()
             },
         },
     }
+end
+
+---------------------------
+
+-- LAGACY HANDLER
+
+---------------------------
+
+function Trinket:LegacySetPosition(trinket, unit)
+    if Gladdy.db.newLayout then
+        return Gladdy.db.newLayout
+    end
+    trinket:ClearAllPoints()
+    local margin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
+    if (Gladdy.db.classIconPos == "LEFT") then
+        if (Gladdy.db.trinketPos == "RIGHT") then
+            trinket:SetPoint("TOPLEFT", Gladdy.buttons[unit].healthBar, "TOPRIGHT", margin, 0)
+        else
+            trinket:SetPoint("TOPRIGHT", Gladdy.buttons[unit].classIcon, "TOPLEFT", -Gladdy.db.padding, 0)
+        end
+    else
+        if (Gladdy.db.trinketPos == "RIGHT") then
+            trinket:SetPoint("TOPLEFT", Gladdy.buttons[unit].classIcon, "TOPRIGHT", Gladdy.db.padding, 0)
+        else
+            trinket:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -margin, 0)
+        end
+    end
 end

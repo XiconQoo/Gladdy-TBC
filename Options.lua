@@ -47,16 +47,16 @@ Gladdy.defaults = {
         hideBlizzard = "arena",
         x = 0,
         y = 0,
-        growUp = false,
         growDirection = "BOTTOM",
         frameScale = 1,
         pixelPerfect = false,
-        padding = 1,
         barWidth = 180,
         bottomMargin = 2,
         statusbarBorderOffset = 6,
         timerFormat = Gladdy.TIMER_FORMAT.tenths,
         backgroundColor = {r = 0, g = 0, b = 0, a = 0},
+        newLayout = false,
+        showMover = true,
     },
 }
 
@@ -215,19 +215,45 @@ function Gladdy:SetupOptions()
         get = getOpt,
         set = setOpt,
         args = {
-            test = {
+            lock = {
                 order = 1,
                 width = 0.7,
+                name = Gladdy.db.locked and L["Unlock frame"] or L["Lock frame"],
+                desc = L["Toggle if frame can be moved"],
+                type = "execute",
+                func = function()
+                    Gladdy.db.locked = not Gladdy.db.locked
+                    Gladdy:UpdateFrame()
+                    self.options.args.lock.name = Gladdy.db.locked and L["Unlock frame"] or L["Lock frame"]
+                end,
+            },
+            showMover = {
+                order = 2,
+                width = 0.7,
+                name = Gladdy.db.showMover and L["Hide Mover"] or L["Show Mover"],
+                desc = L["Toggle to show Mover Frames"],
+                type = "execute",
+                func = function()
+                    Gladdy.db.showMover = not Gladdy.db.showMover
+                    Gladdy:UpdateFrame()
+                    self.options.args.showMover.name = Gladdy.db.showMover and L["Hide Mover"] or L["Show Mover"]
+                end,
+            },
+            test = {
+                order = 2,
+                width = 0.7,
                 name = L["Test"],
+                desc = L["Show Test frames"],
                 type = "execute",
                 func = function()
                     Gladdy:ToggleFrame(3)
                 end,
             },
             hide = {
-                order = 2,
+                order = 3,
                 width = 0.7,
                 name = L["Hide"],
+                desc = L["Hide frames"],
                 type = "execute",
                 func = function()
                     Gladdy:Reset()
@@ -235,16 +261,17 @@ function Gladdy:SetupOptions()
                 end,
             },
             reload = {
-                order = 3,
+                order = 4,
                 width = 0.7,
                 name = L["ReloadUI"],
+                desc = L["Reloads the UI"],
                 type = "execute",
                 func = function()
                     ReloadUI()
                 end,
             },
             version = {
-                order = 4,
+                order = 5,
                 width = 1,
                 type = "description",
                 name = "     Gladdy v" .. Gladdy.version_num .. "-" .. Gladdy.version_releaseType
@@ -256,12 +283,6 @@ function Gladdy:SetupOptions()
                 childGroups = "tab",
                 order = 5,
                 args = {
-                    locked = {
-                        type = "toggle",
-                        name = L["Lock frame"],
-                        desc = L["Toggle if frame can be moved"],
-                        order = 1,
-                    },
                     growDirection = {
                         type = "select",
                         name = L["Grow Direction"],
@@ -314,15 +335,6 @@ function Gladdy:SetupOptions()
                                         min = .1,
                                         max = 2,
                                         step = .01,
-                                    },
-                                    padding = {
-                                        type = "range",
-                                        name = L["Frame padding"],
-                                        desc = L["Padding of the frame"],
-                                        order = 6,
-                                        min = 0,
-                                        max = 20,
-                                        step = 1,
                                     },
                                     barWidth = {
                                         type = "range",

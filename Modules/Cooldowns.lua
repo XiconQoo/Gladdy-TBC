@@ -1,4 +1,4 @@
-local type, pairs, ceil, tonumber, mod, tostring, upper, select = type, pairs, ceil, tonumber, mod, tostring, string.upper, select
+local type, pairs, ipairs, ceil, tonumber, mod, tostring, upper, select = type, pairs, ipairs, ceil, tonumber, mod, tostring, string.upper, select
 local GetTime = GetTime
 local CreateFrame = CreateFrame
 local RACE_ICON_TCOORDS = {
@@ -54,8 +54,8 @@ local Cooldowns = Gladdy:NewModule("Cooldowns", nil, {
     cooldownFontScale = 1,
     cooldownFontColor = { r = 1, g = 1, b = 0, a = 1 },
     cooldown = true,
-    cooldownYPos = "TOP",
-    cooldownXPos = "LEFT",
+    cooldownYGrowDirection = "UP",
+    cooldownXGrowDirection = "RIGHT",
     cooldownYOffset = 0,
     cooldownXOffset = 0,
     cooldownSize = 30,
@@ -66,7 +66,7 @@ local Cooldowns = Gladdy:NewModule("Cooldowns", nil, {
     cooldownBorderColor = { r = 1, g = 1, b = 1, a = 1 },
     cooldownDisableCircle = false,
     cooldownCooldownAlpha = 1,
-    cooldownCooldowns = getDefaultCooldown()
+    cooldownCooldowns = getDefaultCooldown(),
 })
 
 function Cooldowns:Initialize()
@@ -134,42 +134,15 @@ function Cooldowns:UpdateFrame(unit)
     local button = Gladdy.buttons[unit]
     -- Cooldown frame
     if (Gladdy.db.cooldown) then
-        button.spellCooldownFrame:ClearAllPoints()
-        local powerBarHeight = Gladdy.db.powerBarEnabled and (Gladdy.db.powerBarHeight + 1) or 0
-        local horizontalMargin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize)
-        if Gladdy.db.cooldownYPos == "TOP" then
-            if Gladdy.db.cooldownXPos == "RIGHT" then
-                button.spellCooldownFrame:SetPoint("BOTTOMRIGHT", button.healthBar, "TOPRIGHT", Gladdy.db.cooldownXOffset, horizontalMargin + Gladdy.db.cooldownYOffset)
-            else
-                button.spellCooldownFrame:SetPoint("BOTTOMLEFT", button.healthBar, "TOPLEFT", Gladdy.db.cooldownXOffset, horizontalMargin + Gladdy.db.cooldownYOffset)
-            end
-        elseif Gladdy.db.cooldownYPos == "BOTTOM" then
-            if Gladdy.db.cooldownXPos == "RIGHT" then
-                button.spellCooldownFrame:SetPoint("TOPRIGHT", button.healthBar, "BOTTOMRIGHT", Gladdy.db.cooldownXOffset, -horizontalMargin + Gladdy.db.cooldownYOffset - powerBarHeight)
-            else
-                button.spellCooldownFrame:SetPoint("TOPLEFT", button.healthBar, "BOTTOMLEFT", Gladdy.db.cooldownXOffset, -horizontalMargin + Gladdy.db.cooldownYOffset - powerBarHeight)
-            end
-        elseif Gladdy.db.cooldownYPos == "LEFT" then
-            local anchor = Gladdy:GetAnchor(unit, "LEFT")
-            if anchor == Gladdy.buttons[unit].healthBar then
-                button.spellCooldownFrame:SetPoint("RIGHT", anchor, "LEFT", -(horizontalMargin + Gladdy.db.padding) + Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset)
-            else
-                button.spellCooldownFrame:SetPoint("RIGHT", anchor, "LEFT", -Gladdy.db.padding + Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset)
-            end
-        elseif Gladdy.db.cooldownYPos == "RIGHT" then
-            local anchor = Gladdy:GetAnchor(unit, "RIGHT")
-            if anchor == Gladdy.buttons[unit].healthBar then
-                button.spellCooldownFrame:SetPoint("LEFT", anchor, "RIGHT", horizontalMargin + Gladdy.db.padding + Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset)
-            else
-                button.spellCooldownFrame:SetPoint("LEFT", anchor, "RIGHT", Gladdy.db.padding + Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset)
-            end
-        end
         button.spellCooldownFrame:SetHeight(Gladdy.db.cooldownSize)
         button.spellCooldownFrame:SetWidth(1)
         button.spellCooldownFrame:Show()
+
+        Gladdy:SetPosition(button.spellCooldownFrame, unit, "cooldownXOffset", "cooldownYOffset", Cooldowns:LegacySetPosition(button, unit), Cooldowns)
+
         if (unit == "arena1") then
-            Gladdy:CreateMover(button.spellCooldownFrame, "cooldownXOffset", "cooldownYOffset", L["Cooldown"],
-                    Gladdy.db.cooldownXPos == "RIGHT" and {"TOPRIGHT", "TOPRIGHT"} or {"TOPLEFT", "TOPLEFT"},
+            Gladdy:CreateMover(button.spellCooldownFrame,"cooldownXOffset", "cooldownYOffset", L["Cooldown"],
+                    {"TOPLEFT", "TOPLEFT"},
                     Gladdy.db.cooldownSize * Gladdy.db.cooldownWidthFactor, Gladdy.db.cooldownSize)
         end
         -- Update each cooldown icon
@@ -181,11 +154,11 @@ function Cooldowns:UpdateFrame(unit)
             icon.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), Gladdy.db.cooldownSize / 2 * Gladdy.db.cooldownFontScale, "OUTLINE")
             icon.cooldownFont:SetTextColor(Gladdy.db.cooldownFontColor.r, Gladdy.db.cooldownFontColor.g, Gladdy.db.cooldownFontColor.b, Gladdy.db.cooldownFontColor.a)
             icon:ClearAllPoints()
-            if (Gladdy.db.cooldownXPos == "RIGHT") then
+            if (Gladdy.db.cooldownXGrowDirection == "LEFT") then
                 if (j == 1) then
-                    icon:SetPoint("RIGHT", button.spellCooldownFrame, "RIGHT", 0, 0)
+                    icon:SetPoint("LEFT", button.spellCooldownFrame, "LEFT", 0, 0)
                 elseif (mod(j-1,Gladdy.db.cooldownMaxIconsPerLine) == 0) then
-                    if (Gladdy.db.cooldownYPos == "BOTTOM" or Gladdy.db.cooldownYPos == "LEFT" or Gladdy.db.cooldownYPos == "RIGHT") then
+                    if (Gladdy.db.cooldownYGrowDirection == "DOWN") then
                         icon:SetPoint("TOP", button.spellCooldownFrame["icon" .. o], "BOTTOM", 0, -Gladdy.db.cooldownIconPadding)
                     else
                         icon:SetPoint("BOTTOM", button.spellCooldownFrame["icon" .. o], "TOP", 0, Gladdy.db.cooldownIconPadding)
@@ -195,11 +168,11 @@ function Cooldowns:UpdateFrame(unit)
                     icon:SetPoint("RIGHT", button.spellCooldownFrame["icon" .. j - 1], "LEFT", -Gladdy.db.cooldownIconPadding, 0)
                 end
             end
-            if (Gladdy.db.cooldownXPos == "LEFT") then
+            if (Gladdy.db.cooldownXGrowDirection == "RIGHT") then
                 if (j == 1) then
                     icon:SetPoint("LEFT", button.spellCooldownFrame, "LEFT", 0, 0)
                 elseif (mod(j-1,Gladdy.db.cooldownMaxIconsPerLine) == 0) then
-                    if (Gladdy.db.cooldownYPos == "BOTTOM" or Gladdy.db.cooldownYPos == "LEFT" or Gladdy.db.cooldownYPos == "RIGHT") then
+                    if (Gladdy.db.cooldownYGrowDirection == "DOWN") then
                         icon:SetPoint("TOP", button.spellCooldownFrame["icon" .. o], "BOTTOM", 0, -Gladdy.db.cooldownIconPadding)
                     else
                         icon:SetPoint("BOTTOM", button.spellCooldownFrame["icon" .. o], "TOP", 0, Gladdy.db.cooldownIconPadding)
@@ -561,31 +534,6 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId, expirationTimeInSecond
     end  ]]
 end
 
-local function option(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key]
-        end,
-        set = function(info, value)
-            local key = info.arg or info[#info]
-            Gladdy.dbi.profile[key] = value
-            if Gladdy.db.cooldownYPos == "LEFT" then
-                Gladdy.db.cooldownXPos = "RIGHT"
-            elseif Gladdy.db.cooldownYPos == "RIGHT" then
-                Gladdy.db.cooldownXPos = "LEFT"
-            end
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
 function Cooldowns:GetOptions()
     return {
         headerCooldown = {
@@ -642,15 +590,6 @@ function Cooldowns:GetOptions()
                             min = 0,
                             max = 10,
                             step = 0.1,
-                            width = "full",
-                        }),
-                        cooldownMaxIconsPerLine = Gladdy:option({
-                            type = "range",
-                            name = L["Max Icons per row"],
-                            order = 7,
-                            min = 3,
-                            max = 14,
-                            step = 1,
                             width = "full",
                         }),
                     },
@@ -745,37 +684,44 @@ function Cooldowns:GetOptions()
                             name = L["Position"],
                             order = 2,
                         },
-                        cooldownYPos = option({
+                        cooldownYGrowDirection = Gladdy:option({
                             type = "select",
-                            name = L["Anchor"],
-                            desc = L["Anchor of the cooldown icons"],
+                            name = L["Vertical Grow Direction"],
+                            desc = L["Vertical Grow Direction of the cooldown icons"],
                             order = 3,
                             values = {
-                                ["TOP"] = L["Top"],
-                                ["BOTTOM"] = L["Bottom"],
+                                ["UP"] = L["Up"],
+                                ["DOWN"] = L["Down"],
+                            },
+                        }),
+                        cooldownXGrowDirection = Gladdy:option({
+                            type = "select",
+                            name = L["Horizontal Grow Direction"],
+                            desc = L["Horizontal Grow Direction of the cooldown icons"],
+                            order = 4,
+                            values = {
                                 ["LEFT"] = L["Left"],
                                 ["RIGHT"] = L["Right"],
                             },
                         }),
-                        cooldownXPos = Gladdy:option({
-                            type = "select",
-                            name = L["Grow Direction"],
-                            desc = L["Grow Direction of the cooldown icons"],
-                            order = 4,
-                            values = {
-                                ["LEFT"] = L["Right"],
-                                ["RIGHT"] = L["Left"],
-                            },
+                        cooldownMaxIconsPerLine = Gladdy:option({
+                            type = "range",
+                            name = L["Max Icons per row"],
+                            order = 5,
+                            min = 3,
+                            max = 14,
+                            step = 1,
+                            width = "full",
                         }),
                         headerOffset = {
                             type = "header",
                             name = L["Offset"],
-                            order = 5,
+                            order = 10,
                         },
                         cooldownXOffset = Gladdy:option({
                             type = "range",
                             name = L["Horizontal offset"],
-                            order = 6,
+                            order = 11,
                             min = -400,
                             max = 400,
                             step = 0.1,
@@ -784,7 +730,7 @@ function Cooldowns:GetOptions()
                         cooldownYOffset = Gladdy:option({
                             type = "range",
                             name = L["Vertical offset"],
-                            order = 7,
+                            order = 12,
                             min = -400,
                             max = 400,
                             step = 0.1,
@@ -913,4 +859,67 @@ function Gladdy:UpdateTestCooldowns(i)
             Cooldowns:CooldownUsed(unit, button.race, spellID)
         end
     end
+end
+
+---------------------------
+
+-- LAGACY HANDLER
+
+---------------------------
+
+function Cooldowns:LegacySetPosition(button, unit)
+    if Gladdy.db.newLayout then
+        return Gladdy.db.newLayout
+    end
+    button.spellCooldownFrame:ClearAllPoints()
+    local powerBarHeight = Gladdy.db.powerBarEnabled and (Gladdy.db.powerBarHeight + 1) or 0
+    local horizontalMargin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize)
+
+    local offset = 0
+    if (Gladdy.db.cooldownXPos == "RIGHT") then
+        offset = -(Gladdy.db.cooldownSize * Gladdy.db.cooldownWidthFactor)
+    end
+
+    if Gladdy.db.cooldownYPos == "TOP" then
+        Gladdy.db.cooldownYGrowDirection = "UP"
+        if Gladdy.db.cooldownXPos == "RIGHT" then
+            Gladdy.db.cooldownXGrowDirection = "LEFT"
+            button.spellCooldownFrame:SetPoint("BOTTOMRIGHT", button.healthBar, "TOPRIGHT", Gladdy.db.cooldownXOffset + offset, horizontalMargin + Gladdy.db.cooldownYOffset)
+        else
+            Gladdy.db.cooldownXGrowDirection = "RIGHT"
+            button.spellCooldownFrame:SetPoint("BOTTOMLEFT", button.healthBar, "TOPLEFT", Gladdy.db.cooldownXOffset + offset, horizontalMargin + Gladdy.db.cooldownYOffset)
+        end
+    elseif Gladdy.db.cooldownYPos == "BOTTOM" then
+        Gladdy.db.cooldownYGrowDirection = "DOWN"
+        if Gladdy.db.cooldownXPos == "RIGHT" then
+            Gladdy.db.cooldownXGrowDirection = "LEFT"
+            button.spellCooldownFrame:SetPoint("TOPRIGHT", button.healthBar, "BOTTOMRIGHT", Gladdy.db.cooldownXOffset + offset, -horizontalMargin + Gladdy.db.cooldownYOffset - powerBarHeight)
+        else
+            Gladdy.db.cooldownXGrowDirection = "RIGHT"
+            button.spellCooldownFrame:SetPoint("TOPLEFT", button.healthBar, "BOTTOMLEFT", Gladdy.db.cooldownXOffset + offset, -horizontalMargin + Gladdy.db.cooldownYOffset - powerBarHeight)
+        end
+    elseif Gladdy.db.cooldownYPos == "LEFT" then
+        Gladdy.db.cooldownYGrowDirection = "DOWN"
+        local anchor = Gladdy:GetAnchor(unit, "LEFT")
+        if anchor == Gladdy.buttons[unit].healthBar then
+            Gladdy.db.cooldownXGrowDirection = "LEFT"
+            button.spellCooldownFrame:SetPoint("RIGHT", anchor, "LEFT", -(horizontalMargin + Gladdy.db.padding) + Gladdy.db.cooldownXOffset + offset, Gladdy.db.cooldownYOffset)
+        else
+            Gladdy.db.cooldownXGrowDirection = "LEFT"
+            button.spellCooldownFrame:SetPoint("RIGHT", anchor, "LEFT", -Gladdy.db.padding + Gladdy.db.cooldownXOffset + offset, Gladdy.db.cooldownYOffset)
+        end
+    elseif Gladdy.db.cooldownYPos == "RIGHT" then
+        Gladdy.db.cooldownYGrowDirection = "DOWN"
+        local anchor = Gladdy:GetAnchor(unit, "RIGHT")
+        if anchor == Gladdy.buttons[unit].healthBar then
+            Gladdy.db.cooldownXGrowDirection = "RIGHT"
+            button.spellCooldownFrame:SetPoint("LEFT", anchor, "RIGHT", horizontalMargin + Gladdy.db.padding + Gladdy.db.cooldownXOffset + offset, Gladdy.db.cooldownYOffset)
+        else
+            Gladdy.db.cooldownXGrowDirection = "RIGHT"
+            button.spellCooldownFrame:SetPoint("LEFT", anchor, "RIGHT", Gladdy.db.padding + Gladdy.db.cooldownXOffset + offset, Gladdy.db.cooldownYOffset)
+        end
+    end
+    LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
+
+    return Gladdy.db.newLayout
 end

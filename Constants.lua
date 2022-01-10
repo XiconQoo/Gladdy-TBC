@@ -1180,3 +1180,58 @@ function Gladdy:GetArenaTimer()
     end
 end
 
+Gladdy.legacy = {
+    castBarPos = "LEFT",
+    buffsCooldownPos = "TOP",
+    buffsBuffsCooldownPos = "BOTTOM",
+    classIconPos = "LEFT",
+    ciAnchor = "healthBar",
+    ciPos = "TOP",
+    cooldownYPos = "TOP",
+    cooldownXPos = "LEFT",
+    drCooldownPos = "RIGHT",
+    racialAnchor = "trinket",
+    racialPos = "RIGHT",
+    trinketPos = "RIGHT",
+    padding = 1,
+    growUp = false,
+}
+
+Gladdy.newDefaults = {
+    ["bottomMargin"] = 94.99996948242188,
+    ["newLayout"] = true,
+    Pets = {
+        ["petYOffset"] = -81.99993896484375,
+        ["petXOffset"] = 181,
+    },
+    ClassIcon = {
+        ["classIconXOffset"] = -74.90008544921875,
+    },
+    Racial = {
+        ["racialXOffset"] = 255.9000244140625,
+    },
+    Trinket = {
+        ["trinketXOffset"] = 182,
+    },
+    ["Combat Indicator"] = {
+        ["ciXOffset"] = 79.99993896484375,
+        ["ciYOffset"] = -10.99993896484375,
+    },
+    Cooldowns = {
+        ["cooldownYOffset"] = 31,
+    },
+    ["Buffs and Debuffs"] = {
+        ["buffsBuffsXOffset"] = 29,
+        ["buffsBuffsYOffset"] = -82.99993896484375,
+        ["buffsXOffset"] = 29,
+        ["buffsYOffset"] = 62.00006103515625,
+    },
+    Diminishings = {
+        ["drXOffset"] = 329.7999877929688,
+        ["drYOffset"] = -22.5,
+    },
+    ["Cast Bar"] = {
+        ["castBarXOffset"] = -235.900146484375,
+        ["castBarYOffset"] = -30.5,
+    },
+}

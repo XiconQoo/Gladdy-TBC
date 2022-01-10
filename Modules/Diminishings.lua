@@ -30,7 +30,7 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drFont = "DorisPP",
     drFontColor = { r = 1, g = 1, b = 0, a = 1 },
     drFontScale = 1,
-    drCooldownPos = "RIGHT",
+    drGrowDirection = "RIGHT",
     drXOffset = 0,
     drYOffset = 0,
     drIconSize = 36,
@@ -49,7 +49,7 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drLevelTextFontScale = 1,
     drWidthFactor = 1,
     drCategories = defaultCategories(),
-    drDuration = 18
+    drDuration = 18,
 })
 
 local function getDiminishColor(dr)
@@ -179,34 +179,18 @@ function Diminishings:UpdateFrame(unit)
         drFrame:Show()
     end
 
-    drFrame:ClearAllPoints()
-    local horizontalMargin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
-    if (Gladdy.db.drCooldownPos == "LEFT") then
-        local anchor = Gladdy:GetAnchor(unit, "LEFT")
-        if anchor == Gladdy.buttons[unit].healthBar then
-            drFrame:SetPoint("RIGHT", anchor, "LEFT", -horizontalMargin + Gladdy.db.drXOffset, Gladdy.db.drYOffset)
-        else
-            drFrame:SetPoint("RIGHT", anchor, "LEFT", -Gladdy.db.padding + Gladdy.db.drXOffset, Gladdy.db.drYOffset)
-        end
-    end
-    if (Gladdy.db.drCooldownPos == "RIGHT") then
-        local anchor = Gladdy:GetAnchor(unit, "RIGHT")
-        if anchor == Gladdy.buttons[unit].healthBar then
-            drFrame:SetPoint("LEFT", anchor, "RIGHT", horizontalMargin + Gladdy.db.drXOffset, Gladdy.db.drYOffset)
-        else
-            drFrame:SetPoint("LEFT", anchor, "RIGHT", Gladdy.db.padding + Gladdy.db.drXOffset, Gladdy.db.drYOffset)
-        end
-    end
-
-    drFrame:SetWidth(Gladdy.db.drIconSize * 16)
+    drFrame:SetWidth(Gladdy.db.drIconSize)
     drFrame:SetHeight(Gladdy.db.drIconSize)
+
+    Gladdy:SetPosition(drFrame, unit, "drXOffset", "drYOffset", Diminishings:LegacySetPosition(drFrame, unit), Diminishings)
+
     if (unit == "arena1") then
-        Gladdy:CreateMover(drFrame, "drXOffset", "drYOffset", L["Diminishings"],
-                Gladdy.db.drCooldownPos == "RIGHT" and {"TOPLEFT", "TOPLEFT"} or {"TOPRIGHT", "TOPRIGHT"}, --point
-                Gladdy.db.drIconSize * Gladdy.db.drWidthFactor, -- width
+        Gladdy:CreateMover(drFrame,"drXOffset", "drYOffset", L["Diminishings"],
+                Gladdy.db.drGrowDirection == "RIGHT" and {"TOPLEFT", "TOPLEFT"} or {"TOPRIGHT", "TOPRIGHT"},
+                Gladdy.db.drIconSize * Gladdy.db.drWidthFactor,
                 Gladdy.db.drIconSize,
-                0, --xoffset
-                0) --yoffset
+                0,
+                0)
     end
 
     for i = 1, 16 do
@@ -245,15 +229,15 @@ function Diminishings:UpdateFrame(unit)
         end
 
         icon:ClearAllPoints()
-        if (Gladdy.db.drCooldownPos == "LEFT") then
+        if (Gladdy.db.drGrowDirection == "LEFT") then
             if (i == 1) then
-                icon:SetPoint("TOPRIGHT")
+                icon:SetPoint("TOPRIGHT", drFrame, "TOPRIGHT")
             else
                 icon:SetPoint("RIGHT", drFrame["icon" .. (i - 1)], "LEFT", -Gladdy.db.drIconPadding, 0)
             end
         else
             if (i == 1) then
-                icon:SetPoint("TOPLEFT")
+                icon:SetPoint("TOPLEFT", drFrame, "TOPLEFT")
             else
                 icon:SetPoint("LEFT", drFrame["icon" .. (i - 1)], "RIGHT", Gladdy.db.drIconPadding, 0)
             end
@@ -383,13 +367,15 @@ function Diminishings:Positionate(unit)
 
         if (icon.active) then
             icon:ClearAllPoints()
-            if (Gladdy.db.drCooldownPos == "LEFT") then
+            if (Gladdy.db.newLayout and Gladdy.db.drGrowDirection == "LEFT"
+                    or not Gladdy.db.newLayout and Gladdy.db.drCooldownPos == "LEFT") then
                 if (not lastIcon) then
                     icon:SetPoint("TOPRIGHT")
                 else
                     icon:SetPoint("RIGHT", lastIcon, "LEFT", -Gladdy.db.drIconPadding, 0)
                 end
-            else
+            elseif (Gladdy.db.newLayout and Gladdy.db.drGrowDirection == "RIGHT"
+                    or not Gladdy.db.newLayout and Gladdy.db.drCooldownPos == "RIGHT") then
                 if (not lastIcon) then
                     icon:SetPoint("TOPLEFT")
                 else
@@ -562,21 +548,16 @@ function Diminishings:GetOptions()
                             name = L["Position"],
                             order = 20,
                         },
-                        drCooldownPos = Gladdy:option({
+                        drGrowDirection = Gladdy:option({
                             type = "select",
-                            name = L["DR Cooldown position"],
-                            desc = L["Position of the cooldown icons"],
+                            name = L["DR Grow Direction"],
+                            desc = L["Grow Direction of the dr icons"],
                             order = 21,
                             values = {
                                 ["LEFT"] = L["Left"],
                                 ["RIGHT"] = L["Right"],
                             },
                         }),
-                        headerOffset = {
-                            type = "header",
-                            name = L["Offset"],
-                            order = 22,
-                        },
                         drXOffset = Gladdy:option({
                             type = "range",
                             name = L["Horizontal offset"],
@@ -790,4 +771,37 @@ function Diminishings:GetDRIcons(category)
         end
     end
     return icons
+end
+
+---------------------------
+
+-- LAGACY HANDLER
+
+---------------------------
+
+function Diminishings:LegacySetPosition(drFrame, unit)
+    if Gladdy.db.newLayout then
+        return Gladdy.db.newLayout
+    end
+    drFrame:ClearAllPoints()
+    local horizontalMargin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
+    if (Gladdy.db.drCooldownPos == "LEFT") then
+        Gladdy.db.drGrowDirection = "LEFT"
+        local anchor = Gladdy:GetAnchor(unit, "LEFT")
+        if anchor == Gladdy.buttons[unit].healthBar then
+            drFrame:SetPoint("RIGHT", anchor, "LEFT", -horizontalMargin + Gladdy.db.drXOffset, Gladdy.db.drYOffset)
+        else
+            drFrame:SetPoint("RIGHT", anchor, "LEFT", -Gladdy.db.padding + Gladdy.db.drXOffset, Gladdy.db.drYOffset)
+        end
+    end
+    if (Gladdy.db.drCooldownPos == "RIGHT") then
+        Gladdy.db.drGrowDirection = "RIGHT"
+        local anchor = Gladdy:GetAnchor(unit, "RIGHT")
+        if anchor == Gladdy.buttons[unit].healthBar then
+            drFrame:SetPoint("LEFT", anchor, "RIGHT", horizontalMargin + Gladdy.db.drXOffset, Gladdy.db.drYOffset)
+        else
+            drFrame:SetPoint("LEFT", anchor, "RIGHT", Gladdy.db.padding + Gladdy.db.drXOffset, Gladdy.db.drYOffset)
+        end
+    end
+    return Gladdy.db.newLayout
 end

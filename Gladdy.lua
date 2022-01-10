@@ -6,7 +6,6 @@ local pairs = pairs
 local tinsert = table.insert
 local tsort = table.sort
 local str_lower = string.lower
-local math_abs = math.abs
 local GetTime = GetTime
 local GetPhysicalScreenSize = GetPhysicalScreenSize
 local InCombatLockdown = InCombatLockdown
@@ -97,6 +96,7 @@ end
 Gladdy.events = CreateFrame("Frame")
 Gladdy.events.registered = {}
 Gladdy.events:RegisterEvent("PLAYER_LOGIN")
+Gladdy.events:RegisterEvent("PLAYER_LOGOUT")
 Gladdy.events:RegisterEvent("CVAR_UPDATE")
 hooksecurefunc("VideoOptionsFrameOkay_OnClick", function(self, button, down, apply)
     if (self:GetName() == "VideoOptionsFrameApply") then
@@ -111,6 +111,8 @@ Gladdy.events:SetScript("OnEvent", function(self, event, ...)
         if (str_lower(select(1, ...)) == "uiscale") then
             Gladdy:PixelPerfectScale(true)
         end
+    elseif (event == "PLAYER_LOGOUT") then
+        Gladdy:DeleteUnknownOptions(Gladdy.db, Gladdy.defaults.profile)
     else
         local func = self.registered[event]
 
@@ -202,68 +204,6 @@ function Gladdy:NewModule(name, priority, defaults)
     return module
 end
 
-function Gladdy:CreateMover(frame, xConfig, yConfig, name, points, width, height, xOffset, yOffset)
-    if not frame.mover then
-        frame.mover = CreateFrame("Frame", nil, frame, BackdropTemplateMixin and "BackdropTemplate")
-        frame.mover:SetFrameStrata("DIALOG")
-        frame.mover:SetPoint(points[1], frame, points[2], xOffset or 0, yOffset or 0)
-        frame.mover:SetHeight(height or frame:GetHeight())
-        frame.mover:SetWidth(width or frame:GetWidth())
-
-        local backdrop = {
-            bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-            edgeFile = "",
-            tile = true, tileSize = 16, edgeSize = 10,
-            insets = {left = 0, right = 0, top = 0, bottom = 0}
-        }
-        frame.mover:SetBackdrop(backdrop)
-        frame.mover:SetBackdropColor(0,1,0,0.5)
-        frame.mover.border = CreateFrame("Frame", nil, frame.mover, BackdropTemplateMixin and "BackdropTemplate")
-        frame.mover.border:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = 2 })
-        frame.mover.border:SetAllPoints(frame.mover)
-        frame.mover.border:SetBackdropBorderColor(0,1,0,1)
-
-        frame.mover.text = frame.mover.border:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-        frame.mover.text:SetText(name)
-        frame.mover.text:SetPoint("CENTER")
-
-        frame.mover:SetMovable(true)
-        frame.mover:EnableMouse(true)
-
-        frame.mover:SetScript("OnMouseDown", function(self)
-            self.point = { frame:GetPoint() }
-            self.start = { frame:GetCenter() }
-            frame:StartMoving()
-            self:StartMoving()
-        end)
-        frame.mover:SetScript("OnMouseUp", function(self)
-            frame:StopMovingOrSizing()
-            self:StopMovingOrSizing()
-            self.stop = { frame:GetCenter() }
-            local diffX = math_abs(self.start[1] - self.stop[1])
-            diffX = self.start[1] > self.stop[1] and -diffX or diffX
-            local diffY = math_abs(self.start[2] - self.stop[2])
-            diffY = self.start[2] > self.stop[2] and -diffY or diffY
-            frame:ClearAllPoints()
-            frame:SetPoint(self.point[1], self.point[2], self.point[3], self.point[4] + diffX, self.point[5] + diffY)
-            Gladdy.db[xConfig] = self.point[4] + diffX
-            Gladdy.db[yConfig] = self.point[5] + diffY
-            LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
-            Gladdy:UpdateFrame()
-        end)
-    else
-        frame.mover:ClearAllPoints()
-        frame.mover:SetPoint(points[1], frame, points[2], xOffset or 0, yOffset or 0)
-        frame.mover:SetHeight(height or frame:GetHeight())
-        frame.mover:SetWidth(width or frame:GetWidth())
-    end
-    if self.frame and self.frame.testing then
-        frame.mover:Show()
-    else
-        frame.mover:Hide()
-    end
-end
-
 ---------------------------
 
 -- INIT
@@ -310,7 +250,7 @@ function Gladdy:OnInitialize()
     self.dbi = LibStub("AceDB-3.0"):New("GladdyXZ", self.defaults)
     self.dbi.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
     self.dbi.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
-    self.dbi.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
+    self.dbi.RegisterCallback(self, "OnProfileReset", "OnProfileReset")
     self.db = self.dbi.profile
 
     self.LSM = LibStub("LibSharedMedia-3.0")
@@ -347,18 +287,32 @@ function Gladdy:OnInitialize()
     for _, module in self:IterModules() do
         self:Call(module, "Initialize") -- B.E > A.E :D
     end
-    self:DeleteUnknownOptions(self.db, self.defaults.profile)
     if Gladdy.db.hideBlizzard == "always" then
         Gladdy:BlizzArenaSetAlpha(0)
     end
+    if not self.db.newLayout then
+        self:ToggleFrame(3)
+        self:HideFrame()
+    end
+end
+
+function Gladdy:OnProfileReset()
+    self.db = self.dbi.profile
+    Gladdy:Debug("INFO", "OnProfileReset")
+    self:HideFrame()
+    self:ToggleFrame(3)
+    Gladdy.options.args.lock.name = Gladdy.db.locked and L["Unlock frame"] or L["Lock frame"]
+    Gladdy.options.args.showMover.name = Gladdy.db.showMover and L["Hide Mover"] or L["Show Mover"]
+    LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
 end
 
 function Gladdy:OnProfileChanged()
     self.db = self.dbi.profile
-    self:DeleteUnknownOptions(self.db, self.defaults.profile)
-
     self:HideFrame()
     self:ToggleFrame(3)
+    Gladdy.options.args.lock.name = Gladdy.db.locked and L["Unlock frame"] or L["Lock frame"]
+    Gladdy.options.args.showMover.name = Gladdy.db.showMover and L["Hide Mover"] or L["Show Mover"]
+    LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
 end
 
 function Gladdy:OnEnable()

@@ -4,13 +4,14 @@ local Gladdy = LibStub("Gladdy")
 local CreateFrame = CreateFrame
 local GetSpellInfo = GetSpellInfo
 local L = Gladdy.L
-local Classicon = Gladdy:NewModule("Class Icon", 80, {
-    classIconPos = "LEFT",
+local Classicon = Gladdy:NewModule("Class Icon", 81, {
     classIconSize = 60 + 20 + 1,
     classIconWidthFactor = 0.9,
     classIconBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     classIconBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     classIconSpecIcon = false,
+    classIconXOffset = 0,
+    classIconYOffset = 0,
 })
 
 local classIconPath = "Interface\\Addons\\Gladdy\\Images\\Classes\\"
@@ -99,13 +100,6 @@ function Classicon:CreateFrame(unit)
     classIcon:SetFrameStrata("MEDIUM")
     classIcon:SetFrameLevel(2)
 
-    classIcon:ClearAllPoints()
-    if (Gladdy.db.classIconPos == "RIGHT") then
-        classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit].healthBar, "TOPRIGHT", 2, 2)
-    else
-        classIcon:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -2, 2)
-    end
-
     Gladdy.buttons[unit].classIcon = classIcon
     self.frames[unit] = classIcon
 end
@@ -119,12 +113,15 @@ function Classicon:UpdateFrame(unit)
     classIcon:SetWidth(Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor)
     classIcon:SetHeight(Gladdy.db.classIconSize)
 
-    classIcon:ClearAllPoints()
-    local margin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
-    if (Gladdy.db.classIconPos == "LEFT") then
-        classIcon:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -margin, 0)
-    else
-        classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPRIGHT", margin, 0)
+    Gladdy:SetPosition(classIcon, unit, "classIconXOffset", "classIconYOffset", Classicon:LegacySetPosition(classIcon, unit), Classicon)
+
+    if (unit == "arena1") then
+        Gladdy:CreateMover(classIcon, "classIconXOffset", "classIconYOffset", L["Class Icon"],
+                {"TOPLEFT", "TOPLEFT"},
+                Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor,
+                Gladdy.db.classIconSize,
+                0,
+                0)
     end
 
     classIcon.texture:ClearAllPoints()
@@ -278,4 +275,23 @@ function Classicon:GetOptions()
             },
         },
     }
+end
+
+---------------------------
+
+-- LAGACY HANDLER
+
+---------------------------
+
+function Classicon:LegacySetPosition(classIcon, unit)
+    if Gladdy.db.newLayout then
+        return Gladdy.db.newLayout
+    end
+    classIcon:ClearAllPoints()
+    local margin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
+    if (Gladdy.db.classIconPos == "LEFT") then
+        classIcon:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -margin, 0)
+    else
+        classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPRIGHT", margin, 0)
+    end
 end
