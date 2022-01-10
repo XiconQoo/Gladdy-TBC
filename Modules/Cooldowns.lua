@@ -502,7 +502,7 @@ function Cooldowns:UpdateCooldowns(button)
     end
 end
 
-function Cooldowns:CooldownUsed(unit, unitClass, spellId)
+function Cooldowns:CooldownUsed(unit, unitClass, spellId, expirationTimeInSeconds)
     local button = Gladdy.buttons[unit]
     if not button then
         return
@@ -547,7 +547,7 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId)
 
     if (Gladdy.db.cooldown) then
         -- start cooldown
-        self:CooldownStart(button, spellId, cd)
+        self:CooldownStart(button, spellId, expirationTimeInSeconds or cd)
     end
 
     --[[ announcement

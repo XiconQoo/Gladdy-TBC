@@ -1,13 +1,14 @@
-local select, string_gsub, tostring = select, string.gsub, tostring
+local select, string_gsub, tostring, pairs = select, string.gsub, tostring, pairs
 
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local AURA_TYPE_DEBUFF = AURA_TYPE_DEBUFF
 local AURA_TYPE_BUFF = AURA_TYPE_BUFF
 
-local UnitName, UnitAura, UnitRace, UnitClass, UnitGUID, UnitIsUnit = UnitName, UnitAura, UnitRace, UnitClass, UnitGUID, UnitIsUnit
+local UnitName, UnitAura, UnitRace, UnitClass, UnitGUID, UnitIsUnit, UnitExists = UnitName, UnitAura, UnitRace, UnitClass, UnitGUID, UnitIsUnit, UnitExists
 local UnitCastingInfo, UnitChannelInfo = UnitCastingInfo, UnitChannelInfo
 local GetSpellInfo = GetSpellInfo
 local FindAuraByName = AuraUtil.FindAuraByName
+local GetTime = GetTime
 
 local Gladdy = LibStub("Gladdy")
 local Cooldowns = Gladdy.modules["Cooldowns"]
@@ -50,9 +51,9 @@ function EventListener:Reset()
     self:SetScript("OnEvent", nil)
 end
 
-function Gladdy:DetectSpec(unit, specSpell)
-    if specSpell then
-        self.modules["Cooldowns"]:DetectSpec(unit, specSpell)
+function Gladdy:DetectSpec(unit, spec)
+    if spec then
+        self.modules["Cooldowns"]:DetectSpec(unit, spec)
     end
 end
 
@@ -73,11 +74,18 @@ function Gladdy:SpotEnemy(unit, auraScan)
     end
     if auraScan and not button.spec then
         for n = 1, 30 do
-            local spellName,_,_,_,_,_,unitCaster = UnitAura(unit, n, "HELPFUL")
+            local spellName,_,_,_,_,expirationTime,unitCaster = UnitAura(unit, n, "HELPFUL")
             if ( not spellName ) then
                 break
             end
-            if Gladdy.specBuffs[spellName] then
+            if Gladdy.cooldownBuffs[spellName] then -- Check for auras that detect used CDs (like Fear Ward)
+                for arenaUnit,v in pairs(self.buttons) do
+                    if (UnitIsUnit(arenaUnit, unitCaster)) then
+                        Cooldowns:CooldownUsed(arenaUnit, v.class, Gladdy.cooldownBuffs[spellName].spellId, expirationTime - GetTime())
+                    end
+                end
+            end
+            if Gladdy.specBuffs[spellName] then -- Check for auras that detect a spec
                 local unitPet = string_gsub(unit, "%d$", "pet%1")
                 if UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster) then
                     Gladdy:DetectSpec(unit, Gladdy.specBuffs[spellName])
@@ -202,6 +210,10 @@ Gladdy.exceptionNames = { -- TODO MOVE ME TO CLASSBUFFS LIB
     [27010] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
 }
 
+Gladdy.cooldownBuffs = {
+    [GetSpellInfo(6346)] = { cd = 180, spellId = 6346 }, -- Fear Ward
+}
+
 function EventListener:UNIT_AURA(unit)
     local button = Gladdy.buttons[unit]
     if not button then
@@ -219,6 +231,13 @@ function EventListener:UNIT_AURA(unit)
             if ( not spellID ) then
                 Gladdy:SendMessage("AURA_GAIN_LIMIT", unit, auraType, n - 1)
                 break
+            end
+            if Gladdy.cooldownBuffs[spellName] then -- Check for auras that hint used CDs (like Fear Ward)
+                for arenaUnit,v in pairs(Gladdy.buttons) do
+                    if (UnitIsUnit(arenaUnit, unitCaster)) then
+                        Cooldowns:CooldownUsed(arenaUnit, v.class, Gladdy.cooldownBuffs[spellName].spellId, expirationTime - GetTime())
+                    end
+                end
             end
             if not button.spec and Gladdy.specBuffs[spellName] then
                 local unitPet = string_gsub(unit, "%d$", "pet%1")
