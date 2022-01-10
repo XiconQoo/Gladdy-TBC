@@ -112,6 +112,10 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
         end
     end
     if srcUnit then
+        srcUnit = string_gsub(srcUnit, "pet", "")
+        if (not UnitExists(srcUnit)) then
+            return
+        end
         if (eventType == "SPELL_CAST_SUCCESS" or eventType == "SPELL_AURA_APPLIED") then
             local unitRace = Gladdy.buttons[srcUnit].race
             -- cooldown tracker
