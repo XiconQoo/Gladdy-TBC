@@ -251,7 +251,7 @@ function Healthbar:ENEMY_SPOTTED(unit)
         healthBar.hp:SetValue(health)
         Healthbar:SetHealthText(healthBar, health, healthMax)
     end
-    if Gladdy.db.healthName and not Gladdy.db.healthNameToArenaId then
+    if button.name and Gladdy.db.healthName and not Gladdy.db.healthNameToArenaId then
         healthBar.nameText:SetText(button.name)
     end
 
@@ -503,20 +503,6 @@ function Healthbar:GetOptions()
                             order = 3,
                             width = "full",
                             disabled = function() return not Gladdy.db.healthName end
-                        }),
-                        healthActual = option({
-                            type = "toggle",
-                            name = L["Show the actual health"],
-                            desc = L["Show the actual health on the health bar"],
-                            order = 4,
-                            width = "full",
-                        }),
-                        healthMax = option({
-                            type = "toggle",
-                            name = L["Show max health"],
-                            desc = L["Show max health on the health bar"],
-                            order = 5,
-                            width = "full",
                         }),
                         healthPercentage = option({
                             type = "toggle",

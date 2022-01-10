@@ -136,7 +136,7 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
                     else
                         unitClass = Gladdy.buttons[srcUnit].race
                     end
-                    Cooldowns:CooldownUsed(srcUnit, unitClass, spellId, spellName)
+                    Cooldowns:CooldownUsed(srcUnit, unitClass, spellId)
                     Gladdy:DetectSpec(srcUnit, Gladdy.specSpells[spellName])
                 end
             end

@@ -42,7 +42,7 @@ local function getDefaultCooldown()
             if spellName then
                 cooldowns[tostring(spellId)] = true
             else
-                Gladdy:Print("spellid does not exist  " .. spellId)
+                Gladdy:Debug("ERROR", "spellid does not exist  " .. spellId)
             end
         end
     end
@@ -79,7 +79,7 @@ function Cooldowns:Initialize()
                 self.cooldownSpellIds[spellName] = spellId
                 self.spellTextures[spellId] = texture
             else
-                Gladdy:Print("spellid does not exist  " .. spellId)
+                Gladdy:Debug("ERROR", "spellid does not exist  " .. spellId)
             end
         end
     end
@@ -373,7 +373,6 @@ function Cooldowns:DetectSpec(unit, spec)
                 end
             end
         end
-        --end
     end
     ----------------------
     --- RACE FUNCTIONALITY

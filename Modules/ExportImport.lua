@@ -72,6 +72,7 @@ importButton:SetCallback("OnClick", function(widget)
     Gladdy:Reset()
     Gladdy:HideFrame()
     Gladdy:ToggleFrame(3)
+    LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
 end)
 import:AddChild(importButton)
 import.button = importButton
@@ -117,7 +118,7 @@ local function checkIsDeletedOption(k, str, msg, errorFound, errorMsg)
     for key, _ in pairs(deletedOptions) do
         if str_match(k, key) then
             isDeleted = true
-            Gladdy:Warn("found deleted option =", str .. "." .. k)
+            Gladdy:Debug("WARN", "found deleted option =", str .. "." .. k)
         end
     end
     if errorFound then
@@ -231,7 +232,7 @@ function ExportImport:ApplyImport(t, table, str)
             if (table[k] ~= nil) then
                 ExportImport:ApplyImport(v, table[k], str .. "." .. k)
             else
-                Gladdy:Warn("ApplyImport failed for", str .. "." .. k)
+                Gladdy:Debug("ERROR", "ApplyImport failed for", str .. "." .. k)
             end
 
         else
