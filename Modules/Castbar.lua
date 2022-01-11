@@ -232,7 +232,7 @@ function Castbar.OnUpdate(castBar, elapsed)
             castBar.fadeOut = nil;
             castBar.timeText:Show()
             castBar.spark:Show()
-            castBar:Hide();
+            castBar:SetAlpha(0)
         end
     end
 end
@@ -241,7 +241,7 @@ Castbar.CastEventsFunc = {}
 Castbar.CastEventsFunc["UNIT_SPELLCAST_START"] = function(castBar, event, ...)
     local name, text, texture, startTime, endTime, isTradeSkill, castID = UnitCastingInfo(castBar.unit)
     if ( not name or (not castBar.showTradeSkills and isTradeSkill)) then
-        castBar:Hide()
+        castBar:SetAlpha(0)
         return
     end
 
@@ -272,7 +272,7 @@ Castbar.CastEventsFunc["UNIT_SPELLCAST_SUCCEEDED"] = function(castBar, event, ..
 end
 Castbar.CastEventsFunc["UNIT_SPELLCAST_STOP"] = function(castBar, event, ...)
     if ( not castBar:IsVisible() ) then
-        castBar:Hide()
+        castBar:SetAlpha(0)
     end
     if ( (castBar.casting and event == "UNIT_SPELLCAST_STOP" and select(2, ...) == castBar.castID) or
             (castBar.channeling and event == "UNIT_SPELLCAST_CHANNEL_STOP") ) then
@@ -320,7 +320,7 @@ Castbar.CastEventsFunc["UNIT_SPELLCAST_DELAYED"] = function(castBar, event, ...)
 
         if ( not name or (not castBar.showTradeSkills and isTradeSkill)) then
             -- if there is no name, there is no bar
-            castBar:Hide()
+            castBar:SetAlpha(0)
             return
         end
         castBar.value = (GetTime() - (startTime / 1000))
@@ -338,7 +338,7 @@ Castbar.CastEventsFunc["UNIT_SPELLCAST_CHANNEL_START"] = function(castBar, event
     local name, text, texture, startTime, endTime, isTradeSkill, spellID = UnitChannelInfo(castBar.unit)
 
     if ( not name or (not castBar.showTradeSkills and isTradeSkill)) then
-        castBar:Hide()
+        castBar:SetAlpha(0)
         return
     end
     if ( castBar.spark ) then
@@ -356,7 +356,7 @@ Castbar.CastEventsFunc["UNIT_SPELLCAST_CHANNEL_UPDATE"] = function(castBar, even
     if ( castBar:IsShown() ) then
         local name, text, texture, startTime, endTime, isTradeSkill = UnitChannelInfo(castBar.unit)
         if ( not name or (not castBar.showTradeSkills and isTradeSkill)) then
-            castBar:Hide()
+            castBar:SetAlpha(0)
             return
         end
         castBar.value = ((endTime / 1000) - GetTime())
