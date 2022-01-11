@@ -20,7 +20,6 @@ local Trinket = Gladdy:NewModule("Trinket", 80, {
     trinketXOffset = 0,
     trinketYOffset = 0,
 })
-LibStub("AceComm-3.0"):Embed(Trinket)
 
 function Trinket:Initialize()
     self.frames = {}

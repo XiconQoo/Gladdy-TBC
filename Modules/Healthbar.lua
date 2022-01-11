@@ -129,7 +129,7 @@ function Healthbar.OnEvent(self, event, unit)
 end
 
 function Healthbar:SetHealthText(healthBar, health, healthMax)
-    local healthText
+    local healthText = ""
     local healthPercentage = floor(health * 100 / healthMax)
 
     if health == 0 and UnitExists(healthBar.unit) and UnitIsDeadOrGhost(healthBar.unit) then
@@ -137,25 +137,8 @@ function Healthbar:SetHealthText(healthBar, health, healthMax)
         return
     end
 
-    if (Gladdy.db.healthActual) then
-        healthText = healthMax > 999 and ("%.1fk"):format(health / 1000) or health
-    end
-
-    if (Gladdy.db.healthMax) then
-        local text = healthMax > 999 and ("%.1fk"):format(healthMax / 1000) or healthMax
-        if (healthText) then
-            healthText = ("%s/%s"):format(healthText, text)
-        else
-            healthText = text
-        end
-    end
-
     if (Gladdy.db.healthPercentage) then
-        if (healthText) then
-            healthText = ("%s (%d%%)"):format(healthText, healthPercentage)
-        else
-            healthText = ("%d%%"):format(healthPercentage)
-        end
+        healthText = ("%d%%"):format(healthPercentage)
     end
 
     healthBar.healthText:SetText(healthText)
@@ -271,27 +254,10 @@ function Healthbar:UNIT_HEALTH(unit, health, healthMax)
     Gladdy:SendMessage("UNIT_HEALTH", unit, health, healthMax)
 
     local healthPercentage = floor(health * 100 / healthMax)
-    local healthText
-
-    if (Gladdy.db.healthActual) then
-        healthText = healthMax > 999 and ("%.1fk"):format(health / 1000) or health
-    end
-
-    if (Gladdy.db.healthMax) then
-        local text = healthMax > 999 and ("%.1fk"):format(healthMax / 1000) or healthMax
-        if (healthText) then
-            healthText = ("%s/%s"):format(healthText, text)
-        else
-            healthText = text
-        end
-    end
+    local healthText = ""
 
     if (Gladdy.db.healthPercentage) then
-        if (healthText) then
-            healthText = ("%s (%d%%)"):format(healthText, healthPercentage)
-        else
-            healthText = ("%d%%"):format(healthPercentage)
-        end
+        healthText = ("%d%%"):format(healthPercentage)
     end
 
     healthBar.healthText:SetText(healthText)
