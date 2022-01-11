@@ -145,7 +145,7 @@ function Announcements:SPELL_INTERRUPT(destUnit,spellID,spellName,spellSchool,ex
     if (not button or not Gladdy.db.announcements.spellInterrupt) then
         return
     end
-    self:Send(L["INTERRUPTED: %s (%s)"]:format(extraSpellName, button.name or ""), 3, RAID_CLASS_COLORS[button.class])
+    self:Send(L["INTERRUPTED: %s (%s)"]:format(extraSpellName, button.name or ""), nil, RAID_CLASS_COLORS[button.class])
 end
 
 function Announcements:CheckDrink(unit, aura)
@@ -167,9 +167,12 @@ function Announcements:Send(msg, throttle, color)
     if (throttle and throttle > 0) then
         if (not self.throttled[msg]) then
             self.throttled[msg] = GetTime() + throttle
+            Gladdy:Debug("INFO", msg, "- NOT THROTTLED -", self.throttled[msg])
         elseif (self.throttled[msg] < GetTime()) then
-            self.throttled[msg] = nil
+            Gladdy:Debug("INFO", msg, "- THROTTLED OVER -", self.throttled[msg])
+            self.throttled[msg] = GetTime() + throttle
         else
+            Gladdy:Debug("INFO", msg, "- THROTTLED -", self.throttled[msg])
             return
         end
     end
