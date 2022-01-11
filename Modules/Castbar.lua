@@ -220,7 +220,7 @@ function Castbar.OnUpdate(castBar, elapsed)
             castBar.spark:SetPoint("CENTER", castBar.bar, "LEFT", castBar.spark.position, 0)
             castBar.spark:Show()
         end
-    elseif ( GetTime() < castBar.holdTime ) then
+    elseif ( castBar.holdTime and GetTime() < castBar.holdTime ) then
         castBar.timeText:Hide()
         castBar.spark:Hide()
         return
