@@ -82,6 +82,7 @@ function Gladdy:SpotEnemy(unit, auraScan)
                 for arenaUnit,v in pairs(self.buttons) do
                     if (UnitIsUnit(arenaUnit, unitCaster)) then
                         Cooldowns:CooldownUsed(arenaUnit, v.class, Gladdy.cooldownBuffs[spellName].spellId, expirationTime - GetTime())
+                        -- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena5", "PRIEST", 6346, 10)
                     end
                 end
             end

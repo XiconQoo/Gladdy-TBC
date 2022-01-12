@@ -258,7 +258,7 @@ function Cooldowns:SPEC_DETECTED(unit, spec)
     self:DetectSpec(unit, spec)
 end
 
-function Cooldowns:CooldownStart(button, spellId, duration)
+function Cooldowns:CooldownStart(button, spellId, duration, start)
     -- starts timer frame
     if not duration or duration == nil or type(duration) ~= "number" then
         return
@@ -267,8 +267,8 @@ function Cooldowns:CooldownStart(button, spellId, duration)
         if (button.spellCooldownFrame["icon" .. i].spellId == spellId) then
             local frame = button.spellCooldownFrame["icon" .. i]
             frame.active = true
-            frame.timeLeft = duration
-            if (not Gladdy.db.cooldownDisableCircle) then frame.cooldown:SetCooldown(GetTime(), duration) end
+            frame.timeLeft = start and start - GetTime() + duration or duration
+            if (not Gladdy.db.cooldownDisableCircle) then frame.cooldown:SetCooldown(start or GetTime(), duration) end
             frame:SetScript("OnUpdate", function(self, elapsed)
                 self.timeLeft = self.timeLeft - elapsed
                 local timeLeft = ceil(self.timeLeft)
@@ -519,7 +519,7 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId, expirationTimeInSecond
 
     if (Gladdy.db.cooldown) then
         -- start cooldown
-        self:CooldownStart(button, spellId, expirationTimeInSeconds or cd)
+        self:CooldownStart(button, spellId, cd, expirationTimeInSeconds and (GetTime() + expirationTimeInSeconds - cd) or nil)
     end
 
     --[[ announcement
