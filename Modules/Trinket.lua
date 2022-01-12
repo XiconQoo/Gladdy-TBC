@@ -134,7 +134,7 @@ function Trinket:UpdateFrame(unit)
         end
         trinket.texture:SetTexture()
     else
-        trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredNoCd))
+        trinket:SetBackdropColor(0,0,0,0)
         trinket.texture:SetTexture("Interface\\Icons\\INV_Jewelry_TrinketPVP_02")
     end
 
