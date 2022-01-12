@@ -76,13 +76,15 @@ function Racial:CreateFrame(unit)
     racial.cooldown = CreateFrame("Cooldown", nil, racial, "CooldownFrameTemplate")
     racial.cooldown.noCooldownCount = true --Gladdy.db.racialDisableOmniCC
     racial.cooldown:SetHideCountdownNumbers(true)
+    racial.cooldown:SetFrameStrata(Gladdy.db.racialFrameStrata)
+    racial.cooldown:SetFrameLevel(Gladdy.db.racialFrameLevel + 1)
 
     racial.cooldownFrame = CreateFrame("Frame", nil, racial)
     racial.cooldownFrame:ClearAllPoints()
     racial.cooldownFrame:SetPoint("TOPLEFT", racial, "TOPLEFT")
     racial.cooldownFrame:SetPoint("BOTTOMRIGHT", racial, "BOTTOMRIGHT")
     racial.cooldownFrame:SetFrameStrata(Gladdy.db.racialFrameStrata)
-    racial.cooldownFrame:SetFrameLevel(Gladdy.db.racialFrameLevel + 1)
+    racial.cooldownFrame:SetFrameLevel(Gladdy.db.racialFrameLevel + 2)
 
     racial.cooldownFont = racial.cooldownFrame:CreateFontString(nil, "OVERLAY")
     racial.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), 20, "OUTLINE")
@@ -93,7 +95,7 @@ function Racial:CreateFrame(unit)
     racial.borderFrame = CreateFrame("Frame", nil, racial)
     racial.borderFrame:SetAllPoints(racial)
     racial.borderFrame:SetFrameStrata(Gladdy.db.racialFrameStrata)
-    racial.borderFrame:SetFrameLevel(Gladdy.db.racialFrameLevel + 2)
+    racial.borderFrame:SetFrameLevel(Gladdy.db.racialFrameLevel + 3)
 
     racial.texture.overlay = racial.borderFrame:CreateTexture(nil, "OVERLAY")
     racial.texture.overlay:SetAllPoints(racial)
@@ -115,10 +117,12 @@ function Racial:UpdateFrame(unit)
 
     racial:SetFrameStrata(Gladdy.db.racialFrameStrata)
     racial:SetFrameLevel(Gladdy.db.racialFrameLevel)
+    racial.cooldown:SetFrameStrata(Gladdy.db.racialFrameStrata)
+    racial.cooldown:SetFrameLevel(Gladdy.db.racialFrameLevel + 1)
     racial.cooldownFrame:SetFrameStrata(Gladdy.db.racialFrameStrata)
-    racial.cooldownFrame:SetFrameLevel(Gladdy.db.racialFrameLevel + 1)
+    racial.cooldownFrame:SetFrameLevel(Gladdy.db.racialFrameLevel + 2)
     racial.borderFrame:SetFrameStrata(Gladdy.db.racialFrameStrata)
-    racial.borderFrame:SetFrameLevel(Gladdy.db.racialFrameLevel + 2)
+    racial.borderFrame:SetFrameLevel(Gladdy.db.racialFrameLevel + 3)
 
     racial:SetWidth(width)
     racial:SetHeight(height)
@@ -178,7 +182,7 @@ function Racial:Used(unit, startTime, duration)
     end
     if not racial.active then
         racial.timeLeft = duration
-        if not Gladdy.db.trinketDisableCircle then racial.cooldown:SetCooldown(startTime, duration) end
+        if not Gladdy.db.racialDisableCircle then racial.cooldown:SetCooldown(startTime, duration) end
         racial.active = true
     end
 end
