@@ -77,6 +77,8 @@ Thank you!
 This is a packed release with new features and bugfixes. Most importantly, positioning of all elements has been redone with movable frames.
 Thank you for the great feedback and active contribution.
 
+####Attention: Once you install this version it will drastically change your current profile! You can't go back to an earlier version. Either back up your WTF or export your Profile before updating!
+
 **Here is a list of all changes:**
 - **major release version set to v2**
   - this will mean, that export strings will still be backwards compatible, but not forward (Gladdy v2.x String cant be imported into Gladdy v1.x but vice versa)
