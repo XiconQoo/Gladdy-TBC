@@ -35,7 +35,7 @@ local specBuffs = {
     [GetSpellInfo(12043)] = L["Arcane"], -- Presence of Mind
     [GetSpellInfo(31589)] = L["Arcane"], -- Slow
     [GetSpellInfo(12472)] = L["Frost"], -- Icy Veins
-    [GetSpellInfo(46989)] = L["Fire"], -- Improved Blink
+    [GetSpellInfo(46989)] = L["Arcane"], -- Improved Blink
 
     -- PALADIN
     [GetSpellInfo(31836)] = L["Holy"], -- Light's Grace

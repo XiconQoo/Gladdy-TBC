@@ -79,7 +79,7 @@ Thank you for the great feedback and active contribution.
 
 **Here is a list of all changes:**
 - **major release version set to v2**
-  - this will mean, that export strings will still be backwards compatible, but not forward (v2 String cant be imported into v1 Strings but vice versa)
+  - this will mean, that export strings will still be backwards compatible, but not forward (Gladdy v2.x String cant be imported into Gladdy v1.x but vice versa)
 - **big overhaul of positioning elements added! All elements besides HP and PowerBar can be moved separately**
   - added Mover Frames for Auras, Interrupts, (De)Buffs, CastBar, ClassIcon, CombatIndicator, Cooldowns, DRs, Pets, Racial, Trinket
   - this will hopefully make configuration a lot easier
@@ -89,7 +89,7 @@ Thank you for the great feedback and active contribution.
   - added following spells for better spec detection:
       - Expose Weakness (Survival Hunter)
       - Slow (Arcane Mage)
-      - Improved Blink (Fire Mage)
+      - Improved Blink (Arcane Mage)
       - Vindication (Retribution Paladin)
       - Holy Shield (Protection Paladin)
       - Vampiric Embrace (Shadow Priest)
@@ -100,7 +100,7 @@ Thank you for the great feedback and active contribution.
       - Healing Way (Restoration Shaman)
       - Totem of Wrath (Elemental Shaman)
       - Dark Pact (Affliction Warlock)
-      - Conflagate (Destruction Warlock)
+      - Conflagrate (Destruction Warlock)
       - Shield Slam (Protection Warrior)
 - **Cooldowns:**
   - added Fear Ward and Fear Ward Cooldown Detection in case it was used before arena
