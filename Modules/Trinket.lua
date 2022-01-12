@@ -269,8 +269,8 @@ function Trinket:GetOptions()
         }),
         trinketColored = Gladdy:option({
             type = "toggle",
-            name = L["Green colored trinket"],
-            desc = L["Shows a green icon when off CD and red when on CD."],
+            name = L["Colored trinket"],
+            desc = L["Shows a solid colored icon when off/off CD."],
             order = 4,
         }),
         trinketColoredCd = Gladdy:colorOption({
