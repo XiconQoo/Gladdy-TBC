@@ -83,6 +83,7 @@ Thank you for the great feedback and active contribution.
 - **big overhaul of positioning elements added! All elements besides HP and PowerBar can be moved separately**
   - added Mover Frames for Auras, Interrupts, (De)Buffs, CastBar, ClassIcon, CombatIndicator, Cooldowns, DRs, Pets, Racial, Trinket
   - this will hopefully make configuration a lot easier
+  - all visible elements' FrameStrata and FrameLevel can be configured (overlap frames how you want it)
 - **SpecDetection:**
   - fixed spec detection for Paladins
   - added following spells for better spec detection:
@@ -123,6 +124,7 @@ Thank you for the great feedback and active contribution.
 - **Shadowsight:**
   - reset timer when buff was taken
   - add a configurable 2nd timer or show one timer with the closest CD
+- **Trinket: green/red option added**
 - **fixed some DR-categories** (Hibernate / Chastice / Dragonsbreath / ImpConcussiveShot / Counterattack)
 - **Pixel Perfect option added** (makes your Gladdy Frames pixel perfect - no more wierd scaling interferences)
 - **Pets can be grouped** (not perfect yet, but a first step)
