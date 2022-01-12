@@ -9,6 +9,7 @@ local L = Gladdy.L
 local Trinket = Gladdy:NewModule("Trinket", 80, {
     trinketFont = "DorisPP",
     trinketFontScale = 1,
+    trinketFontEnabled = true,
     trinketEnabled = true,
     trinketSize = 60 + 20 + 1,
     trinketWidthFactor = 0.9,
@@ -21,6 +22,7 @@ local Trinket = Gladdy:NewModule("Trinket", 80, {
     trinketYOffset = 0,
     trinketFrameStrata = "MEDIUM",
     trinketFrameLevel = 5,
+    trinketColored = false,
 })
 
 function Trinket:Initialize()
@@ -35,6 +37,9 @@ local function iconTimer(self, elapsed)
             self.active = false
             self.cooldown:Clear()
             Gladdy:SendMessage("TRINKET_READY", self.unit)
+            if Gladdy.db.trinketColored then
+                self:SetBackdropColor(0,1,0,1)
+            end
         else
             self.timeLeft = self.timeLeft - elapsed
         end
@@ -57,12 +62,17 @@ local function iconTimer(self, elapsed)
             self.cooldownFont:SetTextColor(1, 0, 0, Gladdy.db.trinketCooldownNumberAlpha)
             self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
         end
-        Gladdy:FormatTimer(self.cooldownFont, self.timeLeft, self.timeLeft < 10, true)
+        if Gladdy.db.trinketFontEnabled then
+            Gladdy:FormatTimer(self.cooldownFont, self.timeLeft, self.timeLeft < 10, true)
+        else
+            self.cooldownFont:SetText("")
+        end
     end
 end
 
 function Trinket:CreateFrame(unit)
-    local trinket = CreateFrame("Button", "GladdyTrinketButton" .. unit, Gladdy.buttons[unit])
+    local trinket = CreateFrame("Button", "GladdyTrinketButton" .. unit, Gladdy.buttons[unit], BackdropTemplateMixin and "BackdropTemplate")
+    trinket:SetBackdrop({bgFile = "Interface\\AddOns\\Gladdy\\Images\\trinket" })
     trinket:EnableMouse(false)
     trinket:SetFrameStrata(Gladdy.db.trinketFrameStrata)
     trinket:SetFrameLevel(Gladdy.db.trinketFrameLevel)
@@ -114,6 +124,18 @@ function Trinket:UpdateFrame(unit)
         return
     end
 
+    if Gladdy.db.trinketColored then
+        if trinket.active then
+            trinket:SetBackdropColor(1,0,0,1)
+        else
+            trinket:SetBackdropColor(0,1,0,1)
+        end
+        trinket.texture:SetTexture()
+    else
+        trinket:SetBackdropColor(0,1,0,0)
+        trinket.texture:SetTexture("Interface\\Icons\\INV_Jewelry_TrinketPVP_02")
+    end
+
     local width, height = Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor, Gladdy.db.trinketSize
 
     trinket:SetFrameStrata(Gladdy.db.trinketFrameStrata)
@@ -151,7 +173,15 @@ function Trinket:UpdateFrame(unit)
                 0)
     end
 
-    if (Gladdy.db.trinketEnabled == false) then
+    trinket.cooldown:SetAlpha(Gladdy.db.trinketCooldownAlpha)
+
+    if Gladdy.db.trinketDisableCircle then
+        trinket.cooldown:Hide()
+    else
+        trinket.cooldown:Show()
+    end
+
+    if (not Gladdy.db.trinketEnabled) then
         trinket:Hide()
     else
         trinket:Show()
@@ -215,6 +245,9 @@ function Trinket:Used(unit, startTime, duration)
         trinket.timeLeft = (startTime/1000.0 + duration/1000.0) - GetTime()
         if not Gladdy.db.trinketDisableCircle then trinket.cooldown:SetCooldown(startTime/1000.0, duration/1000.0) end
         trinket.active = true
+        if Gladdy.db.trinketColored then
+            trinket:SetBackdropColor(1,0,0,1)
+        end
         Gladdy:SendMessage("TRINKET_USED", unit)
     end
 end
@@ -232,11 +265,17 @@ function Trinket:GetOptions()
             desc = L["Enable trinket icon"],
             order = 3,
         }),
+        trinketColored = Gladdy:option({
+            type = "toggle",
+            name = L["Green colored trinket"],
+            desc = L["Shows a green icon when off CD and red when on CD."],
+            order = 4,
+        }),
         group = {
             type = "group",
             childGroups = "tree",
             name = L["Frame"],
-            order = 4,
+            order = 5,
             args = {
                 general = {
                     type = "group",
@@ -312,13 +351,19 @@ function Trinket:GetOptions()
                         header = {
                             type = "header",
                             name = L["Font"],
-                            order = 4,
+                            order = 1,
                         },
+                        trinketFontEnabled = Gladdy:option({
+                            type = "toggle",
+                            name = L["Font Enabled"],
+                            order = 2,
+                            width = "full",
+                        }),
                         trinketFont = Gladdy:option({
                             type = "select",
                             name = L["Font"],
                             desc = L["Font of the cooldown"],
-                            order = 11,
+                            order = 3,
                             dialogControl = "LSM30_Font",
                             values = AceGUIWidgetLSMlists.font,
                         }),
@@ -326,7 +371,7 @@ function Trinket:GetOptions()
                             type = "range",
                             name = L["Font scale"],
                             desc = L["Scale of the font"],
-                            order = 12,
+                            order = 4,
                             min = 0.1,
                             max = 2,
                             step = 0.1,
