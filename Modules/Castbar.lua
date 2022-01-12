@@ -423,7 +423,11 @@ function Castbar:CAST_START(unit, spell, icon, value, maxValue, test)
         castBar.spark:Show()
     end
     castBar:SetAlpha(1)
-    castBar.icon:Show()
+    if Gladdy.db.castBarIconEnabled then
+        castBar.icon:Show()
+    else
+        castBar.icon:Hide()
+    end
 end
 
 function Castbar:CAST_STOP(unit, ...)
