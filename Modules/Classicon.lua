@@ -5,6 +5,7 @@ local CreateFrame = CreateFrame
 local GetSpellInfo = GetSpellInfo
 local L = Gladdy.L
 local Classicon = Gladdy:NewModule("Class Icon", 81, {
+    classIconEnabled = true,
     classIconSize = 60 + 20 + 1,
     classIconWidthFactor = 0.9,
     classIconBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
@@ -129,6 +130,11 @@ function Classicon:UpdateFrame(unit)
 
     classIcon.texture.overlay:SetTexture(Gladdy.db.classIconBorderStyle)
     classIcon.texture.overlay:SetVertexColor(Gladdy.db.classIconBorderColor.r, Gladdy.db.classIconBorderColor.g, Gladdy.db.classIconBorderColor.b, Gladdy.db.classIconBorderColor.a)
+    if Gladdy.db.classIconEnabled then
+        classIcon:Show()
+    else
+        classIcon:Hide()
+    end
 end
 
 function Classicon:ENEMY_SPOTTED(unit)
@@ -170,11 +176,16 @@ function Classicon:GetOptions()
             name = L["Class Icon"],
             order = 2,
         },
+        classIconEnabled = Gladdy:option({
+            type = "toggle",
+            name = L["Class Icon Enabled"],
+            order = 3,
+        }),
         classIconSpecIcon = {
             type = "toggle",
             name = L["Show Spec Icon"],
             desc = L["Shows Spec Icon once spec is detected"],
-            order = 3,
+            order = 4,
             get = function() return Gladdy.db.classIconSpecIcon end,
             set = function(_, value)
                 Gladdy.db.classIconSpecIcon = value
@@ -208,9 +219,9 @@ function Classicon:GetOptions()
                         classIconSize = Gladdy:option({
                             type = "range",
                             name = L["Icon size"],
-                            min = 1,
+                            min = 3,
                             max = 100,
-                            step = 1,
+                            step = .1,
                             order = 3,
                             width = "full",
                         }),
