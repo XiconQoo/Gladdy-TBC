@@ -23,6 +23,8 @@ local Trinket = Gladdy:NewModule("Trinket", 80, {
     trinketFrameStrata = "MEDIUM",
     trinketFrameLevel = 5,
     trinketColored = false,
+    trinketColoredCd = { r = 1, g = 0, b = 0, a = 1 },
+    trinketColoredNoCd = { r = 0, g = 1, b = 0, a = 1 },
 })
 
 function Trinket:Initialize()
@@ -38,7 +40,7 @@ local function iconTimer(self, elapsed)
             self.cooldown:Clear()
             Gladdy:SendMessage("TRINKET_READY", self.unit)
             if Gladdy.db.trinketColored then
-                self:SetBackdropColor(0,1,0,1)
+                self:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredNoCd))
             end
         else
             self.timeLeft = self.timeLeft - elapsed
@@ -126,13 +128,13 @@ function Trinket:UpdateFrame(unit)
 
     if Gladdy.db.trinketColored then
         if trinket.active then
-            trinket:SetBackdropColor(1,0,0,1)
+            trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredCd))
         else
-            trinket:SetBackdropColor(0,1,0,1)
+            trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredNoCd))
         end
         trinket.texture:SetTexture()
     else
-        trinket:SetBackdropColor(0,1,0,0)
+        trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredNoCd))
         trinket.texture:SetTexture("Interface\\Icons\\INV_Jewelry_TrinketPVP_02")
     end
 
@@ -160,7 +162,7 @@ function Trinket:UpdateFrame(unit)
     trinket.texture:SetAllPoints(trinket)
 
     trinket.texture.overlay:SetTexture(Gladdy.db.trinketBorderStyle)
-    trinket.texture.overlay:SetVertexColor(Gladdy.db.trinketBorderColor.r, Gladdy.db.trinketBorderColor.g, Gladdy.db.trinketBorderColor.b, Gladdy.db.trinketBorderColor.a)
+    trinket.texture.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.trinketBorderColor))
 
     Gladdy:SetPosition(trinket, unit, "trinketXOffset", "trinketYOffset", Trinket:LegacySetPosition(trinket, unit), Trinket)
 
@@ -246,7 +248,7 @@ function Trinket:Used(unit, startTime, duration)
         if not Gladdy.db.trinketDisableCircle then trinket.cooldown:SetCooldown(startTime/1000.0, duration/1000.0) end
         trinket.active = true
         if Gladdy.db.trinketColored then
-            trinket:SetBackdropColor(1,0,0,1)
+            trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredCd))
         end
         Gladdy:SendMessage("TRINKET_USED", unit)
     end
@@ -270,6 +272,26 @@ function Trinket:GetOptions()
             name = L["Green colored trinket"],
             desc = L["Shows a green icon when off CD and red when on CD."],
             order = 4,
+        }),
+        trinketColoredCd = Gladdy:colorOption({
+            type = "color",
+            name = L["Colored trinket CD"],
+            desc = L["Color of the border"],
+            order = 5,
+            hasAlpha = true,
+            disabled = function()
+                return not Gladdy.db.trinketColored
+            end,
+        }),
+        trinketColoredNoCd = Gladdy:colorOption({
+            type = "color",
+            name = L["Colored trinket No CD"],
+            desc = L["Color of the border"],
+            order = 6,
+            hasAlpha = true,
+            disabled = function()
+                return not Gladdy.db.trinketColored
+            end,
         }),
         group = {
             type = "group",

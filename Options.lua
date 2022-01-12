@@ -104,6 +104,10 @@ function Gladdy:option(params)
     return defaults
 end
 
+function Gladdy:SetColor(option)
+    return option.r, option.g, option.b, option.a
+end
+
 function Gladdy:colorOption(params)
     local defaults = {
         get = function(info)
