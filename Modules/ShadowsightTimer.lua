@@ -33,7 +33,6 @@ end
 function ShadowsightTimer:Initialize()
     self.locale = Gladdy:GetArenaTimer()
     self:RegisterMessage("JOINED_ARENA")
-    self:RegisterMessage("AURA_GAIN")
     self:CreateAnchor()
 end
 
@@ -146,7 +145,7 @@ function ShadowsightTimer:JOINED_ARENA()
 end
 
 function ShadowsightTimer:AURA_GAIN(unit, auraType, spellID)
-    if (spellID == 34709) then
+    if (spellID == 34709 and Gladdy.db.shadowsightTimerEnabled) then
         self:Start(Gladdy.db.shadowsightTimerResetTime, self:GetHiddenTimer())
     end
 end

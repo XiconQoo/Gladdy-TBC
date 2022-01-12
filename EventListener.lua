@@ -98,8 +98,11 @@ end
 function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
     -- timestamp,eventType,hideCaster,sourceGUID,sourceName,sourceFlags,sourceRaidFlags,destGUID,destName,destFlags,destRaidFlags,spellId,spellName,spellSchool
     local _,eventType,_,sourceGUID,_,_,_,destGUID,_,_,_,spellID,spellName,spellSchool,extraSpellId,extraSpellName,extraSpellSchool = CombatLogGetCurrentEventInfo()
-    local srcUnit = Gladdy.guids[sourceGUID]
-    local destUnit = Gladdy.guids[destGUID]
+    local srcUnit = Gladdy.guids[sourceGUID] -- can be a PET
+    local destUnit = Gladdy.guids[destGUID] -- can be a PET
+    if (Gladdy.db.shadowsightTimerEnabled and eventType == "SPELL_AURA_APPLIED" and spellID == 34709) then
+        Gladdy.modules["Shadowsight Timer"]:AURA_GAIN(nil, nil, 34709)
+    end
 
     if destUnit then
         -- diminish tracker
