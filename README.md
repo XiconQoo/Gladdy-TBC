@@ -1,7 +1,7 @@
 # Gladdy - TBC
 
 ### The most powerful arena addon for WoW TBC 2.5.1
-## [v1.22-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v1.22-Release/Gladdy_TBC-Classic_v1.22-Release.zip)
+## [v2.00-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.00-Release/Gladdy_TBC-Classic_v2.00-Release.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -68,8 +68,62 @@ Thank you!
 - **Klimp** (thanks for all the suggestions and active feedback)
 - **the whole TBC addons 2.4.3 discord** (thanks for the support and great community, especially the MVPs)
 - **Hydra** (thanks for constructive feedback and suggestions)
+- **Xyz** (thanks for suggestions)
 
 ### Changes
+
+### v2.00-Release
+- major release version set to v2
+  - this will mean, that export strings will still be backwards compatible, but not forward (v2 String cant be imported into v1 Strings but vice versa)
+- big overhaul of positioning elements added! All elements besides HP and PowerBar can be moved separately
+  - added Mover Frames for Auras, Interrupts, (De)Buffs, CastBar, ClassIcon, CombatIndicator, Cooldowns, DRs, Pets, Racial, Trinket
+  - this will hopefully make configuration a lot easier
+- SpecDetection:
+  - fixed spec detection for Paladins
+  - added following spells for better spec detection:
+      - Expose Weakness (Survival Hunter)
+      - Slow (Arcane Mage)
+      - Improved Blink (Fire Mage)
+      - Vindication (Retribution Paladin)
+      - Holy Shield (Protection Paladin)
+      - Vampiric Embrace (Shadow Priest)
+      - Blade Flurry (Combat Rogue)
+      - Unleashed Rage (Enhancement Shaman)
+      - Flurry (Enhancement Shaman)
+      - Shamanistic Rage (Enhancement Shaman)
+      - Healing Way (Restoration Shaman)
+      - Totem of Wrath (Elemental Shaman)
+      - Dark Pact (Affliction Warlock)
+      - Conflagate (Destruction Warlock)
+      - Shield Slam (Protection Warrior)
+- Cooldowns:
+  - added Fear Ward and Fear Ward Cooldown Detection in case it was used before arena
+  - added following cooldowns:
+      - Scare Beast (Hunter)
+      - Feign Death (Hunter)
+      - Viper Sting (Hunter)
+      - Flare (Hunter)
+      - Fear Ward (Priest)
+      - Shadow Word: Death (Priest)
+      - Evocation (Mage)
+      - Grounding Totem (Shaman)
+      - Spell Lock (Warlock)
+      - Devour Magic (Warlock)
+      - Intercept (Warrior)
+- Auras/Interrupts:
+  - can now be detached from ClassIcon and positioned/scaled anywhere separately
+  - added Auras:
+      - Scare Beast (Hunter)
+      - Fear Ward (Priest)
+- Pixel Perfect option added (makes your Gladdy Frames pixel perfect - no more wierd scaling interferences)
+- Pets can be grouped (not perfect yet, but a first step)
+- added DR-Level Text (thanks https://github.com/ManneN1)
+- added zhCN Locale (thanks https://github.com/veiz)
+- Shadowsight:
+  - reset timer when buff was taken
+  - add a configurable 2nd timer or show one timer with closest CD
+- fixed some DR-categories (Hibernate/Chastice/Dragonsbreath/ImpConcussiveShot/Counterattack)
+- ClassIcon can be disabled
 
 ### v1.22-Release
 - fixed import for some localizations not working
