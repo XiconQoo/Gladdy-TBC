@@ -119,7 +119,7 @@ function Highlight:UpdateFrame(unit)
     end
 
     button.targetBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = borderSize })
-    button.targetBorder:SetBackdropBorderColor(Gladdy.db.targetBorderColor.r, Gladdy.db.targetBorderColor.g, Gladdy.db.targetBorderColor.b, Gladdy.db.targetBorderColor.a)
+    button.targetBorder:SetBackdropBorderColor(Gladdy:SetColor(Gladdy.db.targetBorderColor))
 
     button.focusBorder:SetWidth(width)
     button.focusBorder:SetHeight(height)
@@ -132,7 +132,7 @@ function Highlight:UpdateFrame(unit)
     end
 
     button.focusBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = borderSize })
-    button.focusBorder:SetBackdropBorderColor(Gladdy.db.focusBorderColor.r, Gladdy.db.focusBorderColor.g, Gladdy.db.focusBorderColor.b, Gladdy.db.focusBorderColor.a)
+    button.focusBorder:SetBackdropBorderColor(Gladdy:SetColor(Gladdy.db.focusBorderColor))
 
     button.leaderBorder:SetWidth(width)
     button.leaderBorder:SetHeight(height)
@@ -145,7 +145,7 @@ function Highlight:UpdateFrame(unit)
     end
 
     button.leaderBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = borderSize })
-    button.leaderBorder:SetBackdropBorderColor(Gladdy.db.leaderBorderColor.r, Gladdy.db.leaderBorderColor.g, Gladdy.db.leaderBorderColor.b, Gladdy.db.leaderBorderColor.a)
+    button.leaderBorder:SetBackdropBorderColor(Gladdy:SetColor(Gladdy.db.leaderBorderColor))
     if Gladdy.frame.testing then
         Highlight:Test(unit)
     end

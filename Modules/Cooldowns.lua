@@ -125,11 +125,11 @@ function Cooldowns:CreateFrame(unit)
         icon.border = icon.cooldownFrame:CreateTexture(nil, "OVERLAY")
         icon.border:SetAllPoints(icon)
         icon.border:SetTexture(Gladdy.db.cooldownBorderStyle)
-        icon.border:SetVertexColor(Gladdy.db.cooldownBorderColor.r, Gladdy.db.cooldownBorderColor.g, Gladdy.db.cooldownBorderColor.b, Gladdy.db.cooldownBorderColor.a)
+        icon.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.cooldownBorderColor))
 
         icon.cooldownFont = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
         icon.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), Gladdy.db.cooldownSize / 2  * Gladdy.db.cooldownFontScale, "OUTLINE")
-        icon.cooldownFont:SetTextColor(Gladdy.db.cooldownFontColor.r, Gladdy.db.cooldownFontColor.g, Gladdy.db.cooldownFontColor.b, Gladdy.db.cooldownFontColor.a)
+        icon.cooldownFont:SetTextColor(Gladdy:SetColor(Gladdy.db.cooldownFontColor))
         icon.cooldownFont:SetAllPoints(icon)
 
         spellCooldownFrame["icon" .. x] = icon
@@ -169,7 +169,7 @@ function Cooldowns:UpdateFrame(unit)
             icon:SetHeight(Gladdy.db.cooldownSize)
             icon:SetWidth(Gladdy.db.cooldownSize * Gladdy.db.cooldownWidthFactor)
             icon.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), Gladdy.db.cooldownSize / 2 * Gladdy.db.cooldownFontScale, "OUTLINE")
-            icon.cooldownFont:SetTextColor(Gladdy.db.cooldownFontColor.r, Gladdy.db.cooldownFontColor.g, Gladdy.db.cooldownFontColor.b, Gladdy.db.cooldownFontColor.a)
+            icon.cooldownFont:SetTextColor(Gladdy:SetColor(Gladdy.db.cooldownFontColor))
             icon:ClearAllPoints()
             if (Gladdy.db.cooldownXGrowDirection == "LEFT") then
                 if (j == 1) then
@@ -217,10 +217,10 @@ function Cooldowns:UpdateFrame(unit)
             icon.cooldown:SetAlpha(Gladdy.db.cooldownCooldownAlpha)
 
             icon.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), (icon:GetWidth()/2 - 1) * Gladdy.db.cooldownFontScale, "OUTLINE")
-            icon.cooldownFont:SetTextColor(Gladdy.db.cooldownFontColor.r, Gladdy.db.cooldownFontColor.g, Gladdy.db.cooldownFontColor.b, Gladdy.db.cooldownFontColor.a)
+            icon.cooldownFont:SetTextColor(Gladdy:SetColor(Gladdy.db.cooldownFontColor))
 
             icon.border:SetTexture(Gladdy.db.cooldownBorderStyle)
-            icon.border:SetVertexColor(Gladdy.db.cooldownBorderColor.r, Gladdy.db.cooldownBorderColor.g, Gladdy.db.cooldownBorderColor.b, Gladdy.db.cooldownBorderColor.a)
+            icon.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.cooldownBorderColor))
             icon:Hide()
         end
         button.spellCooldownFrame:Show()

@@ -62,7 +62,7 @@ local function spellSchoolToOptionValue(spellSchool)
         spellSchoolToOptionValueTable[spellSchool].b,
         spellSchoolToOptionValueTable[spellSchool].a
     else
-        return Gladdy.db.buffsBorderColor.r,Gladdy.db.buffsBorderColor.g,Gladdy.db.buffsBorderColor.b,Gladdy.db.buffsBorderColor.a
+        return Gladdy:SetColor(Gladdy.db.buffsBorderColor)
     end
 end
 

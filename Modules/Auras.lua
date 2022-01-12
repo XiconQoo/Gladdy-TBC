@@ -108,7 +108,7 @@ function Auras:CreateFrame(unit)
 
     auraFrame.text = auraFrame.cooldownFrame:CreateFontString(nil, "OVERLAY")
     auraFrame.text:SetFont(Gladdy:SMFetch("font", "auraFont"), 10, "OUTLINE")
-    auraFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
+    auraFrame.text:SetTextColor(Gladdy:SetColor(Gladdy.db.auraFontColor))
     --auraFrame.text:SetShadowOffset(1, -1)
     --auraFrame.text:SetShadowColor(0, 0, 0, 1)
     auraFrame.text:SetJustifyH("CENTER")
@@ -181,7 +181,7 @@ function Auras:CreateInterrupt(unit)
 
     interruptFrame.text = interruptFrame.cooldownFrame:CreateFontString(nil, "OVERLAY")
     interruptFrame.text:SetFont(Gladdy:SMFetch("font", "auraFont"), 10, "OUTLINE")
-    interruptFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
+    interruptFrame.text:SetTextColor(Gladdy:SetColor(Gladdy.db.auraFontColor))
     --auraFrame.text:SetShadowOffset(1, -1)
     --auraFrame.text:SetShadowColor(0, 0, 0, 1)
     interruptFrame.text:SetJustifyH("CENTER")
@@ -280,13 +280,13 @@ function Auras:UpdateFrame(unit)
     auraFrame.cooldown:SetAlpha(Gladdy.db.auraCooldownAlpha)
 
     auraFrame.text:SetFont(Gladdy:SMFetch("font", "auraFont"), (width/2 - 1) * Gladdy.db.auraFontSizeScale, "OUTLINE")
-    auraFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
+    auraFrame.text:SetTextColor(Gladdy:SetColor(Gladdy.db.auraFontColor))
 
     auraFrame.icon.overlay:SetTexture(Gladdy.db.auraBorderStyle)
     if auraFrame.track and auraFrame.track == AURA_TYPE_DEBUFF then
-        auraFrame.icon.overlay:SetVertexColor(Gladdy.db.auraDebuffBorderColor.r, Gladdy.db.auraDebuffBorderColor.g, Gladdy.db.auraDebuffBorderColor.b, Gladdy.db.auraDebuffBorderColor.a)
+        auraFrame.icon.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.auraDebuffBorderColor))
     elseif auraFrame.track and auraFrame.track == AURA_TYPE_BUFF then
-        auraFrame.icon.overlay:SetVertexColor(Gladdy.db.auraBuffBorderColor.r, Gladdy.db.auraBuffBorderColor.g, Gladdy.db.auraBuffBorderColor.b, Gladdy.db.auraBuffBorderColor.a)
+        auraFrame.icon.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.auraBuffBorderColor))
     else
         auraFrame.icon.overlay:SetVertexColor(0, 0, 0, 1)
     end
@@ -381,7 +381,7 @@ function Auras:UpdateInterruptFrame(unit)
     interruptFrame.cooldown:SetAlpha(Gladdy.db.auraCooldownAlpha)
 
     interruptFrame.text:SetFont(Gladdy:SMFetch("font", "auraFont"), (width/2 - 1) * Gladdy.db.auraFontSizeScale, "OUTLINE")
-    interruptFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
+    interruptFrame.text:SetTextColor(Gladdy:SetColor(Gladdy.db.auraFontColor))
 
     interruptFrame.icon.overlay:SetTexture(Gladdy.db.auraBorderStyle)
     if interruptFrame.spellSchool then
@@ -522,9 +522,9 @@ function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, exp
     auraFrame.icon.overlay:Show()
     auraFrame.cooldownFrame:Show()
     if auraType == AURA_TYPE_DEBUFF then
-        auraFrame.icon.overlay:SetVertexColor(Gladdy.db.auraDebuffBorderColor.r, Gladdy.db.auraDebuffBorderColor.g, Gladdy.db.auraDebuffBorderColor.b, Gladdy.db.auraDebuffBorderColor.a)
+        auraFrame.icon.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.auraDebuffBorderColor))
     elseif auraType == AURA_TYPE_BUFF then
-        auraFrame.icon.overlay:SetVertexColor(Gladdy.db.auraBuffBorderColor.r, Gladdy.db.auraBuffBorderColor.g, Gladdy.db.auraBuffBorderColor.b, Gladdy.db.auraBuffBorderColor.a)
+        auraFrame.icon.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.auraBuffBorderColor))
     else
         auraFrame.icon.overlay:SetVertexColor(Gladdy.db.frameBorderColor.r, Gladdy.db.frameBorderColor.g, Gladdy.db.frameBorderColor.b, Gladdy.db.frameBorderColor.a)
     end
@@ -559,7 +559,7 @@ end
 
 function Auras:GetInterruptColor(extraSpellSchool)
     if not Gladdy.db.auraInterruptColorsEnabled then
-        return Gladdy.db.auraDebuffBorderColor.r, Gladdy.db.auraDebuffBorderColor.g, Gladdy.db.auraDebuffBorderColor.b, Gladdy.db.auraDebuffBorderColor.a
+        return Gladdy:SetColor(Gladdy.db.auraDebuffBorderColor)
     else
         local color = Gladdy.db.auraInterruptColors[extraSpellSchool] or Gladdy.db.auraInterruptColors["unknown"]
         return color.r, color.g, color.b, color.a

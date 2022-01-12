@@ -134,7 +134,7 @@ function Classicon:UpdateFrame(unit)
     classIcon.texture:SetAllPoints(classIcon)
 
     classIcon.texture.overlay:SetTexture(Gladdy.db.classIconBorderStyle)
-    classIcon.texture.overlay:SetVertexColor(Gladdy.db.classIconBorderColor.r, Gladdy.db.classIconBorderColor.g, Gladdy.db.classIconBorderColor.b, Gladdy.db.classIconBorderColor.a)
+    classIcon.texture.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.classIconBorderColor))
     if Gladdy.db.classIconEnabled then
         classIcon:Show()
     else

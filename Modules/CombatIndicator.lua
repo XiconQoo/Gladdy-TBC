@@ -51,7 +51,7 @@ function CombatIndicator:CreateFrame(unit)
     ciFrame.border = ciFrame:CreateTexture(nil, "OVERLAY")
     ciFrame.border:SetAllPoints(ciFrame)
     ciFrame.border:SetTexture(Gladdy.db.ciBorderStyle)
-    ciFrame.border:SetVertexColor(Gladdy.db.ciBorderColor.r, Gladdy.db.ciBorderColor.g, Gladdy.db.ciBorderColor.b, Gladdy.db.ciBorderColor.a)
+    ciFrame.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.ciBorderColor))
 
     self.frames[unit] = ciFrame
     button.ciFrame = ciFrame
@@ -70,7 +70,7 @@ function CombatIndicator:UpdateFrame(unit)
     ciFrame:SetHeight(Gladdy.db.ciSize)
     ciFrame:SetWidth(Gladdy.db.ciSize * Gladdy.db.ciWidthFactor)
     ciFrame.border:SetTexture(Gladdy.db.ciBorderStyle)
-    ciFrame.border:SetVertexColor(Gladdy.db.ciBorderColor.r, Gladdy.db.ciBorderColor.g, Gladdy.db.ciBorderColor.b, Gladdy.db.ciBorderColor.a)
+    ciFrame.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.ciBorderColor))
 
     Gladdy:SetPosition(ciFrame, unit, "ciXOffset", "ciYOffset", CombatIndicator:LegacySetPosition(ciFrame, unit), CombatIndicator)
 

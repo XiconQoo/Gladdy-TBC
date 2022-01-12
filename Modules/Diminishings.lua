@@ -56,11 +56,11 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
 
 local function getDiminishColor(dr)
     if dr == 0.5 then
-        return Gladdy.db.drHalfColor.r, Gladdy.db.drHalfColor.g, Gladdy.db.drHalfColor.b, Gladdy.db.drHalfColor.a
+        return Gladdy:SetColor(Gladdy.db.drHalfColor)
     elseif dr == 0.25 then
-        return Gladdy.db.drQuarterColor.r, Gladdy.db.drQuarterColor.g, Gladdy.db.drQuarterColor.b, Gladdy.db.drQuarterColor.a
+        return Gladdy:SetColor(Gladdy.db.drQuarterColor)
     else
-        return Gladdy.db.drNullColor.r, Gladdy.db.drNullColor.g, Gladdy.db.drNullColor.b, Gladdy.db.drNullColor.a
+        return Gladdy:SetColor(Gladdy.db.drNullColor)
     end
 end
 
@@ -138,7 +138,7 @@ function Diminishings:CreateFrame(unit)
         icon.text = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
         icon.text:SetDrawLayer("OVERLAY")
         icon.text:SetFont(Gladdy:SMFetch("font", "drFont"), 10, "OUTLINE")
-        icon.text:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
+        icon.text:SetTextColor(Gladdy:SetColor(Gladdy.db.drFontColor))
         icon.text:SetShadowOffset(1, -1)
         icon.text:SetShadowColor(0, 0, 0, 1)
         icon.text:SetJustifyH("CENTER")
@@ -147,7 +147,7 @@ function Diminishings:CreateFrame(unit)
         icon.timeText = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
         icon.timeText:SetDrawLayer("OVERLAY")
         icon.timeText:SetFont(Gladdy:SMFetch("font", "drFont"), 10, "OUTLINE")
-        icon.timeText:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
+        icon.timeText:SetTextColor(Gladdy:SetColor(Gladdy.db.drFontColor))
         icon.timeText:SetShadowOffset(1, -1)
         icon.timeText:SetShadowColor(0, 0, 0, 1)
         icon.timeText:SetJustifyH("CENTER")
@@ -216,9 +216,9 @@ function Diminishings:UpdateFrame(unit)
         icon.cooldownFrame:SetFrameLevel(Gladdy.db.drFrameLevel + 2)
 
         icon.text:SetFont(Gladdy:SMFetch("font", "drFont"), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, "OUTLINE")
-        icon.text:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
+        icon.text:SetTextColor(Gladdy:SetColor(Gladdy.db.drFontColor))
         icon.timeText:SetFont(Gladdy:SMFetch("font", "drFont"), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, "OUTLINE")
-        icon.timeText:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
+        icon.timeText:SetTextColor(Gladdy:SetColor(Gladdy.db.drFontColor))
 
         icon.drLevelText:SetFont(Gladdy:SMFetch("font", "drLevelTextFont"), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drLevelTextFontScale, "OUTLINE")
 
@@ -235,7 +235,7 @@ function Diminishings:UpdateFrame(unit)
         if Gladdy.db.drBorderColorsEnabled then
             icon.border:SetVertexColor(getDiminishColor(icon.diminishing))
         else
-            icon.border:SetVertexColor(Gladdy.db.drBorderColor.r, Gladdy.db.drBorderColor.g, Gladdy.db.drBorderColor.b, Gladdy.db.drBorderColor.a)
+            icon.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.drBorderColor))
         end
 
         if Gladdy.db.drLevelTextEnabled then
@@ -355,7 +355,7 @@ function Diminishings:AuraFade(unit, spellID)
     if Gladdy.db.drBorderColorsEnabled then
         lastIcon.border:SetVertexColor(getDiminishColor(lastIcon.diminishing))
     else
-        lastIcon.border:SetVertexColor(Gladdy.db.drBorderColor.r, Gladdy.db.drBorderColor.g, Gladdy.db.drBorderColor.b, Gladdy.db.drBorderColor.a)
+        lastIcon.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.drBorderColor))
     end
     lastIcon.cooldown:SetCooldown(GetTime(), Gladdy.db.drDuration)
     if Gladdy.db.drCategories[drCat].forceIcon then

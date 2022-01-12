@@ -137,7 +137,7 @@ function Racial:UpdateFrame(unit)
     racial.texture:SetAllPoints(racial)
 
     racial.texture.overlay:SetTexture(Gladdy.db.racialBorderStyle)
-    racial.texture.overlay:SetVertexColor(Gladdy.db.racialBorderColor.r, Gladdy.db.racialBorderColor.g, Gladdy.db.racialBorderColor.b, Gladdy.db.racialBorderColor.a)
+    racial.texture.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.racialBorderColor))
 
     Gladdy:SetPosition(racial, unit, "racialXOffset", "racialYOffset", Racial:LegacySetPosition(racial, unit), Racial)
 

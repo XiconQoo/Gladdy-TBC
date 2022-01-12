@@ -70,13 +70,13 @@ function Castbar:CreateFrame(unit)
     castBar.backdrop:SetAllPoints(castBar)
     castBar.backdrop:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "castBarBorderStyle"),
                                  edgeSize = Gladdy.db.castBarBorderSize })
-    castBar.backdrop:SetBackdropBorderColor(Gladdy.db.castBarBorderColor.r, Gladdy.db.castBarBorderColor.g, Gladdy.db.castBarBorderColor.b, Gladdy.db.castBarBorderColor.a)
+    castBar.backdrop:SetBackdropBorderColor(Gladdy:SetColor(Gladdy.db.castBarBorderColor))
     castBar.backdrop:SetFrameStrata(Gladdy.db.castBarFrameStrata)
     castBar.backdrop:SetFrameLevel(Gladdy.db.castBarFrameLevel - 1)
 
     castBar.bar = CreateFrame("StatusBar", nil, castBar)
     castBar.bar:SetStatusBarTexture(Gladdy:SMFetch("statusbar", "castBarTexture"))
-    castBar.bar:SetStatusBarColor(Gladdy.db.castBarColor.r, Gladdy.db.castBarColor.g, Gladdy.db.castBarColor.b, Gladdy.db.castBarColor.a)
+    castBar.bar:SetStatusBarColor(Gladdy:SetColor(Gladdy.db.castBarColor))
     castBar.bar:SetMinMaxValues(0, 100)
     castBar.bar:SetFrameLevel(0)
     castBar.bar:SetFrameStrata(Gladdy.db.castBarFrameStrata)
@@ -92,7 +92,7 @@ function Castbar:CreateFrame(unit)
     castBar.bg = castBar.bar:CreateTexture(nil, "BACKGROUND")
     castBar.bg:SetAlpha(1)
     castBar.bg:SetTexture(Gladdy:SMFetch("statusbar", "castBarTexture"))
-    castBar.bg:SetVertexColor(Gladdy.db.castBarBgColor.r, Gladdy.db.castBarBgColor.g, Gladdy.db.castBarBgColor.b, Gladdy.db.castBarBgColor.a)
+    castBar.bg:SetVertexColor(Gladdy:SetColor(Gladdy.db.castBarBgColor))
     castBar.bg:SetAllPoints(castBar.bar)
 
     castBar.icon = CreateFrame("Frame", nil, castBar)
@@ -114,7 +114,7 @@ function Castbar:CreateFrame(unit)
 
     castBar.spellText = castBar:CreateFontString(nil, "LOW")
     castBar.spellText:SetFont(Gladdy:SMFetch("font", "auraFont"), Gladdy.db.castBarFontSize)
-    castBar.spellText:SetTextColor(Gladdy.db.castBarFontColor.r, Gladdy.db.castBarFontColor.g, Gladdy.db.castBarFontColor.b, Gladdy.db.castBarFontColor.a)
+    castBar.spellText:SetTextColor(Gladdy:SetColor(Gladdy.db.castBarFontColor))
     castBar.spellText:SetShadowOffset(1, -1)
     castBar.spellText:SetShadowColor(0, 0, 0, 1)
     castBar.spellText:SetJustifyH("CENTER")
@@ -122,7 +122,7 @@ function Castbar:CreateFrame(unit)
 
     castBar.timeText = castBar:CreateFontString(nil, "LOW")
     castBar.timeText:SetFont(Gladdy:SMFetch("font", "auraFont"), Gladdy.db.castBarFontSize)
-    castBar.timeText:SetTextColor(Gladdy.db.castBarFontColor.r, Gladdy.db.castBarFontColor.g, Gladdy.db.castBarFontColor.b, Gladdy.db.castBarFontColor.a)
+    castBar.timeText:SetTextColor(Gladdy:SetColor(Gladdy.db.castBarFontColor))
     castBar.timeText:SetShadowOffset(1, -1)
     castBar.timeText:SetShadowColor(0, 0, 0, 1)
     castBar.timeText:SetJustifyH("CENTER")
@@ -152,20 +152,20 @@ function Castbar:UpdateFrame(unit)
     castBar:SetHeight(Gladdy.db.castBarHeight)
     castBar.backdrop:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "castBarBorderStyle"),
                                  edgeSize = Gladdy.db.castBarBorderSize })
-    castBar.backdrop:SetBackdropBorderColor(Gladdy.db.castBarBorderColor.r, Gladdy.db.castBarBorderColor.g, Gladdy.db.castBarBorderColor.b, Gladdy.db.castBarBorderColor.a)
+    castBar.backdrop:SetBackdropBorderColor(Gladdy:SetColor(Gladdy.db.castBarBorderColor))
 
     castBar.bar:SetStatusBarTexture(Gladdy:SMFetch("statusbar", "castBarTexture"))
     castBar.bar:ClearAllPoints()
-    castBar.bar:SetStatusBarColor(Gladdy.db.castBarColor.r, Gladdy.db.castBarColor.g, Gladdy.db.castBarColor.b, Gladdy.db.castBarColor.a)
+    castBar.bar:SetStatusBarColor(Gladdy:SetColor(Gladdy.db.castBarColor))
     castBar.bar:SetPoint("TOPLEFT", castBar, "TOPLEFT", (Gladdy.db.castBarBorderSize/Gladdy.db.statusbarBorderOffset), -(Gladdy.db.castBarBorderSize/Gladdy.db.statusbarBorderOffset))
     castBar.bar:SetPoint("BOTTOMRIGHT", castBar, "BOTTOMRIGHT", -(Gladdy.db.castBarBorderSize/Gladdy.db.statusbarBorderOffset), (Gladdy.db.castBarBorderSize/Gladdy.db.statusbarBorderOffset))
 
     castBar.bg:SetTexture(Gladdy:SMFetch("statusbar", "castBarTexture"))
-    castBar.bg:SetVertexColor(Gladdy.db.castBarBgColor.r, Gladdy.db.castBarBgColor.g, Gladdy.db.castBarBgColor.b, Gladdy.db.castBarBgColor.a)
+    castBar.bg:SetVertexColor(Gladdy:SetColor(Gladdy.db.castBarBgColor))
 
     if Gladdy.db.castBarSparkEnabled then
         castBar.spark:SetHeight(Gladdy.db.castBarHeight * 1.8)
-        castBar.spark:SetVertexColor(Gladdy.db.castBarSparkColor.r, Gladdy.db.castBarSparkColor.g, Gladdy.db.castBarSparkColor.b, Gladdy.db.castBarSparkColor.a)
+        castBar.spark:SetVertexColor(Gladdy:SetColor(Gladdy.db.castBarSparkColor))
     else
         castBar.spark:SetAlpha(0)
     end
@@ -193,13 +193,13 @@ function Castbar:UpdateFrame(unit)
     Gladdy:SetPosition(castBar, unit, "castBarXOffset", "castBarYOffset", Castbar:LegacySetPosition(castBar, unit, leftMargin, rightMargin), Castbar)
 
     castBar.spellText:SetFont(Gladdy:SMFetch("font", "castBarFont"), Gladdy.db.castBarFontSize)
-    castBar.spellText:SetTextColor(Gladdy.db.castBarFontColor.r, Gladdy.db.castBarFontColor.g, Gladdy.db.castBarFontColor.b, Gladdy.db.castBarFontColor.a)
+    castBar.spellText:SetTextColor(Gladdy:SetColor(Gladdy.db.castBarFontColor))
 
     castBar.timeText:SetFont(Gladdy:SMFetch("font", "castBarFont"), Gladdy.db.castBarFontSize)
-    castBar.timeText:SetTextColor(Gladdy.db.castBarFontColor.r, Gladdy.db.castBarFontColor.g, Gladdy.db.castBarFontColor.b, Gladdy.db.castBarFontColor.a)
+    castBar.timeText:SetTextColor(Gladdy:SetColor(Gladdy.db.castBarFontColor))
 
     castBar.icon.texture.overlay:SetTexture(Gladdy.db.castBarIconStyle)
-    castBar.icon.texture.overlay:SetVertexColor(Gladdy.db.castBarIconColor.r, Gladdy.db.castBarIconColor.g, Gladdy.db.castBarIconColor.b, Gladdy.db.castBarIconColor.a)
+    castBar.icon.texture.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.castBarIconColor))
 
     if (unit == "arena1") then
         Gladdy:CreateMover(castBar, "castBarXOffset", "castBarYOffset", L["Cast Bar"], {"TOPLEFT", "TOPLEFT"}, Gladdy.db.castBarWidth, Gladdy.db.castBarHeight, 0, 0)
@@ -409,7 +409,7 @@ function Castbar:CAST_START(unit, spell, icon, value, maxValue, test)
         castBar.channeling = test == "channel"
     end
 
-    castBar.bar:SetStatusBarColor(Gladdy.db.castBarColor.r, Gladdy.db.castBarColor.g, Gladdy.db.castBarColor.b, Gladdy.db.castBarColor.a)
+    castBar.bar:SetStatusBarColor(Gladdy:SetColor(Gladdy.db.castBarColor))
     castBar.value = value
     castBar.maxValue = maxValue
     castBar.bar:SetMinMaxValues(0, maxValue)
@@ -594,7 +594,7 @@ function Castbar:GetOptions()
                             desc = L["Height of the bar"],
                             order = 3,
                             min = 0,
-                            max = 50,
+                            max = 100,
                             step = 1,
                             width = "full",
                         }),
