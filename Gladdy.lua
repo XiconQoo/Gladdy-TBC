@@ -422,6 +422,7 @@ function Gladdy:PLAYER_REGEN_ENABLED()
             self.startTest = nil
         end
         self.frame:Show()
+        self:SendMessage("JOINED_ARENA")
         self.showFrame = nil
     end
     if self.hideFrame then
@@ -508,13 +509,13 @@ function Gladdy:JoinedArena()
         end
     end
 
-    self:SendMessage("JOINED_ARENA")
     if InCombatLockdown() then
         Gladdy:Print("Gladdy frames show as soon as you leave combat")
         self.showFrame = true
     else
         self:UpdateFrame()
         self.frame:Show()
+        self:SendMessage("JOINED_ARENA")
     end
     for i=1, self.curBracket do
         self.buttons["arena" .. i]:SetAlpha(1)
