@@ -55,6 +55,7 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 - [AlexFolland](https://github.com/AlexFolland)
 - [dfherr](https://github.com/dfherr)
 - [miraage](https://github.com/miraage)
+- [veiz](https://github.com/veiz)
 
 Thank you!
 
@@ -73,12 +74,16 @@ Thank you!
 ### Changes
 
 ### v2.00-Release
-- major release version set to v2
+This is a packed release with new features and bugfixes. Most importantly, positioning of all elements has been redone with movable frames.
+Thank you for the great feedback and active contribution.
+
+**Here is a list of all changes:**
+- **major release version set to v2**
   - this will mean, that export strings will still be backwards compatible, but not forward (v2 String cant be imported into v1 Strings but vice versa)
-- big overhaul of positioning elements added! All elements besides HP and PowerBar can be moved separately
+- **big overhaul of positioning elements added! All elements besides HP and PowerBar can be moved separately**
   - added Mover Frames for Auras, Interrupts, (De)Buffs, CastBar, ClassIcon, CombatIndicator, Cooldowns, DRs, Pets, Racial, Trinket
   - this will hopefully make configuration a lot easier
-- SpecDetection:
+- **SpecDetection:**
   - fixed spec detection for Paladins
   - added following spells for better spec detection:
       - Expose Weakness (Survival Hunter)
@@ -96,7 +101,7 @@ Thank you!
       - Dark Pact (Affliction Warlock)
       - Conflagate (Destruction Warlock)
       - Shield Slam (Protection Warrior)
-- Cooldowns:
+- **Cooldowns:**
   - added Fear Ward and Fear Ward Cooldown Detection in case it was used before arena
   - added following cooldowns:
       - Scare Beast (Hunter)
@@ -110,20 +115,25 @@ Thank you!
       - Spell Lock (Warlock)
       - Devour Magic (Warlock)
       - Intercept (Warrior)
-- Auras/Interrupts:
+- **Auras/Interrupts:**
   - can now be detached from ClassIcon and positioned/scaled anywhere separately
   - added Auras:
       - Scare Beast (Hunter)
       - Fear Ward (Priest)
-- Pixel Perfect option added (makes your Gladdy Frames pixel perfect - no more wierd scaling interferences)
-- Pets can be grouped (not perfect yet, but a first step)
-- added DR-Level Text (thanks https://github.com/ManneN1)
-- added zhCN Locale (thanks https://github.com/veiz)
-- Shadowsight:
+- **Shadowsight:**
   - reset timer when buff was taken
-  - add a configurable 2nd timer or show one timer with closest CD
-- fixed some DR-categories (Hibernate/Chastice/Dragonsbreath/ImpConcussiveShot/Counterattack)
-- ClassIcon can be disabled
+  - add a configurable 2nd timer or show one timer with the closest CD
+- **fixed some DR-categories** (Hibernate / Chastice / Dragonsbreath / ImpConcussiveShot / Counterattack)
+- **Pixel Perfect option added** (makes your Gladdy Frames pixel perfect - no more wierd scaling interferences)
+- **Pets can be grouped** (not perfect yet, but a first step)
+- **added DR-Level Text** (thanks https://github.com/ManneN1)
+- **added zhCN Locale** (thanks https://github.com/veiz)
+- **ClassIcon can be disabled**
+- **add interrupt announcement**
+- **detect SpellLock and Devour Magic cooldowns properly**
+- **minor fixes:**
+  - fixed reloading during arena to properly show all frames
+  - fix grow up positioning
 
 ### v1.22-Release
 - fixed import for some localizations not working
