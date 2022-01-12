@@ -52,6 +52,10 @@ local Auras = Gladdy:NewModule("Auras", nil, {
     auraInterruptYOffset = 0,
     auraInterruptSize = 60 + 20 + 1,
     auraInterruptWidthFactor = 0.9,
+    auraFrameStrata = "MEDIUM",
+    auraFrameLevel = 5,
+    auraInterruptFrameStrata = "MEDIUM",
+    auraInterruptFrameLevel = 5,
 })
 
 function Auras:Initialize()
@@ -223,6 +227,16 @@ function Auras:UpdateFrame(unit)
 
     if Gladdy.db.auraDetached then
         width, height = Gladdy.db.auraSize * Gladdy.db.auraWidthFactor, Gladdy.db.auraSize
+
+        auraFrame:SetFrameStrata(Gladdy.db.auraFrameStrata)
+        auraFrame:SetFrameLevel(Gladdy.db.auraFrameLevel)
+        auraFrame.frame:SetFrameStrata(Gladdy.db.auraFrameStrata)
+        auraFrame.frame:SetFrameLevel(Gladdy.db.auraFrameLevel)
+        auraFrame.cooldown:SetFrameStrata(Gladdy.db.auraFrameStrata)
+        auraFrame.cooldown:SetFrameLevel(Gladdy.db.auraFrameLevel + 1)
+        auraFrame.cooldownFrame:SetFrameStrata(Gladdy.db.auraFrameStrata)
+        auraFrame.cooldownFrame:SetFrameLevel(Gladdy.db.auraFrameLevel + 2)
+
         auraFrame:ClearAllPoints()
         Gladdy:SetPosition(auraFrame, unit, "auraXOffset", "auraYOffset", true, Auras)
         if (unit == "arena1") then
@@ -235,6 +249,16 @@ function Auras:UpdateFrame(unit)
         end
     else
         width, height = Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor, Gladdy.db.classIconSize
+
+        auraFrame:SetFrameStrata(Gladdy.db.classIconFrameStrata)
+        auraFrame:SetFrameLevel(Gladdy.db.classIconFrameLevel + 1)
+        auraFrame.frame:SetFrameStrata(Gladdy.db.classIconFrameStrata)
+        auraFrame.frame:SetFrameLevel(Gladdy.db.classIconFrameLevel + 1)
+        auraFrame.cooldown:SetFrameStrata(Gladdy.db.classIconFrameStrata)
+        auraFrame.cooldown:SetFrameLevel(Gladdy.db.classIconFrameLevel + 2)
+        auraFrame.cooldownFrame:SetFrameStrata(Gladdy.db.classIconFrameStrata)
+        auraFrame.cooldownFrame:SetFrameLevel(Gladdy.db.classIconFrameLevel + 3)
+
         auraFrame:ClearAllPoints()
         auraFrame:SetPoint("TOPLEFT", Gladdy.modules["Class Icon"].frames[unit], "TOPLEFT")
         if auraFrame.mover then
@@ -285,6 +309,16 @@ function Auras:UpdateInterruptFrame(unit)
 
     if Gladdy.db.auraInterruptDetached then
         width, height = Gladdy.db.auraInterruptSize * Gladdy.db.auraInterruptWidthFactor, Gladdy.db.auraInterruptSize
+
+        interruptFrame:SetFrameStrata(Gladdy.db.auraInterruptFrameStrata)
+        interruptFrame:SetFrameLevel(Gladdy.db.auraInterruptFrameLevel)
+        interruptFrame.frame:SetFrameStrata(Gladdy.db.auraInterruptFrameStrata)
+        interruptFrame.frame:SetFrameLevel(Gladdy.db.auraInterruptFrameLevel)
+        interruptFrame.cooldown:SetFrameStrata(Gladdy.db.auraInterruptFrameStrata)
+        interruptFrame.cooldown:SetFrameLevel(Gladdy.db.auraInterruptFrameLevel + 1)
+        interruptFrame.cooldownFrame:SetFrameStrata(Gladdy.db.auraInterruptFrameStrata)
+        interruptFrame.cooldownFrame:SetFrameLevel(Gladdy.db.auraInterruptFrameLevel + 2)
+
         interruptFrame:ClearAllPoints()
         Gladdy:SetPosition(interruptFrame, unit, "auraInterruptXOffset", "auraInterruptYOffset", true, Auras)
         if (unit == "arena1") then
@@ -298,6 +332,16 @@ function Auras:UpdateInterruptFrame(unit)
     else
         if Gladdy.db.auraDetached then
             width, height = Gladdy.db.auraSize * Gladdy.db.auraWidthFactor, Gladdy.db.auraSize
+
+            interruptFrame:SetFrameStrata(Gladdy.db.auraFrameStrata)
+            interruptFrame:SetFrameLevel(Gladdy.db.auraFrameLevel)
+            interruptFrame.frame:SetFrameStrata(Gladdy.db.auraFrameStrata)
+            interruptFrame.frame:SetFrameLevel(Gladdy.db.auraFrameLevel)
+            interruptFrame.cooldown:SetFrameStrata(Gladdy.db.auraFrameStrata)
+            interruptFrame.cooldown:SetFrameLevel(Gladdy.db.auraFrameLevel + 1)
+            interruptFrame.cooldownFrame:SetFrameStrata(Gladdy.db.auraFrameStrata)
+            interruptFrame.cooldownFrame:SetFrameLevel(Gladdy.db.auraFrameLevel + 2)
+
             interruptFrame:ClearAllPoints()
             interruptFrame:SetAllPoints(self.frames[unit])
             if interruptFrame.mover then
@@ -305,6 +349,16 @@ function Auras:UpdateInterruptFrame(unit)
             end
         else
             width, height = Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor, Gladdy.db.classIconSize
+
+            interruptFrame:SetFrameStrata(Gladdy.db.classIconFrameStrata)
+            interruptFrame:SetFrameLevel(Gladdy.db.classIconFrameLevel + 1)
+            interruptFrame.frame:SetFrameStrata(Gladdy.db.classIconFrameStrata)
+            interruptFrame.frame:SetFrameLevel(Gladdy.db.classIconFrameLevel + 1)
+            interruptFrame.cooldown:SetFrameStrata(Gladdy.db.classIconFrameStrata)
+            interruptFrame.cooldown:SetFrameLevel(Gladdy.db.classIconFrameLevel + 2)
+            interruptFrame.cooldownFrame:SetFrameStrata(Gladdy.db.classIconFrameStrata)
+            interruptFrame.cooldownFrame:SetFrameLevel(Gladdy.db.classIconFrameLevel + 3)
+
             interruptFrame:ClearAllPoints()
             interruptFrame:SetPoint("TOPLEFT", Gladdy.modules["Class Icon"].frames[unit], "TOPLEFT")
             if interruptFrame.mover then
@@ -702,6 +756,34 @@ function Auras:GetOptions()
                             order = 22,
                             width = "full",
                         }),
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 30,
+                        },
+                        auraFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            disabled = function()
+                                return not Gladdy.db.auraDetached
+                            end,
+                            order = 32,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        auraFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            disabled = function()
+                                return not Gladdy.db.auraDetached
+                            end,
+                            min = 0,
+                            max = 500,
+                            step = 1,
+                            order = 33,
+                            width = "full",
+                        }),
                     }
                 },
                 detachedInterruptMode = {
@@ -776,6 +858,34 @@ function Auras:GetOptions()
                             max = 1000,
                             step = 0.01,
                             order = 22,
+                            width = "full",
+                        }),
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 30,
+                        },
+                        auraInterruptFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            disabled = function()
+                                return not Gladdy.db.auraDetached
+                            end,
+                            order = 32,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        auraInterruptFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            disabled = function()
+                                return not Gladdy.db.auraDetached
+                            end,
+                            min = 0,
+                            max = 500,
+                            step = 1,
+                            order = 33,
                             width = "full",
                         }),
                     }

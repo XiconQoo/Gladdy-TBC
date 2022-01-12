@@ -41,6 +41,8 @@ local Castbar = Gladdy:NewModule("Cast Bar", 70, {
     castBarTimerFormat = "LEFT",
     castBarSparkEnabled = true,
     castBarSparkColor = { r = 1, g = 1, b = 1, a = 1 },
+    castBarFrameStrata = "MEDIUM",
+    castBarFrameLevel = 5,
 })
 
 function Castbar:Initialize()
@@ -60,19 +62,24 @@ function Castbar:CreateFrame(unit)
     castBar:EnableMouse(false)
     castBar:SetMovable(true)
     castBar.unit = unit
+    castBar:SetFrameStrata(Gladdy.db.castBarFrameStrata)
+    castBar:SetFrameLevel(Gladdy.db.castBarFrameLevel)
 
     castBar.backdrop = CreateFrame("Frame", nil, castBar, BackdropTemplateMixin and "BackdropTemplate")
     castBar.backdrop:SetAllPoints(castBar)
     castBar.backdrop:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "castBarBorderStyle"),
                                  edgeSize = Gladdy.db.castBarBorderSize })
     castBar.backdrop:SetBackdropBorderColor(Gladdy.db.castBarBorderColor.r, Gladdy.db.castBarBorderColor.g, Gladdy.db.castBarBorderColor.b, Gladdy.db.castBarBorderColor.a)
-    castBar.backdrop:SetFrameLevel(1)
+    castBar.backdrop:SetFrameStrata(Gladdy.db.castBarFrameStrata)
+    castBar.backdrop:SetFrameLevel(Gladdy.db.castBarFrameLevel - 1)
 
     castBar.bar = CreateFrame("StatusBar", nil, castBar)
     castBar.bar:SetStatusBarTexture(Gladdy:SMFetch("statusbar", "castBarTexture"))
     castBar.bar:SetStatusBarColor(Gladdy.db.castBarColor.r, Gladdy.db.castBarColor.g, Gladdy.db.castBarColor.b, Gladdy.db.castBarColor.a)
     castBar.bar:SetMinMaxValues(0, 100)
     castBar.bar:SetFrameLevel(0)
+    castBar.bar:SetFrameStrata(Gladdy.db.castBarFrameStrata)
+    castBar.bar:SetFrameLevel(Gladdy.db.castBarFrameLevel)
 
     castBar.spark = castBar:CreateTexture(nil, "OVERLAY")
     castBar.spark:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
@@ -88,6 +95,8 @@ function Castbar:CreateFrame(unit)
     castBar.bg:SetAllPoints(castBar.bar)
 
     castBar.icon = CreateFrame("Frame", nil, castBar)
+    castBar.icon:SetFrameStrata(Gladdy.db.castBarFrameStrata)
+    castBar.icon:SetFrameLevel(Gladdy.db.castBarFrameLevel)
     castBar.icon.texture = castBar.icon:CreateTexture(nil, "BACKGROUND")
     castBar.icon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
     castBar.icon.texture:SetAllPoints(castBar.icon)
@@ -128,6 +137,15 @@ function Castbar:UpdateFrame(unit)
     if (not castBar) then
         return
     end
+
+    castBar:SetFrameStrata(Gladdy.db.castBarFrameStrata)
+    castBar:SetFrameLevel(Gladdy.db.castBarFrameLevel)
+    castBar.backdrop:SetFrameStrata(Gladdy.db.castBarFrameStrata)
+    castBar.backdrop:SetFrameLevel(Gladdy.db.castBarFrameLevel - 1)
+    castBar.bar:SetFrameStrata(Gladdy.db.castBarFrameStrata)
+    castBar.bar:SetFrameLevel(Gladdy.db.castBarFrameLevel)
+    castBar.icon:SetFrameStrata(Gladdy.db.castBarFrameStrata)
+    castBar.icon:SetFrameLevel(Gladdy.db.castBarFrameLevel)
 
     castBar:SetWidth(Gladdy.db.castBarWidth)
     castBar:SetHeight(Gladdy.db.castBarHeight)
@@ -792,6 +810,35 @@ function Castbar:GetOptions()
                             width = "full",
                         }),
                     }
+                },
+                frameStrata = {
+                    type = "group",
+                    name = L["Frame Strata and Level"],
+                    order = 6,
+                    args = {
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 1,
+                        },
+                        castBarFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            order = 2,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        castBarFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            min = 1,
+                            max = 500,
+                            step = 1,
+                            order = 3,
+                            width = "full",
+                        }),
+                    },
                 },
             },
         },

@@ -25,6 +25,8 @@ local Pets = Gladdy:NewModule("Pets", nil, {
     petYOffset = -62,
     petGroup = false,
     petMargin = 1,
+    petFrameStrata = "MEDIUM",
+    petFrameLevel = 5,
 })
 
 function Pets:Initialize()
@@ -156,7 +158,8 @@ function Pets:CreateFrame(unitId)
     healthBar:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "petHealthBarBorderStyle"),
                             edgeSize = Gladdy.db.petHealthBarBorderSize })
     healthBar:SetBackdropBorderColor(Gladdy.db.petHealthBarBorderColor.r, Gladdy.db.petHealthBarBorderColor.g, Gladdy.db.petHealthBarBorderColor.b, Gladdy.db.petHealthBarBorderColor.a)
-    healthBar:SetFrameLevel(1)
+    healthBar:SetFrameStrata(Gladdy.db.petFrameStrata)
+    healthBar:SetFrameLevel(Gladdy.db.petFrameLevel)
     healthBar:SetAllPoints(button)
     healthBar:SetAlpha(0)
 
@@ -174,7 +177,8 @@ function Pets:CreateFrame(unitId)
     healthBar.hp:SetStatusBarTexture(Gladdy:SMFetch("statusbar", "petHealthBarTexture"))
     healthBar.hp:SetStatusBarColor(Gladdy.db.petHealthBarColor.r, Gladdy.db.petHealthBarColor.g, Gladdy.db.petHealthBarColor.b, Gladdy.db.petHealthBarColor.a)
     healthBar.hp:SetMinMaxValues(0, 100)
-    healthBar.hp:SetFrameLevel(0)
+    healthBar.hp:SetFrameStrata(Gladdy.db.petFrameStrata)
+    healthBar.hp:SetFrameLevel(Gladdy.db.petFrameLevel - 1)
     healthBar.hp:SetAllPoints(healthBar)
 
     healthBar.bg = healthBar.hp:CreateTexture(nil, "BACKGROUND")
@@ -244,6 +248,11 @@ function Pets:UpdateFrame(unitId)
     if (not healthBar) then
         return
     end
+
+    healthBar:SetFrameStrata(Gladdy.db.petFrameStrata)
+    healthBar:SetFrameLevel(Gladdy.db.petFrameLevel)
+    healthBar.hp:SetFrameStrata(Gladdy.db.petFrameStrata)
+    healthBar.hp:SetFrameLevel(Gladdy.db.petFrameLevel - 1)
 
     if not Gladdy.db.petEnabled then
         self.frames[unit]:Hide()
@@ -569,10 +578,39 @@ function Pets:GetOptions()
                         }),
                     }
                 },
+                frameStrata = {
+                    type = "group",
+                    name = L["Frame Strata and Level"],
+                    order = 6,
+                    args = {
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 1,
+                        },
+                        petFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            order = 2,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        petFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            min = 1,
+                            max = 500,
+                            step = 1,
+                            order = 3,
+                            width = "full",
+                        }),
+                    },
+                },
                 healthValues = {
                     type = "group",
                     name = L["Health Values"],
-                    order = 6,
+                    order = 7,
                     args = {
                         header = {
                             type = "header",

@@ -14,6 +14,8 @@ local CombatIndicator = Gladdy:NewModule("Combat Indicator", nil, {
     ciYOffset = -31,
     ciBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     ciBorderColor = { r = 0, g = 0, b = 0, a = 1 },
+    ciFrameStrata = "HIGH",
+    ciFrameLevel = 5,
 })
 
 function CombatIndicator:Initialize()
@@ -36,7 +38,8 @@ function CombatIndicator:CreateFrame(unit)
     local ciFrame = CreateFrame("Frame", "GladdyCombatindicator" .. unit, button)
     ciFrame:EnableMouse(false)
     ciFrame:SetMovable(true)
-    ciFrame:SetFrameStrata("HIGH")
+    ciFrame:SetFrameStrata(Gladdy.db.ciFrameStrata)
+    ciFrame:SetFrameLevel(Gladdy.db.ciFrameLevel)
     ciFrame:SetHeight(Gladdy.db.ciSize)
     ciFrame:SetWidth(Gladdy.db.ciSize * Gladdy.db.ciWidthFactor)
 
@@ -60,6 +63,10 @@ function CombatIndicator:UpdateFrame(unit)
     if (not button or not ciFrame) then
         return
     end
+
+    ciFrame:SetFrameStrata(Gladdy.db.ciFrameStrata)
+    ciFrame:SetFrameLevel(Gladdy.db.ciFrameLevel)
+
     ciFrame:SetHeight(Gladdy.db.ciSize)
     ciFrame:SetWidth(Gladdy.db.ciSize * Gladdy.db.ciWidthFactor)
     ciFrame.border:SetTexture(Gladdy.db.ciBorderStyle)
@@ -166,7 +173,7 @@ function CombatIndicator:GetOptions()
                 position = {
                     type = "group",
                     name = L["Position"],
-                    order = 4,
+                    order = 3,
                     args = {
                         header = {
                             type = "header",
@@ -196,7 +203,7 @@ function CombatIndicator:GetOptions()
                 border = {
                     type = "group",
                     name = L["Border"],
-                    order = 4,
+                    order = 2,
                     args = {
                         header = {
                             type = "header",
@@ -215,6 +222,35 @@ function CombatIndicator:GetOptions()
                             desc = L["Color of the border"],
                             order = 32,
                             hasAlpha = true,
+                        }),
+                    },
+                },
+                frameStrata = {
+                    type = "group",
+                    name = L["Frame Strata and Level"],
+                    order = 5,
+                    args = {
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 1,
+                        },
+                        ciFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            order = 2,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        ciFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            min = 0,
+                            max = 500,
+                            step = 1,
+                            order = 3,
+                            width = "full",
                         }),
                     },
                 },

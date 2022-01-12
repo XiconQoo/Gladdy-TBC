@@ -21,6 +21,8 @@ local ShadowsightTimer = Gladdy:NewModule("Shadowsight Timer", nil, {
     shadowsightTimerStartTime = 91,
     shadowsightTimerResetTime = 120,
     shadowsightTimerShowTwoTimer = false,
+    shadowsightTimerFrameStrata = "HIGH",
+    shadowsightTimerFrameLevel = 20,
 })
 
 -- /run LibStub("Gladdy").modules["Shadowsight Timer"]:AURA_GAIN(nil, nil, 34709)
@@ -78,6 +80,9 @@ function ShadowsightTimer:CreateTimerFrame(anchor, name, points)
     self[name].font:SetPoint("LEFT", 5, 0)
     self[name].font:SetJustifyH("LEFT")
     self[name].font:SetTextColor(1, 0.8, 0)
+
+    self[name]:SetFrameStrata(Gladdy.db.shadowsightTimerFrameStrata)
+    self[name]:SetFrameLevel(Gladdy.db.shadowsightTimerFrameLevel)
 end
 
 function ShadowsightTimer:CreateAnchor()
@@ -102,6 +107,14 @@ end
 
 function ShadowsightTimer:UpdateFrameOnce()
     self.anchor:EnableMouse(not Gladdy.db.shadowsightTimerLocked)
+
+    self.anchor:SetFrameStrata(Gladdy.db.shadowsightTimerFrameStrata)
+    self.anchor:SetFrameLevel(Gladdy.db.shadowsightTimerFrameLevel)
+    self.timerFrame1:SetFrameStrata(Gladdy.db.shadowsightTimerFrameStrata)
+    self.timerFrame1:SetFrameLevel(Gladdy.db.shadowsightTimerFrameLevel)
+    self.timerFrame2:SetFrameStrata(Gladdy.db.shadowsightTimerFrameStrata)
+    self.timerFrame2:SetFrameLevel(Gladdy.db.shadowsightTimerFrameLevel)
+
     if Gladdy.db.shadowsightTimerEnabled then
         self.anchor:SetScale(Gladdy.db.shadowsightTimerScale)
         self.anchor:ClearAllPoints()
@@ -268,7 +281,7 @@ end
 
 function ShadowsightTimer:GetOptions()
     return {
-        headerArenaCountdown = {
+        headerShadowsight = {
             type = "header",
             name = L["Shadowsight Timer"],
             order = 2,
@@ -278,61 +291,143 @@ function ShadowsightTimer:GetOptions()
             name = L["Enabled"],
             --desc = L["Turns countdown before the start of an arena match on/off."],
             order = 3,
-            width = "full",
         }),
         shadowsightTimerLocked = Gladdy:option({
             type = "toggle",
             name = L["Locked"],
             --desc = L["Turns countdown before the start of an arena match on/off."],
             order = 4,
-            width = "full",
         }),
         shadowsightTimerShowTwoTimer = Gladdy:option({
             type = "toggle",
             name = L["Show two timers"],
             order = 5,
-            width = "full",
         }),
         shadowsightAnnounce = Gladdy:option({
             type = "toggle",
             name = L["Announce"],
             --desc = L["Turns countdown before the start of an arena match on/off."],
             order = 6,
-            width = "full",
         }),
-        shadowsightTimerScale = Gladdy:option({
-            type = "range",
-            name = L["Scale"],
+        group = {
+            type = "group",
+            childGroups = "tree",
+            name = L["Frame"],
             order = 7,
-            min = 0.1,
-            max = 5,
-            step = 0.1,
-            width = "full",
-        }),
-        headerTimer = {
-            type = "header",
-            name = L["Shadowsight CDs"],
-            order = 10,
+            args = {
+                general = {
+                    type = "group",
+                    name = L["Scale"],
+                    order = 1,
+                    args = {
+                        header = {
+                            type = "header",
+                            name = L["Scale"],
+                            order = 1,
+                        },
+                        shadowsightTimerScale = Gladdy:option({
+                            type = "range",
+                            name = L["Scale"],
+                            order = 2,
+                            min = 0.1,
+                            max = 5,
+                            step = 0.1,
+                            width = "full",
+                        }),
+                    },
+                },
+                cooldown = {
+                    type = "group",
+                    name = L["Cooldown"],
+                    order = 2,
+                    args = {
+                        header = {
+                            type = "header",
+                            name = L["Shadowsight CDs"],
+                            order = 1,
+                        },
+                        shadowsightTimerStartTime = Gladdy:option({
+                            type = "range",
+                            name = L["Start Time"],
+                            desc = L["Start time in seconds"],
+                            min = 80,
+                            max = 100,
+                            order = 2,
+                            step = 0.1,
+                            width = "full",
+                        }),
+                        shadowsightTimerResetTime = Gladdy:option({
+                            type = "range",
+                            name = L["Reset Time"],
+                            desc = L["Reset time in seconds"],
+                            min = 110,
+                            max = 130,
+                            order = 3,
+                            step = 0.1,
+                            width = "full",
+                        }),
+                    },
+                },
+                --[[font = {
+                    type = "group",
+                    name = L["Font"],
+                    order = 3,
+                    args = {
+                        header = {
+                            type = "header",
+                            name = L["Font"],
+                            order = 4,
+                        },
+                        racialFont = Gladdy:option({
+                            type = "select",
+                            name = L["Font"],
+                            desc = L["Font of the cooldown"],
+                            order = 11,
+                            dialogControl = "LSM30_Font",
+                            values = AceGUIWidgetLSMlists.font,
+                        }),
+                        racialFontScale = Gladdy:option({
+                            type = "range",
+                            name = L["Font scale"],
+                            desc = L["Scale of the font"],
+                            order = 12,
+                            min = 0.1,
+                            max = 2,
+                            step = 0.1,
+                            width = "full",
+                        }),
+                    },
+                },--]]
+                frameStrata = {
+                    type = "group",
+                    name = L["Frame Strata and Level"],
+                    order = 6,
+                    args = {
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 1,
+                        },
+                        shadowsightTimerFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            order = 2,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        shadowsightTimerFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            min = 0,
+                            max = 500,
+                            step = 1,
+                            order = 3,
+                            width = "full",
+                        }),
+                    },
+                },
+            },
         },
-        shadowsightTimerStartTime = Gladdy:option({
-            type = "range",
-            name = L["Start Time"],
-            desc = L["Start time in seconds"],
-            min = 80,
-            max = 100,
-            order = 11,
-            step = 0.1,
-            width = "full",
-        }),
-        shadowsightTimerResetTime = Gladdy:option({
-            type = "range",
-            name = L["Reset Time"],
-            desc = L["Reset time in seconds"],
-            min = 110,
-            max = 130,
-            order = 12,
-            step = 0.1,
-            width = "full",
-        }),
     }
 end

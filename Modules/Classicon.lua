@@ -13,6 +13,8 @@ local Classicon = Gladdy:NewModule("Class Icon", 81, {
     classIconSpecIcon = false,
     classIconXOffset = 0,
     classIconYOffset = 0,
+    classIconFrameStrata = "MEDIUM",
+    classIconFrameLevel = 5,
 })
 
 local classIconPath = "Interface\\Addons\\Gladdy\\Images\\Classes\\"
@@ -110,6 +112,9 @@ function Classicon:UpdateFrame(unit)
     if (not classIcon) then
         return
     end
+
+    classIcon:SetFrameStrata(Gladdy.db.classIconFrameStrata)
+    classIcon:SetFrameLevel(Gladdy.db.classIconFrameLevel)
 
     classIcon:SetWidth(Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor)
     classIcon:SetHeight(Gladdy.db.classIconSize)
@@ -239,29 +244,37 @@ function Classicon:GetOptions()
                 position = {
                     type = "group",
                     name = L["Position"],
-                    order = 1,
+                    order = 3,
                     args = {
                         headerPosition = {
                             type = "header",
                             name = L["Position"],
                             order = 5,
                         },
-                        classIconPos = Gladdy:option({
-                            type = "select",
-                            name = L["Icon position"],
-                            desc = L["This changes positions with trinket"],
-                            order = 6,
-                            values = {
-                                ["LEFT"] = L["Left"],
-                                ["RIGHT"] = L["Right"],
-                            },
+                        classIconXOffset = Gladdy:option({
+                            type = "range",
+                            name = L["Horizontal offset"],
+                            order = 11,
+                            min = -800,
+                            max = 800,
+                            step = 0.1,
+                            width = "full",
+                        }),
+                        classIconYOffset = Gladdy:option({
+                            type = "range",
+                            name = L["Vertical offset"],
+                            order = 12,
+                            min = -800,
+                            max = 800,
+                            step = 0.1,
+                            width = "full",
                         }),
                     },
                 },
                 border = {
                     type = "group",
                     name = L["Border"],
-                    order = 1,
+                    order = 2,
                     args = {
                         headerBorder = {
                             type = "header",
@@ -280,6 +293,35 @@ function Classicon:GetOptions()
                             desc = L["Color of the border"],
                             order = 12,
                             hasAlpha = true,
+                        }),
+                    },
+                },
+                frameStrata = {
+                    type = "group",
+                    name = L["Frame Strata and Level"],
+                    order = 4,
+                    args = {
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 1,
+                        },
+                        classIconFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            order = 2,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        classIconFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            min = 0,
+                            max = 500,
+                            step = 1,
+                            order = 3,
+                            width = "full",
                         }),
                     },
                 },

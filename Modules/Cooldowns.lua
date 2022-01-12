@@ -67,6 +67,8 @@ local Cooldowns = Gladdy:NewModule("Cooldowns", nil, {
     cooldownDisableCircle = false,
     cooldownCooldownAlpha = 1,
     cooldownCooldowns = getDefaultCooldown(),
+    cooldownFrameStrata = "MEDIUM",
+    cooldownFrameLevel = 3,
 })
 
 function Cooldowns:Initialize()
@@ -95,10 +97,13 @@ function Cooldowns:CreateFrame(unit)
     local spellCooldownFrame = CreateFrame("Frame", nil, button)
     spellCooldownFrame:EnableMouse(false)
     spellCooldownFrame:SetMovable(true)
+    spellCooldownFrame:SetFrameStrata(Gladdy.db.cooldownFrameStrata)
+    spellCooldownFrame:SetFrameLevel(Gladdy.db.cooldownFrameLevel)
     for x = 1, 14 do
         local icon = CreateFrame("Frame", nil, spellCooldownFrame)
         icon:EnableMouse(false)
-        icon:SetFrameLevel(3)
+        icon:SetFrameStrata(Gladdy.db.cooldownFrameStrata)
+        icon:SetFrameLevel(Gladdy.db.cooldownFrameLevel)
         icon.texture = icon:CreateTexture(nil, "BACKGROUND")
         icon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
         icon.texture:SetAllPoints(icon)
@@ -106,14 +111,16 @@ function Cooldowns:CreateFrame(unit)
         icon.cooldown = CreateFrame("Cooldown", nil, icon, "CooldownFrameTemplate")
         icon.cooldown.noCooldownCount = true
 
-        icon.cooldown:SetFrameLevel(4)
+        icon.cooldown:SetFrameStrata(Gladdy.db.cooldownFrameStrata)
+        icon.cooldown:SetFrameLevel(Gladdy.db.cooldownFrameLevel + 1)
         icon.cooldown:SetReverse(false)
         icon.cooldown:SetHideCountdownNumbers(true)
 
         icon.cooldownFrame = CreateFrame("Frame", nil, icon)
         icon.cooldownFrame:ClearAllPoints()
         icon.cooldownFrame:SetAllPoints(icon)
-        icon.cooldownFrame:SetFrameLevel(5)
+        icon.cooldownFrame:SetFrameStrata(Gladdy.db.cooldownFrameStrata)
+        icon.cooldownFrame:SetFrameLevel(Gladdy.db.cooldownFrameLevel + 2)
 
         icon.border = icon.cooldownFrame:CreateTexture(nil, "OVERLAY")
         icon.border:SetAllPoints(icon)
@@ -136,6 +143,8 @@ function Cooldowns:UpdateFrame(unit)
     if (Gladdy.db.cooldown) then
         button.spellCooldownFrame:SetHeight(Gladdy.db.cooldownSize)
         button.spellCooldownFrame:SetWidth(1)
+        button.spellCooldownFrame:SetFrameStrata(Gladdy.db.cooldownFrameStrata)
+        button.spellCooldownFrame:SetFrameLevel(Gladdy.db.cooldownFrameLevel)
         button.spellCooldownFrame:Show()
 
         Gladdy:SetPosition(button.spellCooldownFrame, unit, "cooldownXOffset", "cooldownYOffset", Cooldowns:LegacySetPosition(button, unit), Cooldowns)
@@ -149,6 +158,14 @@ function Cooldowns:UpdateFrame(unit)
         local o = 1
         for j = 1, 14 do
             local icon = button.spellCooldownFrame["icon" .. j]
+
+            icon:SetFrameStrata(Gladdy.db.cooldownFrameStrata)
+            icon:SetFrameLevel(Gladdy.db.cooldownFrameLevel)
+            icon.cooldown:SetFrameStrata(Gladdy.db.cooldownFrameStrata)
+            icon.cooldown:SetFrameLevel(Gladdy.db.cooldownFrameLevel + 1)
+            icon.cooldownFrame:SetFrameStrata(Gladdy.db.cooldownFrameStrata)
+            icon.cooldownFrame:SetFrameLevel(Gladdy.db.cooldownFrameLevel + 2)
+
             icon:SetHeight(Gladdy.db.cooldownSize)
             icon:SetWidth(Gladdy.db.cooldownSize * Gladdy.db.cooldownWidthFactor)
             icon.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), Gladdy.db.cooldownSize / 2 * Gladdy.db.cooldownFontScale, "OUTLINE")
@@ -676,7 +693,7 @@ function Cooldowns:GetOptions()
                 position = {
                     type = "group",
                     name = L["Position"],
-                    order = 4,
+                    order = 5,
                     args = {
                         header = {
                             type = "header",
@@ -740,7 +757,7 @@ function Cooldowns:GetOptions()
                 border = {
                     type = "group",
                     name = L["Border"],
-                    order = 5,
+                    order = 4,
                     args = {
                         header = {
                             type = "header",
@@ -759,6 +776,35 @@ function Cooldowns:GetOptions()
                             desc = L["Color of the border"],
                             order = 32,
                             hasAlpha = true,
+                        }),
+                    },
+                },
+                frameStrata = {
+                    type = "group",
+                    name = L["Frame Strata and Level"],
+                    order = 6,
+                    args = {
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 1,
+                        },
+                        cooldownFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            order = 2,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        cooldownFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            min = 0,
+                            max = 500,
+                            step = 1,
+                            order = 3,
+                            width = "full",
                         }),
                     },
                 },

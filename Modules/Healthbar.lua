@@ -24,6 +24,8 @@ local Healthbar = Gladdy:NewModule("Health Bar", 100, {
     healthActual = false,
     healthMax = true,
     healthPercentage = true,
+    healthFrameStrata = "MEDIUM",
+    healthFrameLevel = 1,
 })
 
 function Healthbar:Initialize()
@@ -42,12 +44,14 @@ function Healthbar:CreateFrame(unit)
     healthBar:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "healthBarBorderStyle"),
                                    edgeSize = Gladdy.db.healthBarBorderSize })
     healthBar:SetBackdropBorderColor(Gladdy.db.healthBarBorderColor.r, Gladdy.db.healthBarBorderColor.g, Gladdy.db.healthBarBorderColor.b, Gladdy.db.healthBarBorderColor.a)
-    healthBar:SetFrameLevel(1)
+    healthBar:SetFrameStrata(Gladdy.db.healthFrameStrata)
+    healthBar:SetFrameLevel(Gladdy.db.healthFrameLevel)
 
     healthBar.hp = CreateFrame("StatusBar", nil, healthBar)
     healthBar.hp:SetStatusBarTexture(Gladdy:SMFetch("statusbar", "healthBarTexture"))
     healthBar.hp:SetMinMaxValues(0, 100)
-    healthBar.hp:SetFrameLevel(0)
+    healthBar.hp:SetFrameStrata(Gladdy.db.healthFrameStrata)
+    healthBar.hp:SetFrameLevel(Gladdy.db.healthFrameLevel - 1)
 
     healthBar.bg = healthBar.hp:CreateTexture(nil, "BACKGROUND")
     healthBar.bg:SetTexture(Gladdy:SMFetch("statusbar", "healthBarTexture"))
@@ -149,6 +153,11 @@ function Healthbar:UpdateFrame(unit)
     if (not healthBar) then
         return
     end
+
+    healthBar:SetFrameStrata(Gladdy.db.healthFrameStrata)
+    healthBar:SetFrameLevel(Gladdy.db.healthFrameLevel)
+    healthBar.hp:SetFrameStrata(Gladdy.db.healthFrameStrata)
+    healthBar.hp:SetFrameLevel(Gladdy.db.healthFrameLevel - 1)
 
     healthBar.bg:SetTexture(Gladdy:SMFetch("statusbar", "healthBarTexture"))
     healthBar.bg:SetVertexColor(Gladdy.db.healthBarBgColor.r, Gladdy.db.healthBarBgColor.g, Gladdy.db.healthBarBgColor.b, Gladdy.db.healthBarBgColor.a)
@@ -445,10 +454,39 @@ function Healthbar:GetOptions()
                         }),
                     },
                 },
+                frameStrata = {
+                    type = "group",
+                    name = L["Frame Strata and Level"],
+                    order = 4,
+                    args = {
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 1,
+                        },
+                        healthFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            order = 2,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        healthFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            min = 1,
+                            max = 500,
+                            step = 1,
+                            order = 3,
+                            width = "full",
+                        }),
+                    },
+                },
                 healthValues = {
                     type = "group",
                     name = L["Health Bar Text"],
-                    order = 4,
+                    order = 5,
                     args = {
                         header = {
                             type = "header",

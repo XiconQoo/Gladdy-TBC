@@ -395,7 +395,7 @@ function Gladdy:CreateMover(frame, xConfig, yConfig, name, points, width, height
         frame:EnableMouse(false)
         frame:SetMovable(true)
         frame.mover = CreateFrame("Frame", nil, frame, BackdropTemplateMixin and "BackdropTemplate")
-        frame.mover:SetFrameStrata("DIALOG")
+        frame.mover:SetFrameStrata("TOOLTIP")
         frame.mover:SetPoint(points[1], frame, points[2], xOffset or 0, yOffset or 0)
         frame.mover:SetHeight(height or frame:GetHeight())
         frame.mover:SetWidth(width or frame:GetWidth())
@@ -412,6 +412,7 @@ function Gladdy:CreateMover(frame, xConfig, yConfig, name, points, width, height
         frame.mover.border:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = 2 })
         frame.mover.border:SetAllPoints(frame.mover)
         frame.mover.border:SetBackdropBorderColor(0,1,0,1)
+        frame.mover.border:SetFrameStrata("TOOLTIP")
 
         frame.mover.text = frame.mover.border:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
         frame.mover.text:SetText(name)

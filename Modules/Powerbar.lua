@@ -22,6 +22,8 @@ local Powerbar = Gladdy:NewModule("Power Bar", 90, {
     powerActual = true,
     powerMax = true,
     powerPercentage = false,
+    powerFrameStrata = "MEDIUM",
+    powerFrameLevel = 1,
 })
 
 function Powerbar:Initialize()
@@ -41,12 +43,14 @@ function Powerbar:CreateFrame(unit)
     powerBar:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "powerBarBorderStyle"),
                                   edgeSize = Gladdy.db.powerBarBorderSize })
     powerBar:SetBackdropBorderColor(Gladdy.db.powerBarBorderColor.r, Gladdy.db.powerBarBorderColor.g, Gladdy.db.powerBarBorderColor.b, Gladdy.db.powerBarBorderColor.a)
-    powerBar:SetFrameLevel(1)
+    powerBar:SetFrameStrata(Gladdy.db.powerFrameStrata)
+    powerBar:SetFrameLevel(Gladdy.db.powerFrameLevel)
 
     powerBar.energy = CreateFrame("StatusBar", nil, powerBar)
     powerBar.energy:SetStatusBarTexture(Gladdy:SMFetch("statusbar", "powerBarTexture"))
     powerBar.energy:SetMinMaxValues(0, 100)
-    powerBar.energy:SetFrameLevel(0)
+    powerBar.energy:SetFrameStrata(Gladdy.db.powerFrameStrata)
+    powerBar.energy:SetFrameLevel(Gladdy.db.powerFrameLevel - 1)
 
     powerBar.bg = powerBar.energy:CreateTexture(nil, "BACKGROUND")
     powerBar.bg:SetTexture(Gladdy:SMFetch("statusbar", "powerBarTexture"))
@@ -139,9 +143,7 @@ function Powerbar:UpdateFrame(unit)
     if (not powerBar) then
         return
     end
-
     local healthBar = Gladdy.modules["Health Bar"].frames[unit]
-
 
     if not Gladdy.db.powerBarEnabled then
         powerBar:Hide()
@@ -171,6 +173,11 @@ function Powerbar:UpdateFrame(unit)
     powerBar.raceText:SetTextColor(Gladdy.db.powerBarFontColor.r, Gladdy.db.powerBarFontColor.g, Gladdy.db.powerBarFontColor.b, Gladdy.db.powerBarFontColor.a)
     powerBar.powerText:SetFont(Gladdy:SMFetch("font", "powerBarFont"), Gladdy.db.powerBarFontSize)
     powerBar.powerText:SetTextColor(Gladdy.db.powerBarFontColor.r, Gladdy.db.powerBarFontColor.g, Gladdy.db.powerBarFontColor.b, Gladdy.db.powerBarFontColor.a)
+
+    powerBar:SetFrameStrata(Gladdy.db.powerFrameStrata)
+    powerBar:SetFrameLevel(Gladdy.db.powerFrameLevel)
+    powerBar.energy:SetFrameStrata(Gladdy.db.powerFrameStrata)
+    powerBar.energy:SetFrameLevel(Gladdy.db.powerFrameLevel - 1)
 end
 
 function Powerbar:ResetUnit(unit)
@@ -455,10 +462,39 @@ function Powerbar:GetOptions()
                         }),
                     },
                 },
+                frameStrata = {
+                    type = "group",
+                    name = L["Frame Strata and Level"],
+                    order = 4,
+                    args = {
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 1,
+                        },
+                        powerFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            order = 2,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        powerFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            min = 1,
+                            max = 500,
+                            step = 1,
+                            order = 3,
+                            width = "full",
+                        }),
+                    },
+                },
                 powerValues = {
                     type = "group",
                     name = L["Power Bar Text"],
-                    order = 4,
+                    order = 5,
                     args = {
                         header = {
                             type = "header",

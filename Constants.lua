@@ -1235,3 +1235,25 @@ Gladdy.newDefaults = {
         ["castBarYOffset"] = -30.5,
     },
 }
+
+Gladdy.frameStrata = {
+    BACKGROUND = L["Background"] .. "(0)",
+    LOW = L["Low"] .. "(1)",
+    MEDIUM = L["Medium"] .. "(2)",
+    HIGH = L["High"] .. "(3)",
+    DIALOG = L["Dialog"] .. "(4)",
+    FULLSCREEN = L["Fullscreen"] .. "(5)",
+    FULLSCREEN_DIALOG = L["Fullscreen Dialog"] .. "(6)",
+    TOOLTIP = L["Tooltip"] .. "(7)",
+}
+
+Gladdy.frameStrataSorting = {
+    [1] = "BACKGROUND",
+    [2] = "LOW",
+    [3] = "MEDIUM",
+    [4] = "HIGH",
+    [5] = "DIALOG",
+    [6] = "FULLSCREEN",
+    [7] = "FULLSCREEN_DIALOG",
+    [8] = "TOOLTIP",
+}

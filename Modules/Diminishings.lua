@@ -50,6 +50,8 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drWidthFactor = 1,
     drCategories = defaultCategories(),
     drDuration = 18,
+    drFrameStrata = "MEDIUM",
+    drFrameLevel = 3,
 })
 
 local function getDiminishColor(dr)
@@ -81,12 +83,15 @@ function Diminishings:CreateFrame(unit)
     local drFrame = CreateFrame("Frame", nil, Gladdy.buttons[unit])
     drFrame:EnableMouse(false)
     drFrame:SetMovable(true)
+    drFrame:SetFrameStrata(Gladdy.db.drFrameStrata)
+    drFrame:SetFrameLevel(Gladdy.db.drFrameLevel)
 
     for i = 1, 16 do
         local icon = CreateFrame("Frame", "GladdyDr" .. unit .. "Icon" .. i, drFrame)
         icon:Hide()
         icon:EnableMouse(false)
-        icon:SetFrameLevel(3)
+        icon:SetFrameStrata(Gladdy.db.drFrameStrata)
+        icon:SetFrameLevel(Gladdy.db.drFrameLevel)
         icon.texture = icon:CreateTexture(nil, "BACKGROUND")
         icon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
         icon.texture:SetAllPoints(icon)
@@ -114,13 +119,15 @@ function Diminishings:CreateFrame(unit)
         icon.cooldown = CreateFrame("Cooldown", nil, icon, "CooldownFrameTemplate")
         icon.cooldown.noCooldownCount = true --Gladdy.db.trinketDisableOmniCC
         icon.cooldown:SetHideCountdownNumbers(true)
-        icon.cooldown:SetFrameLevel(4)
+        icon.cooldown:SetFrameStrata(Gladdy.db.drFrameStrata)
+        icon.cooldown:SetFrameLevel(Gladdy.db.drFrameLevel + 1)
 
         icon.cooldownFrame = CreateFrame("Frame", nil, icon)
         icon.cooldownFrame:ClearAllPoints()
         icon.cooldownFrame:SetPoint("TOPLEFT", icon, "TOPLEFT")
         icon.cooldownFrame:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT")
-        icon.cooldownFrame:SetFrameLevel(5)
+        icon.cooldownFrame:SetFrameStrata(Gladdy.db.drFrameStrata)
+        icon.cooldownFrame:SetFrameLevel(Gladdy.db.drFrameLevel + 2)
 
         --icon.overlay = CreateFrame("Frame", nil, icon)
         --icon.overlay:SetAllPoints(icon)
@@ -181,6 +188,8 @@ function Diminishings:UpdateFrame(unit)
 
     drFrame:SetWidth(Gladdy.db.drIconSize)
     drFrame:SetHeight(Gladdy.db.drIconSize)
+    drFrame:SetFrameStrata(Gladdy.db.drFrameStrata)
+    drFrame:SetFrameLevel(Gladdy.db.drFrameLevel)
 
     Gladdy:SetPosition(drFrame, unit, "drXOffset", "drYOffset", Diminishings:LegacySetPosition(drFrame, unit), Diminishings)
 
@@ -198,6 +207,13 @@ function Diminishings:UpdateFrame(unit)
 
         icon:SetWidth(Gladdy.db.drIconSize * Gladdy.db.drWidthFactor)
         icon:SetHeight(Gladdy.db.drIconSize)
+
+        icon:SetFrameStrata(Gladdy.db.drFrameStrata)
+        icon:SetFrameLevel(Gladdy.db.drFrameLevel)
+        icon.cooldown:SetFrameStrata(Gladdy.db.drFrameStrata)
+        icon.cooldown:SetFrameLevel(Gladdy.db.drFrameLevel + 1)
+        icon.cooldownFrame:SetFrameStrata(Gladdy.db.drFrameStrata)
+        icon.cooldownFrame:SetFrameLevel(Gladdy.db.drFrameLevel + 2)
 
         icon.text:SetFont(Gladdy:SMFetch("font", "drFont"), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, "OUTLINE")
         icon.text:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
@@ -541,7 +557,7 @@ function Diminishings:GetOptions()
                 position = {
                     type = "group",
                     name = L["Position"],
-                    order = 4,
+                    order = 6,
                     args = {
                         headerPosition = {
                             type = "header",
@@ -618,7 +634,7 @@ function Diminishings:GetOptions()
                 border = {
                     type = "group",
                     name = L["Border"],
-                    order = 6,
+                    order = 4,
                     args = {
                         headerBorder = {
                             type = "header",
@@ -672,6 +688,35 @@ function Diminishings:GetOptions()
                             hasAlpha = true,
                         }),
                     }
+                },
+                frameStrata = {
+                    type = "group",
+                    name = L["Frame Strata and Level"],
+                    order = 7,
+                    args = {
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 1,
+                        },
+                        drFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            order = 2,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        drFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            min = 0,
+                            max = 500,
+                            step = 1,
+                            order = 3,
+                            width = "full",
+                        }),
+                    },
                 },
             },
         },

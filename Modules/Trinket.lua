@@ -19,6 +19,8 @@ local Trinket = Gladdy:NewModule("Trinket", 80, {
     trinketCooldownNumberAlpha = 1,
     trinketXOffset = 0,
     trinketYOffset = 0,
+    trinketFrameStrata = "MEDIUM",
+    trinketFrameLevel = 5,
 })
 
 function Trinket:Initialize()
@@ -62,6 +64,9 @@ end
 function Trinket:CreateFrame(unit)
     local trinket = CreateFrame("Button", "GladdyTrinketButton" .. unit, Gladdy.buttons[unit])
     trinket:EnableMouse(false)
+    trinket:SetFrameStrata(Gladdy.db.trinketFrameStrata)
+    trinket:SetFrameLevel(Gladdy.db.trinketFrameLevel)
+
     trinket.texture = trinket:CreateTexture(nil, "BACKGROUND")
     trinket.texture:SetAllPoints(trinket)
     trinket.texture:SetTexture("Interface\\Icons\\INV_Jewelry_TrinketPVP_02")
@@ -70,11 +75,15 @@ function Trinket:CreateFrame(unit)
     trinket.cooldown = CreateFrame("Cooldown", nil, trinket, "CooldownFrameTemplate")
     trinket.cooldown.noCooldownCount = true --Gladdy.db.trinketDisableOmniCC
     trinket.cooldown:SetHideCountdownNumbers(true)
+    trinket.cooldown:SetFrameStrata(Gladdy.db.trinketFrameStrata)
+    trinket.cooldown:SetFrameLevel(Gladdy.db.trinketFrameLevel + 1)
 
     trinket.cooldownFrame = CreateFrame("Frame", nil, trinket)
     trinket.cooldownFrame:ClearAllPoints()
     trinket.cooldownFrame:SetPoint("TOPLEFT", trinket, "TOPLEFT")
     trinket.cooldownFrame:SetPoint("BOTTOMRIGHT", trinket, "BOTTOMRIGHT")
+    trinket.cooldownFrame:SetFrameStrata(Gladdy.db.trinketFrameStrata)
+    trinket.cooldownFrame:SetFrameLevel(Gladdy.db.trinketFrameLevel + 2)
 
     trinket.cooldownFont = trinket.cooldownFrame:CreateFontString(nil, "OVERLAY")
     trinket.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), 20, "OUTLINE")
@@ -84,6 +93,9 @@ function Trinket:CreateFrame(unit)
 
     trinket.borderFrame = CreateFrame("Frame", nil, trinket)
     trinket.borderFrame:SetAllPoints(trinket)
+    trinket.borderFrame:SetFrameStrata(Gladdy.db.trinketFrameStrata)
+    trinket.borderFrame:SetFrameLevel(Gladdy.db.trinketFrameLevel + 3)
+
     trinket.texture.overlay = trinket.borderFrame:CreateTexture(nil, "OVERLAY")
     trinket.texture.overlay:SetAllPoints(trinket)
     trinket.texture.overlay:SetTexture(Gladdy.db.trinketBorderStyle)
@@ -103,6 +115,15 @@ function Trinket:UpdateFrame(unit)
     end
 
     local width, height = Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor, Gladdy.db.trinketSize
+
+    trinket:SetFrameStrata(Gladdy.db.trinketFrameStrata)
+    trinket:SetFrameLevel(Gladdy.db.trinketFrameLevel)
+    trinket.cooldown:SetFrameStrata(Gladdy.db.trinketFrameStrata)
+    trinket.cooldown:SetFrameLevel(Gladdy.db.trinketFrameLevel + 1)
+    trinket.cooldownFrame:SetFrameStrata(Gladdy.db.trinketFrameStrata)
+    trinket.cooldownFrame:SetFrameLevel(Gladdy.db.trinketFrameLevel + 2)
+    trinket.borderFrame:SetFrameStrata(Gladdy.db.trinketFrameStrata)
+    trinket.borderFrame:SetFrameLevel(Gladdy.db.trinketFrameLevel + 3)
 
     trinket:SetWidth(width)
     trinket:SetHeight(height)
@@ -316,22 +337,30 @@ function Trinket:GetOptions()
                 position = {
                     type = "group",
                     name = L["Position"],
-                    order = 4,
+                    order = 5,
                     args = {
                         header = {
                             type = "header",
                             name = L["Icon position"],
                             order = 4,
                         },
-                        trinketPos = Gladdy:option({
-                            type = "select",
-                            name = L["Icon position"],
-                            desc = L["This changes positions of the trinket"],
-                            order = 21,
-                            values = {
-                                ["LEFT"] = L["Left"],
-                                ["RIGHT"] = L["Right"],
-                            },
+                        trinketXOffset = Gladdy:option({
+                            type = "range",
+                            name = L["Horizontal offset"],
+                            order = 23,
+                            min = -800,
+                            max = 800,
+                            step = 0.1,
+                            width = "full",
+                        }),
+                        trinketYOffset = Gladdy:option({
+                            type = "range",
+                            name = L["Vertical offset"],
+                            order = 24,
+                            min = -800,
+                            max = 800,
+                            step = 0.1,
+                            width = "full",
                         }),
                     },
                 },
@@ -357,6 +386,35 @@ function Trinket:GetOptions()
                             desc = L["Color of the border"],
                             order = 32,
                             hasAlpha = true,
+                        }),
+                    },
+                },
+                frameStrata = {
+                    type = "group",
+                    name = L["Frame Strata and Level"],
+                    order = 6,
+                    args = {
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 1,
+                        },
+                        trinketFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            order = 2,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        trinketFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            min = 0,
+                            max = 500,
+                            step = 1,
+                            order = 3,
+                            width = "full",
                         }),
                     },
                 },

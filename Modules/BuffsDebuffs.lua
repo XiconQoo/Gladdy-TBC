@@ -50,6 +50,8 @@ local BuffsDebuffs = Gladdy:NewModule("Buffs and Debuffs", nil, {
     buffsBorderColorDisease = Gladdy:GetAuraTypeColor()["disease"],
     buffsBorderColorForm = Gladdy:GetAuraTypeColor()["form"],
     buffsBorderColorAura = Gladdy:GetAuraTypeColor()["aura"],
+    buffFrameStrata = "MEDIUM",
+    buffsFrameLevel = 9,
 })
 
 local spellSchoolToOptionValueTable
@@ -232,11 +234,15 @@ end
 
 function BuffsDebuffs:CreateFrame(unit)
     local debuffFrame = CreateFrame("Frame", "GladdyDebuffs" .. unit, Gladdy.buttons[unit])
+    debuffFrame:SetFrameStrata(Gladdy.db.buffFrameStrata)
+    debuffFrame:SetFrameLevel(Gladdy.db.buffsFrameLevel)
     debuffFrame:SetMovable(true)
     debuffFrame:SetHeight(Gladdy.db.buffsIconSize)
     debuffFrame:SetWidth(1)
     debuffFrame.unit = unit
     local buffFrame = CreateFrame("Frame", "GladdyBuffs" .. unit, Gladdy.buttons[unit])
+    buffFrame:SetFrameStrata(Gladdy.db.buffFrameStrata)
+    buffFrame:SetFrameLevel(Gladdy.db.buffsFrameLevel)
     buffFrame:SetMovable(true)
     buffFrame:SetHeight(Gladdy.db.buffsIconSize)
     buffFrame:SetWidth(1)
@@ -270,6 +276,11 @@ local function styleIcon(aura, auraType)
     else
         aura.cooldowncircle:SetAlpha(Gladdy.db.buffsCooldownAlpha)
     end
+
+    aura:SetFrameStrata(Gladdy.db.buffFrameStrata)
+    aura:SetFrameLevel(Gladdy.db.buffsFrameLevel)
+    aura.cooldowncircle:SetFrameLevel(Gladdy.db.buffsFrameLevel + 1)
+    aura.overlay:SetFrameLevel(Gladdy.db.buffsFrameLevel + 2)
 
     aura.border:SetTexture(Gladdy.db.buffsBorderStyle)
     aura.border:SetVertexColor(spellSchoolToOptionValue(aura.spellSchool))
@@ -388,18 +399,19 @@ function BuffsDebuffs:AddAura(unit, spellID, auraType, duration, timeLeft, stack
         else
             aura = CreateFrame("Frame")
             aura:EnableMouse(false)
-            aura:SetFrameLevel(3)
+            aura:SetFrameStrata(Gladdy.db.buffFrameStrata)
+            aura:SetFrameLevel(Gladdy.db.buffsFrameLevel)
             aura.texture = aura:CreateTexture(nil, "BACKGROUND")
             aura.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
             aura.texture:SetAllPoints(aura)
             aura.cooldowncircle = CreateFrame("Cooldown", nil, aura, "CooldownFrameTemplate")
-            aura.cooldowncircle:SetFrameLevel(4)
+            aura.cooldowncircle:SetFrameLevel(Gladdy.db.buffsFrameLevel + 1)
             aura.cooldowncircle.noCooldownCount = true -- disable OmniCC
             aura.cooldowncircle:SetAllPoints(aura)
             aura.cooldowncircle:SetReverse(true)
             aura.cooldowncircle:SetHideCountdownNumbers(true)
             aura.overlay = CreateFrame("Frame", nil, aura)
-            aura.overlay:SetFrameLevel(5)
+            aura.overlay:SetFrameLevel(Gladdy.db.buffsFrameLevel + 2)
             aura.overlay:SetAllPoints(aura)
             aura.border = aura.overlay:CreateTexture(nil, "OVERLAY")
             aura.border:SetAllPoints(aura)
@@ -875,6 +887,35 @@ function BuffsDebuffs:GetOptions()
                             desc = L["Color of the border"],
                             order = 49,
                             hasAlpha = true,
+                        }),
+                    },
+                },
+                frameStrata = {
+                    type = "group",
+                    name = L["Frame Strata and Level"],
+                    order = 6,
+                    args = {
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 1,
+                        },
+                        buffFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            order = 2,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        buffsFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            min = 0,
+                            max = 500,
+                            step = 1,
+                            order = 3,
+                            width = "full",
                         }),
                     },
                 },

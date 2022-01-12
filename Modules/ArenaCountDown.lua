@@ -6,7 +6,9 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local ACDFrame = Gladdy:NewModule("Arena Countdown", nil, {
     countdown = true,
-    arenaCountdownSize = 256
+    arenaCountdownSize = 256,
+    arenaCountdownFrameStrata = "HIGH",
+    arenaCountdownFrameLevel = 50,
 })
 
 function ACDFrame:OnEvent(event, ...)
@@ -49,6 +51,11 @@ function ACDFrame:Initialize()
     self:RegisterMessage("ENEMY_SPOTTED")
     self:RegisterMessage("UNIT_SPEC")
     self.faction = UnitFactionGroup("player")
+end
+
+function ACDFrame:UpdateFrameOnce()
+    self.ACDNumFrame:SetFrameStrata(Gladdy.db.arenaCountdownFrameStrata)
+    self.ACDNumFrame:SetFrameLevel(Gladdy.db.arenaCountdownFrameLevel)
 end
 
 function ACDFrame.OnUpdate(self, elapse)
@@ -180,6 +187,27 @@ function ACDFrame:GetOptions()
             min = 64,
             max = 512,
             step = 16,
+            width = "full",
+        }),
+        headerAuraLevel = {
+            type = "header",
+            name = L["Frame Strata and Level"],
+            order = 5,
+        },
+        arenaCountdownFrameStrata = Gladdy:option({
+            type = "select",
+            name = L["Frame Strata"],
+            order = 6,
+            values = Gladdy.frameStrata,
+            sorting = Gladdy.frameStrataSorting,
+        }),
+        arenaCountdownFrameLevel = Gladdy:option({
+            type = "range",
+            name = L["Frame Level"],
+            min = 0,
+            max = 500,
+            step = 1,
+            order = 7,
             width = "full",
         }),
     }
