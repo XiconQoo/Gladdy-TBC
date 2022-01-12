@@ -430,8 +430,8 @@ function Auras:JOINED_ARENA()
         self.frames[unit].active = false
         self:AURA_FADE(unit, AURA_TYPE_DEBUFF)
         self:AURA_FADE(unit, AURA_TYPE_BUFF)
-        self.frames[unit].frame:Show()
-        self.frames[unit].interruptFrame.frame:Show()
+        self.frames[unit]:Show()
+        self.frames[unit].interruptFrame:Show()
     end
 end
 
