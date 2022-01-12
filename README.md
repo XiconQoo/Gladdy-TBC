@@ -124,6 +124,7 @@ Thank you for the great feedback and active contribution.
 - **Shadowsight:**
   - reset timer when buff was taken
   - add a configurable 2nd timer or show one timer with the closest CD
+- **CastBar Icon can be enabled/disabled**
 - **Trinket: green/red option added**
 - **fixed some DR-categories** (Hibernate / Chastice / Dragonsbreath / ImpConcussiveShot / Counterattack)
 - **Pixel Perfect option added** (makes your Gladdy Frames pixel perfect - no more wierd scaling interferences)
