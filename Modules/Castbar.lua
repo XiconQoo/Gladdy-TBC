@@ -33,6 +33,7 @@ local Castbar = Gladdy:NewModule("Cast Bar", 70, {
     castBarIconColor = { r = 0, g = 0, b = 0, a = 1 },
     castBarBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     castBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
+    castBarIconEnabled = true,
     castBarGuesses = true,
     castBarXOffset = 0,
     castBarYOffset = 0,
@@ -173,6 +174,11 @@ function Castbar:UpdateFrame(unit)
     castBar.icon:SetHeight(Gladdy.db.castBarIconSize)
     castBar.icon.texture:SetAllPoints(castBar.icon)
     castBar.icon:ClearAllPoints()
+    if Gladdy.db.castBarIconEnabled then
+        castBar.icon:Show()
+    else
+        castBar.icon:Hide()
+    end
 
     local rightMargin = 0
     local leftMargin = 0
@@ -664,6 +670,12 @@ function Castbar:GetOptions()
                             name = L["Icon Size"],
                             order = 1,
                         },
+                        castBarIconEnabled = option({
+                            type = "toggle",
+                            name = L["Icon Enabled"],
+                            order = 2,
+                            width = "full",
+                        }),
                         castBarIconSize = option({
                             type = "range",
                             name = L["Icon size"],
