@@ -92,6 +92,7 @@ end
 
 function ACDFrame:JOINED_ARENA()
     if Gladdy.db.countdown then
+        self.ACDNumFrame:Show()
         self:RegisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
         self:SetScript("OnEvent", ACDFrame.OnEvent)
         self.endTime = GetTime() + 70
@@ -152,6 +153,7 @@ function ACDFrame:Reset()
     self:UnregisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
     self:SetScript("OnUpdate", nil)
     self.hidden = true;
+    self.ACDNumFrame:Hide()
     self.ACDNumTens:Hide();
     self.ACDNumOnes:Hide();
     self.ACDNumOne:Hide();
