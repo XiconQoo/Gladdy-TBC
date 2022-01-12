@@ -216,11 +216,11 @@ function Gladdy:DeleteUnknownOptions(tbl, refTbl, str)
     end
     for k,v in pairs(tbl) do
         if refTbl[k] == nil then
-            --Gladdy:Print("SavedVariable deleted:", str .. "." .. k, "not found!")
+            Gladdy:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, "not found!")
             tbl[k] = nil
         else
             if type(v) ~= type(refTbl[k]) then
-                --Gladdy:Print("SavedVariable deleted:", str .. "." .. k, "type error!", "Expected", type(refTbl[k]), "but found", type(v))
+                Gladdy:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, "type error!", "Expected", type(refTbl[k]), "but found", type(v))
                 tbl[k] = nil
             elseif type(v) == "table" then
                 Gladdy:DeleteUnknownOptions(v, refTbl[k], str .. "." .. k)
