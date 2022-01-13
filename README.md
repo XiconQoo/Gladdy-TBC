@@ -1,6 +1,9 @@
 # Gladdy - TBC
 
 ### The most powerful arena addon for WoW TBC 2.5.1
+
+---
+
 ## [v2.00-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.00-Release/Gladdy_TBC-Classic_v2.00-Release.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
@@ -71,13 +74,16 @@ Thank you!
 - **Hydra** (thanks for constructive feedback and suggestions)
 - **Xyz** (thanks for suggestions)
 
+---
+
 ### Changes
 
 ### v2.00-Release
+
 This is a packed release with new features and bugfixes. Most importantly, positioning of all elements has been redone with movable frames.
 Thank you for the great feedback and active contribution.
 
-####Attention: Once you install this version it will drastically change your current profile! You can't go back to an earlier version. Either back up your WTF or export your Profile before updating!
+***Attention: Once you install this version it will drastically change your current profile! You can't go back to an earlier version. Either back up your WTF or export your Profile before updating!***
 
 **Here is a list of all changes:**
 - **major release version set to v2**
