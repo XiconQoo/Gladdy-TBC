@@ -152,5 +152,24 @@ function XiconProfiles:GetOptions()
             width = "full",
             order = 15,
         },
+        headerProfileMirEdited = {
+            type = "header",
+            name = "Mir's " .. L["Profile"] .. " edited",
+            order = 16,
+        },
+        mirProfileEdited = {
+            type = "execute",
+            func = function()
+                Gladdy.dbi:ResetProfile(Gladdy.dbi:GetCurrentProfile())
+                applyProfile(Gladdy:GetMirEditedProfile())
+            end,
+            name = " ",
+            desc = "Mir's " .. L["Profile"],
+            image = "Interface\\AddOns\\Gladdy\\Images\\BasicProfiles\\Mir1_edited.blp",
+            imageWidth = 350,
+            imageHeight = 175,
+            width = "full",
+            order = 17,
+        },
     }
 end
