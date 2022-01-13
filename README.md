@@ -134,9 +134,9 @@ Thank you for the great feedback and active contribution.
   - add a configurable 2nd timer or show one timer with the closest CD
 - **CastBar Icon can be enabled/disabled**
 - **Trinket solid color option added**
-  - color for Trinket on/off CD can bi configured (red/green by default)
+  - color for Trinket on/off CD can be configured (red/green by default)
 - **fixed some DR-categories** (Hibernate / Chastice / Dragonsbreath / ImpConcussiveShot / Counterattack)
-- **Pixel Perfect option added** (makes your Gladdy Frames pixel perfect - no more wierd scaling interferences)
+- **Pixel Perfect option added** (makes your Gladdy Frames pixel perfect - no more weird scaling interferences)
 - **Pets can be grouped** (not perfect yet, but a first step)
 - **added DR-Level Text** (thanks https://github.com/ManneN1)
 - **added zhCN Locale** (thanks https://github.com/veiz)
