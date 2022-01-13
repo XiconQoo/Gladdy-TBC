@@ -299,9 +299,6 @@ function BuffsDebuffs:UpdateFrame(unit)
                 {"TOPRIGHT", "TOPRIGHT"},
                 Gladdy.db.buffsIconSize * Gladdy.db.buffsWidthFactor, Gladdy.db.buffsIconSize,
                 0, 0, "buffsEnabled")
-        if not Gladdy.db.buffsEnabled then
-            self.frames[unit].debuffFrame.mover:Hide()
-        end
     end
 
     --BUFFS
@@ -312,9 +309,6 @@ function BuffsDebuffs:UpdateFrame(unit)
                 {"TOPRIGHT", "TOPRIGHT"},
                 Gladdy.db.buffsBuffsIconSize * Gladdy.db.buffsBuffsWidthFactor, Gladdy.db.buffsBuffsIconSize,
                 0, 0, "buffsEnabled")
-        if not Gladdy.db.buffsEnabled then
-            self.frames[unit].buffFrame.mover:Hide()
-        end
     end
 
     for i=1, #self.frames[unit].auras[AURA_TYPE_BUFF] do
