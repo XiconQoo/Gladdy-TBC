@@ -270,6 +270,7 @@ function Gladdy:HideFrame()
             self.startTest = nil
             self.hideFrame = true
         else
+            self:Reset()
             self.frame:Hide()
         end
 
