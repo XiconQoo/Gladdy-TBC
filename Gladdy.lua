@@ -27,7 +27,7 @@ local LibStub = LibStub
 
 ---------------------------
 
-local MAJOR, MINOR = "Gladdy", 4
+local MAJOR, MINOR = "Gladdy", 5
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
 Gladdy.version_major_num = 2
