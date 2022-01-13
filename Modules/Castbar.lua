@@ -202,7 +202,12 @@ function Castbar:UpdateFrame(unit)
     castBar.icon.texture.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.castBarIconColor))
 
     if (unit == "arena1") then
-        Gladdy:CreateMover(castBar, "castBarXOffset", "castBarYOffset", L["Cast Bar"], {"TOPLEFT", "TOPLEFT"}, Gladdy.db.castBarWidth, Gladdy.db.castBarHeight, 0, 0)
+        Gladdy:CreateMover(castBar, "castBarXOffset", "castBarYOffset", L["Cast Bar"],
+                {"TOPLEFT", "TOPLEFT"}, Gladdy.db.castBarWidth, Gladdy.db.castBarHeight,
+                0, 0, "castBarEnabled")
+    end
+    if not Gladdy.db.castBarEnabled then
+        self:CAST_STOP(unit)
     end
 end
 
@@ -414,6 +419,7 @@ function Castbar:CAST_START(unit, spell, icon, value, maxValue, test)
     castBar.maxValue = maxValue
     castBar.bar:SetMinMaxValues(0, maxValue)
     castBar.bar:SetValue(value)
+    castBar.icon:SetAlpha(1)
     castBar.icon.texture:SetTexture(icon)
     castBar.spellText:SetText(spell)
     castBar.timeText:SetText(maxValue)
@@ -440,6 +446,7 @@ function Castbar:CAST_STOP(unit, ...)
         castBar.channeling = nil
         castBar.value = 0
         castBar.maxValue = 0
+        castBar.icon:SetAlpha(0)
         castBar.icon.texture:SetTexture("")
         castBar.spellText:SetText("")
         castBar.timeText:SetText("")

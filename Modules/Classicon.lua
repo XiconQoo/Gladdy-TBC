@@ -127,7 +127,7 @@ function Classicon:UpdateFrame(unit)
                 Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor,
                 Gladdy.db.classIconSize,
                 0,
-                0)
+                0, "classIconEnabled")
     end
 
     classIcon.texture:ClearAllPoints()

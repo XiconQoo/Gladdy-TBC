@@ -172,7 +172,7 @@ function Trinket:UpdateFrame(unit)
                 Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor,
                 Gladdy.db.trinketSize,
                 0,
-                0)
+                0, "trinketEnabled")
     end
 
     trinket.cooldown:SetAlpha(Gladdy.db.trinketCooldownAlpha)

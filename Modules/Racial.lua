@@ -146,8 +146,7 @@ function Racial:UpdateFrame(unit)
                 {"TOPLEFT", "TOPLEFT"},
                 Gladdy.db.racialSize * Gladdy.db.racialWidthFactor,
                 Gladdy.db.racialSize,
-                0,
-                0)
+                0, 0, "racialEnabled")
     end
 
     if (Gladdy.db.racialEnabled == false) then

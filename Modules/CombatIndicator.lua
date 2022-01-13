@@ -82,7 +82,10 @@ function CombatIndicator:UpdateFrame(unit)
         ciFrame:Show()
     end
     if (unit == "arena1") then
-        Gladdy:CreateMover(ciFrame, "ciXOffset", "ciYOffset", L["Combat Indicator"], {"TOPLEFT", "TOPLEFT"})
+        Gladdy:CreateMover(ciFrame, "ciXOffset", "ciYOffset", L["Combat Indicator"],
+                {"TOPLEFT", "TOPLEFT"},
+                Gladdy.db.ciSize * Gladdy.db.ciWidthFactor, Gladdy.db.ciSize,
+                0, 0, "ciEnabled")
     end
 end
 

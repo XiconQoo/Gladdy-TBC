@@ -448,7 +448,11 @@ function Gladdy:CreateMover(frame, xConfig, yConfig, name, points, width, height
         frame.mover:SetWidth(width or frame:GetWidth())
     end
     if self.frame and self.frame.testing and self.db.showMover then
-        frame.mover:Show()
+        if (activated ~= nil and not Gladdy.db[activated]) then
+            frame.mover:Hide()
+        else
+            frame.mover:Show()
+        end
     else
         frame.mover:Hide()
     end

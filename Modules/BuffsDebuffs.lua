@@ -297,8 +297,8 @@ function BuffsDebuffs:UpdateFrame(unit)
     if (unit == "arena1") then
         Gladdy:CreateMover(self.frames[unit].debuffFrame, "buffsXOffset", "buffsYOffset", L["Debuffs"],
                 {"TOPRIGHT", "TOPRIGHT"},
-                Gladdy.db.buffsIconSize * Gladdy.db.buffsWidthFactor,
-                Gladdy.db.buffsIconSize, 0, 0)
+                Gladdy.db.buffsIconSize * Gladdy.db.buffsWidthFactor, Gladdy.db.buffsIconSize,
+                0, 0, "buffsEnabled")
         if not Gladdy.db.buffsEnabled then
             self.frames[unit].debuffFrame.mover:Hide()
         end
@@ -310,8 +310,8 @@ function BuffsDebuffs:UpdateFrame(unit)
     if (unit == "arena1") then
         Gladdy:CreateMover(self.frames[unit].buffFrame, "buffsBuffsXOffset", "buffsBuffsYOffset", L["Buffs"],
                 {"TOPRIGHT", "TOPRIGHT"},
-                Gladdy.db.buffsBuffsIconSize * Gladdy.db.buffsBuffsWidthFactor,
-                Gladdy.db.buffsBuffsIconSize, 0, 0)
+                Gladdy.db.buffsBuffsIconSize * Gladdy.db.buffsBuffsWidthFactor, Gladdy.db.buffsBuffsIconSize,
+                0, 0, "buffsEnabled")
         if not Gladdy.db.buffsEnabled then
             self.frames[unit].buffFrame.mover:Hide()
         end

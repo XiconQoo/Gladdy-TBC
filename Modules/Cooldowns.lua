@@ -152,7 +152,7 @@ function Cooldowns:UpdateFrame(unit)
         if (unit == "arena1") then
             Gladdy:CreateMover(button.spellCooldownFrame,"cooldownXOffset", "cooldownYOffset", L["Cooldown"],
                     {"TOPLEFT", "TOPLEFT"},
-                    Gladdy.db.cooldownSize * Gladdy.db.cooldownWidthFactor, Gladdy.db.cooldownSize)
+                    Gladdy.db.cooldownSize * Gladdy.db.cooldownWidthFactor, Gladdy.db.cooldownSize, 0, 0, "cooldown")
         end
         -- Update each cooldown icon
         local o = 1
