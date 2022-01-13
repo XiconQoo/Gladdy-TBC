@@ -5,16 +5,21 @@ local select = select
 local pairs = pairs
 local tinsert = table.insert
 local tsort = table.sort
+local str_lower = string.lower
 local GetTime = GetTime
+local GetPhysicalScreenSize = GetPhysicalScreenSize
+local InCombatLockdown = InCombatLockdown
 local CreateFrame = CreateFrame
 local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
 local IsAddOnLoaded = IsAddOnLoaded
-local IsInInstance = IsInInstance
 local GetBattlefieldStatus = GetBattlefieldStatus
 local IsActiveBattlefieldArena = IsActiveBattlefieldArena
+local IsInInstance = IsInInstance
+local GetNumArenaOpponents = GetNumArenaOpponents
 local RELEASE_TYPES = { alpha = "Alpha", beta = "Beta", release = "Release"}
 local PREFIX = "TBC-Classic_v"
 local VERSION_REGEX = PREFIX .. "(%d+%.%d+)%-(%a)"
+local LibStub = LibStub
 
 ---------------------------
 
@@ -22,15 +27,17 @@ local VERSION_REGEX = PREFIX .. "(%d+%.%d+)%-(%a)"
 
 ---------------------------
 
-local MAJOR, MINOR = "Gladdy", 4
+local MAJOR, MINOR = "Gladdy", 5
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
-Gladdy.version_major_num = 1
-Gladdy.version_minor_num = 0.22
+Gladdy.version_major_num = 2
+Gladdy.version_minor_num = 0.00
 Gladdy.version_num = Gladdy.version_major_num + Gladdy.version_minor_num
 Gladdy.version_releaseType = RELEASE_TYPES.release
 Gladdy.version = PREFIX .. Gladdy.version_num .. "-" .. Gladdy.version_releaseType
 Gladdy.VERSION_REGEX = VERSION_REGEX
+
+Gladdy.debug = false
 
 LibStub("AceTimer-3.0"):Embed(Gladdy)
 LibStub("AceComm-3.0"):Embed(Gladdy)
@@ -53,6 +60,17 @@ function Gladdy:Print(...)
 end
 
 function Gladdy:Warn(...)
+    local text = "|cfff29f05Gladdy|r:"
+    local val
+    for i = 1, select("#", ...) do
+        val = select(i, ...)
+        if (type(val) == 'boolean') then val = val and "true" or false end
+        text = text .. " " .. tostring(val)
+    end
+    DEFAULT_CHAT_FRAME:AddMessage(text)
+end
+
+function Gladdy:Error(...)
     local text = "|cfffc0303Gladdy|r:"
     local val
     for i = 1, select("#", ...) do
@@ -63,13 +81,38 @@ function Gladdy:Warn(...)
     DEFAULT_CHAT_FRAME:AddMessage(text)
 end
 
+function Gladdy:Debug(lvl, ...)
+    if Gladdy.debug then
+        if lvl == "INFO" then
+            Gladdy:Print(...)
+        elseif lvl == "WARN" then
+            Gladdy:Warn(...)
+        elseif lvl == "ERROR" then
+            Gladdy:Error(...)
+        end
+    end
+end
+
 Gladdy.events = CreateFrame("Frame")
 Gladdy.events.registered = {}
 Gladdy.events:RegisterEvent("PLAYER_LOGIN")
+Gladdy.events:RegisterEvent("PLAYER_LOGOUT")
+Gladdy.events:RegisterEvent("CVAR_UPDATE")
+hooksecurefunc("VideoOptionsFrameOkay_OnClick", function(self, button, down, apply)
+    if (self:GetName() == "VideoOptionsFrameApply") then
+        Gladdy:PixelPerfectScale(true)
+    end
+end)
 Gladdy.events:SetScript("OnEvent", function(self, event, ...)
     if (event == "PLAYER_LOGIN") then
         Gladdy:OnInitialize()
         Gladdy:OnEnable()
+    elseif (event == "CVAR_UPDATE") then
+        if (str_lower(select(1, ...)) == "uiscale") then
+            Gladdy:PixelPerfectScale(true)
+        end
+    elseif (event == "PLAYER_LOGOUT") then
+        Gladdy:DeleteUnknownOptions(Gladdy.db, Gladdy.defaults.profile)
     else
         local func = self.registered[event]
 
@@ -148,6 +191,16 @@ function Gladdy:NewModule(name, priority, defaults)
         self.messages[message] = func or message
     end
 
+    module.UnregisterMessage = function(self, message)
+        self.messages[message] = nil
+    end
+
+    module.UnregisterAllMessages = function(self)
+        for msg,_ in pairs(self.messages) do
+            self.messages[msg] = nil
+        end
+    end
+
     module.GetOptions = function()
         return nil
     end
@@ -173,11 +226,11 @@ function Gladdy:DeleteUnknownOptions(tbl, refTbl, str)
     end
     for k,v in pairs(tbl) do
         if refTbl[k] == nil then
-            --Gladdy:Print("SavedVariable deleted:", str .. "." .. k, "not found!")
+            Gladdy:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, "not found!")
             tbl[k] = nil
         else
             if type(v) ~= type(refTbl[k]) then
-                --Gladdy:Print("SavedVariable deleted:", str .. "." .. k, "type error!", "Expected", type(refTbl[k]), "but found", type(v))
+                Gladdy:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, "type error!", "Expected", type(refTbl[k]), "but found", type(v))
                 tbl[k] = nil
             elseif type(v) == "table" then
                 Gladdy:DeleteUnknownOptions(v, refTbl[k], str .. "." .. k)
@@ -186,11 +239,28 @@ function Gladdy:DeleteUnknownOptions(tbl, refTbl, str)
     end
 end
 
+function Gladdy:PixelPerfectScale(update)
+    local physicalWidth, physicalHeight = GetPhysicalScreenSize()
+    local perfectUIScale = 768.0/physicalHeight--768/select(2, strsplit("x",({ GetScreenResolutions()})[GetCurrentResolution()]))
+    if self.db and self.db.pixelPerfect and self.frame then
+        self.frame:SetIgnoreParentScale(true)
+        self.frame:SetScale(perfectUIScale)
+        --local adaptiveScale = (GetCVar("useUiScale") == "1" and 1.0 + perfectUIScale - GetCVar("UIScale") or perfectUIScale)
+        --self.frame:SetScale(adaptiveScale)
+        if update then
+            self:UpdateFrame()
+        end
+    elseif self.frame then
+        self.frame:SetScale(self.db.frameScale)
+        self.frame:SetIgnoreParentScale(false)
+    end
+end
+
 function Gladdy:OnInitialize()
     self.dbi = LibStub("AceDB-3.0"):New("GladdyXZ", self.defaults)
     self.dbi.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
     self.dbi.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
-    self.dbi.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
+    self.dbi.RegisterCallback(self, "OnProfileReset", "OnProfileReset")
     self.db = self.dbi.profile
 
     self.LSM = LibStub("LibSharedMedia-3.0")
@@ -221,25 +291,38 @@ function Gladdy:OnInitialize()
     self.guids = {}
     self.curBracket = nil
     self.curUnit = 1
-    self.lastInstance = nil
 
     self:SetupOptions()
 
     for _, module in self:IterModules() do
         self:Call(module, "Initialize") -- B.E > A.E :D
     end
-    self:DeleteUnknownOptions(self.db, self.defaults.profile)
     if Gladdy.db.hideBlizzard == "always" then
         Gladdy:BlizzArenaSetAlpha(0)
     end
+    if not self.db.newLayout then
+        self:ToggleFrame(3)
+        self:HideFrame()
+    end
+end
+
+function Gladdy:OnProfileReset()
+    self.db = self.dbi.profile
+    Gladdy:Debug("INFO", "OnProfileReset")
+    self:HideFrame()
+    self:ToggleFrame(3)
+    Gladdy.options.args.lock.name = Gladdy.db.locked and L["Unlock frame"] or L["Lock frame"]
+    Gladdy.options.args.showMover.name = Gladdy.db.showMover and L["Hide Mover"] or L["Show Mover"]
+    LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
 end
 
 function Gladdy:OnProfileChanged()
     self.db = self.dbi.profile
-    self:DeleteUnknownOptions(self.db, self.defaults.profile)
-
     self:HideFrame()
     self:ToggleFrame(3)
+    Gladdy.options.args.lock.name = Gladdy.db.locked and L["Unlock frame"] or L["Lock frame"]
+    Gladdy.options.args.showMover.name = Gladdy.db.showMover and L["Hide Mover"] or L["Show Mover"]
+    LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
 end
 
 function Gladdy:OnEnable()
@@ -325,21 +408,17 @@ function Gladdy:PLAYER_ENTERING_WORLD()
         LibStub("AceConfigDialog-3.0"):Open("Gladdy", nil, LibStub("AceConfigDialog-3.0"):SelectGroup("Gladdy", "XiconProfiles"))
         self.showConfig = nil
     end
-    local instance = select(2, IsInInstance())
-    if (instance ~= "arena" and self.frame and self.frame:IsVisible() and not self.frame.testing) then
+    if (self.frame and self.frame:IsVisible()) then
         self:Reset()
         self:HideFrame()
     end
-    if (instance == "arena") then
-        self:Reset()
-        self:HideFrame()
-    end
-    self.lastInstance = instance
 end
 
 function Gladdy:UPDATE_BATTLEFIELD_STATUS(_, index)
     local status, mapName, instanceID, levelRangeMin, levelRangeMax, teamSize, isRankedArena, suspendedQueue, bool, queueType = GetBattlefieldStatus(index)
-    if (status == "active" and teamSize > 0 and IsActiveBattlefieldArena()) then
+    local instanceType = select(2, IsInInstance())
+    Gladdy:Debug("INFO", "UPDATE_BATTLEFIELD_STATUS", instanceType, status, teamSize)
+    if ((instanceType == "arena" or GetNumArenaOpponents() > 0) and status == "active" and teamSize > 0) then
         self.curBracket = teamSize
         self:JoinedArena()
     end
@@ -353,6 +432,7 @@ function Gladdy:PLAYER_REGEN_ENABLED()
             self.startTest = nil
         end
         self.frame:Show()
+        self:SendMessage("JOINED_ARENA")
         self.showFrame = nil
     end
     if self.hideFrame then
@@ -439,13 +519,13 @@ function Gladdy:JoinedArena()
         end
     end
 
-    self:SendMessage("JOINED_ARENA")
     if InCombatLockdown() then
         Gladdy:Print("Gladdy frames show as soon as you leave combat")
         self.showFrame = true
     else
         self:UpdateFrame()
         self.frame:Show()
+        self:SendMessage("JOINED_ARENA")
     end
     for i=1, self.curBracket do
         self.buttons["arena" .. i]:SetAlpha(1)

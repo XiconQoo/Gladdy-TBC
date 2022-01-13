@@ -1,6 +1,9 @@
 local CreateFrame = CreateFrame
 local UIParent = UIParent
 local InCombatLockdown = InCombatLockdown
+local math_abs = math.abs
+local pairs = pairs
+local LibStub = LibStub
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
@@ -36,7 +39,7 @@ function Gladdy:CreateFrame()
     self.frame.background = CreateFrame("Frame", nil, self.frame, BackdropTemplateMixin and "BackdropTemplate")
     self.frame.background:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = false, tileSize = 16})
     self.frame.background:SetFrameStrata("BACKGROUND")
-    self.frame.background:SetBackdropColor(self.db.backgroundColor.r, self.db.backgroundColor.g, self.db.backgroundColor.b, self.db.backgroundColor.a)
+    self.frame.background:SetBackdropColor(Gladdy:SetColor(self.db.backgroundColor))
     self.frame.background:SetAllPoints(self.frame)
     --self.frame.texture = self.frame:CreateTexture(nil, "OVERLAY")
     --self.frame.texture:SetAllPoints(self.frame)
@@ -45,7 +48,7 @@ function Gladdy:CreateFrame()
     self.frame:SetClampedToScreen(true)
     self.frame:EnableMouse(false)
     self.frame:SetMovable(true)
-    self.frame:RegisterForDrag("LeftButton")
+    --self.frame:RegisterForDrag("LeftButton")
 
     self.frame:SetScript("OnDragStart", function(f)
         if (not InCombatLockdown() and not self.db.locked) then
@@ -58,7 +61,7 @@ function Gladdy:CreateFrame()
 
             local scale = f:GetEffectiveScale()
             self.db.x = f:GetLeft() * scale
-            self.db.y = (self.db.growUp and f:GetBottom() or f:GetTop()) * scale
+            self.db.y = (self.db.growDirection == "TOP" and f:GetBottom() or f:GetTop()) * scale
         end
     end)
 
@@ -82,7 +85,7 @@ function Gladdy:CreateFrame()
 
             local scale = self.frame:GetEffectiveScale()
             self.db.x = self.frame:GetLeft() * scale
-            self.db.y = (self.db.growUp and self.frame:GetBottom() or self.frame:GetTop()) * scale
+            self.db.y = (self.db.growDirection == "TOP" and self.frame:GetBottom() or self.frame:GetTop()) * scale
         end
     end)
     self.anchor:SetScript("OnClick", function()
@@ -126,75 +129,27 @@ function Gladdy:UpdateFrame()
 
     local highlightBorderSize = (self.db.highlightInset and 0 or self.db.highlightBorderSize * 2)
     local powerBarHeight = self.db.powerBarEnabled and (self.db.powerBarHeight + 1) or 0
-    local leftSize = 0
-    local rightSize = 0
-    --Trinket + Racial
-    if self.db.trinketEnabled and self.db.trinketPos == "LEFT" then
-        leftSize = leftSize + self.db.trinketSize * self.db.trinketWidthFactor + self.db.padding
-        if self.db.racialEnabled and self.db.racialAnchor == "trinket" and self.db.racialPos == "LEFT" then
-            leftSize = leftSize + self.db.racialSize * self.db.racialWidthFactor + self.db.padding
-        end
-    end
-    if self.db.trinketEnabled and self.db.trinketPos == "RIGHT" then
-        rightSize = rightSize + self.db.trinketSize * self.db.trinketWidthFactor + self.db.padding
-        if self.db.racialEnabled and self.db.racialAnchor == "trinket" and self.db.racialPos == "RIGHT" then
-            rightSize = rightSize + self.db.racialSize * self.db.racialWidthFactor + self.db.padding
-        end
-    end
-    --ClassIcon
-    if self.db.classIconPos == "LEFT" then
-        leftSize = leftSize + self.db.classIconSize * self.db.classIconWidthFactor + self.db.padding
-    else
-        rightSize = rightSize + self.db.classIconSize * self.db.classIconWidthFactor + self.db.padding
-    end
-    --Highlight
-    if not self.db.highlightInset then
-        leftSize = leftSize + self.db.highlightBorderSize
-        rightSize = rightSize + self.db.highlightBorderSize
-    end
 
     local margin = powerBarHeight
-    local width = self.db.barWidth + leftSize + rightSize
     local height = (self.db.healthBarHeight + powerBarHeight) * teamSize
             + (self.db.highlightInset and 0 or self.db.highlightBorderSize * 2 * teamSize)
             + self.db.bottomMargin * (teamSize - 1)
 
     -- Highlight
     margin = margin + highlightBorderSize
-
-    if (self.db.cooldownYPos == "TOP" or self.db.cooldownYPos == "BOTTOM") and self.db.cooldown then
-        margin = margin + self.db.cooldownSize
-        height = height + self.db.cooldownSize * (teamSize - 1)
-    end
-    if (self.db.buffsCooldownPos == "TOP" or self.db.buffsCooldownPos == "BOTTOM") and self.db.buffsEnabled then
-        margin = margin + self.db.buffsIconSize
-        height = height + self.db.buffsIconSize * (teamSize - 1)
-    end
-    if (self.db.buffsBuffsCooldownPos == "TOP" or self.db.buffsBuffsCooldownPos == "BOTTOM") and self.db.buffsEnabled then
-        margin = margin + self.db.buffsBuffsIconSize
-        height = height + self.db.buffsBuffsIconSize * (teamSize - 1)
-    end
-    if self.db.buffsCooldownPos == "TOP" and self.db.cooldownYPos == "TOP" and self.db.cooldown and self.db.buffsEnabled then
-        margin = margin + 1
-        height = height + (teamSize - 1)
-    end
-    if self.db.buffsCooldownPos == "BOTTOM" and self.db.cooldownYPos == "BOTTOM" and self.db.cooldown and self.db.buffsEnabled then
-        margin = margin + 1
-        height = height + (teamSize - 1)
-    end
+    margin, height = Gladdy:LegacyPositioning(margin, height, teamSize)
 
     -- GrowDirection
     if (self.db.growDirection == "LEFT" or self.db.growDirection == "RIGHT") then
-        width = self.db.barWidth * teamSize + (leftSize + rightSize) * teamSize + self.db.bottomMargin * (teamSize - 1)
         height = self.db.healthBarHeight + powerBarHeight
     end
 
     self.frame:SetScale(self.db.frameScale)
-    self.frame:SetWidth(width)
+    self:PixelPerfectScale(false)
+    self.frame:SetWidth(self.db.barWidth + highlightBorderSize)
     self.frame:SetHeight(height)
     self.frame:ClearAllPoints()
-    self.frame.background:SetBackdropColor(self.db.backgroundColor.r, self.db.backgroundColor.g, self.db.backgroundColor.b, self.db.backgroundColor.a)
-    --self.frame:SetBackdropColor(self.db.frameColor.r, self.db.frameColor.g, self.db.frameColor.b, self.db.frameColor.a)
+    self.frame.background:SetBackdropColor(Gladdy:SetColor(self.db.backgroundColor))
     self.frame:ClearAllPoints()
     if (self.db.x == 0 and self.db.y == 0) then
         self.frame:SetPoint("CENTER")
@@ -208,14 +163,14 @@ function Gladdy:UpdateFrame()
     end
 
     --Anchor
-    self.anchor:SetWidth(width)
+    self.anchor:SetWidth(self.db.barWidth * 2 + highlightBorderSize)
     self.anchor:ClearAllPoints()
     if (self.db.growDirection == "TOP") then
-        self.anchor:SetPoint("TOPLEFT", self.frame, "BOTTOMLEFT")
+        self.anchor:SetPoint("TOP", self.frame, "BOTTOM")
     elseif self.growDirection == "BOTTOM" or self.growDirection == "RIGHT" then
-        self.anchor:SetPoint("BOTTOMLEFT", self.frame, "TOPLEFT")
+        self.anchor:SetPoint("BOTTOM", self.frame, "TOP")
     else
-        self.anchor:SetPoint("BOTTOMRIGHT", self.frame, "TOPRIGHT")
+        self.anchor:SetPoint("BOTTOM", self.frame, "TOP")
     end
 
     if (self.db.locked) then
@@ -235,7 +190,7 @@ function Gladdy:UpdateFrame()
         button.secure:ClearAllPoints()
         if (self.db.growDirection == "TOP") then
             if (i == 1) then
-                button:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", leftSize, powerBarHeight)
+                button:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", 0, powerBarHeight)
                 button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             else
                 button:SetPoint("BOTTOMLEFT", self.buttons["arena" .. (i - 1)], "TOPLEFT", 0, margin + self.db.bottomMargin)
@@ -243,7 +198,7 @@ function Gladdy:UpdateFrame()
             end
         elseif (self.db.growDirection == "BOTTOM") then
             if (i == 1) then
-                button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", leftSize, 0)
+                button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 0, 0)
                 button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             else
                 button:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "BOTTOMLEFT", 0, -margin - self.db.bottomMargin)
@@ -251,18 +206,18 @@ function Gladdy:UpdateFrame()
             end
         elseif (self.db.growDirection == "LEFT") then
             if (i == 1) then
-                button:SetPoint("TOPRIGHT", self.frame, "TOPRIGHT", -rightSize, 0)
+                button:SetPoint("TOPRIGHT", self.frame, "TOPRIGHT", -0, 0)
                 button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             else
-                button:SetPoint("TOPRIGHT", self.buttons["arena" .. (i - 1)], "TOPLEFT", -rightSize - leftSize - self.db.bottomMargin, 0)
+                button:SetPoint("TOPRIGHT", self.buttons["arena" .. (i - 1)], "TOPLEFT", - self.db.bottomMargin, 0)
                 button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             end
         elseif (self.db.growDirection == "RIGHT") then
             if (i == 1) then
-                button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", leftSize, 0)
+                button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 0, 0)
                 button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             else
-                button:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "TOPRIGHT", leftSize + rightSize + self.db.bottomMargin, 0)
+                button:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "TOPRIGHT", self.db.bottomMargin, 0)
                 button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             end
         end
@@ -286,6 +241,27 @@ function Gladdy:UpdateFrame()
     elseif Gladdy.db.hideBlizzard == "never" then
         Gladdy:BlizzArenaSetAlpha(1)
     end
+    if (not Gladdy.db.newLayout) then
+        Gladdy.db.newLayout = true
+        --get margin
+        local arena1Bottom
+        local arena2Top
+        if (self.db.growDirection == "BOTTOM") then
+            arena1Bottom = self.buttons["arena1"].secure:GetBottom()
+            arena2Top = self.buttons["arena2"].secure:GetTop()
+        elseif (self.db.growDirection == "TOP") then
+            arena1Bottom = self.buttons["arena1"].secure:GetTop()
+            arena2Top = self.buttons["arena2"].secure:GetBottom()
+        elseif (self.db.growDirection == "LEFT") then
+            arena1Bottom = self.buttons["arena1"].secure:GetLeft()
+            arena2Top = self.buttons["arena2"].secure:GetRight()
+        elseif (self.db.growDirection == "RIGHT") then
+            arena1Bottom = self.buttons["arena1"].secure:GetRight()
+            arena2Top = self.buttons["arena2"].secure:GetLeft()
+        end
+        Gladdy.db.bottomMargin = math_abs(arena1Bottom - arena2Top)
+        Gladdy:UpdateFrame()
+    end
 end
 
 function Gladdy:HideFrame()
@@ -294,6 +270,7 @@ function Gladdy:HideFrame()
             self.startTest = nil
             self.hideFrame = true
         else
+            self:Reset()
             self.frame:Hide()
         end
 
@@ -304,6 +281,7 @@ end
 function Gladdy:ToggleFrame(i)
     self:Reset()
     if (self.frame and self.frame:IsShown() and i == self.curBracket) then
+        self.frame.testing = nil
         self:HideFrame()
     else
         self.curBracket = i
@@ -311,6 +289,7 @@ function Gladdy:ToggleFrame(i)
         if (not self.frame) then
             self:CreateFrame()
         end
+        self.frame.testing = true
 
         for o = 1, self.curBracket do
             local unit = "arena" .. o
@@ -376,6 +355,184 @@ function Gladdy:CreateButton(i)
         self:Call(v, "CreateFrame", "arena" .. i)
     end
     self:ResetButton("arena" .. i)
+end
+
+
+
+function Gladdy:SetPosition(frame, unit, xOffsetDB, yOffsetDB, newLayout, module)
+    local button = self.buttons[unit]
+    if not button or not frame or not xOffsetDB or not yOffsetDB then
+        return
+    end
+
+    if (not newLayout) then
+        --Gladdy:Debug("INFO", name, "old X/Y:", frame:GetCenter())
+        local xOffset, yOffset = frame:GetLeft(), frame:GetTop()
+        local x,y = button.healthBar:GetLeft(), button.healthBar:GetTop()
+        local newXOffset = math_abs(x - xOffset) * (x > xOffset and -1 or 1)
+        local newYOffset = math_abs(y - yOffset) * (y > yOffset and -1 or 1)
+        frame:ClearAllPoints()
+        frame:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT", newXOffset, newYOffset)
+        --Gladdy:Debug("INFO", name, "new X/Y:", frame:GetCenter())
+        if unit == "arena1" then
+            Gladdy.db[xOffsetDB] = newXOffset
+            Gladdy.db[yOffsetDB] = newYOffset
+            LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
+        end
+    else
+        frame:ClearAllPoints()
+        frame:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT", Gladdy.db[xOffsetDB], Gladdy.db[yOffsetDB])
+    end
+    if (self.newDefaults[module.name]) then
+        for k,v in pairs(self.newDefaults[module.name]) do
+            module.defaults[k] = v
+        end
+    end
+end
+
+function Gladdy:CreateMover(frame, xConfig, yConfig, name, points, width, height, xOffset, yOffset, activated)
+    if not frame.mover then
+        frame:EnableMouse(false)
+        frame:SetMovable(true)
+        frame.mover = CreateFrame("Frame", nil, frame, BackdropTemplateMixin and "BackdropTemplate")
+        frame.mover:SetFrameStrata("TOOLTIP")
+        frame.mover:SetPoint(points[1], frame, points[2], xOffset or 0, yOffset or 0)
+        frame.mover:SetHeight(height or frame:GetHeight())
+        frame.mover:SetWidth(width or frame:GetWidth())
+
+        local backdrop = {
+            bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+            edgeFile = "",
+            tile = true, tileSize = 16, edgeSize = 10,
+            insets = {left = 0, right = 0, top = 0, bottom = 0}
+        }
+        frame.mover:SetBackdrop(backdrop)
+        frame.mover:SetBackdropColor(0,1,0,0.5)
+        frame.mover.border = CreateFrame("Frame", nil, frame.mover, BackdropTemplateMixin and "BackdropTemplate")
+        frame.mover.border:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = 2 })
+        frame.mover.border:SetAllPoints(frame.mover)
+        frame.mover.border:SetBackdropBorderColor(0,1,0,1)
+        frame.mover.border:SetFrameStrata("TOOLTIP")
+
+        frame.mover.text = frame.mover.border:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+        frame.mover.text:SetText(name)
+        frame.mover.text:SetPoint("CENTER")
+
+        frame.mover:SetMovable(true)
+        frame.mover:EnableMouse(true)
+
+        frame.mover:SetScript("OnMouseDown", function(self)
+            self.point = { frame:GetPoint() }
+            self.start = { frame:GetCenter() }
+            frame:StartMoving()
+            self:StartMoving()
+        end)
+        frame.mover:SetScript("OnMouseUp", function(self)
+            frame:StopMovingOrSizing()
+            self:StopMovingOrSizing()
+            self.stop = { frame:GetCenter() }
+            local diffX = math_abs(self.start[1] - self.stop[1])
+            diffX = self.start[1] > self.stop[1] and -diffX or diffX
+            local diffY = math_abs(self.start[2] - self.stop[2])
+            diffY = self.start[2] > self.stop[2] and -diffY or diffY
+            frame:ClearAllPoints()
+            frame:SetPoint(self.point[1], self.point[2], self.point[3], self.point[4] + diffX, self.point[5] + diffY)
+            Gladdy.db[xConfig] = self.point[4] + diffX
+            Gladdy.db[yConfig] = self.point[5] + diffY
+            LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
+            Gladdy:UpdateFrame()
+        end)
+    else
+        frame.mover:ClearAllPoints()
+        frame.mover:SetPoint(points[1], frame, points[2], xOffset or 0, yOffset or 0)
+        frame.mover:SetHeight(height or frame:GetHeight())
+        frame.mover:SetWidth(width or frame:GetWidth())
+    end
+    if self.frame and self.frame.testing and self.db.showMover then
+        if (activated ~= nil and not Gladdy.db[activated]) then
+            frame.mover:Hide()
+        else
+            frame.mover:Show()
+        end
+    else
+        frame.mover:Hide()
+    end
+end
+
+---------------------------
+
+-- LAGACY SUPPORT
+
+---------------------------
+
+function Gladdy:LegacyPositioning(margin, height, teamSize)
+    if not Gladdy.db.newLayout then
+        for k,v in pairs(Gladdy.legacy) do
+            if Gladdy.db[k] == nil then
+                Gladdy:Debug("INFO", "Gladdy:LegacyPositioning write", k,v)
+                Gladdy.db[k] = v
+            else
+                Gladdy:Debug("INFO", "Gladdy:LegacyPositioning found", k,v)
+            end
+        end
+        if (self.db.cooldownYPos == "TOP" or self.db.cooldownYPos == "BOTTOM") and self.db.cooldown then
+            margin = margin + self.db.cooldownSize
+            height = height + self.db.cooldownSize * (teamSize - 1)
+        end
+        if (self.db.buffsCooldownPos == "TOP" or self.db.buffsCooldownPos == "BOTTOM") and self.db.buffsEnabled then
+            margin = margin + self.db.buffsIconSize
+            height = height + self.db.buffsIconSize * (teamSize - 1)
+        end
+        if (self.db.buffsBuffsCooldownPos == "TOP" or self.db.buffsBuffsCooldownPos == "BOTTOM") and self.db.buffsEnabled then
+            margin = margin + self.db.buffsBuffsIconSize
+            height = height + self.db.buffsBuffsIconSize * (teamSize - 1)
+        end
+        if self.db.buffsCooldownPos == "TOP" and self.db.cooldownYPos == "TOP" and self.db.cooldown and self.db.buffsEnabled then
+            margin = margin + 1
+            height = height + (teamSize - 1)
+        end
+        if self.db.buffsCooldownPos == "BOTTOM" and self.db.cooldownYPos == "BOTTOM" and self.db.cooldown and self.db.buffsEnabled then
+            margin = margin + 1
+            height = height + (teamSize - 1)
+        end
+    end
+    return margin, height
+end
+
+function Gladdy:PositionButton(button, i, leftSize, rightSize, powerBarHeight, margin)
+    if (self.db.growDirection == "TOP") then
+        if (i == 1) then
+            button:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", leftSize, powerBarHeight)
+            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
+        else
+            button:SetPoint("BOTTOMLEFT", self.buttons["arena" .. (i - 1)], "TOPLEFT", 0, margin + self.db.bottomMargin)
+            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
+        end
+    elseif (self.db.growDirection == "BOTTOM") then
+        if (i == 1) then
+            button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", leftSize, 0)
+            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
+        else
+            button:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "BOTTOMLEFT", 0, -margin - self.db.bottomMargin)
+            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
+        end
+    elseif (self.db.growDirection == "LEFT") then
+        if (i == 1) then
+            button:SetPoint("TOPRIGHT", self.frame, "TOPRIGHT", -rightSize, 0)
+            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
+        else
+            button:SetPoint("TOPRIGHT", self.buttons["arena" .. (i - 1)], "TOPLEFT", -rightSize - leftSize - self.db.bottomMargin, 0)
+            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
+        end
+    elseif (self.db.growDirection == "RIGHT") then
+        if (i == 1) then
+            button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", leftSize, 0)
+            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
+        else
+            button:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "TOPRIGHT", leftSize + rightSize + self.db.bottomMargin, 0)
+            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
+        end
+    end
 end
 
 function Gladdy:GetAnchor(unit, position)

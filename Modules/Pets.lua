@@ -23,6 +23,10 @@ local Pets = Gladdy:NewModule("Pets", nil, {
     petHealthPercentage = true,
     petXOffset = 1,
     petYOffset = -62,
+    petGroup = false,
+    petMargin = 1,
+    petFrameStrata = "MEDIUM",
+    petFrameLevel = 5,
 })
 
 function Pets:Initialize()
@@ -63,9 +67,10 @@ function Pets:ResetUnit(unitId)
 end
 
 function Pets:PET_SPOTTED(unit)
+    Gladdy.guids[UnitGUID(unit)] = unit
     if Gladdy.db.petEnabled then
         self.frames[unit].healthBar:SetAlpha(1)
-        self.frames[unit].healthBar.hp:SetStatusBarColor(Gladdy.db.petHealthBarColor.r, Gladdy.db.petHealthBarColor.g, Gladdy.db.petHealthBarColor.b, Gladdy.db.petHealthBarColor.a)
+        self.frames[unit].healthBar.hp:SetStatusBarColor(Gladdy:SetColor(Gladdy.db.petHealthBarColor))
         self.frames[unit].healthBar:SetScript("OnUpdate", function(self)
             self.hp:SetValue(UnitHealth(self.unit))
             Pets:SetHealthText(self, UnitHealth(unit), UnitHealthMax(unit))
@@ -134,6 +139,7 @@ function Pets:CreateFrame(unitId)
         return
     end
     local button = CreateFrame("Frame", "GladdyButtonFramePet" .. unit, Gladdy.frame)
+    button:SetMovable(true)
     --button:SetAlpha(0)
     button:SetPoint("LEFT", Gladdy.buttons[unitId].healthBar, "RIGHT", Gladdy.db.petXOffset, Gladdy.db.petYOffset)
 
@@ -151,8 +157,9 @@ function Pets:CreateFrame(unitId)
     local healthBar = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
     healthBar:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "petHealthBarBorderStyle"),
                             edgeSize = Gladdy.db.petHealthBarBorderSize })
-    healthBar:SetBackdropBorderColor(Gladdy.db.petHealthBarBorderColor.r, Gladdy.db.petHealthBarBorderColor.g, Gladdy.db.petHealthBarBorderColor.b, Gladdy.db.petHealthBarBorderColor.a)
-    healthBar:SetFrameLevel(1)
+    healthBar:SetBackdropBorderColor(Gladdy:SetColor(Gladdy.db.petHealthBarBorderColor))
+    healthBar:SetFrameStrata(Gladdy.db.petFrameStrata)
+    healthBar:SetFrameLevel(Gladdy.db.petFrameLevel)
     healthBar:SetAllPoints(button)
     healthBar:SetAlpha(0)
 
@@ -163,14 +170,15 @@ function Pets:CreateFrame(unitId)
     healthBar.portrait.border = healthBar:CreateTexture(nil, "OVERLAY")
     healthBar.portrait.border:SetAllPoints(healthBar.portrait)
     healthBar.portrait.border:SetTexture(Gladdy.db.classIconBorderStyle)
-    healthBar.portrait.border:SetVertexColor(Gladdy.db.petHealthBarBorderColor.r, Gladdy.db.petHealthBarBorderColor.g, Gladdy.db.petHealthBarBorderColor.b, Gladdy.db.petHealthBarBorderColor.a)
+    healthBar.portrait.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.petHealthBarBorderColor))
 
 
     healthBar.hp = CreateFrame("StatusBar", nil, healthBar)
     healthBar.hp:SetStatusBarTexture(Gladdy:SMFetch("statusbar", "petHealthBarTexture"))
-    healthBar.hp:SetStatusBarColor(Gladdy.db.petHealthBarColor.r, Gladdy.db.petHealthBarColor.g, Gladdy.db.petHealthBarColor.b, Gladdy.db.petHealthBarColor.a)
+    healthBar.hp:SetStatusBarColor(Gladdy:SetColor(Gladdy.db.petHealthBarColor))
     healthBar.hp:SetMinMaxValues(0, 100)
-    healthBar.hp:SetFrameLevel(0)
+    healthBar.hp:SetFrameStrata(Gladdy.db.petFrameStrata)
+    healthBar.hp:SetFrameLevel(Gladdy.db.petFrameLevel - 1)
     healthBar.hp:SetAllPoints(healthBar)
 
     healthBar.bg = healthBar.hp:CreateTexture(nil, "BACKGROUND")
@@ -178,7 +186,7 @@ function Pets:CreateFrame(unitId)
     healthBar.bg:ClearAllPoints()
     healthBar.bg:SetAllPoints(healthBar.hp)
     healthBar.bg:SetAlpha(1)
-    healthBar.bg:SetVertexColor(Gladdy.db.petHealthBarBgColor.r, Gladdy.db.petHealthBarBgColor.g, Gladdy.db.petHealthBarBgColor.b, Gladdy.db.petHealthBarBgColor.a)
+    healthBar.bg:SetVertexColor(Gladdy:SetColor(Gladdy.db.petHealthBarBgColor))
 
     healthBar.nameText = healthBar:CreateFontString(nil, "LOW", "GameFontNormalSmall")
     if (Gladdy.db.petHealthBarFontSize < 1) then
@@ -188,7 +196,7 @@ function Pets:CreateFrame(unitId)
         healthBar.nameText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), Gladdy.db.petHealthBarFontSize)
         healthBar.nameText:Show()
     end
-    healthBar.nameText:SetTextColor(Gladdy.db.petHealthBarFontColor.r, Gladdy.db.petHealthBarFontColor.g, Gladdy.db.petHealthBarFontColor.b, Gladdy.db.petHealthBarFontColor.a)
+    healthBar.nameText:SetTextColor(Gladdy:SetColor(Gladdy.db.petHealthBarFontColor))
     healthBar.nameText:SetShadowOffset(1, -1)
     healthBar.nameText:SetShadowColor(0, 0, 0, 1)
     healthBar.nameText:SetJustifyH("CENTER")
@@ -202,7 +210,7 @@ function Pets:CreateFrame(unitId)
         healthBar.healthText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), Gladdy.db.petHealthBarFontSize)
         healthBar.healthText:Hide()
     end
-    healthBar.healthText:SetTextColor(Gladdy.db.petHealthBarFontColor.r, Gladdy.db.petHealthBarFontColor.g, Gladdy.db.petHealthBarFontColor.b, Gladdy.db.petHealthBarFontColor.a)
+    healthBar.healthText:SetTextColor(Gladdy:SetColor(Gladdy.db.petHealthBarFontColor))
     healthBar.healthText:SetShadowOffset(1, -1)
     healthBar.healthText:SetShadowColor(0, 0, 0, 1)
     healthBar.healthText:SetJustifyH("CENTER")
@@ -241,6 +249,11 @@ function Pets:UpdateFrame(unitId)
         return
     end
 
+    healthBar:SetFrameStrata(Gladdy.db.petFrameStrata)
+    healthBar:SetFrameLevel(Gladdy.db.petFrameLevel)
+    healthBar.hp:SetFrameStrata(Gladdy.db.petFrameStrata)
+    healthBar.hp:SetFrameLevel(Gladdy.db.petFrameLevel - 1)
+
     if not Gladdy.db.petEnabled then
         self.frames[unit]:Hide()
     else
@@ -249,7 +262,22 @@ function Pets:UpdateFrame(unitId)
 
     self.frames[unit]:SetWidth(Gladdy.db.petWidth)
     self.frames[unit]:SetHeight(Gladdy.db.petHeight)
-    self.frames[unit]:SetPoint("LEFT", Gladdy.buttons[unitId].healthBar, "RIGHT", Gladdy.db.petXOffset, Gladdy.db.petYOffset)
+
+    Gladdy:SetPosition(self.frames[unit], unitId, "petXOffset", "petYOffset", Pets:LegacySetPosition(unit, unitId), Pets)
+
+    if (Gladdy.db.petGroup) then
+        if (unit == "arenapet1") then
+            self.frames[unit]:ClearAllPoints()
+            self.frames[unit]:SetPoint("TOPLEFT", Gladdy.buttons[unitId].healthBar, "TOPLEFT", Gladdy.db.petXOffset, Gladdy.db.petYOffset)
+        else
+            local previousPet = "arenapet" .. string_gsub(unit, "arenapet", "") - 1
+            self.frames[unit]:ClearAllPoints()
+            self.frames[unit]:SetPoint("TOPLEFT", self.frames[previousPet], "BOTTOMLEFT", 0, - Gladdy.db.petMargin)
+        end
+    else
+        self.frames[unit]:ClearAllPoints()
+        self.frames[unit]:SetPoint("TOPLEFT", Gladdy.buttons[unitId].healthBar, "TOPLEFT", Gladdy.db.petXOffset, Gladdy.db.petYOffset)
+    end
 
     healthBar.portrait:SetHeight(Gladdy.db.petHeight)
     healthBar.portrait:SetWidth(Gladdy.db.petHeight)
@@ -261,17 +289,17 @@ function Pets:UpdateFrame(unitId)
         healthBar.portrait.border:Show()
     end
     healthBar.portrait.border:SetTexture(Gladdy.db.petPortraitBorderStyle)
-    healthBar.portrait.border:SetVertexColor(Gladdy.db.petHealthBarBorderColor.r, Gladdy.db.petHealthBarBorderColor.g, Gladdy.db.petHealthBarBorderColor.b, Gladdy.db.petHealthBarBorderColor.a)
+    healthBar.portrait.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.petHealthBarBorderColor))
 
     healthBar.bg:SetTexture(Gladdy:SMFetch("statusbar",  "petHealthBarTexture"))
-    healthBar.bg:SetVertexColor(Gladdy.db.petHealthBarBgColor.r, Gladdy.db.petHealthBarBgColor.g, Gladdy.db.petHealthBarBgColor.b, Gladdy.db.petHealthBarBgColor.a)
+    healthBar.bg:SetVertexColor(Gladdy:SetColor(Gladdy.db.petHealthBarBgColor))
 
     healthBar:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "petHealthBarBorderStyle"),
                             edgeSize = Gladdy.db.petHealthBarBorderSize })
-    healthBar:SetBackdropBorderColor(Gladdy.db.petHealthBarBorderColor.r, Gladdy.db.petHealthBarBorderColor.g, Gladdy.db.petHealthBarBorderColor.b, Gladdy.db.petHealthBarBorderColor.a)
+    healthBar:SetBackdropBorderColor(Gladdy:SetColor(Gladdy.db.petHealthBarBorderColor))
 
     healthBar.hp:SetStatusBarTexture(Gladdy:SMFetch("statusbar", "petHealthBarTexture"))
-    healthBar.hp:SetStatusBarColor(Gladdy.db.petHealthBarColor.r, Gladdy.db.petHealthBarColor.g, Gladdy.db.petHealthBarColor.b, Gladdy.db.petHealthBarColor.a)
+    healthBar.hp:SetStatusBarColor(Gladdy:SetColor(Gladdy.db.petHealthBarColor))
     healthBar.hp:ClearAllPoints()
     healthBar.hp:SetPoint("TOPLEFT", healthBar, "TOPLEFT", (Gladdy.db.petHealthBarBorderSize/Gladdy.db.statusbarBorderOffset), -(Gladdy.db.petHealthBarBorderSize/Gladdy.db.statusbarBorderOffset))
     healthBar.hp:SetPoint("BOTTOMRIGHT", healthBar, "BOTTOMRIGHT", -(Gladdy.db.petHealthBarBorderSize/Gladdy.db.statusbarBorderOffset), (Gladdy.db.petHealthBarBorderSize/Gladdy.db.statusbarBorderOffset))
@@ -287,8 +315,11 @@ function Pets:UpdateFrame(unitId)
         healthBar.healthText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), Gladdy.db.petHealthBarFontSize)
         healthBar.healthText:Show()
     end
-    healthBar.nameText:SetTextColor(Gladdy.db.petHealthBarFontColor.r, Gladdy.db.petHealthBarFontColor.g, Gladdy.db.petHealthBarFontColor.b, Gladdy.db.petHealthBarFontColor.a)
-    healthBar.healthText:SetTextColor(Gladdy.db.petHealthBarFontColor.r, Gladdy.db.petHealthBarFontColor.g, Gladdy.db.petHealthBarFontColor.b, Gladdy.db.petHealthBarFontColor.a)
+    healthBar.nameText:SetTextColor(Gladdy:SetColor(Gladdy.db.petHealthBarFontColor))
+    healthBar.healthText:SetTextColor(Gladdy:SetColor(Gladdy.db.petHealthBarFontColor))
+    if (unit == "arenapet1") then
+        Gladdy:CreateMover(self.frames[unit], "petXOffset", "petYOffset", L["Pets"], {"TOPLEFT", "TOPLEFT"})
+    end
 end
 
 function Pets:SetHealthText(healthBar, health, healthMax)
@@ -380,11 +411,28 @@ function Pets:GetOptions()
                             step = 1,
                             width = "full",
                         }),
+                        petGroup = option({
+                            type = "toggle",
+                            name = L["Group Pets"],
+                            order = 5,
+                        }),
+                        petMargin = option({
+                            type = "range",
+                            name = L["Margin"],
+                            desc = L["Height of the bar"],
+                            order = 6,
+                            disabled = function()
+                                return not Gladdy.db.petGroup
+                            end,
+                            min = 0,
+                            max = 50,
+                            step = .1,
+                        }),
                         petHealthBarTexture = option({
                             type = "select",
                             name = L["Bar texture"],
                             desc = L["Texture of the bar"],
-                            order = 5,
+                            order = 7,
                             dialogControl = "LSM30_Statusbar",
                             values = AceGUIWidgetLSMlists.statusbar,
                         }),
@@ -392,14 +440,14 @@ function Pets:GetOptions()
                             type = "color",
                             name = L["Health color"],
                             desc = L["Color of the status bar"],
-                            order = 6,
+                            order = 8,
                             hasAlpha = true,
                         }),
                         petHealthBarBgColor = Gladdy:colorOption({
                             type = "color",
                             name = L["Background color"],
                             desc = L["Color of the status bar background"],
-                            order = 7,
+                            order = 9,
                             hasAlpha = true,
                         }),
                     },
@@ -530,10 +578,39 @@ function Pets:GetOptions()
                         }),
                     }
                 },
+                frameStrata = {
+                    type = "group",
+                    name = L["Frame Strata and Level"],
+                    order = 6,
+                    args = {
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 1,
+                        },
+                        petFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            order = 2,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        petFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            min = 1,
+                            max = 500,
+                            step = 1,
+                            order = 3,
+                            width = "full",
+                        }),
+                    },
+                },
                 healthValues = {
                     type = "group",
                     name = L["Health Values"],
-                    order = 6,
+                    order = 7,
                     args = {
                         header = {
                             type = "header",
@@ -551,4 +628,31 @@ function Pets:GetOptions()
             },
         },
     }
+end
+
+---------------------------
+
+-- LAGACY HANDLER
+
+---------------------------
+
+function Pets:LegacySetPosition(unit, unitId)
+    if Gladdy.db.newLayout then
+        return Gladdy.db.newLayout
+    end
+    self.frames[unit]:ClearAllPoints()
+    self.frames[unit]:SetPoint("LEFT", Gladdy.buttons[unitId].healthBar, "RIGHT", Gladdy.db.petXOffset, Gladdy.db.petYOffset)
+    if (Gladdy.db.petGroup) then
+        if (unit == "arenapet1") then
+            self.frames[unit]:SetPoint("LEFT", Gladdy.buttons[unitId].healthBar, "RIGHT", Gladdy.db.petXOffset, Gladdy.db.petYOffset)
+        else
+            local previousPet = "arenapet" .. string_gsub(unit, "arenapet", "") - 1
+            self.frames[unit]:ClearAllPoints()
+            self.frames[unit]:SetPoint("TOPLEFT", self.frames[previousPet], "BOTTOMLEFT", 0, - Gladdy.db.petMargin)
+        end
+    else
+        self.frames[unit]:ClearAllPoints()
+        self.frames[unit]:SetPoint("LEFT", Gladdy.buttons[unitId].healthBar, "RIGHT", Gladdy.db.petXOffset, Gladdy.db.petYOffset)
+    end
+    return Gladdy.db.newLayout
 end

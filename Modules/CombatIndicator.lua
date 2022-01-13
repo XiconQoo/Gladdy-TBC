@@ -1,7 +1,6 @@
 local select = select
 local UnitExists, UnitAffectingCombat, GetSpellInfo = UnitExists, UnitAffectingCombat, GetSpellInfo
 local CreateFrame = CreateFrame
-local ANCHORS = { ["LEFT"] = "RIGHT", ["RIGHT"] = "LEFT", ["BOTTOM"] = "TOP", ["TOP"] = "BOTTOM"}
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
@@ -11,12 +10,12 @@ local CombatIndicator = Gladdy:NewModule("Combat Indicator", nil, {
     ciSize = 20,
     ciAlpha = 1,
     ciWidthFactor = 1,
-    ciAnchor = "healthBar",
-    ciPos = "TOP",
     ciXOffset = 0,
     ciYOffset = -31,
     ciBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     ciBorderColor = { r = 0, g = 0, b = 0, a = 1 },
+    ciFrameStrata = "HIGH",
+    ciFrameLevel = 5,
 })
 
 function CombatIndicator:Initialize()
@@ -38,7 +37,9 @@ function CombatIndicator:CreateFrame(unit)
     end
     local ciFrame = CreateFrame("Frame", "GladdyCombatindicator" .. unit, button)
     ciFrame:EnableMouse(false)
-    ciFrame:SetFrameStrata("HIGH")
+    ciFrame:SetMovable(true)
+    ciFrame:SetFrameStrata(Gladdy.db.ciFrameStrata)
+    ciFrame:SetFrameLevel(Gladdy.db.ciFrameLevel)
     ciFrame:SetHeight(Gladdy.db.ciSize)
     ciFrame:SetWidth(Gladdy.db.ciSize * Gladdy.db.ciWidthFactor)
 
@@ -50,7 +51,7 @@ function CombatIndicator:CreateFrame(unit)
     ciFrame.border = ciFrame:CreateTexture(nil, "OVERLAY")
     ciFrame.border:SetAllPoints(ciFrame)
     ciFrame.border:SetTexture(Gladdy.db.ciBorderStyle)
-    ciFrame.border:SetVertexColor(Gladdy.db.ciBorderColor.r, Gladdy.db.ciBorderColor.g, Gladdy.db.ciBorderColor.b, Gladdy.db.ciBorderColor.a)
+    ciFrame.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.ciBorderColor))
 
     self.frames[unit] = ciFrame
     button.ciFrame = ciFrame
@@ -62,13 +63,16 @@ function CombatIndicator:UpdateFrame(unit)
     if (not button or not ciFrame) then
         return
     end
+
+    ciFrame:SetFrameStrata(Gladdy.db.ciFrameStrata)
+    ciFrame:SetFrameLevel(Gladdy.db.ciFrameLevel)
+
     ciFrame:SetHeight(Gladdy.db.ciSize)
     ciFrame:SetWidth(Gladdy.db.ciSize * Gladdy.db.ciWidthFactor)
     ciFrame.border:SetTexture(Gladdy.db.ciBorderStyle)
-    ciFrame.border:SetVertexColor(Gladdy.db.ciBorderColor.r, Gladdy.db.ciBorderColor.g, Gladdy.db.ciBorderColor.b, Gladdy.db.ciBorderColor.a)
+    ciFrame.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.ciBorderColor))
 
-    ciFrame:ClearAllPoints()
-    ciFrame:SetPoint(ANCHORS[Gladdy.db.ciPos], Gladdy.buttons[unit][Gladdy.db.ciAnchor], Gladdy.db.ciPos, Gladdy.db.ciXOffset, Gladdy.db.ciYOffset)
+    Gladdy:SetPosition(ciFrame, unit, "ciXOffset", "ciYOffset", CombatIndicator:LegacySetPosition(ciFrame, unit), CombatIndicator)
 
     ciFrame:SetAlpha(Gladdy.db.ciAlpha)
 
@@ -76,6 +80,12 @@ function CombatIndicator:UpdateFrame(unit)
         ciFrame:Hide()
     else
         ciFrame:Show()
+    end
+    if (unit == "arena1") then
+        Gladdy:CreateMover(ciFrame, "ciXOffset", "ciYOffset", L["Combat Indicator"],
+                {"TOPLEFT", "TOPLEFT"},
+                Gladdy.db.ciSize * Gladdy.db.ciWidthFactor, Gladdy.db.ciSize,
+                0, 0, "ciEnabled")
     end
 end
 
@@ -166,37 +176,13 @@ function CombatIndicator:GetOptions()
                 position = {
                     type = "group",
                     name = L["Position"],
-                    order = 4,
+                    order = 3,
                     args = {
                         header = {
                             type = "header",
                             name = L["Position"],
                             order = 4,
                         },
-                        ciAnchor = Gladdy:option({
-                            type = "select",
-                            name = L["Anchor"],
-                            desc = L["This changes the anchor of the ci icon"],
-                            order = 20,
-                            values = {
-                                ["trinket"] = L["Trinket"],
-                                ["classIcon"] = L["Class Icon"],
-                                ["healthBar"] = L["Health Bar"],
-                                ["powerBar"] = L["Power Bar"],
-                            },
-                        }),
-                        ciPos = Gladdy:option({
-                            type = "select",
-                            name = L["Position"],
-                            desc = L["This changes position relative to its anchor of the ci icon"],
-                            order = 21,
-                            values = {
-                                ["LEFT"] = L["Left"],
-                                ["RIGHT"] = L["Right"],
-                                ["TOP"] = L["Top"],
-                                ["BOTTOM"] = L["Bottom"],
-                            },
-                        }),
                         ciXOffset = Gladdy:option({
                             type = "range",
                             name = L["Horizontal offset"],
@@ -220,7 +206,7 @@ function CombatIndicator:GetOptions()
                 border = {
                     type = "group",
                     name = L["Border"],
-                    order = 4,
+                    order = 2,
                     args = {
                         header = {
                             type = "header",
@@ -242,7 +228,56 @@ function CombatIndicator:GetOptions()
                         }),
                     },
                 },
+                frameStrata = {
+                    type = "group",
+                    name = L["Frame Strata and Level"],
+                    order = 5,
+                    args = {
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 1,
+                        },
+                        ciFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            order = 2,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        ciFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            min = 0,
+                            max = 500,
+                            step = 1,
+                            order = 3,
+                            width = "full",
+                        }),
+                    },
+                },
             },
         },
     }
+end
+
+---------------------------
+
+-- LAGACY HANDLER
+
+---------------------------
+
+function CombatIndicator:LegacySetPosition(ciFrame, unit)
+    if Gladdy.db.newLayout then
+        return Gladdy.db.newLayout
+    end
+    -- LEGACY options
+    local ANCHORS = { ["LEFT"] = "RIGHT", ["RIGHT"] = "LEFT", ["BOTTOM"] = "TOP", ["TOP"] = "BOTTOM"}
+    local ciAnchor = Gladdy.db.ciAnchor or Gladdy.legacy.ciAnchor
+    local ciPos = Gladdy.db.ciPos
+
+    ciFrame:ClearAllPoints()
+    ciFrame:SetPoint(ANCHORS[ciPos], Gladdy.buttons[unit][ciAnchor], ciPos, Gladdy.db.ciXOffset, Gladdy.db.ciYOffset)
+    return Gladdy.db.newLayout
 end

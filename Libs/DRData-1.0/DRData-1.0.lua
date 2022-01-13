@@ -188,9 +188,9 @@ Data.spells = {
 
 	--[[ SLEEPS ]]--
 	-- Hibernate
-	[2637] = "sleep",
-	[18657] = "sleep",
-	[18658] = "sleep",
+	[2637] = "disorient",
+	[18657] = "disorient",
+	[18658] = "disorient",
 	
 	-- Wyvern Sting
 	[19386] = "disorient",
@@ -199,19 +199,19 @@ Data.spells = {
 	[27068] = "disorient",
 	
 	--[[ MISC ]]--
-	-- Chastise (Maybe this shares DR with Imp HS?)
-	[44041] = "root",
-	[44043] = "root",
-	[44044] = "root",
-	[44045] = "root",
-	[44046] = "root",
-	[44047] = "root",
+	-- Chastise
+	[44041] = "chastise",
+	[44043] = "chastise",
+	[44044] = "chastise",
+	[44045] = "chastise",
+	[44046] = "chastise",
+	[44047] = "chastise",
 
 	-- Dragon's Breath
-	[31661] = "dragonsbreath", -- Dragon's Breath
-	[33041] = "dragonsbreath", -- Dragon's Breath
-	[33042] = "dragonsbreath", -- Dragon's Breath
-	[33043] = "dragonsbreath", -- Dragon's Breath
+	[31661] = "scatters", -- Dragon's Breath
+	[33041] = "scatters", -- Dragon's Breath
+	[33042] = "scatters", -- Dragon's Breath
+	[33043] = "scatters", -- Dragon's Breath
 	-- Repentance
 	[20066] = "disorient",
 
@@ -224,9 +224,9 @@ Data.spells = {
 	[14309] = "disorient",
 	
 	-- Improved Conc Shot
-	[19410] = "impconc",
-	[22915] = "impconc",
-	[28445] = "impconc",
+	[19410] = "rndstun",
+	[22915] = "rndstun",
+	[28445] = "rndstun",
 	
 	-- Death Coil
 	[6789] = "dc",
@@ -242,6 +242,9 @@ Data.spells = {
 	[605] = "charm",
 	[10911] = "charm",
 	[10912] = "charm",
+
+	-- Counterattack
+	[19306] = "counterattack"
 }
 
 -- DR Category names
@@ -264,6 +267,7 @@ Data.typeNames = {
 	["repentance"] = "Repentance",
 	["dragonsbreath"] = "Dragon's Breath",
 	["ua"] = "Unstable Affliction Silence",
+	["counterattack"] = "Counterattack Immobilize"
 }
 
 -- Categories that have DR in PvE as well as PvP

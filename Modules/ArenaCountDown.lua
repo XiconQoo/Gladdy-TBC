@@ -6,7 +6,9 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local ACDFrame = Gladdy:NewModule("Arena Countdown", nil, {
     countdown = true,
-    arenaCountdownSize = 256
+    arenaCountdownSize = 256,
+    arenaCountdownFrameStrata = "HIGH",
+    arenaCountdownFrameLevel = 50,
 })
 
 function ACDFrame:OnEvent(event, ...)
@@ -51,6 +53,11 @@ function ACDFrame:Initialize()
     self.faction = UnitFactionGroup("player")
 end
 
+function ACDFrame:UpdateFrameOnce()
+    self.ACDNumFrame:SetFrameStrata(Gladdy.db.arenaCountdownFrameStrata)
+    self.ACDNumFrame:SetFrameLevel(Gladdy.db.arenaCountdownFrameLevel)
+end
+
 function ACDFrame.OnUpdate(self, elapse)
     if (self.countdown > 0 and Gladdy.db.countdown) then
         self.hidden = false;
@@ -92,6 +99,7 @@ end
 
 function ACDFrame:JOINED_ARENA()
     if Gladdy.db.countdown then
+        self.ACDNumFrame:Show()
         self:RegisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
         self:SetScript("OnEvent", ACDFrame.OnEvent)
         self.endTime = GetTime() + 70
@@ -152,6 +160,7 @@ function ACDFrame:Reset()
     self:UnregisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
     self:SetScript("OnUpdate", nil)
     self.hidden = true;
+    self.ACDNumFrame:Hide()
     self.ACDNumTens:Hide();
     self.ACDNumOnes:Hide();
     self.ACDNumOne:Hide();
@@ -178,6 +187,27 @@ function ACDFrame:GetOptions()
             min = 64,
             max = 512,
             step = 16,
+            width = "full",
+        }),
+        headerAuraLevel = {
+            type = "header",
+            name = L["Frame Strata and Level"],
+            order = 5,
+        },
+        arenaCountdownFrameStrata = Gladdy:option({
+            type = "select",
+            name = L["Frame Strata"],
+            order = 6,
+            values = Gladdy.frameStrata,
+            sorting = Gladdy.frameStrataSorting,
+        }),
+        arenaCountdownFrameLevel = Gladdy:option({
+            type = "range",
+            name = L["Frame Level"],
+            min = 0,
+            max = 500,
+            step = 1,
+            order = 7,
             width = "full",
         }),
     }

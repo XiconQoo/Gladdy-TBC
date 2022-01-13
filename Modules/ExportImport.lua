@@ -72,6 +72,7 @@ importButton:SetCallback("OnClick", function(widget)
     Gladdy:Reset()
     Gladdy:HideFrame()
     Gladdy:ToggleFrame(3)
+    LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
 end)
 import:AddChild(importButton)
 import.button = importButton
@@ -89,9 +90,27 @@ import:AddChild(importClearButton)
 import.clearButton = importClearButton
 
 local deletedOptions = { -- backwards compatibility
-    growUp = true,
+    --deleted DR-categories
+    repentance = true,
+    sleep = true,
+    impconc = true,
+    dragonsbreath = true,
     freezetrap = true,
-    repentance = true
+    --deleted db options
+    castBarPos = true,
+    buffsCooldownPos = true,
+    buffsBuffsCooldownPos = true,
+    classIconPos = true,
+    ciAnchor = true,
+    ciPos = true,
+    cooldownYPos = true,
+    cooldownXPos = true,
+    drCooldownPos = true,
+    racialAnchor = true,
+    racialPos = true,
+    trinketPos = true,
+    padding = true,
+    growUp = true,
 }
 
 local function checkIsDeletedOption(k, str, msg, errorFound, errorMsg)
@@ -99,7 +118,7 @@ local function checkIsDeletedOption(k, str, msg, errorFound, errorMsg)
     for key, _ in pairs(deletedOptions) do
         if str_match(k, key) then
             isDeleted = true
-            Gladdy:Warn("found deleted option =", str .. "." .. k)
+            Gladdy:Debug("WARN", "found deleted option =", str .. "." .. k)
         end
     end
     if errorFound then
@@ -114,8 +133,8 @@ function ExportImport:CheckDeserializedOptions(tbl, refTbl, str)
     if str == nil and not tbl.version_major_num then
         return false, "Version conflict: version_major_num not seen"
     end
-    if str == nil and tbl.version_major_num ~= Gladdy.version_major_num then
-        return false, "Version conflict: " .. tbl.version_major_num .. " ~= " .. Gladdy.version_major_num
+    if str == nil and tbl.version_major_num > Gladdy.version_major_num then
+        return false, "Version conflict: Major v" .. tbl.version_major_num .. " ~= v" .. Gladdy.version_major_num
     end
     if str == nil then
         str = "Gladdy.db"
@@ -204,13 +223,16 @@ end
 function ExportImport:ApplyImport(t, table, str)
     if str == nil then
         str = "Gladdy.db"
+        if (not t.newLayout) then
+            table.newLayout = false
+        end
     end
     for k,v in pairs(t) do
         if type(v) == "table" then
             if (table[k] ~= nil) then
                 ExportImport:ApplyImport(v, table[k], str .. "." .. k)
             else
-                Gladdy:Warn("ApplyImport failed for", str .. "." .. k)
+                Gladdy:Debug("ERROR", "ApplyImport failed for", str .. "." .. k)
             end
 
         else

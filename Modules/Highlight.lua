@@ -13,6 +13,8 @@ local Highlight = Gladdy:NewModule("Highlight", nil, {
     targetBorder = true,
     focusBorder = true,
     leaderBorder = true,
+    highlightFrameStrata = "MEDIUM",
+    highlightFrameLevel = 20,
 })
 
 function Highlight:Initialize()
@@ -56,17 +58,20 @@ function Highlight:CreateFrame(unit)
 
     local targetBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
     targetBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = Gladdy.db.highlightBorderSize })
-    --targetBorder:SetFrameStrata("MEDIUM")
+    targetBorder:SetFrameStrata(Gladdy.db.highlightFrameStrata)
+    targetBorder:SetFrameLevel(Gladdy.db.highlightFrameLevel)
     targetBorder:Hide()
 
     local focusBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
     focusBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = Gladdy.db.highlightBorderSize })
-    --focusBorder:SetFrameStrata("MEDIUM")
+    focusBorder:SetFrameStrata(Gladdy.db.highlightFrameStrata)
+    focusBorder:SetFrameLevel(Gladdy.db.highlightFrameLevel)
     focusBorder:Hide()
 
     local leaderBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
     leaderBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = Gladdy.db.highlightBorderSize })
-    --leaderBorder:SetFrameStrata("MEDIUM")
+    leaderBorder:SetFrameStrata(Gladdy.db.highlightFrameStrata)
+    leaderBorder:SetFrameLevel(Gladdy.db.highlightFrameLevel)
     leaderBorder:Hide()
 
     local highlight = healthBar:CreateTexture(nil, "OVERLAY")
@@ -96,6 +101,13 @@ function Highlight:UpdateFrame(unit)
     local width = Gladdy.db.barWidth + (Gladdy.db.highlightInset and 0 or borderSize * 2)
     local height = hpAndPowerHeight + (Gladdy.db.highlightInset and 0 or borderSize * 2)
 
+    button.targetBorder:SetFrameStrata(Gladdy.db.highlightFrameStrata)
+    button.targetBorder:SetFrameLevel(Gladdy.db.highlightFrameLevel)
+    button.focusBorder:SetFrameStrata(Gladdy.db.highlightFrameStrata)
+    button.focusBorder:SetFrameLevel(Gladdy.db.highlightFrameLevel)
+    button.leaderBorder:SetFrameStrata(Gladdy.db.highlightFrameStrata)
+    button.leaderBorder:SetFrameLevel(Gladdy.db.highlightFrameLevel)
+
     button.targetBorder:SetWidth(width)
     button.targetBorder:SetHeight(height)
     button.targetBorder:ClearAllPoints()
@@ -107,7 +119,7 @@ function Highlight:UpdateFrame(unit)
     end
 
     button.targetBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = borderSize })
-    button.targetBorder:SetBackdropBorderColor(Gladdy.db.targetBorderColor.r, Gladdy.db.targetBorderColor.g, Gladdy.db.targetBorderColor.b, Gladdy.db.targetBorderColor.a)
+    button.targetBorder:SetBackdropBorderColor(Gladdy:SetColor(Gladdy.db.targetBorderColor))
 
     button.focusBorder:SetWidth(width)
     button.focusBorder:SetHeight(height)
@@ -120,7 +132,7 @@ function Highlight:UpdateFrame(unit)
     end
 
     button.focusBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = borderSize })
-    button.focusBorder:SetBackdropBorderColor(Gladdy.db.focusBorderColor.r, Gladdy.db.focusBorderColor.g, Gladdy.db.focusBorderColor.b, Gladdy.db.focusBorderColor.a)
+    button.focusBorder:SetBackdropBorderColor(Gladdy:SetColor(Gladdy.db.focusBorderColor))
 
     button.leaderBorder:SetWidth(width)
     button.leaderBorder:SetHeight(height)
@@ -133,7 +145,7 @@ function Highlight:UpdateFrame(unit)
     end
 
     button.leaderBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = borderSize })
-    button.leaderBorder:SetBackdropBorderColor(Gladdy.db.leaderBorderColor.r, Gladdy.db.leaderBorderColor.g, Gladdy.db.leaderBorderColor.b, Gladdy.db.leaderBorderColor.a)
+    button.leaderBorder:SetBackdropBorderColor(Gladdy:SetColor(Gladdy.db.leaderBorderColor))
     if Gladdy.frame.testing then
         Highlight:Test(unit)
     end
@@ -207,67 +219,130 @@ function Highlight:GetOptions()
             desc = L["Show Highlight border inside of frame"],
             order = 3,
         }),
-        highlightBorderSize = Gladdy:option({
-            type = "range",
-            name = L["Border size"],
-            desc = L["Border size"],
-            order = 4,
-            min = 1,
-            max = 20,
-            step = 1,
-            width = "full",
-        }),
-        highlightBorderStyle = Gladdy:option({
-            type = "select",
-            name = L["Border style"],
-            order = 5,
-            dialogControl = "LSM30_Border",
-            values = AceGUIWidgetLSMlists.border,
-        }),
-        headerColor = {
-            type = "header",
-            name = L["Colors"],
-            order = 6,
+        group = {
+            type = "group",
+            childGroups = "tree",
+            name = L["Frame"],
+            order = 3,
+            args = {
+                enabled = {
+                    type = "group",
+                    name = L["Enabled"],
+                    order = 1,
+                    args = {
+                        headerEnable = {
+                            type = "header",
+                            name = L["Enabled"],
+                            order = 10,
+                        },
+                        highlight = Gladdy:option({
+                            type = "toggle",
+                            name = L["Highlight target"],
+                            desc = L["Toggle if the selected target should be highlighted"],
+                            order = 11,
+                            width = "full",
+                        }),
+                        targetBorder = Gladdy:option({
+                            type = "toggle",
+                            name = L["Show border around target"],
+                            desc = L["Toggle if a border should be shown around the selected target"],
+                            order = 12,
+                            width = "full",
+                        }),
+                        focusBorder = Gladdy:option({
+                            type = "toggle",
+                            name = L["Show border around focus"],
+                            desc = L["Toggle of a border should be shown around the current focus"],
+                            order = 13,
+                            width = "full",
+                        }),
+                    },
+                },
+                border = {
+                    type = "group",
+                    name = L["Border"],
+                    order = 2,
+                    args = {
+                        headerHighlight = {
+                            type = "header",
+                            name = L["Border"],
+                            order = 2,
+                        },
+                        highlightBorderSize = Gladdy:option({
+                            type = "range",
+                            name = L["Border size"],
+                            desc = L["Border size"],
+                            order = 4,
+                            min = 1,
+                            max = 20,
+                            step = 1,
+                            width = "full",
+                        }),
+                        highlightBorderStyle = Gladdy:option({
+                            type = "select",
+                            name = L["Border style"],
+                            order = 5,
+                            dialogControl = "LSM30_Border",
+                            values = AceGUIWidgetLSMlists.border,
+                        }),
+                    },
+                },
+                color = {
+                    type = "group",
+                    name = L["Color"],
+                    order = 3,
+                    args = {
+                        headerColor = {
+                            type = "header",
+                            name = L["Colors"],
+                            order = 6,
+                        },
+                        targetBorderColor = Gladdy:colorOption({
+                            type = "color",
+                            name = L["Target border color"],
+                            desc = L["Color of the selected targets border"],
+                            order = 7,
+                            hasAlpha = true,
+                        }),
+                        focusBorderColor = Gladdy:colorOption({
+                            type = "color",
+                            name = L["Focus border color"],
+                            desc = L["Color of the focus border"],
+                            order = 8,
+                            hasAlpha = true,
+                        }),
+                    },
+                },
+                frameStrata = {
+                    type = "group",
+                    name = L["Frame Strata and Level"],
+                    order = 4,
+                    args = {
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 1,
+                        },
+                        highlightFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            order = 2,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        highlightFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            min = 1,
+                            max = 500,
+                            step = 1,
+                            order = 3,
+                            width = "full",
+                        }),
+                    },
+                },
+            },
         },
-        targetBorderColor = Gladdy:colorOption({
-            type = "color",
-            name = L["Target border color"],
-            desc = L["Color of the selected targets border"],
-            order = 7,
-            hasAlpha = true,
-        }),
-        focusBorderColor = Gladdy:colorOption({
-            type = "color",
-            name = L["Focus border color"],
-            desc = L["Color of the focus border"],
-            order = 8,
-            hasAlpha = true,
-        }),
-        headerEnable = {
-            type = "header",
-            name = L["Enabled"],
-            order = 10,
-        },
-        highlight = Gladdy:option({
-            type = "toggle",
-            name = L["Highlight target"],
-            desc = L["Toggle if the selected target should be highlighted"],
-            order = 11,
-            width = "full",
-        }),
-        targetBorder = Gladdy:option({
-            type = "toggle",
-            name = L["Show border around target"],
-            desc = L["Toggle if a border should be shown around the selected target"],
-            order = 12,
-            width = "full",
-        }),
-        focusBorder = Gladdy:option({
-            type = "toggle",
-            name = L["Show border around focus"],
-            desc = L["Toggle of a border should be shown around the current focus"],
-            order = 13,
-            width = "full",
-        }),
     }
 end

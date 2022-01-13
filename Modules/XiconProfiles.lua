@@ -4,74 +4,17 @@ local L = Gladdy.L
 local XiconProfiles = Gladdy:NewModule("XiconProfiles", nil, {
 })
 
-function XiconProfiles:ApplyKlimp()
-    local deserialized = Gladdy.modules["Export Import"]:Decode(Gladdy:GetKlimpProfile())
+local function applyProfile(profileString)
+    local deserialized = Gladdy.modules["Export Import"]:Decode(profileString)
     if deserialized then
         Gladdy.modules["Export Import"]:ApplyImport(deserialized, Gladdy.db)
     end
     Gladdy:Reset()
     Gladdy:HideFrame()
     Gladdy:ToggleFrame(3)
-end
-
-function XiconProfiles:ApplyKnall()
-    local deserialized = Gladdy.modules["Export Import"]:Decode(Gladdy:GetKnallProfile())
-    if deserialized then
-        Gladdy.modules["Export Import"]:ApplyImport(deserialized, Gladdy.db)
-    end
-    Gladdy:Reset()
-    Gladdy:HideFrame()
-    Gladdy:ToggleFrame(3)
-end
-
-function XiconProfiles:ApplyClassic()
-    local deserialized = Gladdy.modules["Export Import"]:Decode(Gladdy:GetClassicProfile())
-    if deserialized then
-        Gladdy.modules["Export Import"]:ApplyImport(deserialized, Gladdy.db)
-    end
-    Gladdy:Reset()
-    Gladdy:HideFrame()
-    Gladdy:ToggleFrame(3)
-end
-
-function XiconProfiles:ApplyClassicNoPet()
-    local deserialized = Gladdy.modules["Export Import"]:Decode(Gladdy:GetClassicProfileNoPet())
-    if deserialized then
-        Gladdy.modules["Export Import"]:ApplyImport(deserialized, Gladdy.db)
-    end
-    Gladdy:Reset()
-    Gladdy:HideFrame()
-    Gladdy:ToggleFrame(3)
-end
-
-function XiconProfiles:ApplyBlizz()
-    local deserialized = Gladdy.modules["Export Import"]:Decode(Gladdy:GetBlizzardProfile())
-    if deserialized then
-        Gladdy.modules["Export Import"]:ApplyImport(deserialized, Gladdy.db)
-    end
-    Gladdy:Reset()
-    Gladdy:HideFrame()
-    Gladdy:ToggleFrame(3)
-end
-
-function XiconProfiles:ApplyRukk()
-    local deserialized = Gladdy.modules["Export Import"]:Decode(Gladdy:GetRukkProfile())
-    if deserialized then
-        Gladdy.modules["Export Import"]:ApplyImport(deserialized, Gladdy.db)
-    end
-    Gladdy:Reset()
-    Gladdy:HideFrame()
-    Gladdy:ToggleFrame(3)
-end
-
-function XiconProfiles:ApplyMir()
-    local deserialized = Gladdy.modules["Export Import"]:Decode(Gladdy:GetMirProfile())
-    if deserialized then
-        Gladdy.modules["Export Import"]:ApplyImport(deserialized, Gladdy.db)
-    end
-    Gladdy:Reset()
-    Gladdy:HideFrame()
-    Gladdy:ToggleFrame(3)
+    Gladdy.options.args.lock.name = Gladdy.db.locked and L["Unlock frame"] or L["Lock frame"]
+    Gladdy.options.args.showMover.name = Gladdy.db.showMover and L["Hide Mover"] or L["Show Mover"]
+    LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
 end
 
 function XiconProfiles:GetOptions()
@@ -85,7 +28,7 @@ function XiconProfiles:GetOptions()
             type = "execute",
             func = function()
                 Gladdy.dbi:ResetProfile(Gladdy.dbi:GetCurrentProfile())
-                XiconProfiles:ApplyBlizz()
+                applyProfile(Gladdy:GetBlizzardProfile())
             end,
             name = " ",
             desc = "Blizzard " .. L["Profile"],
@@ -104,7 +47,7 @@ function XiconProfiles:GetOptions()
             type = "execute",
             func = function()
                 Gladdy.dbi:ResetProfile(Gladdy.dbi:GetCurrentProfile())
-                XiconProfiles:ApplyClassic()
+                applyProfile(Gladdy:GetClassicProfile())
             end,
             name = " ",
             desc = "Classic " .. L["Profile"],
@@ -123,7 +66,7 @@ function XiconProfiles:GetOptions()
             type = "execute",
             func = function()
                 Gladdy.dbi:ResetProfile(Gladdy.dbi:GetCurrentProfile())
-                XiconProfiles:ApplyClassicNoPet()
+                applyProfile(Gladdy:GetClassicProfileNoPet())
             end,
             name = " ",
             desc = "Classic " .. L["Profile"] .. L[" No Pet"],
@@ -142,7 +85,7 @@ function XiconProfiles:GetOptions()
             type = "execute",
             func = function()
                 Gladdy.dbi:ResetProfile(Gladdy.dbi:GetCurrentProfile())
-                XiconProfiles:ApplyKnall()
+                applyProfile(Gladdy:GetKnallProfile())
             end,
             name = " ",
             desc = "Knall's " .. L["Profile"],
@@ -161,7 +104,7 @@ function XiconProfiles:GetOptions()
             type = "execute",
             func = function()
                 Gladdy.dbi:ResetProfile(Gladdy.dbi:GetCurrentProfile())
-                XiconProfiles:ApplyKlimp()
+                applyProfile(Gladdy:GetKlimpProfile())
             end,
             image = "Interface\\AddOns\\Gladdy\\Images\\BasicProfiles\\Klimp1.blp",
             imageWidth = 350,
@@ -180,7 +123,7 @@ function XiconProfiles:GetOptions()
             type = "execute",
             func = function()
                 Gladdy.dbi:ResetProfile(Gladdy.dbi:GetCurrentProfile())
-                XiconProfiles:ApplyRukk()
+                applyProfile(Gladdy:GetRukkProfile())
             end,
             name = " ",
             desc = "Rukk1's " .. L["Profile"],
@@ -199,7 +142,7 @@ function XiconProfiles:GetOptions()
             type = "execute",
             func = function()
                 Gladdy.dbi:ResetProfile(Gladdy.dbi:GetCurrentProfile())
-                XiconProfiles:ApplyMir()
+                applyProfile(Gladdy:GetMirProfile())
             end,
             name = " ",
             desc = "Mir's " .. L["Profile"],
@@ -208,6 +151,25 @@ function XiconProfiles:GetOptions()
             imageHeight = 175,
             width = "full",
             order = 15,
+        },
+        headerProfileMirEdited = {
+            type = "header",
+            name = "Mir's " .. L["Profile"] .. " edited",
+            order = 16,
+        },
+        mirProfileEdited = {
+            type = "execute",
+            func = function()
+                Gladdy.dbi:ResetProfile(Gladdy.dbi:GetCurrentProfile())
+                applyProfile(Gladdy:GetMirEditedProfile())
+            end,
+            name = " ",
+            desc = "Mir's " .. L["Profile"],
+            image = "Interface\\AddOns\\Gladdy\\Images\\BasicProfiles\\Mir1_edited.blp",
+            imageWidth = 350,
+            imageHeight = 175,
+            width = "full",
+            order = 17,
         },
     }
 end

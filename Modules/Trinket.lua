@@ -6,20 +6,26 @@ local GetTime = GetTime
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
-local Trinket = Gladdy:NewModule("Trinket", nil, {
+local Trinket = Gladdy:NewModule("Trinket", 80, {
     trinketFont = "DorisPP",
     trinketFontScale = 1,
+    trinketFontEnabled = true,
     trinketEnabled = true,
     trinketSize = 60 + 20 + 1,
     trinketWidthFactor = 0.9,
-    trinketPos = "RIGHT",
     trinketBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     trinketBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     trinketDisableCircle = false,
     trinketCooldownAlpha = 1,
     trinketCooldownNumberAlpha = 1,
+    trinketXOffset = 0,
+    trinketYOffset = 0,
+    trinketFrameStrata = "MEDIUM",
+    trinketFrameLevel = 5,
+    trinketColored = false,
+    trinketColoredCd = { r = 1, g = 0, b = 0, a = 1 },
+    trinketColoredNoCd = { r = 0, g = 1, b = 0, a = 1 },
 })
-LibStub("AceComm-3.0"):Embed(Trinket)
 
 function Trinket:Initialize()
     self.frames = {}
@@ -33,6 +39,9 @@ local function iconTimer(self, elapsed)
             self.active = false
             self.cooldown:Clear()
             Gladdy:SendMessage("TRINKET_READY", self.unit)
+            if Gladdy.db.trinketColored then
+                self:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredNoCd))
+            end
         else
             self.timeLeft = self.timeLeft - elapsed
         end
@@ -55,13 +64,21 @@ local function iconTimer(self, elapsed)
             self.cooldownFont:SetTextColor(1, 0, 0, Gladdy.db.trinketCooldownNumberAlpha)
             self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
         end
-        Gladdy:FormatTimer(self.cooldownFont, self.timeLeft, self.timeLeft < 10, true)
+        if Gladdy.db.trinketFontEnabled then
+            Gladdy:FormatTimer(self.cooldownFont, self.timeLeft, self.timeLeft < 10, true)
+        else
+            self.cooldownFont:SetText("")
+        end
     end
 end
 
 function Trinket:CreateFrame(unit)
-    local trinket = CreateFrame("Button", "GladdyTrinketButton" .. unit, Gladdy.buttons[unit])
+    local trinket = CreateFrame("Button", "GladdyTrinketButton" .. unit, Gladdy.buttons[unit], BackdropTemplateMixin and "BackdropTemplate")
+    trinket:SetBackdrop({bgFile = "Interface\\AddOns\\Gladdy\\Images\\trinket" })
     trinket:EnableMouse(false)
+    trinket:SetFrameStrata(Gladdy.db.trinketFrameStrata)
+    trinket:SetFrameLevel(Gladdy.db.trinketFrameLevel)
+
     trinket.texture = trinket:CreateTexture(nil, "BACKGROUND")
     trinket.texture:SetAllPoints(trinket)
     trinket.texture:SetTexture("Interface\\Icons\\INV_Jewelry_TrinketPVP_02")
@@ -70,11 +87,15 @@ function Trinket:CreateFrame(unit)
     trinket.cooldown = CreateFrame("Cooldown", nil, trinket, "CooldownFrameTemplate")
     trinket.cooldown.noCooldownCount = true --Gladdy.db.trinketDisableOmniCC
     trinket.cooldown:SetHideCountdownNumbers(true)
+    trinket.cooldown:SetFrameStrata(Gladdy.db.trinketFrameStrata)
+    trinket.cooldown:SetFrameLevel(Gladdy.db.trinketFrameLevel + 1)
 
     trinket.cooldownFrame = CreateFrame("Frame", nil, trinket)
     trinket.cooldownFrame:ClearAllPoints()
     trinket.cooldownFrame:SetPoint("TOPLEFT", trinket, "TOPLEFT")
     trinket.cooldownFrame:SetPoint("BOTTOMRIGHT", trinket, "BOTTOMRIGHT")
+    trinket.cooldownFrame:SetFrameStrata(Gladdy.db.trinketFrameStrata)
+    trinket.cooldownFrame:SetFrameLevel(Gladdy.db.trinketFrameLevel + 2)
 
     trinket.cooldownFont = trinket.cooldownFrame:CreateFontString(nil, "OVERLAY")
     trinket.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), 20, "OUTLINE")
@@ -84,6 +105,9 @@ function Trinket:CreateFrame(unit)
 
     trinket.borderFrame = CreateFrame("Frame", nil, trinket)
     trinket.borderFrame:SetAllPoints(trinket)
+    trinket.borderFrame:SetFrameStrata(Gladdy.db.trinketFrameStrata)
+    trinket.borderFrame:SetFrameLevel(Gladdy.db.trinketFrameLevel + 3)
+
     trinket.texture.overlay = trinket.borderFrame:CreateTexture(nil, "OVERLAY")
     trinket.texture.overlay:SetAllPoints(trinket)
     trinket.texture.overlay:SetTexture(Gladdy.db.trinketBorderStyle)
@@ -102,7 +126,28 @@ function Trinket:UpdateFrame(unit)
         return
     end
 
+    if Gladdy.db.trinketColored then
+        if trinket.active then
+            trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredCd))
+        else
+            trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredNoCd))
+        end
+        trinket.texture:SetTexture()
+    else
+        trinket:SetBackdropColor(0,0,0,0)
+        trinket.texture:SetTexture("Interface\\Icons\\INV_Jewelry_TrinketPVP_02")
+    end
+
     local width, height = Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor, Gladdy.db.trinketSize
+
+    trinket:SetFrameStrata(Gladdy.db.trinketFrameStrata)
+    trinket:SetFrameLevel(Gladdy.db.trinketFrameLevel)
+    trinket.cooldown:SetFrameStrata(Gladdy.db.trinketFrameStrata)
+    trinket.cooldown:SetFrameLevel(Gladdy.db.trinketFrameLevel + 1)
+    trinket.cooldownFrame:SetFrameStrata(Gladdy.db.trinketFrameStrata)
+    trinket.cooldownFrame:SetFrameLevel(Gladdy.db.trinketFrameLevel + 2)
+    trinket.borderFrame:SetFrameStrata(Gladdy.db.trinketFrameStrata)
+    trinket.borderFrame:SetFrameLevel(Gladdy.db.trinketFrameLevel + 3)
 
     trinket:SetWidth(width)
     trinket:SetHeight(height)
@@ -117,25 +162,28 @@ function Trinket:UpdateFrame(unit)
     trinket.texture:SetAllPoints(trinket)
 
     trinket.texture.overlay:SetTexture(Gladdy.db.trinketBorderStyle)
-    trinket.texture.overlay:SetVertexColor(Gladdy.db.trinketBorderColor.r, Gladdy.db.trinketBorderColor.g, Gladdy.db.trinketBorderColor.b, Gladdy.db.trinketBorderColor.a)
+    trinket.texture.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.trinketBorderColor))
 
-    trinket:ClearAllPoints()
-    local margin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
-    if (Gladdy.db.classIconPos == "LEFT") then
-        if (Gladdy.db.trinketPos == "RIGHT") then
-            trinket:SetPoint("TOPLEFT", Gladdy.buttons[unit].healthBar, "TOPRIGHT", margin, 0)
-        else
-            trinket:SetPoint("TOPRIGHT", Gladdy.buttons[unit].classIcon, "TOPLEFT", -Gladdy.db.padding, 0)
-        end
-    else
-        if (Gladdy.db.trinketPos == "RIGHT") then
-            trinket:SetPoint("TOPLEFT", Gladdy.buttons[unit].classIcon, "TOPRIGHT", Gladdy.db.padding, 0)
-        else
-            trinket:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -margin, 0)
-        end
+    Gladdy:SetPosition(trinket, unit, "trinketXOffset", "trinketYOffset", Trinket:LegacySetPosition(trinket, unit), Trinket)
+
+    if (unit == "arena1") then
+        Gladdy:CreateMover(trinket,"trinketXOffset", "trinketYOffset", L["Trinket"],
+                {"TOPLEFT", "TOPLEFT"},
+                Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor,
+                Gladdy.db.trinketSize,
+                0,
+                0, "trinketEnabled")
     end
 
-    if (Gladdy.db.trinketEnabled == false) then
+    trinket.cooldown:SetAlpha(Gladdy.db.trinketCooldownAlpha)
+
+    if Gladdy.db.trinketDisableCircle then
+        trinket.cooldown:Hide()
+    else
+        trinket.cooldown:Show()
+    end
+
+    if (not Gladdy.db.trinketEnabled) then
         trinket:Hide()
     else
         trinket:Show()
@@ -199,6 +247,9 @@ function Trinket:Used(unit, startTime, duration)
         trinket.timeLeft = (startTime/1000.0 + duration/1000.0) - GetTime()
         if not Gladdy.db.trinketDisableCircle then trinket.cooldown:SetCooldown(startTime/1000.0, duration/1000.0) end
         trinket.active = true
+        if Gladdy.db.trinketColored then
+            trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredCd))
+        end
         Gladdy:SendMessage("TRINKET_USED", unit)
     end
 end
@@ -216,11 +267,37 @@ function Trinket:GetOptions()
             desc = L["Enable trinket icon"],
             order = 3,
         }),
+        trinketColored = Gladdy:option({
+            type = "toggle",
+            name = L["Colored trinket"],
+            desc = L["Shows a solid colored icon when off/off CD."],
+            order = 4,
+        }),
+        trinketColoredCd = Gladdy:colorOption({
+            type = "color",
+            name = L["Colored trinket CD"],
+            desc = L["Color of the border"],
+            order = 5,
+            hasAlpha = true,
+            disabled = function()
+                return not Gladdy.db.trinketColored
+            end,
+        }),
+        trinketColoredNoCd = Gladdy:colorOption({
+            type = "color",
+            name = L["Colored trinket No CD"],
+            desc = L["Color of the border"],
+            order = 6,
+            hasAlpha = true,
+            disabled = function()
+                return not Gladdy.db.trinketColored
+            end,
+        }),
         group = {
             type = "group",
             childGroups = "tree",
             name = L["Frame"],
-            order = 4,
+            order = 5,
             args = {
                 general = {
                     type = "group",
@@ -296,13 +373,19 @@ function Trinket:GetOptions()
                         header = {
                             type = "header",
                             name = L["Font"],
-                            order = 4,
+                            order = 1,
                         },
+                        trinketFontEnabled = Gladdy:option({
+                            type = "toggle",
+                            name = L["Font Enabled"],
+                            order = 2,
+                            width = "full",
+                        }),
                         trinketFont = Gladdy:option({
                             type = "select",
                             name = L["Font"],
                             desc = L["Font of the cooldown"],
-                            order = 11,
+                            order = 3,
                             dialogControl = "LSM30_Font",
                             values = AceGUIWidgetLSMlists.font,
                         }),
@@ -310,7 +393,7 @@ function Trinket:GetOptions()
                             type = "range",
                             name = L["Font scale"],
                             desc = L["Scale of the font"],
-                            order = 12,
+                            order = 4,
                             min = 0.1,
                             max = 2,
                             step = 0.1,
@@ -321,22 +404,30 @@ function Trinket:GetOptions()
                 position = {
                     type = "group",
                     name = L["Position"],
-                    order = 4,
+                    order = 5,
                     args = {
                         header = {
                             type = "header",
                             name = L["Icon position"],
                             order = 4,
                         },
-                        trinketPos = Gladdy:option({
-                            type = "select",
-                            name = L["Icon position"],
-                            desc = L["This changes positions of the trinket"],
-                            order = 21,
-                            values = {
-                                ["LEFT"] = L["Left"],
-                                ["RIGHT"] = L["Right"],
-                            },
+                        trinketXOffset = Gladdy:option({
+                            type = "range",
+                            name = L["Horizontal offset"],
+                            order = 23,
+                            min = -800,
+                            max = 800,
+                            step = 0.1,
+                            width = "full",
+                        }),
+                        trinketYOffset = Gladdy:option({
+                            type = "range",
+                            name = L["Vertical offset"],
+                            order = 24,
+                            min = -800,
+                            max = 800,
+                            step = 0.1,
+                            width = "full",
                         }),
                     },
                 },
@@ -365,7 +456,63 @@ function Trinket:GetOptions()
                         }),
                     },
                 },
+                frameStrata = {
+                    type = "group",
+                    name = L["Frame Strata and Level"],
+                    order = 6,
+                    args = {
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 1,
+                        },
+                        trinketFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            order = 2,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        trinketFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            min = 0,
+                            max = 500,
+                            step = 1,
+                            order = 3,
+                            width = "full",
+                        }),
+                    },
+                },
             },
         },
     }
+end
+
+---------------------------
+
+-- LAGACY HANDLER
+
+---------------------------
+
+function Trinket:LegacySetPosition(trinket, unit)
+    if Gladdy.db.newLayout then
+        return Gladdy.db.newLayout
+    end
+    trinket:ClearAllPoints()
+    local margin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
+    if (Gladdy.db.classIconPos == "LEFT") then
+        if (Gladdy.db.trinketPos == "RIGHT") then
+            trinket:SetPoint("TOPLEFT", Gladdy.buttons[unit].healthBar, "TOPRIGHT", margin, 0)
+        else
+            trinket:SetPoint("TOPRIGHT", Gladdy.buttons[unit].classIcon, "TOPLEFT", -Gladdy.db.padding, 0)
+        end
+    else
+        if (Gladdy.db.trinketPos == "RIGHT") then
+            trinket:SetPoint("TOPLEFT", Gladdy.buttons[unit].classIcon, "TOPRIGHT", Gladdy.db.padding, 0)
+        else
+            trinket:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -margin, 0)
+        end
+    end
 end

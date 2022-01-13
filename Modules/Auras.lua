@@ -41,7 +41,21 @@ local Auras = Gladdy:NewModule("Auras", nil, {
     auraListDefault = defaultSpells(),
     auraListInterrupts = defaultInterrupts(),
     auraInterruptColorsEnabled = true,
-    auraInterruptColors = Gladdy:GetSpellSchoolColors()
+    auraInterruptColors = Gladdy:GetSpellSchoolColors(),
+    auraDetached = false,
+    auraXOffset = 0,
+    auraYOffset = 0,
+    auraSize = 60 + 20 + 1,
+    auraWidthFactor = 0.9,
+    auraInterruptDetached = false,
+    auraInterruptXOffset = 0,
+    auraInterruptYOffset = 0,
+    auraInterruptSize = 60 + 20 + 1,
+    auraInterruptWidthFactor = 0.9,
+    auraFrameStrata = "MEDIUM",
+    auraFrameLevel = 5,
+    auraInterruptFrameStrata = "MEDIUM",
+    auraInterruptFrameLevel = 5,
 })
 
 function Auras:Initialize()
@@ -57,25 +71,30 @@ function Auras:Initialize()
 end
 
 function Auras:CreateFrame(unit)
-    local auraFrame = CreateFrame("Frame", nil, Gladdy.modules["Class Icon"].frames[unit])
+    local auraFrame = CreateFrame("Frame", nil, Gladdy.buttons[unit])
     auraFrame:EnableMouse(false)
     auraFrame:SetFrameStrata("MEDIUM")
     auraFrame:SetFrameLevel(3)
+    auraFrame.frame = CreateFrame("Frame", nil, auraFrame)
+    auraFrame.frame:SetPoint("TOPLEFT", auraFrame, "TOPLEFT")
+    auraFrame.frame:EnableMouse(false)
+    auraFrame.frame:SetFrameStrata("MEDIUM")
+    auraFrame.frame:SetFrameLevel(3)
 
-    auraFrame.cooldown = CreateFrame("Cooldown", nil, auraFrame, "CooldownFrameTemplate")
+    auraFrame.cooldown = CreateFrame("Cooldown", nil, auraFrame.frame, "CooldownFrameTemplate")
     auraFrame.cooldown.noCooldownCount = true
     auraFrame.cooldown:SetFrameStrata("MEDIUM")
     auraFrame.cooldown:SetFrameLevel(4)
     auraFrame.cooldown:SetReverse(true)
     auraFrame.cooldown:SetHideCountdownNumbers(true)
 
-    auraFrame.cooldownFrame = CreateFrame("Frame", nil, auraFrame)
+    auraFrame.cooldownFrame = CreateFrame("Frame", nil, auraFrame.frame)
     auraFrame.cooldownFrame:ClearAllPoints()
-    auraFrame.cooldownFrame:SetAllPoints(auraFrame)
+    auraFrame.cooldownFrame:SetAllPoints(auraFrame.frame)
     auraFrame.cooldownFrame:SetFrameStrata("MEDIUM")
     auraFrame.cooldownFrame:SetFrameLevel(5)
 
-    auraFrame.icon = auraFrame:CreateTexture(nil, "BACKGROUND")
+    auraFrame.icon = auraFrame.frame:CreateTexture(nil, "BACKGROUND")
     auraFrame.icon:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
     auraFrame.icon:SetAllPoints(auraFrame)
 
@@ -89,7 +108,7 @@ function Auras:CreateFrame(unit)
 
     auraFrame.text = auraFrame.cooldownFrame:CreateFontString(nil, "OVERLAY")
     auraFrame.text:SetFont(Gladdy:SMFetch("font", "auraFont"), 10, "OUTLINE")
-    auraFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
+    auraFrame.text:SetTextColor(Gladdy:SetColor(Gladdy.db.auraFontColor))
     --auraFrame.text:SetShadowOffset(1, -1)
     --auraFrame.text:SetShadowColor(0, 0, 0, 1)
     auraFrame.text:SetJustifyH("CENTER")
@@ -98,10 +117,10 @@ function Auras:CreateFrame(unit)
 
     auraFrame:SetScript("OnUpdate", function(self, elapsed)
         if (self.active) then
-            if (self.interruptFrame.priority and self.priority < self.interruptFrame.priority) then
-                self:SetAlpha(0.01)
+            if (not Gladdy.db.auraInterruptDetached and not Gladdy.db.auraDetached and self.interruptFrame.priority and self.priority < self.interruptFrame.priority) then
+                self.frame:SetAlpha(0.001)
             else
-                self:SetAlpha(1)
+                self.frame:SetAlpha(1)
             end
             if (self.timeLeft <= 0) then
                 Auras:AURA_FADE(self.unit, self.track)
@@ -114,7 +133,7 @@ function Auras:CreateFrame(unit)
                 self.timeLeft = self.timeLeft - elapsed
             end
         else
-            self:SetAlpha(0.01)
+            self.frame:SetAlpha(0.001)
         end
     end)
 
@@ -125,30 +144,35 @@ function Auras:CreateFrame(unit)
 end
 
 function Auras:CreateInterrupt(unit)
-    local interruptFrame = CreateFrame("Frame", nil, Gladdy.modules["Class Icon"].frames[unit])
+    local interruptFrame = CreateFrame("Frame", nil, Gladdy.buttons[unit])
     interruptFrame:EnableMouse(false)
     interruptFrame:SetFrameStrata("MEDIUM")
     interruptFrame:SetFrameLevel(3)
+    interruptFrame.frame = CreateFrame("Frame", nil, interruptFrame)
+    interruptFrame.frame:SetPoint("TOPLEFT", interruptFrame, "TOPLEFT")
+    interruptFrame.frame:EnableMouse(false)
+    interruptFrame.frame:SetFrameStrata("MEDIUM")
+    interruptFrame.frame:SetFrameLevel(3)
 
-    interruptFrame.cooldown = CreateFrame("Cooldown", nil, interruptFrame, "CooldownFrameTemplate")
+    interruptFrame.cooldown = CreateFrame("Cooldown", nil, interruptFrame.frame, "CooldownFrameTemplate")
     interruptFrame.cooldown.noCooldownCount = true
     interruptFrame.cooldown:SetFrameStrata("MEDIUM")
     interruptFrame.cooldown:SetFrameLevel(4)
     interruptFrame.cooldown:SetReverse(true)
     interruptFrame.cooldown:SetHideCountdownNumbers(true)
 
-    interruptFrame.cooldownFrame = CreateFrame("Frame", nil, interruptFrame)
+    interruptFrame.cooldownFrame = CreateFrame("Frame", nil, interruptFrame.frame)
     interruptFrame.cooldownFrame:ClearAllPoints()
-    interruptFrame.cooldownFrame:SetAllPoints(interruptFrame)
+    interruptFrame.cooldownFrame:SetAllPoints(interruptFrame.frame)
     interruptFrame.cooldownFrame:SetFrameStrata("MEDIUM")
     interruptFrame.cooldownFrame:SetFrameLevel(5)
 
-    interruptFrame.icon = interruptFrame:CreateTexture(nil, "BACKGROUND")
+    interruptFrame.icon = interruptFrame.frame:CreateTexture(nil, "BACKGROUND")
     interruptFrame.icon:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
-    interruptFrame.icon:SetAllPoints(interruptFrame)
+    interruptFrame.icon:SetAllPoints(interruptFrame.frame)
 
     interruptFrame.icon.overlay = interruptFrame.cooldownFrame:CreateTexture(nil, "OVERLAY")
-    interruptFrame.icon.overlay:SetAllPoints(interruptFrame)
+    interruptFrame.icon.overlay:SetAllPoints(interruptFrame.frame)
     interruptFrame.icon.overlay:SetTexture(Gladdy.db.buttonBorderStyle)
 
     local classIcon = Gladdy.modules["Class Icon"].frames[unit]
@@ -157,7 +181,7 @@ function Auras:CreateInterrupt(unit)
 
     interruptFrame.text = interruptFrame.cooldownFrame:CreateFontString(nil, "OVERLAY")
     interruptFrame.text:SetFont(Gladdy:SMFetch("font", "auraFont"), 10, "OUTLINE")
-    interruptFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
+    interruptFrame.text:SetTextColor(Gladdy:SetColor(Gladdy.db.auraFontColor))
     --auraFrame.text:SetShadowOffset(1, -1)
     --auraFrame.text:SetShadowColor(0, 0, 0, 1)
     interruptFrame.text:SetJustifyH("CENTER")
@@ -166,23 +190,25 @@ function Auras:CreateInterrupt(unit)
 
     interruptFrame:SetScript("OnUpdate", function(self, elapsed)
         if (self.active) then
-            if (Auras.frames[self.unit].priority and self.priority <= Auras.frames[self.unit].priority) then
-                self:SetAlpha(0.01)
+            if (not Gladdy.db.auraInterruptDetached and Auras.frames[self.unit].priority and self.priority <= Auras.frames[self.unit].priority) then
+                self.frame:SetAlpha(0.001)
             else
-                self:SetAlpha(1)
+                self.frame:SetAlpha(1)
             end
             if (self.timeLeft <= 0) then
                 self.active = false
                 self.priority = nil
                 self.spellSchool = nil
                 self.cooldown:Clear()
-                self:SetAlpha(0.01)
+                self.frame:SetAlpha(0.001)
             else
                 self.timeLeft = self.timeLeft - elapsed
                 Gladdy:FormatTimer(self.text, self.timeLeft, self.timeLeft < 10)
             end
         else
-            self:SetAlpha(0.01)
+            self.priority = nil
+            self.spellSchool = nil
+            self.frame:SetAlpha(0.001)
         end
     end)
 
@@ -197,26 +223,70 @@ function Auras:UpdateFrame(unit)
         return
     end
 
-    local width, height = Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor, Gladdy.db.classIconSize
+    local width, height
+
+    if Gladdy.db.auraDetached then
+        width, height = Gladdy.db.auraSize * Gladdy.db.auraWidthFactor, Gladdy.db.auraSize
+
+        auraFrame:SetFrameStrata(Gladdy.db.auraFrameStrata)
+        auraFrame:SetFrameLevel(Gladdy.db.auraFrameLevel)
+        auraFrame.frame:SetFrameStrata(Gladdy.db.auraFrameStrata)
+        auraFrame.frame:SetFrameLevel(Gladdy.db.auraFrameLevel)
+        auraFrame.cooldown:SetFrameStrata(Gladdy.db.auraFrameStrata)
+        auraFrame.cooldown:SetFrameLevel(Gladdy.db.auraFrameLevel + 1)
+        auraFrame.cooldownFrame:SetFrameStrata(Gladdy.db.auraFrameStrata)
+        auraFrame.cooldownFrame:SetFrameLevel(Gladdy.db.auraFrameLevel + 2)
+
+        auraFrame:ClearAllPoints()
+        Gladdy:SetPosition(auraFrame, unit, "auraXOffset", "auraYOffset", true, Auras)
+        if (unit == "arena1") then
+            Gladdy:CreateMover(auraFrame, "auraXOffset", "auraYOffset", L["Auras"],
+                    {"TOPLEFT", "TOPLEFT"},
+                    width,
+                    height,
+                    0,
+                    0)
+        end
+    else
+        width, height = Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor, Gladdy.db.classIconSize
+
+        auraFrame:SetFrameStrata(Gladdy.db.classIconFrameStrata)
+        auraFrame:SetFrameLevel(Gladdy.db.classIconFrameLevel + 1)
+        auraFrame.frame:SetFrameStrata(Gladdy.db.classIconFrameStrata)
+        auraFrame.frame:SetFrameLevel(Gladdy.db.classIconFrameLevel + 1)
+        auraFrame.cooldown:SetFrameStrata(Gladdy.db.classIconFrameStrata)
+        auraFrame.cooldown:SetFrameLevel(Gladdy.db.classIconFrameLevel + 2)
+        auraFrame.cooldownFrame:SetFrameStrata(Gladdy.db.classIconFrameStrata)
+        auraFrame.cooldownFrame:SetFrameLevel(Gladdy.db.classIconFrameLevel + 3)
+
+        auraFrame:ClearAllPoints()
+        auraFrame:SetPoint("TOPLEFT", Gladdy.modules["Class Icon"].frames[unit], "TOPLEFT")
+        if auraFrame.mover then
+            auraFrame.mover:Hide()
+        end
+    end
 
     auraFrame:SetWidth(width)
     auraFrame:SetHeight(height)
-    auraFrame:SetAllPoints(Gladdy.modules["Class Icon"].frames[unit])
+    auraFrame.frame:SetWidth(height)
+    auraFrame.frame:SetHeight(height)
+    auraFrame.cooldownFrame:ClearAllPoints()
+    auraFrame.cooldownFrame:SetAllPoints(auraFrame)
 
-    auraFrame.cooldown:SetWidth(width - width/16)
-    auraFrame.cooldown:SetHeight(height - height/16)
     auraFrame.cooldown:ClearAllPoints()
     auraFrame.cooldown:SetPoint("CENTER", auraFrame, "CENTER")
+    auraFrame.cooldown:SetWidth(width - width/16)
+    auraFrame.cooldown:SetHeight(height - height/16)
     auraFrame.cooldown:SetAlpha(Gladdy.db.auraCooldownAlpha)
 
     auraFrame.text:SetFont(Gladdy:SMFetch("font", "auraFont"), (width/2 - 1) * Gladdy.db.auraFontSizeScale, "OUTLINE")
-    auraFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
+    auraFrame.text:SetTextColor(Gladdy:SetColor(Gladdy.db.auraFontColor))
 
     auraFrame.icon.overlay:SetTexture(Gladdy.db.auraBorderStyle)
     if auraFrame.track and auraFrame.track == AURA_TYPE_DEBUFF then
-        auraFrame.icon.overlay:SetVertexColor(Gladdy.db.auraDebuffBorderColor.r, Gladdy.db.auraDebuffBorderColor.g, Gladdy.db.auraDebuffBorderColor.b, Gladdy.db.auraDebuffBorderColor.a)
+        auraFrame.icon.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.auraDebuffBorderColor))
     elseif auraFrame.track and auraFrame.track == AURA_TYPE_BUFF then
-        auraFrame.icon.overlay:SetVertexColor(Gladdy.db.auraBuffBorderColor.r, Gladdy.db.auraBuffBorderColor.g, Gladdy.db.auraBuffBorderColor.b, Gladdy.db.auraBuffBorderColor.a)
+        auraFrame.icon.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.auraBuffBorderColor))
     else
         auraFrame.icon.overlay:SetVertexColor(0, 0, 0, 1)
     end
@@ -235,20 +305,83 @@ function Auras:UpdateInterruptFrame(unit)
         return
     end
 
-    local width, height = Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor, Gladdy.db.classIconSize
+    local width, height
+
+    if Gladdy.db.auraInterruptDetached then
+        width, height = Gladdy.db.auraInterruptSize * Gladdy.db.auraInterruptWidthFactor, Gladdy.db.auraInterruptSize
+
+        interruptFrame:SetFrameStrata(Gladdy.db.auraInterruptFrameStrata)
+        interruptFrame:SetFrameLevel(Gladdy.db.auraInterruptFrameLevel)
+        interruptFrame.frame:SetFrameStrata(Gladdy.db.auraInterruptFrameStrata)
+        interruptFrame.frame:SetFrameLevel(Gladdy.db.auraInterruptFrameLevel)
+        interruptFrame.cooldown:SetFrameStrata(Gladdy.db.auraInterruptFrameStrata)
+        interruptFrame.cooldown:SetFrameLevel(Gladdy.db.auraInterruptFrameLevel + 1)
+        interruptFrame.cooldownFrame:SetFrameStrata(Gladdy.db.auraInterruptFrameStrata)
+        interruptFrame.cooldownFrame:SetFrameLevel(Gladdy.db.auraInterruptFrameLevel + 2)
+
+        interruptFrame:ClearAllPoints()
+        Gladdy:SetPosition(interruptFrame, unit, "auraInterruptXOffset", "auraInterruptYOffset", true, Auras)
+        if (unit == "arena1") then
+            Gladdy:CreateMover(interruptFrame, "auraInterruptXOffset", "auraInterruptYOffset", L["Interrupts"],
+                    {"TOPLEFT", "TOPLEFT"},
+                    width,
+                    height,
+                    0,
+                    0)
+        end
+    else
+        if Gladdy.db.auraDetached then
+            width, height = Gladdy.db.auraSize * Gladdy.db.auraWidthFactor, Gladdy.db.auraSize
+
+            interruptFrame:SetFrameStrata(Gladdy.db.auraFrameStrata)
+            interruptFrame:SetFrameLevel(Gladdy.db.auraFrameLevel)
+            interruptFrame.frame:SetFrameStrata(Gladdy.db.auraFrameStrata)
+            interruptFrame.frame:SetFrameLevel(Gladdy.db.auraFrameLevel)
+            interruptFrame.cooldown:SetFrameStrata(Gladdy.db.auraFrameStrata)
+            interruptFrame.cooldown:SetFrameLevel(Gladdy.db.auraFrameLevel + 1)
+            interruptFrame.cooldownFrame:SetFrameStrata(Gladdy.db.auraFrameStrata)
+            interruptFrame.cooldownFrame:SetFrameLevel(Gladdy.db.auraFrameLevel + 2)
+
+            interruptFrame:ClearAllPoints()
+            interruptFrame:SetAllPoints(self.frames[unit])
+            if interruptFrame.mover then
+                interruptFrame.mover:Hide()
+            end
+        else
+            width, height = Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor, Gladdy.db.classIconSize
+
+            interruptFrame:SetFrameStrata(Gladdy.db.classIconFrameStrata)
+            interruptFrame:SetFrameLevel(Gladdy.db.classIconFrameLevel + 1)
+            interruptFrame.frame:SetFrameStrata(Gladdy.db.classIconFrameStrata)
+            interruptFrame.frame:SetFrameLevel(Gladdy.db.classIconFrameLevel + 1)
+            interruptFrame.cooldown:SetFrameStrata(Gladdy.db.classIconFrameStrata)
+            interruptFrame.cooldown:SetFrameLevel(Gladdy.db.classIconFrameLevel + 2)
+            interruptFrame.cooldownFrame:SetFrameStrata(Gladdy.db.classIconFrameStrata)
+            interruptFrame.cooldownFrame:SetFrameLevel(Gladdy.db.classIconFrameLevel + 3)
+
+            interruptFrame:ClearAllPoints()
+            interruptFrame:SetPoint("TOPLEFT", Gladdy.modules["Class Icon"].frames[unit], "TOPLEFT")
+            if interruptFrame.mover then
+                interruptFrame.mover:Hide()
+            end
+        end
+    end
 
     interruptFrame:SetWidth(width)
     interruptFrame:SetHeight(height)
-    interruptFrame:SetAllPoints(Gladdy.modules["Class Icon"].frames[unit])
+    interruptFrame.frame:SetWidth(width)
+    interruptFrame.frame:SetHeight(height)
+    interruptFrame.cooldownFrame:ClearAllPoints()
+    interruptFrame.cooldownFrame:SetAllPoints(interruptFrame.frame)
 
-    interruptFrame.cooldown:SetWidth(width - width/16)
-    interruptFrame.cooldown:SetHeight(height - height/16)
     interruptFrame.cooldown:ClearAllPoints()
     interruptFrame.cooldown:SetPoint("CENTER", interruptFrame, "CENTER")
+    interruptFrame.cooldown:SetWidth(width - width/16)
+    interruptFrame.cooldown:SetHeight(height - height/16)
     interruptFrame.cooldown:SetAlpha(Gladdy.db.auraCooldownAlpha)
 
     interruptFrame.text:SetFont(Gladdy:SMFetch("font", "auraFont"), (width/2 - 1) * Gladdy.db.auraFontSizeScale, "OUTLINE")
-    interruptFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
+    interruptFrame.text:SetTextColor(Gladdy:SetColor(Gladdy.db.auraFontColor))
 
     interruptFrame.icon.overlay:SetTexture(Gladdy.db.auraBorderStyle)
     if interruptFrame.spellSchool then
@@ -265,9 +398,15 @@ function Auras:UpdateInterruptFrame(unit)
 end
 
 function Auras:ResetUnit(unit)
-    self.frames[unit]:UnregisterAllEvents()
+    self.frames[unit].interruptFrame.active = false
+    self.frames[unit].active = false
     self:AURA_FADE(unit, AURA_TYPE_DEBUFF)
     self:AURA_FADE(unit, AURA_TYPE_BUFF)
+    self.frames[unit]:UnregisterAllEvents()
+    self.frames[unit]:Hide()
+    self.frames[unit].interruptFrame:Hide()
+    self.frames[unit].interruptFrame.priority = nil
+    self.frames[unit].interruptFrame.spellSchool = nil
 end
 
 function Auras:Test(unit)
@@ -275,6 +414,10 @@ function Auras:Test(unit)
 
     self:AURA_FADE(unit, AURA_TYPE_BUFF)
     self:AURA_FADE(unit, AURA_TYPE_DEBUFF)
+    if not self.frames[unit]:IsShown() then
+        self.frames[unit]:Show()
+        self.frames[unit].interruptFrame:Show()
+    end
 
     --Auras
     local enabledDebuffs, enabledBuffs, testauras = {}, {}
@@ -310,6 +453,8 @@ function Auras:Test(unit)
             self:AURA_GAIN(unit,v.value.track, spellid, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
         end
     end
+    -- /run LibStub("Gladdy").modules["Auras"]:Test("arena1")
+    -- /run LibStub("Gladdy"):JoinedArena()
 
     --Interrupts
     if (unit == "arena1" or unit == "arena3") then
@@ -333,10 +478,15 @@ function Auras:Test(unit)
 end
 
 function Auras:JOINED_ARENA()
-    --[[for i=1, Gladdy.curBracket do
-        self.frames["arena" .. i]:RegisterUnitEvent("UNIT_AURA", "arena" .. i)
-        self.frames["arena" .. i]:SetScript("OnEvent", Auras.OnEvent)
-    end--]]
+    for i=1, Gladdy.curBracket do
+        local unit = "arena" .. i
+        self.frames[unit].interruptFrame.active = false
+        self.frames[unit].active = false
+        self:AURA_FADE(unit, AURA_TYPE_DEBUFF)
+        self:AURA_FADE(unit, AURA_TYPE_BUFF)
+        self.frames[unit]:Show()
+        self.frames[unit].interruptFrame:Show()
+    end
 end
 
 function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, expirationTime, count, debuffType)
@@ -372,9 +522,9 @@ function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, exp
     auraFrame.icon.overlay:Show()
     auraFrame.cooldownFrame:Show()
     if auraType == AURA_TYPE_DEBUFF then
-        auraFrame.icon.overlay:SetVertexColor(Gladdy.db.auraDebuffBorderColor.r, Gladdy.db.auraDebuffBorderColor.g, Gladdy.db.auraDebuffBorderColor.b, Gladdy.db.auraDebuffBorderColor.a)
+        auraFrame.icon.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.auraDebuffBorderColor))
     elseif auraType == AURA_TYPE_BUFF then
-        auraFrame.icon.overlay:SetVertexColor(Gladdy.db.auraBuffBorderColor.r, Gladdy.db.auraBuffBorderColor.g, Gladdy.db.auraBuffBorderColor.b, Gladdy.db.auraBuffBorderColor.a)
+        auraFrame.icon.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.auraBuffBorderColor))
     else
         auraFrame.icon.overlay:SetVertexColor(Gladdy.db.frameBorderColor.r, Gladdy.db.frameBorderColor.g, Gladdy.db.frameBorderColor.b, Gladdy.db.frameBorderColor.a)
     end
@@ -409,7 +559,7 @@ end
 
 function Auras:GetInterruptColor(extraSpellSchool)
     if not Gladdy.db.auraInterruptColorsEnabled then
-        return Gladdy.db.auraDebuffBorderColor.r, Gladdy.db.auraDebuffBorderColor.g, Gladdy.db.auraDebuffBorderColor.b, Gladdy.db.auraDebuffBorderColor.a
+        return Gladdy:SetColor(Gladdy.db.auraDebuffBorderColor)
     else
         local color = Gladdy.db.auraInterruptColors[extraSpellSchool] or Gladdy.db.auraInterruptColors["unknown"]
         return color.r, color.g, color.b, color.a
@@ -418,7 +568,7 @@ end
 
 function Auras:SPELL_INTERRUPT(unit,spellID,spellName,spellSchool,extraSpellId,extraSpellName,extraSpellSchool)
     local auraFrame = self.frames[unit]
-    local interruptFrame = auraFrame and auraFrame.interruptFrame
+    local interruptFrame = auraFrame ~= nil and auraFrame.interruptFrame
     local button = Gladdy.buttons[unit]
     if (not interruptFrame) then
         return
@@ -532,6 +682,214 @@ function Auras:GetOptions()
             name = L["Frame"],
             order = 3,
             args = {
+                detachedAuraMode = {
+                    type = "group",
+                    name = L["Detached Aura"],
+                    order = 4,
+                    args = {
+                        headerDetachedMode = {
+                            type = "header",
+                            name = L["Detached Mode"],
+                            order = 1,
+                        },
+                        auraDetached = Gladdy:option({
+                            type = "toggle",
+                            name = L["Aura Detached"],
+                            order = 2,
+                            width = "full"
+                        }),
+                        headerAuraSize = {
+                            type = "header",
+                            name = L["Size"],
+                            order = 10,
+                        },
+                        auraSize = Gladdy:option({
+                            type = "range",
+                            name = L["Aura size"],
+                            disabled = function()
+                                return not Gladdy.db.auraDetached
+                            end,
+                            min = 3,
+                            max = 100,
+                            step = 0.1,
+                            order = 11,
+                            width = "full",
+                        }),
+                        auraWidthFactor = Gladdy:option({
+                            type = "range",
+                            name = L["Aura width factor"],
+                            disabled = function()
+                                return not Gladdy.db.auraDetached
+                            end,
+                            min = 0.5,
+                            max = 2,
+                            step = 0.05,
+                            order = 12,
+                            width = "full",
+                        }),
+                        headerAuraPosition = {
+                            type = "header",
+                            name = L["Position"],
+                            order = 20,
+                        },
+                        auraXOffset = Gladdy:option({
+                            type = "range",
+                            name = L["Aura X Offset"],
+                            disabled = function()
+                                return not Gladdy.db.auraDetached
+                            end,
+                            min = -1000,
+                            max = 1000,
+                            step = 0.01,
+                            order = 21,
+                            width = "full",
+                        }),
+                        auraYOffset = Gladdy:option({
+                            type = "range",
+                            name = L["Aura Y Offset"],
+                            disabled = function()
+                                return not Gladdy.db.auraDetached
+                            end,
+                            min = -1000,
+                            max = 1000,
+                            step = 0.01,
+                            order = 22,
+                            width = "full",
+                        }),
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 30,
+                        },
+                        auraFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            disabled = function()
+                                return not Gladdy.db.auraDetached
+                            end,
+                            order = 32,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        auraFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            disabled = function()
+                                return not Gladdy.db.auraDetached
+                            end,
+                            min = 0,
+                            max = 500,
+                            step = 1,
+                            order = 33,
+                            width = "full",
+                        }),
+                    }
+                },
+                detachedInterruptMode = {
+                    type = "group",
+                    name = L["Detached Interrupt"],
+                    order = 5,
+                    args = {
+                        headerDetachedMode = {
+                            type = "header",
+                            name = L["Detached Mode"],
+                            order = 1,
+                        },
+                        auraInterruptDetached = Gladdy:option({
+                            type = "toggle",
+                            name = L["Interrupt Detached"],
+                            order = 2,
+                            width = "full"
+                        }),
+                        headerAuraSize = {
+                            type = "header",
+                            name = L["Size"],
+                            order = 10,
+                        },
+                        auraInterruptSize = Gladdy:option({
+                            type = "range",
+                            name = L["Interrupt size"],
+                            disabled = function()
+                                return not Gladdy.db.auraInterruptDetached
+                            end,
+                            min = 3,
+                            max = 100,
+                            step = 0.1,
+                            order = 11,
+                            width = "full",
+                        }),
+                        auraInterruptWidthFactor = Gladdy:option({
+                            type = "range",
+                            name = L["Interrupt width factor"],
+                            disabled = function()
+                                return not Gladdy.db.auraInterruptDetached
+                            end,
+                            min = 0.5,
+                            max = 2,
+                            step = 0.05,
+                            order = 12,
+                            width = "full",
+                        }),
+                        headerAuraPosition = {
+                            type = "header",
+                            name = L["Position"],
+                            order = 20,
+                        },
+                        auraInterruptXOffset = Gladdy:option({
+                            type = "range",
+                            name = L["Interrupt X Offset"],
+                            disabled = function()
+                                return not Gladdy.db.auraInterruptDetached
+                            end,
+                            min = -1000,
+                            max = 1000,
+                            step = 0.01,
+                            order = 21,
+                            width = "full",
+                        }),
+                        auraInterruptYOffset = Gladdy:option({
+                            type = "range",
+                            name = L["Interrupt Y Offset"],
+                            disabled = function()
+                                return not Gladdy.db.auraInterruptDetached
+                            end,
+                            min = -1000,
+                            max = 1000,
+                            step = 0.01,
+                            order = 22,
+                            width = "full",
+                        }),
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 30,
+                        },
+                        auraInterruptFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            disabled = function()
+                                return not Gladdy.db.auraDetached
+                            end,
+                            order = 32,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        auraInterruptFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            disabled = function()
+                                return not Gladdy.db.auraDetached
+                            end,
+                            min = 0,
+                            max = 500,
+                            step = 1,
+                            order = 33,
+                            width = "full",
+                        }),
+                    }
+                },
                 cooldown = {
                     type = "group",
                     name = L["Cooldown"],

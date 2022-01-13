@@ -5,14 +5,12 @@ local GetTime = GetTime
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
-local Racial = Gladdy:NewModule("Racial", nil, {
+local Racial = Gladdy:NewModule("Racial", 79, {
     racialFont = "DorisPP",
     racialFontScale = 1,
     racialEnabled = true,
     racialSize = 60 + 20 + 1,
     racialWidthFactor = 0.9,
-    racialAnchor = "trinket",
-    racialPos = "RIGHT",
     racialXOffset = 0,
     racialYOffset = 0,
     racialBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
@@ -20,9 +18,10 @@ local Racial = Gladdy:NewModule("Racial", nil, {
     racialDisableCircle = false,
     racialCooldownAlpha = 1,
     racialCooldownNumberAlpha = 1,
+    racialFrameStrata = "MEDIUM",
+    racialFrameLevel = 5,
 })
 
-local ANCHORS = { ["LEFT"] = "RIGHT", ["RIGHT"] = "LEFT", ["BOTTOM"] = "TOP", ["TOP"] = "BOTTOM"}
 
 function Racial:Initialize()
     self.frames = {}
@@ -66,6 +65,9 @@ end
 function Racial:CreateFrame(unit)
     local racial = CreateFrame("Button", "GladdyTrinketButton" .. unit, Gladdy.buttons[unit])
     racial:EnableMouse(false)
+    racial:SetFrameStrata(Gladdy.db.racialFrameStrata)
+    racial:SetFrameLevel(Gladdy.db.racialFrameLevel)
+
     racial.texture = racial:CreateTexture(nil, "BACKGROUND")
     racial.texture:SetAllPoints(racial)
     racial.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
@@ -74,11 +76,15 @@ function Racial:CreateFrame(unit)
     racial.cooldown = CreateFrame("Cooldown", nil, racial, "CooldownFrameTemplate")
     racial.cooldown.noCooldownCount = true --Gladdy.db.racialDisableOmniCC
     racial.cooldown:SetHideCountdownNumbers(true)
+    racial.cooldown:SetFrameStrata(Gladdy.db.racialFrameStrata)
+    racial.cooldown:SetFrameLevel(Gladdy.db.racialFrameLevel + 1)
 
     racial.cooldownFrame = CreateFrame("Frame", nil, racial)
     racial.cooldownFrame:ClearAllPoints()
     racial.cooldownFrame:SetPoint("TOPLEFT", racial, "TOPLEFT")
     racial.cooldownFrame:SetPoint("BOTTOMRIGHT", racial, "BOTTOMRIGHT")
+    racial.cooldownFrame:SetFrameStrata(Gladdy.db.racialFrameStrata)
+    racial.cooldownFrame:SetFrameLevel(Gladdy.db.racialFrameLevel + 2)
 
     racial.cooldownFont = racial.cooldownFrame:CreateFontString(nil, "OVERLAY")
     racial.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), 20, "OUTLINE")
@@ -88,6 +94,9 @@ function Racial:CreateFrame(unit)
 
     racial.borderFrame = CreateFrame("Frame", nil, racial)
     racial.borderFrame:SetAllPoints(racial)
+    racial.borderFrame:SetFrameStrata(Gladdy.db.racialFrameStrata)
+    racial.borderFrame:SetFrameLevel(Gladdy.db.racialFrameLevel + 3)
+
     racial.texture.overlay = racial.borderFrame:CreateTexture(nil, "OVERLAY")
     racial.texture.overlay:SetAllPoints(racial)
     racial.texture.overlay:SetTexture(Gladdy.db.racialBorderStyle)
@@ -106,6 +115,15 @@ function Racial:UpdateFrame(unit)
 
     local width, height = Gladdy.db.racialSize * Gladdy.db.racialWidthFactor, Gladdy.db.racialSize
 
+    racial:SetFrameStrata(Gladdy.db.racialFrameStrata)
+    racial:SetFrameLevel(Gladdy.db.racialFrameLevel)
+    racial.cooldown:SetFrameStrata(Gladdy.db.racialFrameStrata)
+    racial.cooldown:SetFrameLevel(Gladdy.db.racialFrameLevel + 1)
+    racial.cooldownFrame:SetFrameStrata(Gladdy.db.racialFrameStrata)
+    racial.cooldownFrame:SetFrameLevel(Gladdy.db.racialFrameLevel + 2)
+    racial.borderFrame:SetFrameStrata(Gladdy.db.racialFrameStrata)
+    racial.borderFrame:SetFrameLevel(Gladdy.db.racialFrameLevel + 3)
+
     racial:SetWidth(width)
     racial:SetHeight(height)
     racial.cooldown:SetWidth(width - width/16)
@@ -119,18 +137,16 @@ function Racial:UpdateFrame(unit)
     racial.texture:SetAllPoints(racial)
 
     racial.texture.overlay:SetTexture(Gladdy.db.racialBorderStyle)
-    racial.texture.overlay:SetVertexColor(Gladdy.db.racialBorderColor.r, Gladdy.db.racialBorderColor.g, Gladdy.db.racialBorderColor.b, Gladdy.db.racialBorderColor.a)
+    racial.texture.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.racialBorderColor))
 
-    racial:ClearAllPoints()
-    local parent = Gladdy.buttons[unit][Gladdy.db.racialAnchor]
-    if (Gladdy.db.racialPos == "RIGHT") then
-        racial:SetPoint(ANCHORS[Gladdy.db.racialPos], parent, Gladdy.db.racialPos, Gladdy.db.padding + Gladdy.db.racialXOffset, Gladdy.db.racialYOffset)
-    elseif (Gladdy.db.racialPos == "LEFT") then
-        racial:SetPoint(ANCHORS[Gladdy.db.racialPos], parent, Gladdy.db.racialPos, -Gladdy.db.padding + Gladdy.db.racialXOffset, Gladdy.db.racialYOffset)
-    elseif (Gladdy.db.racialPos == "TOP") then
-        racial:SetPoint(ANCHORS[Gladdy.db.racialPos], parent, Gladdy.db.racialPos, Gladdy.db.racialXOffset, Gladdy.db.padding + Gladdy.db.racialYOffset)
-    elseif (Gladdy.db.racialPos == "BOTTOM") then
-        racial:SetPoint(ANCHORS[Gladdy.db.racialPos], parent, Gladdy.db.racialPos, Gladdy.db.racialXOffset, -Gladdy.db.padding + Gladdy.db.racialYOffset)
+    Gladdy:SetPosition(racial, unit, "racialXOffset", "racialYOffset", Racial:LegacySetPosition(racial, unit), Racial)
+
+    if (unit == "arena1") then
+        Gladdy:CreateMover(racial,"racialXOffset", "racialYOffset", L["Racial"],
+                {"TOPLEFT", "TOPLEFT"},
+                Gladdy.db.racialSize * Gladdy.db.racialWidthFactor,
+                Gladdy.db.racialSize,
+                0, 0, "racialEnabled")
     end
 
     if (Gladdy.db.racialEnabled == false) then
@@ -165,7 +181,7 @@ function Racial:Used(unit, startTime, duration)
     end
     if not racial.active then
         racial.timeLeft = duration
-        if not Gladdy.db.trinketDisableCircle then racial.cooldown:SetCooldown(startTime, duration) end
+        if not Gladdy.db.racialDisableCircle then racial.cooldown:SetCooldown(startTime, duration) end
         racial.active = true
     end
 end
@@ -315,37 +331,13 @@ function Racial:GetOptions()
                 position = {
                     type = "group",
                     name = L["Position"],
-                    order = 4,
+                    order = 5,
                     args = {
                         header = {
                             type = "header",
                             name = L["Icon position"],
                             order = 4,
                         },
-                        racialAnchor = Gladdy:option({
-                            type = "select",
-                            name = L["Anchor"],
-                            desc = L["This changes the anchor of the racial icon"],
-                            order = 20,
-                            values = {
-                                ["trinket"] = L["Trinket"],
-                                ["classIcon"] = L["Class Icon"],
-                                ["healthBar"] = L["Health Bar"],
-                                ["powerBar"] = L["Power Bar"],
-                            },
-                        }),
-                        racialPos = Gladdy:option({
-                            type = "select",
-                            name = L["Icon position"],
-                            desc = L["This changes position relative to its anchor of the racial icon"],
-                            order = 21,
-                            values = {
-                                ["LEFT"] = L["Left"],
-                                ["RIGHT"] = L["Right"],
-                                ["TOP"] = L["Top"],
-                                ["BOTTOM"] = L["Bottom"],
-                            },
-                        }),
                         racialXOffset = Gladdy:option({
                             type = "range",
                             name = L["Horizontal offset"],
@@ -391,7 +383,62 @@ function Racial:GetOptions()
                         }),
                     },
                 },
+                frameStrata = {
+                    type = "group",
+                    name = L["Frame Strata and Level"],
+                    order = 6,
+                    args = {
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 1,
+                        },
+                        racialFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            order = 2,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        racialFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            min = 0,
+                            max = 500,
+                            step = 1,
+                            order = 3,
+                            width = "full",
+                        }),
+                    },
+                },
             },
         },
     }
+end
+
+---------------------------
+
+-- LAGACY HANDLER
+
+---------------------------
+
+function Racial:LegacySetPosition(racial, unit)
+    if Gladdy.db.newLayout then
+        return Gladdy.db.newLayout
+    end
+
+    local ANCHORS = { ["LEFT"] = "RIGHT", ["RIGHT"] = "LEFT", ["BOTTOM"] = "TOP", ["TOP"] = "BOTTOM"}
+    racial:ClearAllPoints()
+    local parent = Gladdy.buttons[unit][Gladdy.db.racialAnchor]
+    if (Gladdy.db.racialPos == "RIGHT") then
+        racial:SetPoint(ANCHORS[Gladdy.db.racialPos], parent, Gladdy.db.racialPos, Gladdy.db.padding + Gladdy.db.racialXOffset, Gladdy.db.racialYOffset)
+    elseif (Gladdy.db.racialPos == "LEFT") then
+        racial:SetPoint(ANCHORS[Gladdy.db.racialPos], parent, Gladdy.db.racialPos, -Gladdy.db.padding + Gladdy.db.racialXOffset, Gladdy.db.racialYOffset)
+    elseif (Gladdy.db.racialPos == "TOP") then
+        racial:SetPoint(ANCHORS[Gladdy.db.racialPos], parent, Gladdy.db.racialPos, Gladdy.db.racialXOffset, Gladdy.db.padding + Gladdy.db.racialYOffset)
+    elseif (Gladdy.db.racialPos == "BOTTOM") then
+        racial:SetPoint(ANCHORS[Gladdy.db.racialPos], parent, Gladdy.db.racialPos, Gladdy.db.racialXOffset, -Gladdy.db.padding + Gladdy.db.racialYOffset)
+    end
+    return Gladdy.db.newLayout
 end

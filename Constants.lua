@@ -26,13 +26,16 @@ local specBuffs = {
     [GetSpellInfo(20895)] = L["Beast Mastery"], -- Spirit Bond
     [GetSpellInfo(34455)] = L["Beast Mastery"], -- Ferocious Inspiration
     [GetSpellInfo(27066)] = L["Marksmanship"], -- Trueshot Aura
+    [GetSpellInfo(34501)] = L["Survival"], -- Expose Weakness
 
     -- MAGE
     [GetSpellInfo(33405)] = L["Frost"], -- Ice Barrier
     [GetSpellInfo(11129)] = L["Fire"], -- Combustion
     [GetSpellInfo(12042)] = L["Arcane"], -- Arcane Power
     [GetSpellInfo(12043)] = L["Arcane"], -- Presence of Mind
+    [GetSpellInfo(31589)] = L["Arcane"], -- Slow
     [GetSpellInfo(12472)] = L["Frost"], -- Icy Veins
+    [GetSpellInfo(46989)] = L["Arcane"], -- Improved Blink
 
     -- PALADIN
     [GetSpellInfo(31836)] = L["Holy"], -- Light's Grace
@@ -41,9 +44,12 @@ local specBuffs = {
     [GetSpellInfo(20375)] = L["Retribution"], -- Seal of Command
     [GetSpellInfo(20049)] = L["Retribution"], -- Vengeance
     [GetSpellInfo(20218)] = L["Retribution"], -- Sanctity Aura
+    [GetSpellInfo(26018)] = L["Retribution"], -- Vindication
+    [GetSpellInfo(27179)] = L["Protection"], -- Holy Shield
 
     -- PRIEST
     [GetSpellInfo(15473)] = L["Shadow"], -- Shadowform
+    [GetSpellInfo(15286)] = L["Shadow"], -- Vampiric Embrace
     [GetSpellInfo(45234)] = L["Discipline"], -- Focused Will
     [GetSpellInfo(27811)] = L["Discipline"], -- Blessed Recovery
     [GetSpellInfo(33142)] = L["Holy"], -- Blessed Resilience
@@ -59,11 +65,15 @@ local specBuffs = {
     [GetSpellInfo(36563)] = L["Subtlety"], -- Shadowstep DMG
     [GetSpellInfo(14278)] = L["Subtlety"], -- Ghostly Strike
     [GetSpellInfo(31233)] = L["Assassination"], -- Find Weakness
+    [GetSpellInfo(13877)] = L["Combat"], -- Blade Flurry
 
     --Shaman
+    [GetSpellInfo(30807)] = L["Enhancement"], -- Unleashed Rage
+    [GetSpellInfo(16280)] = L["Enhancement"], -- Flurry
+    [GetSpellInfo(30823)] = L["Enhancement"], -- Shamanistic Rage
     [GetSpellInfo(16190)] = L["Restoration"], -- Mana Tide Totem
     [GetSpellInfo(32594)] = L["Restoration"], -- Earth Shield
-    [GetSpellInfo(30823)] = L["Enhancement"], -- Shamanistic Rage
+    [GetSpellInfo(29202)] = L["Restoration"], -- Healing Way
 
     -- WARLOCK
     [GetSpellInfo(19028)] = L["Demonology"], -- Soul Link
@@ -122,11 +132,13 @@ local specSpells = {
     [GetSpellInfo(34861)] = L["Holy"], -- Circle of Healing
     [GetSpellInfo(15473)] = L["Shadow"], -- Shadowform
     [GetSpellInfo(34917)] = L["Shadow"], -- Vampiric Touch
+    [GetSpellInfo(15286)] = L["Shadow"], -- Vampiric Embrace
 
     -- ROGUE
     [GetSpellInfo(34413)] = L["Assassination"], -- Mutilate
     [GetSpellInfo(14177)] = L["Assassination"], -- Cold Blood
     [GetSpellInfo(13750)] = L["Combat"], -- Adrenaline Rush
+    [GetSpellInfo(13877)] = L["Combat"], -- Blade Flurry
     [GetSpellInfo(14185)] = L["Subtlety"], -- Preparation
     [GetSpellInfo(16511)] = L["Subtlety"], -- Hemorrhage
     [GetSpellInfo(36554)] = L["Subtlety"], -- Shadowstep
@@ -135,6 +147,7 @@ local specSpells = {
 
     -- SHAMAN
     [GetSpellInfo(16166)] = L["Elemental"], -- Elemental Mastery
+    [GetSpellInfo(30706)] = L["Elemental"], -- Totem of Wrath
     [GetSpellInfo(30823)] = L["Enhancement"], -- Shamanistic Rage
     [GetSpellInfo(17364)] = L["Enhancement"], -- Stormstrike
     [GetSpellInfo(16190)] = L["Restoration"], -- Mana Tide Totem
@@ -143,8 +156,10 @@ local specSpells = {
 
     -- WARLOCK
     [GetSpellInfo(30405)] = L["Affliction"], -- Unstable Affliction
+    [GetSpellInfo(18220)] = L["Affliction"], -- Dark Pact
     --[GetSpellInfo(30911)] = L["Affliction"], -- Siphon Life
     [GetSpellInfo(30414)] = L["Destruction"], -- Shadowfury
+    [GetSpellInfo(30912)] = L["Destruction"], -- Conflagrate
 
     -- WARRIOR
     [GetSpellInfo(30330)] = L["Arms"], -- Mortal Strike
@@ -152,6 +167,7 @@ local specSpells = {
     [GetSpellInfo(30335)] = L["Fury"], -- Bloodthirst
     [GetSpellInfo(12809)] = L["Protection"], -- Concussion Blow
     [GetSpellInfo(30022)] = L["Protection"], -- Devastation
+    [GetSpellInfo(30356)] = L["Protection"], -- Shield Slam
 }
 function Gladdy:GetSpecSpells()
     return specSpells
@@ -263,6 +279,16 @@ local importantAuras = {
         priority = 40,
         onDamage = true,
         spellID = 19503,
+    },
+    -- Scare Beast
+    [GetSpellInfo(14327)] = {
+        track = AURA_TYPE_DEBUFF,
+        duration = 8,
+        priority = 40,
+        onDamage = true,
+        fear = true,
+        magic = true,
+        spellID = 14327,
     },
     -- Silencing Shot
     [GetSpellInfo(34490)] = {
@@ -445,6 +471,13 @@ local importantAuras = {
         duration = 8,
         priority = 10,
         spellID = 33206,
+    },
+    -- Fear Ward
+    [GetSpellInfo(6346)] = {
+        track = AURA_TYPE_BUFF,
+        duration = 180,
+        priority = 9,
+        spellID = 6346,
     },
 
 
@@ -796,7 +829,7 @@ local cooldownList = {
     ["MAGE"] = {
         [1953] = 15, -- Blink
         --[122] 	= 22,    -- Frost Nova
-        --[12051] = 480, --Evocation
+        [12051] = 480, --Evocation
         [2139] = 24, -- Counterspell
         [45438] = { cd = 300, [L["Frost"]] = 240, }, -- Ice Block
         [12472] = { cd = 180, spec = L["Frost"], }, -- Icy Veins
@@ -828,6 +861,8 @@ local cooldownList = {
         [10060] = { cd = 180, spec = L["Discipline"], }, -- Power Infusion
         [33206] = { cd = 120, spec = L["Discipline"], }, -- Pain Suppression
         [34433] = 300, -- Shadowfiend
+        [32379] = 12, -- Shadow Word: Death
+        [6346] = 180, -- Fear Ward
     },
 
     -- Druid
@@ -853,6 +888,7 @@ local cooldownList = {
         [16166] = { cd = 180, spec = L["Elemental"], }, -- Elemental Mastery
         [16188] = { cd = 180, spec = L["Restoration"], }, -- Natures Swiftness
         [16190] = { cd = 300, spec = L["Restoration"], }, -- Mana Tide Totem
+        [8177] = 15, -- Grounding Totem
     },
 
     -- Paladin
@@ -882,7 +918,8 @@ local cooldownList = {
     ["WARLOCK"] = {
         [17928] = 40, -- Howl of Terror
         [27223] = 120, -- Death Coil
-        --[19647] 	= { cd = 24 },	-- Spell Lock; how will I handle pet spells?
+        [19647] = 24,	-- Spell Lock
+        [27277] = 8,	-- Devour Magic
         [30414] = { cd = 20, spec = L["Destruction"], }, -- Shadowfury
         [17877] = { cd = 15, spec = L["Destruction"], }, -- Shadowburn
         [18708] = { cd = 900, spec = L["Demonology"], }, -- Feldom
@@ -907,6 +944,7 @@ local cooldownList = {
         [18499] = 30, -- Berserker Rage
         --[2565] 	= 60,    -- Shield Block
         [12292] = { cd = 180, spec = L["Arms"], }, -- Death Wish
+        [20252] = { cd = 30, [L["Arms"]] = 20 }, -- Intercept
         [12975] = { cd = 180, spec = L["Protection"], }, -- Last Stand
         [12809] = { cd = 30, spec = L["Protection"], }, -- Concussion Blow
 
@@ -915,6 +953,7 @@ local cooldownList = {
     -- Hunter
     ["HUNTER"] = {
         [19503] = 30, -- Scatter Shot
+        [14327] = 30, -- Scare Beast
         [19263] = 300, -- Deterrence; not on BM but can't do 2 specs
         [14311] = { cd = 30, -- Freezing Trap
                     sharedCD = {
@@ -938,6 +977,9 @@ local cooldownList = {
         [19386] = { cd = 60, spec = L["Survival"], }, -- Wyvern Sting
         [19577] = { cd = 60, spec = L["Beast Mastery"], }, -- Intimidation
         [38373] = { cd = 120, spec = L["Beast Mastery"], }, -- The Beast Within
+        [5384] = 30, -- Feign Death
+        [3034] = 15, -- Viper Sting
+        [1543] = 20, -- Flare
     },
 
     -- Rogue
@@ -1138,3 +1180,80 @@ function Gladdy:GetArenaTimer()
     end
 end
 
+Gladdy.legacy = {
+    castBarPos = "LEFT",
+    buffsCooldownPos = "TOP",
+    buffsBuffsCooldownPos = "BOTTOM",
+    classIconPos = "LEFT",
+    ciAnchor = "healthBar",
+    ciPos = "TOP",
+    cooldownYPos = "TOP",
+    cooldownXPos = "LEFT",
+    drCooldownPos = "RIGHT",
+    racialAnchor = "trinket",
+    racialPos = "RIGHT",
+    trinketPos = "RIGHT",
+    padding = 1,
+    growUp = false,
+}
+
+Gladdy.newDefaults = {
+    ["bottomMargin"] = 94.99996948242188,
+    ["newLayout"] = true,
+    Pets = {
+        ["petYOffset"] = -81.99993896484375,
+        ["petXOffset"] = 181,
+    },
+    ClassIcon = {
+        ["classIconXOffset"] = -74.90008544921875,
+    },
+    Racial = {
+        ["racialXOffset"] = 255.9000244140625,
+    },
+    Trinket = {
+        ["trinketXOffset"] = 182,
+    },
+    ["Combat Indicator"] = {
+        ["ciXOffset"] = 79.99993896484375,
+        ["ciYOffset"] = -10.99993896484375,
+    },
+    Cooldowns = {
+        ["cooldownYOffset"] = 31,
+    },
+    ["Buffs and Debuffs"] = {
+        ["buffsBuffsXOffset"] = 29,
+        ["buffsBuffsYOffset"] = -82.99993896484375,
+        ["buffsXOffset"] = 29,
+        ["buffsYOffset"] = 62.00006103515625,
+    },
+    Diminishings = {
+        ["drXOffset"] = 329.7999877929688,
+        ["drYOffset"] = -22.5,
+    },
+    ["Cast Bar"] = {
+        ["castBarXOffset"] = -235.900146484375,
+        ["castBarYOffset"] = -30.5,
+    },
+}
+
+Gladdy.frameStrata = {
+    BACKGROUND = L["Background"] .. "(0)",
+    LOW = L["Low"] .. "(1)",
+    MEDIUM = L["Medium"] .. "(2)",
+    HIGH = L["High"] .. "(3)",
+    DIALOG = L["Dialog"] .. "(4)",
+    FULLSCREEN = L["Fullscreen"] .. "(5)",
+    FULLSCREEN_DIALOG = L["Fullscreen Dialog"] .. "(6)",
+    TOOLTIP = L["Tooltip"] .. "(7)",
+}
+
+Gladdy.frameStrataSorting = {
+    [1] = "BACKGROUND",
+    [2] = "LOW",
+    [3] = "MEDIUM",
+    [4] = "HIGH",
+    [5] = "DIALOG",
+    [6] = "FULLSCREEN",
+    [7] = "FULLSCREEN_DIALOG",
+    [8] = "TOOLTIP",
+}

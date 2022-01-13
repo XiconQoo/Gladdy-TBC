@@ -47,15 +47,16 @@ Gladdy.defaults = {
         hideBlizzard = "arena",
         x = 0,
         y = 0,
-        growUp = false,
         growDirection = "BOTTOM",
         frameScale = 1,
-        padding = 1,
+        pixelPerfect = false,
         barWidth = 180,
         bottomMargin = 2,
         statusbarBorderOffset = 6,
         timerFormat = Gladdy.TIMER_FORMAT.tenths,
         backgroundColor = {r = 0, g = 0, b = 0, a = 0},
+        newLayout = false,
+        showMover = true,
     },
 }
 
@@ -101,6 +102,10 @@ function Gladdy:option(params)
     end
 
     return defaults
+end
+
+function Gladdy:SetColor(option)
+    return option.r, option.g, option.b, option.a
 end
 
 function Gladdy:colorOption(params)
@@ -214,19 +219,45 @@ function Gladdy:SetupOptions()
         get = getOpt,
         set = setOpt,
         args = {
-            test = {
+            lock = {
                 order = 1,
                 width = 0.7,
+                name = Gladdy.db.locked and L["Unlock frame"] or L["Lock frame"],
+                desc = L["Toggle if frame can be moved"],
+                type = "execute",
+                func = function()
+                    Gladdy.db.locked = not Gladdy.db.locked
+                    Gladdy:UpdateFrame()
+                    self.options.args.lock.name = Gladdy.db.locked and L["Unlock frame"] or L["Lock frame"]
+                end,
+            },
+            showMover = {
+                order = 2,
+                width = 0.7,
+                name = Gladdy.db.showMover and L["Hide Mover"] or L["Show Mover"],
+                desc = L["Toggle to show Mover Frames"],
+                type = "execute",
+                func = function()
+                    Gladdy.db.showMover = not Gladdy.db.showMover
+                    Gladdy:UpdateFrame()
+                    self.options.args.showMover.name = Gladdy.db.showMover and L["Hide Mover"] or L["Show Mover"]
+                end,
+            },
+            test = {
+                order = 2,
+                width = 0.7,
                 name = L["Test"],
+                desc = L["Show Test frames"],
                 type = "execute",
                 func = function()
                     Gladdy:ToggleFrame(3)
                 end,
             },
             hide = {
-                order = 2,
+                order = 3,
                 width = 0.7,
                 name = L["Hide"],
+                desc = L["Hide frames"],
                 type = "execute",
                 func = function()
                     Gladdy:Reset()
@@ -234,16 +265,17 @@ function Gladdy:SetupOptions()
                 end,
             },
             reload = {
-                order = 3,
+                order = 4,
                 width = 0.7,
                 name = L["ReloadUI"],
+                desc = L["Reloads the UI"],
                 type = "execute",
                 func = function()
                     ReloadUI()
                 end,
             },
             version = {
-                order = 4,
+                order = 5,
                 width = 1,
                 type = "description",
                 name = "     Gladdy v" .. Gladdy.version_num .. "-" .. Gladdy.version_releaseType
@@ -255,12 +287,6 @@ function Gladdy:SetupOptions()
                 childGroups = "tab",
                 order = 5,
                 args = {
-                    locked = {
-                        type = "toggle",
-                        name = L["Lock frame"],
-                        desc = L["Toggle if frame can be moved"],
-                        order = 1,
-                    },
                     growDirection = {
                         type = "select",
                         name = L["Grow Direction"],
@@ -298,29 +324,27 @@ function Gladdy:SetupOptions()
                                         name = L["Frame General"],
                                         order = 3,
                                     },
+                                    pixelPerfect = {
+                                        type = "toggle",
+                                        name = L["Pixel Perfect Scale"],
+                                        desc = L["Enables Pixel Perfect Scale - disables manual "].. L["Frame scale"],
+                                        order = 4,
+                                    },
                                     frameScale = {
                                         type = "range",
                                         name = L["Frame scale"],
                                         desc = L["Scale of the frame"],
-                                        order = 4,
+                                        disabled = function() return Gladdy.db.pixelPerfect end,
+                                        order = 5,
                                         min = .1,
                                         max = 2,
                                         step = .01,
-                                    },
-                                    padding = {
-                                        type = "range",
-                                        name = L["Frame padding"],
-                                        desc = L["Padding of the frame"],
-                                        order = 5,
-                                        min = 0,
-                                        max = 20,
-                                        step = 1,
                                     },
                                     barWidth = {
                                         type = "range",
                                         name = L["Frame width"],
                                         desc = L["Width of the bars"],
-                                        order = 6,
+                                        order = 7,
                                         min = 10,
                                         max = 500,
                                         step = 5,
@@ -329,7 +353,7 @@ function Gladdy:SetupOptions()
                                         type = "range",
                                         name = L["Margin"],
                                         desc = L["Margin between each button"],
-                                        order = 7,
+                                        order = 8,
                                         min = -200,
                                         max = 200,
                                         step = 1,
@@ -338,7 +362,7 @@ function Gladdy:SetupOptions()
                                         type = "color",
                                         name = L["Background color"],
                                         desc = L["Background Color of the frame"],
-                                        order = 8,
+                                        order = 9,
                                         hasAlpha = true,
                                         get = getColorOpt,
                                         set = setColorOpt,

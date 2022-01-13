@@ -4,13 +4,17 @@ local Gladdy = LibStub("Gladdy")
 local CreateFrame = CreateFrame
 local GetSpellInfo = GetSpellInfo
 local L = Gladdy.L
-local Classicon = Gladdy:NewModule("Class Icon", 80, {
-    classIconPos = "LEFT",
+local Classicon = Gladdy:NewModule("Class Icon", 81, {
+    classIconEnabled = true,
     classIconSize = 60 + 20 + 1,
     classIconWidthFactor = 0.9,
     classIconBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     classIconBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     classIconSpecIcon = false,
+    classIconXOffset = 0,
+    classIconYOffset = 0,
+    classIconFrameStrata = "MEDIUM",
+    classIconFrameLevel = 5,
 })
 
 local classIconPath = "Interface\\Addons\\Gladdy\\Images\\Classes\\"
@@ -99,13 +103,6 @@ function Classicon:CreateFrame(unit)
     classIcon:SetFrameStrata("MEDIUM")
     classIcon:SetFrameLevel(2)
 
-    classIcon:ClearAllPoints()
-    if (Gladdy.db.classIconPos == "RIGHT") then
-        classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit].healthBar, "TOPRIGHT", 2, 2)
-    else
-        classIcon:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -2, 2)
-    end
-
     Gladdy.buttons[unit].classIcon = classIcon
     self.frames[unit] = classIcon
 end
@@ -116,22 +113,33 @@ function Classicon:UpdateFrame(unit)
         return
     end
 
+    classIcon:SetFrameStrata(Gladdy.db.classIconFrameStrata)
+    classIcon:SetFrameLevel(Gladdy.db.classIconFrameLevel)
+
     classIcon:SetWidth(Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor)
     classIcon:SetHeight(Gladdy.db.classIconSize)
 
-    classIcon:ClearAllPoints()
-    local margin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
-    if (Gladdy.db.classIconPos == "LEFT") then
-        classIcon:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -margin, 0)
-    else
-        classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPRIGHT", margin, 0)
+    Gladdy:SetPosition(classIcon, unit, "classIconXOffset", "classIconYOffset", Classicon:LegacySetPosition(classIcon, unit), Classicon)
+
+    if (unit == "arena1") then
+        Gladdy:CreateMover(classIcon, "classIconXOffset", "classIconYOffset", L["Class Icon"],
+                {"TOPLEFT", "TOPLEFT"},
+                Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor,
+                Gladdy.db.classIconSize,
+                0,
+                0, "classIconEnabled")
     end
 
     classIcon.texture:ClearAllPoints()
     classIcon.texture:SetAllPoints(classIcon)
 
     classIcon.texture.overlay:SetTexture(Gladdy.db.classIconBorderStyle)
-    classIcon.texture.overlay:SetVertexColor(Gladdy.db.classIconBorderColor.r, Gladdy.db.classIconBorderColor.g, Gladdy.db.classIconBorderColor.b, Gladdy.db.classIconBorderColor.a)
+    classIcon.texture.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.classIconBorderColor))
+    if Gladdy.db.classIconEnabled then
+        classIcon:Show()
+    else
+        classIcon:Hide()
+    end
 end
 
 function Classicon:ENEMY_SPOTTED(unit)
@@ -173,11 +181,16 @@ function Classicon:GetOptions()
             name = L["Class Icon"],
             order = 2,
         },
+        classIconEnabled = Gladdy:option({
+            type = "toggle",
+            name = L["Class Icon Enabled"],
+            order = 3,
+        }),
         classIconSpecIcon = {
             type = "toggle",
             name = L["Show Spec Icon"],
             desc = L["Shows Spec Icon once spec is detected"],
-            order = 3,
+            order = 4,
             get = function() return Gladdy.db.classIconSpecIcon end,
             set = function(_, value)
                 Gladdy.db.classIconSpecIcon = value
@@ -211,9 +224,9 @@ function Classicon:GetOptions()
                         classIconSize = Gladdy:option({
                             type = "range",
                             name = L["Icon size"],
-                            min = 1,
+                            min = 3,
                             max = 100,
-                            step = 1,
+                            step = .1,
                             order = 3,
                             width = "full",
                         }),
@@ -231,29 +244,37 @@ function Classicon:GetOptions()
                 position = {
                     type = "group",
                     name = L["Position"],
-                    order = 1,
+                    order = 3,
                     args = {
                         headerPosition = {
                             type = "header",
                             name = L["Position"],
                             order = 5,
                         },
-                        classIconPos = Gladdy:option({
-                            type = "select",
-                            name = L["Icon position"],
-                            desc = L["This changes positions with trinket"],
-                            order = 6,
-                            values = {
-                                ["LEFT"] = L["Left"],
-                                ["RIGHT"] = L["Right"],
-                            },
+                        classIconXOffset = Gladdy:option({
+                            type = "range",
+                            name = L["Horizontal offset"],
+                            order = 11,
+                            min = -800,
+                            max = 800,
+                            step = 0.1,
+                            width = "full",
+                        }),
+                        classIconYOffset = Gladdy:option({
+                            type = "range",
+                            name = L["Vertical offset"],
+                            order = 12,
+                            min = -800,
+                            max = 800,
+                            step = 0.1,
+                            width = "full",
                         }),
                     },
                 },
                 border = {
                     type = "group",
                     name = L["Border"],
-                    order = 1,
+                    order = 2,
                     args = {
                         headerBorder = {
                             type = "header",
@@ -275,7 +296,55 @@ function Classicon:GetOptions()
                         }),
                     },
                 },
+                frameStrata = {
+                    type = "group",
+                    name = L["Frame Strata and Level"],
+                    order = 4,
+                    args = {
+                        headerAuraLevel = {
+                            type = "header",
+                            name = L["Frame Strata and Level"],
+                            order = 1,
+                        },
+                        classIconFrameStrata = Gladdy:option({
+                            type = "select",
+                            name = L["Frame Strata"],
+                            order = 2,
+                            values = Gladdy.frameStrata,
+                            sorting = Gladdy.frameStrataSorting,
+                            width = "full",
+                        }),
+                        classIconFrameLevel = Gladdy:option({
+                            type = "range",
+                            name = L["Frame Level"],
+                            min = 0,
+                            max = 500,
+                            step = 1,
+                            order = 3,
+                            width = "full",
+                        }),
+                    },
+                },
             },
         },
     }
+end
+
+---------------------------
+
+-- LAGACY HANDLER
+
+---------------------------
+
+function Classicon:LegacySetPosition(classIcon, unit)
+    if Gladdy.db.newLayout then
+        return Gladdy.db.newLayout
+    end
+    classIcon:ClearAllPoints()
+    local margin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
+    if (Gladdy.db.classIconPos == "LEFT") then
+        classIcon:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -margin, 0)
+    else
+        classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPRIGHT", margin, 0)
+    end
 end

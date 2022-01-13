@@ -1,7 +1,10 @@
 # Gladdy - TBC
 
 ### The most powerful arena addon for WoW TBC 2.5.1
-## [v1.22-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v1.22-Release/Gladdy_TBC-Classic_v1.22-Release.zip)
+
+---
+
+## [v2.00-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.00-Release/Gladdy_TBC-Classic_v2.00-Release.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -49,6 +52,16 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 <img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/sample2.jpg" align="right" width="48.5%">
 <img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/sample3.png" width="48.5%">
 
+## Contributors
+
+- [ManneN1](https://github.com/ManneN1)
+- [AlexFolland](https://github.com/AlexFolland)
+- [dfherr](https://github.com/dfherr)
+- [miraage](https://github.com/miraage)
+- [veiz](https://github.com/veiz)
+
+Thank you!
+
 ## Special Thanks
 
 - **miraage** - the origininal author of Gladdy! Your work set the foundation for this edit. Thanks!
@@ -59,8 +72,80 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 - **Klimp** (thanks for all the suggestions and active feedback)
 - **the whole TBC addons 2.4.3 discord** (thanks for the support and great community, especially the MVPs)
 - **Hydra** (thanks for constructive feedback and suggestions)
+- **Xyz** (thanks for suggestions)
+
+---
 
 ### Changes
+
+### v2.00-Release
+
+This is a packed release with new features and bugfixes. Most importantly, positioning of all elements has been redone with movable frames.
+Thank you for the great feedback and active contribution.
+
+***Attention: Once you install this version it will drastically change your current profile! You can't go back to an earlier version. Either back up your WTF or export your Profile before updating!***
+
+**Here is a list of all changes:**
+- **major release version set to v2**
+  - this will mean, that export strings will still be backwards compatible, but not forward (Gladdy v2.x String can't be imported into Gladdy v1.x but vice versa)
+- **big overhaul of positioning elements added! All elements besides HP and PowerBar can be moved separately**
+  - added Mover Frames for Auras, Interrupts, (De)Buffs, CastBar, ClassIcon, CombatIndicator, Cooldowns, DRs, Pets, Racial, Trinket
+  - this will hopefully make configuration a lot easier
+  - all visible elements' FrameStrata and FrameLevel can be configured (overlap frames how you want it)
+- **SpecDetection:**
+  - fixed spec detection for Paladins
+  - added following spells for better spec detection:
+      - Expose Weakness (Survival Hunter)
+      - Slow (Arcane Mage)
+      - Improved Blink (Arcane Mage)
+      - Vindication (Retribution Paladin)
+      - Holy Shield (Protection Paladin)
+      - Vampiric Embrace (Shadow Priest)
+      - Blade Flurry (Combat Rogue)
+      - Unleashed Rage (Enhancement Shaman)
+      - Flurry (Enhancement Shaman)
+      - Shamanistic Rage (Enhancement Shaman)
+      - Healing Way (Restoration Shaman)
+      - Totem of Wrath (Elemental Shaman)
+      - Dark Pact (Affliction Warlock)
+      - Conflagrate (Destruction Warlock)
+      - Shield Slam (Protection Warrior)
+- **Cooldowns:**
+  - added Fear Ward and Fear Ward Cooldown Detection in case it was used before arena
+  - added following cooldowns:
+      - Scare Beast (Hunter)
+      - Feign Death (Hunter)
+      - Viper Sting (Hunter)
+      - Flare (Hunter)
+      - Fear Ward (Priest)
+      - Shadow Word: Death (Priest)
+      - Evocation (Mage)
+      - Grounding Totem (Shaman)
+      - Spell Lock (Warlock)
+      - Devour Magic (Warlock)
+      - Intercept (Warrior)
+- **Auras/Interrupts:**
+  - can now be detached from ClassIcon and positioned/scaled anywhere separately
+  - added Auras:
+      - Scare Beast (Hunter)
+      - Fear Ward (Priest)
+- **Shadowsight:**
+  - reset timer when buff was taken
+  - add a configurable 2nd timer or show one timer with the closest CD
+- **CastBar Icon can be enabled/disabled**
+- **Trinket solid color option added**
+  - color for Trinket on/off CD can be configured (red/green by default)
+- **fixed some DR-categories** (Hibernate / Chastice / Dragonsbreath / ImpConcussiveShot / Counterattack)
+- **Pixel Perfect option added** (makes your Gladdy Frames pixel perfect - no more weird scaling interferences)
+- **Pets can be grouped** (not perfect yet, but a first step)
+- **added DR-Level Text** (thanks https://github.com/ManneN1)
+- **added zhCN Locale** (thanks https://github.com/veiz)
+- **ClassIcon can be disabled**
+- **add interrupt announcement**
+- **detect SpellLock and Devour Magic cooldowns properly**
+- **minor fixes:**
+  - fixed reloading during arena to properly show all frames
+  - fix grow up positioning
 
 ### v1.22-Release
 - fixed import for some localizations not working
