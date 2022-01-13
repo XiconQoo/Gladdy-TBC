@@ -191,6 +191,16 @@ function Gladdy:NewModule(name, priority, defaults)
         self.messages[message] = func or message
     end
 
+    module.UnregisterMessage = function(self, message)
+        self.messages[message] = nil
+    end
+
+    module.UnregisterAllMessages = function(self)
+        for msg,_ in pairs(self.messages) do
+            self.messages[msg] = nil
+        end
+    end
+
     module.GetOptions = function()
         return nil
     end

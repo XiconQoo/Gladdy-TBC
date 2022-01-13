@@ -53,6 +53,7 @@ function Announcements:Initialize()
 end
 
 function Announcements:Reset()
+    self:UnregisterAllMessages()
     self.enemy = {}
     self.throttled = {}
 end
