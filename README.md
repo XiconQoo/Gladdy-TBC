@@ -87,7 +87,7 @@ Thank you for the great feedback and active contribution.
 
 **Here is a list of all changes:**
 - **major release version set to v2**
-  - this will mean, that export strings will still be backwards compatible, but not forward (Gladdy v2.x String cant be imported into Gladdy v1.x but vice versa)
+  - this will mean, that export strings will still be backwards compatible, but not forward (Gladdy v2.x String can't be imported into Gladdy v1.x but vice versa)
 - **big overhaul of positioning elements added! All elements besides HP and PowerBar can be moved separately**
   - added Mover Frames for Auras, Interrupts, (De)Buffs, CastBar, ClassIcon, CombatIndicator, Cooldowns, DRs, Pets, Racial, Trinket
   - this will hopefully make configuration a lot easier
