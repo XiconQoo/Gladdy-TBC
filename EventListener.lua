@@ -86,6 +86,9 @@ function Gladdy:SpotEnemy(unit, auraScan)
                     end
                 end
             end
+            if Gladdy.cooldownBuffs.racials[spellName] then
+                Gladdy:SendMessage("RACIAL_USED", unit, expirationTime, spellName)
+            end
             if Gladdy.specBuffs[spellName] then -- Check for auras that detect a spec
                 local unitPet = string_gsub(unit, "%d$", "pet%1")
                 if UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster) then
@@ -216,6 +219,9 @@ Gladdy.exceptionNames = { -- TODO MOVE ME TO CLASSBUFFS LIB
 
 Gladdy.cooldownBuffs = {
     [GetSpellInfo(6346)] = { cd = 180, spellId = 6346 }, -- Fear Ward
+    racials = {
+        [GetSpellInfo(20600)] = { cd = 180, spellId = 20600 }, -- Perception
+    }
 }
 
 function EventListener:UNIT_AURA(unit)
@@ -242,6 +248,9 @@ function EventListener:UNIT_AURA(unit)
                         Cooldowns:CooldownUsed(arenaUnit, v.class, Gladdy.cooldownBuffs[spellName].spellId, expirationTime - GetTime())
                     end
                 end
+            end
+            if Gladdy.cooldownBuffs.racials[spellName] then
+                Gladdy:SendMessage("RACIAL_USED", unit, spellName, expirationTime, spellName)
             end
             if not button.spec and Gladdy.specBuffs[spellName] then
                 local unitPet = string_gsub(unit, "%d$", "pet%1")

@@ -165,13 +165,17 @@ function Racial:JOINED_ARENA()
     end)
 end
 
-function Racial:RACIAL_USED(unit)
+function Racial:RACIAL_USED(unit, expirationTime, spellName)
     local racial = self.frames[unit]
     local button = Gladdy.buttons[unit]
     if (not racial or not button or not button.race) then
         return
     end
-    Racial:Used(unit, GetTime(), Gladdy:Racials()[button.race].duration)
+    if expirationTime and Gladdy:Racials()[button.race].spellName ~= spellName then
+        return
+    end
+    local startTime = (expirationTime and expirationTime - Gladdy:Racials()[button.race].duration) or GetTime()
+    Racial:Used(unit, startTime, Gladdy:Racials()[button.race].duration)
 end
 
 function Racial:Used(unit, startTime, duration)
