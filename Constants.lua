@@ -20,6 +20,7 @@ local specBuffs = {
     [GetSpellInfo(24858)] = L["Restoration"], -- Moonkin Form; Dreamstate spec in TBC equals Restoration
     [GetSpellInfo(17007)] = L["Feral"], -- Leader of the Pack
     [GetSpellInfo(16188)] = L["Restoration"], -- Nature's Swiftness
+    [GetSpellInfo(33891)] = L["Restoration"], -- Tree of Life
 
     -- HUNTER
     [GetSpellInfo(34692)] = L["Beast Mastery"], -- The Beast Within
@@ -97,6 +98,7 @@ local specSpells = {
     [GetSpellInfo(33987)] = L["Feral"], -- Mangle (Bear)
     [GetSpellInfo(18562)] = L["Restoration"], -- Swiftmend
     [GetSpellInfo(16188)] = L["Restoration"], -- Nature's Swiftness
+    [GetSpellInfo(33891)] = L["Restoration"], -- Tree of Life
 
     -- HUNTER
     [GetSpellInfo(19577)] = L["Beast Mastery"], -- Intimidation
