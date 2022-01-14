@@ -922,6 +922,7 @@ local cooldownList = {
         [27277] = 8,	-- Devour Magic
         [30414] = { cd = 20, spec = L["Destruction"], }, -- Shadowfury
         [17877] = { cd = 15, spec = L["Destruction"], }, -- Shadowburn
+        [30912] = { cd = 10, spec = L["Destruction"], }, -- Conflagrate
         [18708] = { cd = 900, spec = L["Demonology"], }, -- Feldom
     },
 
