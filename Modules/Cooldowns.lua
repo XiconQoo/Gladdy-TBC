@@ -534,7 +534,17 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId, expirationTimeInSecond
 
             for spellID,_ in pairs(cooldown.sharedCD) do
                 if (spellID ~= "cd") then
-                    self:CooldownStart(button, spellID, sharedCD)
+                    local skip = false
+                    for i = 1, button.lastCooldownSpell do
+                        local icon = button.spellCooldownFrame["icon" .. i]
+                        if (icon.spellId == spellID and icon.active and icon.timeLeft > sharedCD) then
+                            skip = true
+                            break
+                        end
+                    end
+                    if not skip then
+                        self:CooldownStart(button, spellID, sharedCD)
+                    end
                 end
             end
         end
