@@ -26,7 +26,7 @@ function ACDFrame:Initialize()
     ACDNumFrame:SetHeight(512)
     ACDNumFrame:SetWidth(512)
     ACDNumFrame:SetPoint("CENTER", 0, 256)
-    ACDNumFrame:Show()
+    ACDNumFrame:Hide()
     self.ACDNumFrame = ACDNumFrame
 
     local ACDNumTens = ACDNumFrame:CreateTexture("ACDNumTens", "HIGH")
@@ -88,6 +88,7 @@ function ACDFrame.OnUpdate(self, elapse)
         self.countdown = self.countdown - elapse;
     else
         self.hidden = true;
+        self.ACDNumFrame:Hide()
         self.ACDNumTens:Hide();
         self.ACDNumOnes:Hide();
         self.ACDNumOne:Hide();
