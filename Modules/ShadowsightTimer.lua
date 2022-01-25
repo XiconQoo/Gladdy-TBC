@@ -148,13 +148,15 @@ end
 ---------------------------
 
 function ShadowsightTimer:JOINED_ARENA()
-    self:RegisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
-    self:SetScript("OnEvent", ShadowsightTimer.OnEvent)
-    for i=1,2 do
-        self["timerFrame" .. i].font:SetText("1:30")
-        self["timerFrame" .. i].font:SetTextColor(1, 0.8, 0)
+    if Gladdy.db.shadowsightTimerEnabled then
+        self:RegisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
+        self:SetScript("OnEvent", ShadowsightTimer.OnEvent)
+        for i=1,2 do
+            self["timerFrame" .. i].font:SetText("1:30")
+            self["timerFrame" .. i].font:SetTextColor(1, 0.8, 0)
+        end
+        self.anchor:Show()
     end
-    self.anchor:Show()
 end
 
 function ShadowsightTimer:AURA_GAIN(unit, auraType, spellID)
