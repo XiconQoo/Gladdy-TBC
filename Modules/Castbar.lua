@@ -879,6 +879,12 @@ function Castbar:LegacySetPosition(castBar, unit, leftMargin, rightMargin)
         return Gladdy.db.newLayout
     end
     castBar:ClearAllPoints()
+    if Gladdy.db.castBarWidth <= 0 then
+        castBar:SetWidth(0.1)
+    end
+    if Gladdy.db.castBarHeight <= 0 then
+        castBar:SetHeight(0.1)
+    end
     local horizontalMargin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
     if (Gladdy.db.castBarPos == "LEFT") then
         local anchor = Gladdy:GetAnchor(unit, "LEFT")
