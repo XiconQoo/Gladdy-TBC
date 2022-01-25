@@ -369,8 +369,8 @@ function Gladdy:SetPosition(frame, unit, xOffsetDB, yOffsetDB, newLayout, module
         --Gladdy:Debug("INFO", name, "old X/Y:", frame:GetCenter())
         local xOffset, yOffset = frame:GetLeft(), frame:GetTop()
         if not xOffset or not yOffset then
-            xOffset = frame:GetCenter() - frame:GetWidth()/2
-            yOffset = select(2, frame:GetCenter()) + frame:GetHeight()/2
+            xOffset = frame:GetCenter()-- - frame:GetWidth()/2
+            yOffset = select(2, frame:GetCenter())-- + frame:GetHeight()/2
         end
         local x,y = button.healthBar:GetLeft(), button.healthBar:GetTop()
         local newXOffset = math_abs(x - xOffset) * (x > xOffset and -1 or 1)
