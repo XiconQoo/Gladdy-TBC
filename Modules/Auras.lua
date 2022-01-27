@@ -472,7 +472,7 @@ function Auras:Test(unit)
             local extraSpellSchool = spellSchools[rand(1, #spellSchools)]
             spellid = tonumber(enabledInterrupts[rand(1, #enabledInterrupts)])
             spellName = select(1, GetSpellInfo(spellid))
-            self:SPELL_INTERRUPT(unit,spellid, spellName, "physical", spellid, spellName, extraSpellSchool)
+            Gladdy:SendMessage("SPELL_INTERRUPT", unit,spellid, spellName, "physical", spellid, spellName, extraSpellSchool)
         end
     end
 end

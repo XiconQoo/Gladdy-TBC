@@ -16,7 +16,7 @@ local UnitName = UnitName
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
-local Announcements = Gladdy:NewModule("Announcements", nil, {
+local Announcements = Gladdy:NewModule("Announcements", 101, {
     announcements = {
         drinks = true,
         resurrections = true,
@@ -42,18 +42,20 @@ function Announcements:Initialize()
         [GetSpellInfo(20777)] = true,
     }
 
-    self:RegisterMessage("CAST_START")
-    self:RegisterMessage("ENEMY_SPOTTED")
-    self:RegisterMessage("UNIT_SPEC")
-    self:RegisterMessage("UNIT_HEALTH")
-    self:RegisterMessage("TRINKET_USED")
-    self:RegisterMessage("TRINKET_READY")
-    self:RegisterMessage("SHADOWSIGHT")
-    self:RegisterMessage("SPELL_INTERRUPT")
+    self:RegisterMessage("JOINED_ARENA")
 end
 
 function Announcements:Reset()
-    self:UnregisterAllMessages()
+    self:UnregisterMessages(
+            "CAST_START",
+            "ENEMY_SPOTTED",
+            "UNIT_SPEC",
+            "AURA_GAIN",
+            "UNIT_HEALTH",
+            "TRINKET_USED",
+            "TRINKET_READY",
+            "SHADOWSIGHT",
+            "SPELL_INTERRUPT")
     self.enemy = {}
     self.throttled = {}
 end
@@ -63,15 +65,23 @@ function Announcements:Test(unit)
     if (not button) then
         return
     end
-
-    if (unit == "arena1") then
-        self:UNIT_SPEC(unit, button.testSpec)
-    elseif (unit == "arena2") then
-        self:CheckDrink(unit, self.DRINK_AURA)
-    elseif (unit == "arena3") then
-        self:UNIT_HEALTH(unit, button.health, button.healthMax)
-        self:ENEMY_SPOTTED(unit)
+    self:JOINED_ARENA()
+    if unit == "arena1" then
+        self:AURA_GAIN(unit, nil, nil, self.DRINK_AURA)
     end
+end
+
+function Announcements:JOINED_ARENA()
+    self:RegisterMessages(
+            "CAST_START",
+            "ENEMY_SPOTTED",
+            "UNIT_SPEC",
+            "AURA_GAIN",
+            "UNIT_HEALTH",
+            "TRINKET_USED",
+            "TRINKET_READY",
+            "SHADOWSIGHT",
+            "SPELL_INTERRUPT")
 end
 
 function Announcements:CAST_START(unit, spell)
@@ -149,13 +159,13 @@ function Announcements:SPELL_INTERRUPT(destUnit,spellID,spellName,spellSchool,ex
     self:Send(L["INTERRUPTED: %s (%s)"]:format(extraSpellName, button.name or ""), nil, RAID_CLASS_COLORS[button.class])
 end
 
-function Announcements:CheckDrink(unit, aura)
+function Announcements:AURA_GAIN(unit, auraType, spellID, spellName)
     local button = Gladdy.buttons[unit]
     if (not button or not Gladdy.db.announcements.drinks) then
         return
     end
 
-    if (aura == self.DRINK_AURA) then
+    if (spellName == self.DRINK_AURA) then
         self:Send(L["DRINKING: %s (%s)"]:format(button.name, button.classLoc), 3, RAID_CLASS_COLORS[button.class])
     end
 end

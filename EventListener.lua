@@ -15,7 +15,7 @@ local L = Gladdy.L
 local Cooldowns = Gladdy.modules["Cooldowns"]
 local Diminishings = Gladdy.modules["Diminishings"]
 
-local EventListener = Gladdy:NewModule("EventListener", 100, {
+local EventListener = Gladdy:NewModule("EventListener", 10, {
     test = true,
 })
 
@@ -214,6 +214,7 @@ Gladdy.exceptionNames = { -- TODO MOVE ME TO CLASSBUFFS LIB
 
 Gladdy.cooldownBuffs = {
     [GetSpellInfo(6346)] = { cd = 180, spellId = 6346 }, -- Fear Ward
+    -- TODO sprint, shadowstep
     racials = {
         [GetSpellInfo(20600)] = { cd = 180, spellId = 20600 }, -- Perception
     }
@@ -257,7 +258,6 @@ function EventListener:UNIT_AURA(unit)
                 spellName = Gladdy.exceptionNames[spellID]
             end
             Gladdy:SendMessage("AURA_GAIN", unit, auraType, spellID, spellName, texture, duration, expirationTime, count, debuffType, i)
-            Gladdy:Call("Announcements", "CheckDrink", unit, spellName)
         end
     end
 end
