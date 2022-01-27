@@ -278,30 +278,22 @@ function Cooldowns:Test(unit)
     local button = Gladdy.buttons[unit]
     if Gladdy.db.cooldown then
         button.spellCooldownFrame:Show()
-        self:UpdateTestCooldowns(unit)
     else
         button.spellCooldownFrame:Hide()
-        self:UpdateTestCooldowns(unit)
     end
-
+    self:UpdateTestCooldowns(unit)
 end
 
 function Cooldowns:UpdateTestCooldowns(unit)
     local button = Gladdy.buttons[unit]
-
-    if (button.testSpec and button.testSpec == Gladdy.testData[unit].testSpec) then
-        self:UpdateCooldowns(button)
-        button.spec = nil
-        self:DetectSpec(unit, button.testSpec)
-
-        -- use class spells
-        for spellId,_ in pairs(Gladdy:GetCooldownList()[button.class]) do
-            self:CooldownUsed(unit, button.class, spellId)
-        end
-        -- use race spells
-        for spellId,_ in pairs(Gladdy:GetCooldownList()[button.race]) do
-            self:CooldownUsed(unit, button.race, spellId)
-        end
+    self:UpdateCooldowns(button)
+    -- use class spells
+    for spellId,_ in pairs(Gladdy:GetCooldownList()[button.class]) do
+        self:CooldownUsed(unit, button.class, spellId)
+    end
+    -- use race spells
+    for spellId,_ in pairs(Gladdy:GetCooldownList()[button.race]) do
+        self:CooldownUsed(unit, button.race, spellId)
     end
 end
 
@@ -310,11 +302,17 @@ end
 ---------------------
 
 function Cooldowns:ENEMY_SPOTTED(unit)
+    if (not Gladdy.buttons[unit]) then
+        return
+    end
     self:UpdateCooldowns(Gladdy.buttons[unit])
 end
 
-function Cooldowns:SPEC_DETECTED(unit, spec)
-    self:DetectSpec(unit, spec)
+function Cooldowns:SPEC_DETECTED(unit)
+    if (not Gladdy.buttons[unit]) then
+        return
+    end
+    self:UpdateCooldowns(Gladdy.buttons[unit])
 end
 
 function Cooldowns:UNIT_DESTROYED(unit)
@@ -445,40 +443,8 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId, expirationTimeInSecond
 end
 
 ---------------------
--- Detect Spec
+-- Update Cooldowns
 ---------------------
-
-local function notIn(spec, list)
-    for _,v in ipairs(list) do
-        if spec == v then
-            return false
-        end
-    end
-    return true
-end
-
-function Cooldowns:DetectSpec(unit, spec)
-    local button = Gladdy.buttons[unit]
-    if (not button or not spec or button.spec) then
-        return
-    end
-    if button.class == "PALADIN" and notIn(spec, {L["Holy"], L["Retribution"], L["Protection"]})
-            or button.class == "SHAMAN" and notIn(spec, {L["Restoration"], L["Enhancement"], L["Elemental"]})
-            or button.class == "ROGUE" and notIn(spec, {L["Subtlety"], L["Assassination"], L["Combat"]})
-            or button.class == "WARLOCK" and notIn(spec, {L["Demonology"], L["Destruction"], L["Affliction"]})
-            or button.class == "PRIEST" and notIn(spec, {L["Shadow"], L["Discipline"], L["Holy"]})
-            or button.class == "MAGE" and notIn(spec, {L["Frost"], L["Fire"], L["Arcane"]})
-            or button.class == "DRUID" and notIn(spec, {L["Restoration"], L["Feral"], L["Balance"]})
-            or button.class == "HUNTER" and notIn(spec, {L["Beast Mastery"], L["Marksmanship"], L["Survival"]})
-            or button.class == "WARRIOR" and notIn(spec, {L["Arms"], L["Protection"], L["Fury"]}) then
-        return
-    end
-    if not button.spec then
-        button.spec = spec
-        Gladdy:SendMessage("UNIT_SPEC", unit, spec)
-        Cooldowns:UpdateCooldowns(button)
-    end
-end
 
 function Cooldowns:AddCooldown(spellID, value, button)
     -- see if we have shared cooldowns without a cooldown defined
@@ -515,20 +481,6 @@ function Cooldowns:UpdateCooldowns(button)
     local spec = button.spec
     if not class or not race then
         return
-    end
-
-    if spec then
-        if class == "PALADIN" and notIn(spec, {L["Holy"], L["Retribution"], L["Protection"]})
-                or class == "SHAMAN" and notIn(spec, {L["Restoration"], L["Enhancement"], L["Elemental"]})
-                or class == "ROGUE" and notIn(spec, {L["Subtlety"], L["Assassination"], L["Combat"]})
-                or class == "WARLOCK" and notIn(spec, {L["Demonology"], L["Destruction"], L["Affliction"]})
-                or class == "PRIEST" and notIn(spec, {L["Shadow"], L["Discipline"], L["Holy"]})
-                or class == "MAGE" and notIn(spec, {L["Frost"], L["Fire"], L["Arcane"]})
-                or class == "DRUID" and notIn(spec, {L["Restoration"], L["Feral"], L["Balance"]})
-                or class == "HUNTER" and notIn(spec, {L["Beast Mastery"], L["Marksmanship"], L["Survival"]})
-                or class == "WARRIOR" and notIn(spec, {L["Arms"], L["Protection"], L["Fury"]}) then
-            return
-        end
     end
 
     for k, v in pairs(Gladdy:GetCooldownList()[class]) do

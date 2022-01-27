@@ -1,4 +1,4 @@
-local select, string_gsub, tostring, pairs = select, string.gsub, tostring, pairs
+local select, string_gsub, tostring, pairs, ipairs = select, string.gsub, tostring, pairs, ipairs
 
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local AURA_TYPE_DEBUFF = AURA_TYPE_DEBUFF
@@ -11,10 +11,11 @@ local FindAuraByName = AuraUtil.FindAuraByName
 local GetTime = GetTime
 
 local Gladdy = LibStub("Gladdy")
+local L = Gladdy.L
 local Cooldowns = Gladdy.modules["Cooldowns"]
 local Diminishings = Gladdy.modules["Diminishings"]
 
-local EventListener = Gladdy:NewModule("EventListener", nil, {
+local EventListener = Gladdy:NewModule("EventListener", 100, {
     test = true,
 })
 
@@ -49,12 +50,6 @@ end
 function EventListener:Reset()
     self:UnregisterAllEvents()
     self:SetScript("OnEvent", nil)
-end
-
-function Gladdy:DetectSpec(unit, spec)
-    if spec then
-        self.modules["Cooldowns"]:DetectSpec(unit, spec)
-    end
 end
 
 function Gladdy:SpotEnemy(unit, auraScan)
@@ -92,7 +87,7 @@ function Gladdy:SpotEnemy(unit, auraScan)
             if Gladdy.specBuffs[spellName] then -- Check for auras that detect a spec
                 local unitPet = string_gsub(unit, "%d$", "pet%1")
                 if UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster) then
-                    Gladdy:DetectSpec(unit, Gladdy.specBuffs[spellName])
+                    EventListener:DetectSpec(unit, Gladdy.specBuffs[spellName])
                 end
             end
         end
@@ -144,7 +139,7 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
                         unitClass = Gladdy.buttons[srcUnit].race
                     end
                     Cooldowns:CooldownUsed(srcUnit, unitClass, spellId)
-                    Gladdy:DetectSpec(srcUnit, Gladdy.specSpells[spellName])
+                    self:DetectSpec(srcUnit, Gladdy.specSpells[spellName])
                 end
             end
 
@@ -157,7 +152,7 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
             Gladdy:SpotEnemy(srcUnit, true)
         end
         if not Gladdy.buttons[srcUnit].spec then
-            Gladdy:DetectSpec(srcUnit, Gladdy.specSpells[spellName])
+            self:DetectSpec(srcUnit, Gladdy.specSpells[spellName])
         end
     end
 end
@@ -255,7 +250,7 @@ function EventListener:UNIT_AURA(unit)
             if not button.spec and Gladdy.specBuffs[spellName] then
                 local unitPet = string_gsub(unit, "%d$", "pet%1")
                 if unitCaster and (UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster)) then
-                    Gladdy:DetectSpec(unit, Gladdy.specBuffs[spellName])
+                    self:DetectSpec(unit, Gladdy.specBuffs[spellName])
                 end
             end
             if Gladdy.exceptionNames[spellID] then
@@ -271,7 +266,7 @@ function EventListener:UNIT_SPELLCAST_START(unit)
     if Gladdy.buttons[unit] then
         local spellName = UnitCastingInfo(unit)
         if Gladdy.specSpells[spellName] and not Gladdy.buttons[unit].spec then
-            Gladdy:DetectSpec(unit, Gladdy.specSpells[spellName])
+            self:DetectSpec(unit, Gladdy.specSpells[spellName])
         end
     end
 end
@@ -280,7 +275,7 @@ function EventListener:UNIT_SPELLCAST_CHANNEL_START(unit)
     if Gladdy.buttons[unit] then
         local spellName = UnitChannelInfo(unit)
         if Gladdy.specSpells[spellName] and not Gladdy.buttons[unit].spec then
-            Gladdy:DetectSpec(unit, Gladdy.specSpells[spellName])
+            self:DetectSpec(unit, Gladdy.specSpells[spellName])
         end
     end
 end
@@ -289,7 +284,46 @@ function EventListener:UNIT_SPELLCAST_SUCCEEDED(unit)
     if Gladdy.buttons[unit] then
         local spellName = UnitCastingInfo(unit)
         if Gladdy.specSpells[spellName] and not Gladdy.buttons[unit].spec then
-            Gladdy:DetectSpec(unit, Gladdy.specSpells[spellName])
+            self:DetectSpec(unit, Gladdy.specSpells[spellName])
         end
+    end
+end
+
+local function notIn(spec, list)
+    for _,v in ipairs(list) do
+        if spec == v then
+            return false
+        end
+    end
+    return true
+end
+
+function EventListener:DetectSpec(unit, spec)
+    local button = Gladdy.buttons[unit]
+    if (not button or not spec or button.spec) then
+        return
+    end
+    if button.class == "PALADIN" and notIn(spec, {L["Holy"], L["Retribution"], L["Protection"]})
+            or button.class == "SHAMAN" and notIn(spec, {L["Restoration"], L["Enhancement"], L["Elemental"]})
+            or button.class == "ROGUE" and notIn(spec, {L["Subtlety"], L["Assassination"], L["Combat"]})
+            or button.class == "WARLOCK" and notIn(spec, {L["Demonology"], L["Destruction"], L["Affliction"]})
+            or button.class == "PRIEST" and notIn(spec, {L["Shadow"], L["Discipline"], L["Holy"]})
+            or button.class == "MAGE" and notIn(spec, {L["Frost"], L["Fire"], L["Arcane"]})
+            or button.class == "DRUID" and notIn(spec, {L["Restoration"], L["Feral"], L["Balance"]})
+            or button.class == "HUNTER" and notIn(spec, {L["Beast Mastery"], L["Marksmanship"], L["Survival"]})
+            or button.class == "WARRIOR" and notIn(spec, {L["Arms"], L["Protection"], L["Fury"]}) then
+        return
+    end
+    if not button.spec then
+        button.spec = spec
+        Gladdy:SendMessage("UNIT_SPEC", unit, spec)
+    end
+end
+
+function EventListener:Test(unit)
+    local button = Gladdy.buttons[unit]
+    if (Gladdy.testData[unit].testSpec) then
+        button.spec = nil
+        self:DetectSpec(unit, button.testSpec)
     end
 end
