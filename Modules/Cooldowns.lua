@@ -1,4 +1,4 @@
-local type, pairs, ipairs, ceil, tonumber, mod, tostring, upper, select = type, pairs, ipairs, ceil, tonumber, mod, tostring, string.upper, select
+local type, pairs, ipairs, ceil, tonumber, mod, tostring, upper, select, tinsert, tremove = type, pairs, ipairs, ceil, tonumber, mod, tostring, string.upper, select, tinsert, tremove
 local GetTime = GetTime
 local CreateFrame = CreateFrame
 local RACE_ICON_TCOORDS = {
@@ -74,6 +74,7 @@ local Cooldowns = Gladdy:NewModule("Cooldowns", nil, {
 function Cooldowns:Initialize()
     self.cooldownSpellIds = {}
     self.spellTextures = {}
+    self.iconCache = {}
     for _,spellTable in pairs(Gladdy:GetCooldownList()) do
         for spellId,_ in pairs(spellTable) do
             local spellName, _, texture = GetSpellInfo(spellId)
@@ -91,6 +92,10 @@ function Cooldowns:Initialize()
     self:RegisterMessage("UNIT_DESTROYED")
 end
 
+---------------------
+-- Frame
+---------------------
+
 function Cooldowns:CreateFrame(unit)
     local button = Gladdy.buttons[unit]
     -- Cooldown frame
@@ -99,42 +104,105 @@ function Cooldowns:CreateFrame(unit)
     spellCooldownFrame:SetMovable(true)
     spellCooldownFrame:SetFrameStrata(Gladdy.db.cooldownFrameStrata)
     spellCooldownFrame:SetFrameLevel(Gladdy.db.cooldownFrameLevel)
-    for x = 1, 14 do
-        local icon = CreateFrame("Frame", nil, spellCooldownFrame)
+    spellCooldownFrame.icons = {}
+    button.spellCooldownFrame = spellCooldownFrame
+end
+
+function Cooldowns:CreateIcon() -- returns iconFrame
+    local icon
+    if (#self.iconCache > 0) then
+        icon = tremove(self.iconCache, #self.iconCache)
+    else
+        icon = CreateFrame("Frame")
         icon:EnableMouse(false)
-        icon:SetFrameStrata(Gladdy.db.cooldownFrameStrata)
-        icon:SetFrameLevel(Gladdy.db.cooldownFrameLevel)
+
         icon.texture = icon:CreateTexture(nil, "BACKGROUND")
         icon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
         icon.texture:SetAllPoints(icon)
 
         icon.cooldown = CreateFrame("Cooldown", nil, icon, "CooldownFrameTemplate")
         icon.cooldown.noCooldownCount = true
-
-        icon.cooldown:SetFrameStrata(Gladdy.db.cooldownFrameStrata)
-        icon.cooldown:SetFrameLevel(Gladdy.db.cooldownFrameLevel + 1)
         icon.cooldown:SetReverse(false)
         icon.cooldown:SetHideCountdownNumbers(true)
 
         icon.cooldownFrame = CreateFrame("Frame", nil, icon)
         icon.cooldownFrame:ClearAllPoints()
         icon.cooldownFrame:SetAllPoints(icon)
-        icon.cooldownFrame:SetFrameStrata(Gladdy.db.cooldownFrameStrata)
-        icon.cooldownFrame:SetFrameLevel(Gladdy.db.cooldownFrameLevel + 2)
 
         icon.border = icon.cooldownFrame:CreateTexture(nil, "OVERLAY")
         icon.border:SetAllPoints(icon)
-        icon.border:SetTexture(Gladdy.db.cooldownBorderStyle)
-        icon.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.cooldownBorderColor))
 
         icon.cooldownFont = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
-        icon.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), Gladdy.db.cooldownSize / 2  * Gladdy.db.cooldownFontScale, "OUTLINE")
-        icon.cooldownFont:SetTextColor(Gladdy:SetColor(Gladdy.db.cooldownFontColor))
         icon.cooldownFont:SetAllPoints(icon)
 
-        spellCooldownFrame["icon" .. x] = icon
+        self:UpdateIcon(icon)
     end
-    button.spellCooldownFrame = spellCooldownFrame
+    return icon
+end
+
+function Cooldowns:UpdateIcon(icon)
+    icon:SetFrameStrata(Gladdy.db.cooldownFrameStrata)
+    icon:SetFrameLevel(Gladdy.db.cooldownFrameLevel)
+    icon.cooldown:SetFrameStrata(Gladdy.db.cooldownFrameStrata)
+    icon.cooldown:SetFrameLevel(Gladdy.db.cooldownFrameLevel + 1)
+    icon.cooldownFrame:SetFrameStrata(Gladdy.db.cooldownFrameStrata)
+    icon.cooldownFrame:SetFrameLevel(Gladdy.db.cooldownFrameLevel + 2)
+
+    icon:SetHeight(Gladdy.db.cooldownSize)
+    icon:SetWidth(Gladdy.db.cooldownSize * Gladdy.db.cooldownWidthFactor)
+    icon.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), Gladdy.db.cooldownSize / 2 * Gladdy.db.cooldownFontScale, "OUTLINE")
+    icon.cooldownFont:SetTextColor(Gladdy:SetColor(Gladdy.db.cooldownFontColor))
+
+    icon.cooldown:SetWidth(icon:GetWidth() - icon:GetWidth()/16)
+    icon.cooldown:SetHeight(icon:GetHeight() - icon:GetHeight()/16)
+    icon.cooldown:ClearAllPoints()
+    icon.cooldown:SetPoint("CENTER", icon, "CENTER")
+    icon.cooldown:SetAlpha(Gladdy.db.cooldownCooldownAlpha)
+
+    icon.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), (icon:GetWidth()/2 - 1) * Gladdy.db.cooldownFontScale, "OUTLINE")
+    icon.cooldownFont:SetTextColor(Gladdy:SetColor(Gladdy.db.cooldownFontColor))
+
+    icon.border:SetTexture(Gladdy.db.cooldownBorderStyle)
+    icon.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.cooldownBorderColor))
+end
+
+function Cooldowns:IconsSetPoint(button)
+    for i,icon in ipairs(button.spellCooldownFrame.icons) do
+        icon:SetParent(button.spellCooldownFrame)
+        icon:ClearAllPoints()
+        if (Gladdy.db.cooldownXGrowDirection == "LEFT") then
+            if (i == 1) then
+                icon:SetPoint("LEFT", button.spellCooldownFrame, "LEFT", 0, 0)
+            elseif (mod(i-1,Gladdy.db.cooldownMaxIconsPerLine) == 0) then
+                if (Gladdy.db.cooldownYGrowDirection == "DOWN") then
+                    icon:SetPoint("TOP", button.spellCooldownFrame.icons[i-Gladdy.db.cooldownMaxIconsPerLine], "BOTTOM", 0, -Gladdy.db.cooldownIconPadding)
+                else
+                    icon:SetPoint("BOTTOM", button.spellCooldownFrame.icons[i-Gladdy.db.cooldownMaxIconsPerLine], "TOP", 0, Gladdy.db.cooldownIconPadding)
+                end
+            else
+                icon:SetPoint("RIGHT", button.spellCooldownFrame.icons[i-1], "LEFT", -Gladdy.db.cooldownIconPadding, 0)
+            end
+        end
+        if (Gladdy.db.cooldownXGrowDirection == "RIGHT") then
+            if (i == 1) then
+                icon:SetPoint("LEFT", button.spellCooldownFrame, "LEFT", 0, 0)
+            elseif (mod(i-1,Gladdy.db.cooldownMaxIconsPerLine) == 0) then
+                if (Gladdy.db.cooldownYGrowDirection == "DOWN") then
+                    icon:SetPoint("TOP", button.spellCooldownFrame.icons[i-Gladdy.db.cooldownMaxIconsPerLine], "BOTTOM", 0, -Gladdy.db.cooldownIconPadding)
+                else
+                    icon:SetPoint("BOTTOM", button.spellCooldownFrame.icons[i-Gladdy.db.cooldownMaxIconsPerLine], "TOP", 0, Gladdy.db.cooldownIconPadding)
+                end
+            else
+                icon:SetPoint("LEFT", button.spellCooldownFrame.icons[i-1], "RIGHT", Gladdy.db.cooldownIconPadding, 0)
+            end
+        end
+    end
+end
+
+function Cooldowns:UpdateFrameOnce()
+    for _,icon in ipairs(self.iconCache) do
+        Cooldowns:UpdateIcon(icon)
+    end
 end
 
 function Cooldowns:UpdateFrame(unit)
@@ -145,7 +213,6 @@ function Cooldowns:UpdateFrame(unit)
         button.spellCooldownFrame:SetWidth(1)
         button.spellCooldownFrame:SetFrameStrata(Gladdy.db.cooldownFrameStrata)
         button.spellCooldownFrame:SetFrameLevel(Gladdy.db.cooldownFrameLevel)
-        button.spellCooldownFrame:Show()
 
         Gladdy:SetPosition(button.spellCooldownFrame, unit, "cooldownXOffset", "cooldownYOffset", Cooldowns:LegacySetPosition(button, unit), Cooldowns)
 
@@ -155,92 +222,65 @@ function Cooldowns:UpdateFrame(unit)
                     Gladdy.db.cooldownSize * Gladdy.db.cooldownWidthFactor, Gladdy.db.cooldownSize, 0, 0, "cooldown")
         end
         -- Update each cooldown icon
-        local o = 1
-        for j = 1, 14 do
-            local icon = button.spellCooldownFrame["icon" .. j]
-
-            icon:SetFrameStrata(Gladdy.db.cooldownFrameStrata)
-            icon:SetFrameLevel(Gladdy.db.cooldownFrameLevel)
-            icon.cooldown:SetFrameStrata(Gladdy.db.cooldownFrameStrata)
-            icon.cooldown:SetFrameLevel(Gladdy.db.cooldownFrameLevel + 1)
-            icon.cooldownFrame:SetFrameStrata(Gladdy.db.cooldownFrameStrata)
-            icon.cooldownFrame:SetFrameLevel(Gladdy.db.cooldownFrameLevel + 2)
-
-            icon:SetHeight(Gladdy.db.cooldownSize)
-            icon:SetWidth(Gladdy.db.cooldownSize * Gladdy.db.cooldownWidthFactor)
-            icon.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), Gladdy.db.cooldownSize / 2 * Gladdy.db.cooldownFontScale, "OUTLINE")
-            icon.cooldownFont:SetTextColor(Gladdy:SetColor(Gladdy.db.cooldownFontColor))
-            icon:ClearAllPoints()
-            if (Gladdy.db.cooldownXGrowDirection == "LEFT") then
-                if (j == 1) then
-                    icon:SetPoint("LEFT", button.spellCooldownFrame, "LEFT", 0, 0)
-                elseif (mod(j-1,Gladdy.db.cooldownMaxIconsPerLine) == 0) then
-                    if (Gladdy.db.cooldownYGrowDirection == "DOWN") then
-                        icon:SetPoint("TOP", button.spellCooldownFrame["icon" .. o], "BOTTOM", 0, -Gladdy.db.cooldownIconPadding)
-                    else
-                        icon:SetPoint("BOTTOM", button.spellCooldownFrame["icon" .. o], "TOP", 0, Gladdy.db.cooldownIconPadding)
-                    end
-                    o = o + tonumber(Gladdy.db.cooldownMaxIconsPerLine)
-                else
-                    icon:SetPoint("RIGHT", button.spellCooldownFrame["icon" .. j - 1], "LEFT", -Gladdy.db.cooldownIconPadding, 0)
-                end
-            end
-            if (Gladdy.db.cooldownXGrowDirection == "RIGHT") then
-                if (j == 1) then
-                    icon:SetPoint("LEFT", button.spellCooldownFrame, "LEFT", 0, 0)
-                elseif (mod(j-1,Gladdy.db.cooldownMaxIconsPerLine) == 0) then
-                    if (Gladdy.db.cooldownYGrowDirection == "DOWN") then
-                        icon:SetPoint("TOP", button.spellCooldownFrame["icon" .. o], "BOTTOM", 0, -Gladdy.db.cooldownIconPadding)
-                    else
-                        icon:SetPoint("BOTTOM", button.spellCooldownFrame["icon" .. o], "TOP", 0, Gladdy.db.cooldownIconPadding)
-                    end
-                    o = o + tonumber(Gladdy.db.cooldownMaxIconsPerLine)
-                else
-                    icon:SetPoint("LEFT", button.spellCooldownFrame["icon" .. j - 1], "RIGHT", Gladdy.db.cooldownIconPadding, 0)
-                end
-            end
-
-            if (icon.active) then
-                icon.active = false
-                icon.cooldown:SetCooldown(GetTime(), 0)
-                icon.cooldownFont:SetText("")
-                icon:SetScript("OnUpdate", nil)
-            end
-            icon.spellId = nil
-            icon:SetAlpha(1)
-            icon.texture:SetTexture("Interface\\Icons\\Spell_Holy_PainSupression")
-
-            icon.cooldown:SetWidth(icon:GetWidth() - icon:GetWidth()/16)
-            icon.cooldown:SetHeight(icon:GetHeight() - icon:GetHeight()/16)
-            icon.cooldown:ClearAllPoints()
-            icon.cooldown:SetPoint("CENTER", icon, "CENTER")
-            icon.cooldown:SetAlpha(Gladdy.db.cooldownCooldownAlpha)
-
-            icon.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), (icon:GetWidth()/2 - 1) * Gladdy.db.cooldownFontScale, "OUTLINE")
-            icon.cooldownFont:SetTextColor(Gladdy:SetColor(Gladdy.db.cooldownFontColor))
-
-            icon.border:SetTexture(Gladdy.db.cooldownBorderStyle)
-            icon.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.cooldownBorderColor))
-            icon:Hide()
+        for _,icon in pairs(button.spellCooldownFrame.icons) do
+            self:UpdateIcon(icon)
         end
+        self:IconsSetPoint(button)
         button.spellCooldownFrame:Show()
     else
         button.spellCooldownFrame:Hide()
     end
-    if (Gladdy.frame.testing) then
-        self:Test(unit)
+end
+
+function Cooldowns:ResetUnit(unit)
+    local button = Gladdy.buttons[unit]
+    if not button then
+        return
+    end
+    for i=#button.spellCooldownFrame.icons,1,-1 do
+        self:ClearIcon(button, i)
     end
 end
+
+function Cooldowns:ClearIcon(button, index, spellId, icon)
+    if index then
+        icon = tremove(button.spellCooldownFrame.icons, index)
+    else
+        for i=#button.spellCooldownFrame.icons,1,-1 do
+            if icon then
+                if button.spellCooldownFrame.icons[i] == icon then
+                    icon = tremove(button.spellCooldownFrame.icons, index)
+                end
+            end
+            if not icon and spellId then
+                if button.spellCooldownFrame.icons[i].spellId == spellId then
+                    icon = tremove(button.spellCooldownFrame.icons, index)
+                end
+            end
+        end
+    end
+    icon:ClearAllPoints()
+    icon:SetParent(nil)
+    icon:Hide()
+    icon.spellId = nil
+    icon.active = false
+    icon.cooldown:Hide()
+    icon.cooldownFont:SetText("")
+    icon:SetScript("OnUpdate", nil)
+    tinsert(self.iconCache, icon)
+end
+
+---------------------
+-- Test
+---------------------
 
 function Cooldowns:Test(unit)
     local button = Gladdy.buttons[unit]
     if Gladdy.db.cooldown then
         button.spellCooldownFrame:Show()
-        button.lastCooldownSpell = 1
         self:UpdateTestCooldowns(unit)
     else
         button.spellCooldownFrame:Hide()
-        button.lastCooldownSpell = 1
         self:UpdateTestCooldowns(unit)
     end
 
@@ -250,11 +290,9 @@ function Cooldowns:UpdateTestCooldowns(unit)
     local button = Gladdy.buttons[unit]
 
     if (button.testSpec and button.testSpec == Gladdy.testData[unit].testSpec) then
-        button.lastCooldownSpell = 1
         self:UpdateCooldowns(button)
         button.spec = nil
         self:DetectSpec(unit, button.testSpec)
-        button.test = true
 
         -- use class spells
         for spellId,_ in pairs(Gladdy:GetCooldownList()[button.class]) do
@@ -267,6 +305,10 @@ function Cooldowns:UpdateTestCooldowns(unit)
     end
 end
 
+---------------------
+-- Events
+---------------------
+
 function Cooldowns:ENEMY_SPOTTED(unit)
     self:UpdateCooldowns(Gladdy.buttons[unit])
 end
@@ -275,18 +317,25 @@ function Cooldowns:SPEC_DETECTED(unit, spec)
     self:DetectSpec(unit, spec)
 end
 
+function Cooldowns:UNIT_DESTROYED(unit)
+
+end
+
+---------------------
+-- Cooldown Start/Ready
+---------------------
+
 function Cooldowns:CooldownStart(button, spellId, duration, start)
     -- starts timer frame
     if not duration or duration == nil or type(duration) ~= "number" then
         return
     end
-    for i = 1, button.lastCooldownSpell + 1 do
-        if (button.spellCooldownFrame["icon" .. i].spellId == spellId) then
-            local frame = button.spellCooldownFrame["icon" .. i]
-            frame.active = true
-            frame.timeLeft = start and start - GetTime() + duration or duration
-            if (not Gladdy.db.cooldownDisableCircle) then frame.cooldown:SetCooldown(start or GetTime(), duration) end
-            frame:SetScript("OnUpdate", function(self, elapsed)
+    for _,icon in pairs(button.spellCooldownFrame.icons) do
+        if (icon.spellId == spellId) then
+            icon.active = true
+            icon.timeLeft = start and start - GetTime() + duration or duration
+            if (not Gladdy.db.cooldownDisableCircle) then icon.cooldown:SetCooldown(start or GetTime(), duration) end
+            icon:SetScript("OnUpdate", function(self, elapsed)
                 self.timeLeft = self.timeLeft - elapsed
                 local timeLeft = ceil(self.timeLeft)
                 if timeLeft >= 540 then
@@ -298,26 +347,25 @@ function Cooldowns:CooldownStart(button, spellId, duration, start)
                 end
                 Gladdy:FormatTimer(self.cooldownFont, self.timeLeft, self.timeLeft < 0)
                 if (self.timeLeft <= 0) then
-                    Cooldowns:CooldownReady(button, spellId, frame)
+                    Cooldowns:CooldownReady(button, spellId, icon)
                 end
                 if (self.timeLeft <= 0) then
-                    Cooldowns:CooldownReady(button, spellId, frame)
+                    Cooldowns:CooldownReady(button, spellId, icon)
                 end
             end)
+            --C_VoiceChat.SpeakText(2, GetSpellInfo(spellId), 3, 4, 100)
         end
     end
 end
 
 function Cooldowns:CooldownReady(button, spellId, frame)
     if (frame == false) then
-        for i = 1, button.lastCooldownSpell do
-            frame = button.spellCooldownFrame["icon" .. i]
-
-            if (frame.spellId == spellId) then
-                frame.active = false
-                frame.cooldown:Hide()
-                frame.cooldownFont:SetText("")
-                frame:SetScript("OnUpdate", nil)
+        for _,icon in pairs(button.spellCooldownFrame.icons) do
+            if (icon.spellId == spellId) then
+                icon.active = false
+                icon.cooldown:Hide()
+                icon.cooldownFont:SetText("")
+                icon:SetScript("OnUpdate", nil)
             end
         end
     else
@@ -325,175 +373,6 @@ function Cooldowns:CooldownReady(button, spellId, frame)
         frame.cooldown:Hide()
         frame.cooldownFont:SetText("")
         frame:SetScript("OnUpdate", nil)
-    end
-end
-
-local function notIn(spec, list)
-    for _,v in ipairs(list) do
-        if spec == v then
-            return false
-        end
-    end
-    return true
-end
-
-function Cooldowns:DetectSpec(unit, spec)
-
-    local button = Gladdy.buttons[unit]
-    if (not button or not spec or button.spec) then
-        return
-    end
-    if button.class == "PALADIN" and notIn(spec, {L["Holy"], L["Retribution"], L["Protection"]})
-            or button.class == "SHAMAN" and notIn(spec, {L["Restoration"], L["Enhancement"], L["Elemental"]})
-            or button.class == "ROGUE" and notIn(spec, {L["Subtlety"], L["Assassination"], L["Combat"]})
-            or button.class == "WARLOCK" and notIn(spec, {L["Demonology"], L["Destruction"], L["Affliction"]})
-            or button.class == "PRIEST" and notIn(spec, {L["Shadow"], L["Discipline"], L["Holy"]})
-            or button.class == "MAGE" and notIn(spec, {L["Frost"], L["Fire"], L["Arcane"]})
-            or button.class == "DRUID" and notIn(spec, {L["Restoration"], L["Feral"], L["Balance"]})
-            or button.class == "HUNTER" and notIn(spec, {L["Beast Mastery"], L["Marksmanship"], L["Survival"]})
-            or button.class == "WARRIOR" and notIn(spec, {L["Arms"], L["Protection"], L["Fury"]}) then
-        return
-    end
-
-    button.spec = spec
-    if not button.test then
-        Gladdy:SendMessage("UNIT_SPEC", unit, spec)
-    end
-
-
-    -- update cooldown tracker
-    --[[
-        All of this could possibly be handled in a "once they're used, they show up"-manner
-        but I PERSONALLY prefer it this way. It also meant less work and makes spec-specific cooldowns easier
-    ]]
-    if (Gladdy.db.cooldown) then
-        local class = Gladdy.buttons[unit].class
-        for k, v in pairs(Gladdy:GetCooldownList()[class]) do
-            if Gladdy.db.cooldownCooldowns[tostring(k)] then
-                --if (self.db.cooldownList[k] ~= false and self.db.cooldownList[class] ~= false) then
-                if (type(v) == "table" and ((v.spec ~= nil and v.spec == spec) or (v.notSpec ~= nil and v.notSpec ~= spec))) then
-                    local sharedCD = false
-                    if (type(v) == "table" and v.sharedCD ~= nil and v.sharedCD.cd == nil) then
-                        for spellId, _ in pairs(v.sharedCD) do
-                            for i = 1, button.lastCooldownSpell do
-                                local icon = button.spellCooldownFrame["icon" .. i]
-                                if (icon.spellId == spellId) then
-                                    sharedCD = true
-                                end
-                            end
-                        end
-                    end
-                    if sharedCD then
-                        return
-                    end
-
-                    local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
-                    icon:Show()
-                    icon.texture:SetTexture(self.spellTextures[k])
-                    icon.spellId = k
-                    button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
-                    button.lastCooldownSpell = button.lastCooldownSpell + 1
-                end
-            end
-        end
-    end
-    ----------------------
-    --- RACE FUNCTIONALITY
-    ----------------------
-    local race = Gladdy.buttons[unit].race
-    if Gladdy:GetCooldownList()[race] then
-        for k, v in pairs(Gladdy:GetCooldownList()[race]) do
-            if Gladdy.db.cooldownCooldowns[tostring(k)] then
-                --if (self.db.cooldownList[k] ~= false and self.db.cooldownList[class] ~= false) then
-                if (type(v) == "table" and ((v.spec ~= nil and v.spec == spec) or (v.notSpec ~= nil and v.notSpec ~= spec))) then
-                    local sharedCD = false
-                    if (type(v) == "table" and v.sharedCD ~= nil and v.sharedCD.cd == nil) then
-                        for spellId, _ in pairs(v.sharedCD) do
-                            for i = 1, button.lastCooldownSpell do
-                                local icon = button.spellCooldownFrame["icon" .. i]
-                                if (icon.spellId == spellId) then
-                                    sharedCD = true
-                                end
-                            end
-                        end
-                    end
-                    if sharedCD then
-                        return
-                    end
-
-                    local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
-                    icon:Show()
-                    icon.texture:SetTexture(self.spellTextures[k])
-                    icon.spellId = k
-                    button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
-                    button.lastCooldownSpell = button.lastCooldownSpell + 1
-                end
-            end
-        end
-    end
-end
-
-function Cooldowns:ResetUnit(unit)
-    Gladdy.buttons[unit].lastCooldownSpell = nil
-    Gladdy.buttons[unit].test = nil
-end
-
-function Cooldowns:UNIT_DESTROYED(unit)
-
-end
-
-function Cooldowns:UpdateCooldowns(button)
-    local class = button.class
-    local race = button.race
-    if ( not button.lastCooldownSpell) then
-        button.lastCooldownSpell = 1
-    end
-
-    if (Gladdy.db.cooldown) then
-        for k, v in pairs(Gladdy:GetCooldownList()[class]) do
-            if Gladdy.db.cooldownCooldowns[tostring(k)] then
-                if (type(v) ~= "table" or (type(v) == "table" and v.spec == nil and v.notSpec == nil)) then
-                    -- see if we have shared cooldowns without a cooldown defined
-                    -- e.g. hunter traps have shared cooldowns, so only display one trap instead all of them
-                    local sharedCD = false
-                    if (type(v) == "table" and v.sharedCD ~= nil and v.sharedCD.cd == nil) then
-                        for spellId, _ in pairs(v.sharedCD) do
-                            for i = 1, button.lastCooldownSpell do
-                                local icon = button.spellCooldownFrame["icon" .. i]
-                                if (icon.spellId == spellId) then
-                                    sharedCD = true
-                                end
-                            end
-                        end
-                    end
-
-                    if (not sharedCD) then
-                        local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
-                        icon:Show()
-                        icon.spellId = k
-                        icon.texture:SetTexture(self.spellTextures[k])
-                        button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
-                        button.lastCooldownSpell = button.lastCooldownSpell + 1
-                    end
-                end
-            end
-        end
-        ----
-        -- RACE FUNCTIONALITY
-        ----
-
-        for k, v in pairs(Gladdy:GetCooldownList()[race]) do
-            if Gladdy.db.cooldownCooldowns[tostring(k)] then
-                if (type(v) ~= "table" or (type(v) == "table" and v.spec == nil and v.notSpec == nil)) then
-                    local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
-                    icon:Show()
-                    icon.spellId = k
-                    icon.texture:SetTexture(self.spellTextures[k])
-                    button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
-                    button.lastCooldownSpell = button.lastCooldownSpell + 1
-                end
-            end
-        end
     end
 end
 
@@ -535,8 +414,7 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId, expirationTimeInSecond
             for spellID,_ in pairs(cooldown.sharedCD) do
                 if (spellID ~= "cd") then
                     local skip = false
-                    for i = 1, button.lastCooldownSpell do
-                        local icon = button.spellCooldownFrame["icon" .. i]
+                    for _,icon in pairs(button.spellCooldownFrame.icons) do
                         if (icon.spellId == spellID and icon.active and icon.timeLeft > sharedCD) then
                             skip = true
                             break
@@ -565,6 +443,119 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId, expirationTimeInSecond
        PlaySoundFile(LSM:Fetch(LSM.MediaType.SOUND, db.cooldownSoundList[spellId]))
     end  ]]
 end
+
+---------------------
+-- Detect Spec
+---------------------
+
+local function notIn(spec, list)
+    for _,v in ipairs(list) do
+        if spec == v then
+            return false
+        end
+    end
+    return true
+end
+
+function Cooldowns:DetectSpec(unit, spec)
+    local button = Gladdy.buttons[unit]
+    if (not button or not spec or button.spec) then
+        return
+    end
+    if button.class == "PALADIN" and notIn(spec, {L["Holy"], L["Retribution"], L["Protection"]})
+            or button.class == "SHAMAN" and notIn(spec, {L["Restoration"], L["Enhancement"], L["Elemental"]})
+            or button.class == "ROGUE" and notIn(spec, {L["Subtlety"], L["Assassination"], L["Combat"]})
+            or button.class == "WARLOCK" and notIn(spec, {L["Demonology"], L["Destruction"], L["Affliction"]})
+            or button.class == "PRIEST" and notIn(spec, {L["Shadow"], L["Discipline"], L["Holy"]})
+            or button.class == "MAGE" and notIn(spec, {L["Frost"], L["Fire"], L["Arcane"]})
+            or button.class == "DRUID" and notIn(spec, {L["Restoration"], L["Feral"], L["Balance"]})
+            or button.class == "HUNTER" and notIn(spec, {L["Beast Mastery"], L["Marksmanship"], L["Survival"]})
+            or button.class == "WARRIOR" and notIn(spec, {L["Arms"], L["Protection"], L["Fury"]}) then
+        return
+    end
+    if not button.spec then
+        button.spec = spec
+        Gladdy:SendMessage("UNIT_SPEC", unit, spec)
+        Cooldowns:UpdateCooldowns(button)
+    end
+end
+
+function Cooldowns:AddCooldown(spellID, value, button)
+    -- see if we have shared cooldowns without a cooldown defined
+    -- e.g. hunter traps have shared cooldowns, so only display one trap instead all of them
+    local sharedCD = false
+    if (type(value) == "table" and value.sharedCD ~= nil and value.sharedCD.cd == nil) then
+        for spellId, _ in pairs(value.sharedCD) do
+            for _,icon in pairs(button.spellCooldownFrame.icons) do
+                if (icon.spellId == spellId) then
+                    sharedCD = true
+                end
+            end
+        end
+    end
+    for _,icon in pairs(button.spellCooldownFrame.icons) do
+        if (icon and icon.spellId == spellID) then
+            sharedCD = true
+        end
+    end
+    if (not sharedCD) then
+        local icon = self:CreateIcon()
+        icon:Show()
+        icon.spellId = spellID
+        icon.texture:SetTexture(self.spellTextures[spellID])
+        tinsert(button.spellCooldownFrame.icons, icon)
+        self:IconsSetPoint(button)
+        Gladdy:Debug("Cooldowns:AddCooldown", button.unit, GetSpellInfo(spellID))
+    end
+end
+
+function Cooldowns:UpdateCooldowns(button)
+    local class = button.class
+    local race = button.race
+    local spec = button.spec
+    if not class or not race then
+        return
+    end
+
+    if spec then
+        if class == "PALADIN" and notIn(spec, {L["Holy"], L["Retribution"], L["Protection"]})
+                or class == "SHAMAN" and notIn(spec, {L["Restoration"], L["Enhancement"], L["Elemental"]})
+                or class == "ROGUE" and notIn(spec, {L["Subtlety"], L["Assassination"], L["Combat"]})
+                or class == "WARLOCK" and notIn(spec, {L["Demonology"], L["Destruction"], L["Affliction"]})
+                or class == "PRIEST" and notIn(spec, {L["Shadow"], L["Discipline"], L["Holy"]})
+                or class == "MAGE" and notIn(spec, {L["Frost"], L["Fire"], L["Arcane"]})
+                or class == "DRUID" and notIn(spec, {L["Restoration"], L["Feral"], L["Balance"]})
+                or class == "HUNTER" and notIn(spec, {L["Beast Mastery"], L["Marksmanship"], L["Survival"]})
+                or class == "WARRIOR" and notIn(spec, {L["Arms"], L["Protection"], L["Fury"]}) then
+            return
+        end
+    end
+
+    for k, v in pairs(Gladdy:GetCooldownList()[class]) do
+        if Gladdy.db.cooldownCooldowns[tostring(k)] then
+            if (type(v) ~= "table" or (type(v) == "table" and v.spec == nil)) then
+                Cooldowns:AddCooldown(k, v, button)
+            end
+            if (type(v) == "table" and v.spec ~= nil and v.spec == spec) then
+                Cooldowns:AddCooldown(k, v, button)
+            end
+        end
+    end
+    for k, v in pairs(Gladdy:GetCooldownList()[button.race]) do
+        if Gladdy.db.cooldownCooldowns[tostring(k)] then
+            if (type(v) ~= "table" or (type(v) == "table" and v.spec == nil)) then
+                Cooldowns:AddCooldown(k, v, button)
+            end
+            if (type(v) == "table" and v.spec ~= nil and v.spec == spec) then
+                Cooldowns:AddCooldown(k, v, button)
+            end
+        end
+    end
+end
+
+---------------------
+-- Options
+---------------------
 
 function Cooldowns:GetOptions()
     return {
@@ -898,28 +889,6 @@ function Cooldowns:GetCooldownOptions()
         end
     end
     return group
-end
-
-function Gladdy:UpdateTestCooldowns(i)
-    local unit = "arena" .. i
-    local button = Gladdy.buttons[unit]
-
-    if (button.testSpec and button.testSpec == Gladdy.testData[unit].testSpec) then
-        button.lastCooldownSpell = 1
-        Cooldowns:UpdateCooldowns(button)
-        button.spec = nil
-        Cooldowns:DetectSpec(unit, button.testSpec)
-
-        -- use class spells
-        for spellID,_ in pairs(Gladdy:GetCooldownList()[button.class]) do
-            --k is spellId
-            Cooldowns:CooldownUsed(unit, button.class, spellID)
-        end
-        -- use race spells
-        for spellID,_ in pairs(Gladdy:GetCooldownList()[button.race]) do
-            Cooldowns:CooldownUsed(unit, button.race, spellID)
-        end
-    end
 end
 
 ---------------------------
