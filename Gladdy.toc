@@ -26,6 +26,7 @@ Modules\Clicks.lua
 Modules\Diminishings.lua
 Modules\Highlight.lua
 Modules\TotemPlates.lua
+Modules\TotemPulse.lua
 Modules\Trinket.lua
 Modules\Racial.lua
 Modules\Cooldowns.lua
