@@ -98,6 +98,18 @@ local function GetTotemColorDefaultOptions()
     end)
     for i=1,#indexedList do
         defaultDB["totem" .. indexedList[i].id] = {color = indexedList[i].color, enabled = indexedList[i].enabled, alpha = 0.6, customText = ""}
+        options["npTotemsHideDisabledTotems"] = {
+            order = 1,
+            name = L["Hide Disabled Totem Plates"],
+            desc = L["Hide Disabled Totem Plates"],
+            type = "toggle",
+            width = "full",
+            get = function() return Gladdy.dbi.profile.npTotemsHideDisabledTotems end,
+            set = function(_, value)
+                Gladdy.dbi.profile.npTotemsHideDisabledTotems = value
+                Gladdy:UpdateFrame()
+            end
+        }
         options["totem" .. indexedList[i].id] = {
             order = i+1,
             name = select(1, GetSpellInfo(indexedList[i].id)),
@@ -198,7 +210,8 @@ local TotemPlates = Gladdy:NewModule("Totem Plates", nil, {
     npTotemPlatesAlpha = 0.6,
     npTotemPlatesAlphaAlways = false,
     npTotemPlatesAlphaAlwaysTargeted = false,
-    npTotemColors = select(1, GetTotemColorDefaultOptions())
+    npTotemColors = select(1, GetTotemColorDefaultOptions()),
+    npTotemsHideDisabledTotems = false,
 })
 
 LibStub("AceHook-3.0"):Embed(TotemPlates)
@@ -294,6 +307,18 @@ function TotemPlates:UpdateFrameOnce()
         elseif not Gladdy.db.npTotemsShowFriendly and not isEnemy then
             nameplate.gladdyTotemFrame:Hide()
             self:ToggleAddon(nameplate, true)
+        end
+        if Gladdy.db.npTotems and Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enabled then
+            nameplate.gladdyTotemFrame:Show()
+            self:ToggleAddon(nameplate)
+        end
+        if Gladdy.db.npTotems and not Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enabled then
+            nameplate.gladdyTotemFrame:Hide()
+            self:ToggleAddon(nameplate, true)
+        end
+        if Gladdy.db.npTotems and not Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enabled and Gladdy.db.npTotemsHideDisabledTotems then
+            nameplate.gladdyTotemFrame:Hide()
+            self:ToggleAddon(nameplate)
         end
     end
     for _,gladdyTotemFrame in ipairs(self.totemPlateCache) do
@@ -395,7 +420,7 @@ function TotemPlates:ToggleAddon(nameplate, show)
 end
 
 function TotemPlates.OnUpdate(self)
-    if (UnitIsUnit("mouseover", self.unitID) or UnitIsUnit("target", self.unitID)) then
+    if (UnitIsUnit("mouseover", self.unitID) or UnitIsUnit("target", self.unitID)) and Gladdy.db.npTotemColors["totem" .. self.totemDataEntry.id].alpha > 0 then
         self.selectionHighlight:SetAlpha(.25)
     else
         self.selectionHighlight:SetAlpha(0)
@@ -452,6 +477,14 @@ function TotemPlates:OnUnitEvent(unitID)
         TotemPlates:SetTotemAlpha(nameplate.gladdyTotemFrame, unitID)
         self:ToggleAddon(nameplate)
         self.activeTotemNameplates[unitID] = nameplate
+    elseif totemDataEntry and not Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enabled and Gladdy.db.npTotemsHideDisabledTotems then
+        if nameplate.gladdyTotemFrame then
+            nameplate.gladdyTotemFrame:Hide()
+            nameplate.gladdyTotemFrame:SetParent(nil)
+            tinsert(self.totemPlateCache, nameplate.gladdyTotemFrame)
+            nameplate.gladdyTotemFrame = nil
+        end
+        self:ToggleAddon(nameplate)
     else
         self:ToggleAddon(nameplate, true)
     end
