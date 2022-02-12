@@ -73,7 +73,7 @@ function Gladdy:SpotEnemy(unit, auraScan)
             if ( not spellName ) then
                 break
             end
-            if Gladdy.cooldownBuffs[spellName] then -- Check for auras that detect used CDs (like Fear Ward)
+            if Gladdy.cooldownBuffs[spellName] and unitCaster then -- Check for auras that detect used CDs (like Fear Ward)
                 for arenaUnit,v in pairs(self.buttons) do
                     if (UnitIsUnit(arenaUnit, unitCaster)) then
                         Cooldowns:CooldownUsed(arenaUnit, v.class, Gladdy.cooldownBuffs[spellName].spellId, expirationTime - GetTime())
@@ -84,7 +84,7 @@ function Gladdy:SpotEnemy(unit, auraScan)
             if Gladdy.cooldownBuffs.racials[spellName] then
                 Gladdy:SendMessage("RACIAL_USED", unit, expirationTime, spellName)
             end
-            if Gladdy.specBuffs[spellName] then -- Check for auras that detect a spec
+            if Gladdy.specBuffs[spellName] and unitCaster then -- Check for auras that detect a spec
                 local unitPet = string_gsub(unit, "%d$", "pet%1")
                 if UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster) then
                     EventListener:DetectSpec(unit, Gladdy.specBuffs[spellName])
@@ -238,7 +238,7 @@ function EventListener:UNIT_AURA(unit)
                 Gladdy:SendMessage("AURA_GAIN_LIMIT", unit, auraType, n - 1)
                 break
             end
-            if Gladdy.cooldownBuffs[spellName] then -- Check for auras that hint used CDs (like Fear Ward)
+            if Gladdy.cooldownBuffs[spellName] and unitCaster then -- Check for auras that hint used CDs (like Fear Ward)
                 for arenaUnit,v in pairs(Gladdy.buttons) do
                     if (UnitIsUnit(arenaUnit, unitCaster)) then
                         Cooldowns:CooldownUsed(arenaUnit, v.class, Gladdy.cooldownBuffs[spellName].spellId, expirationTime - GetTime())
@@ -248,7 +248,7 @@ function EventListener:UNIT_AURA(unit)
             if Gladdy.cooldownBuffs.racials[spellName] then
                 Gladdy:SendMessage("RACIAL_USED", unit, spellName, expirationTime, spellName)
             end
-            if not button.spec and Gladdy.specBuffs[spellName] then
+            if not button.spec and Gladdy.specBuffs[spellName] and unitCaster then
                 local unitPet = string_gsub(unit, "%d$", "pet%1")
                 if unitCaster and (UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster)) then
                     self:DetectSpec(unit, Gladdy.specBuffs[spellName])
