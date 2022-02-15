@@ -29,8 +29,17 @@ local Trinket = Gladdy:NewModule("Trinket", 80, {
 
 function Trinket:Initialize()
     self.frames = {}
+    if Gladdy.db.trinketEnabled then
+        self:RegisterMessage("JOINED_ARENA")
+    end
+end
 
-    self:RegisterMessage("JOINED_ARENA")
+function Trinket:UpdateFrameOnce()
+    if Gladdy.db.trinketEnabled then
+        self:RegisterMessage("JOINED_ARENA")
+    else
+        self:UnregisterAllMessages()
+    end
 end
 
 local function iconTimer(self, elapsed)
@@ -272,6 +281,7 @@ function Trinket:GetOptions()
             name = L["Colored trinket"],
             desc = L["Shows a solid colored icon when off/off CD."],
             order = 4,
+            disabled = function() return not Gladdy.db.trinketEnabled end,
         }),
         trinketColoredCd = Gladdy:colorOption({
             type = "color",
@@ -279,9 +289,7 @@ function Trinket:GetOptions()
             desc = L["Color of the border"],
             order = 5,
             hasAlpha = true,
-            disabled = function()
-                return not Gladdy.db.trinketColored
-            end,
+            disabled = function() return not Gladdy.db.trinketEnabled end,
         }),
         trinketColoredNoCd = Gladdy:colorOption({
             type = "color",
@@ -289,15 +297,14 @@ function Trinket:GetOptions()
             desc = L["Color of the border"],
             order = 6,
             hasAlpha = true,
-            disabled = function()
-                return not Gladdy.db.trinketColored
-            end,
+            disabled = function() return not Gladdy.db.trinketEnabled end,
         }),
         group = {
             type = "group",
             childGroups = "tree",
             name = L["Frame"],
             order = 5,
+            disabled = function() return not Gladdy.db.trinketEnabled end,
             args = {
                 general = {
                     type = "group",

@@ -82,9 +82,21 @@ local specIcons = {
 function Classicon:Initialize()
     self.frames = {}
 
-    self:RegisterMessage("ENEMY_SPOTTED")
-    self:RegisterMessage("UNIT_DEATH")
-    self:RegisterMessage("UNIT_SPEC")
+    if Gladdy.db.classIconEnabled then
+        self:RegisterMessage("ENEMY_SPOTTED")
+        self:RegisterMessage("UNIT_DEATH")
+        self:RegisterMessage("UNIT_SPEC")
+    end
+end
+
+function Classicon:UpdateFrameOnce()
+    if Gladdy.db.classIconEnabled then
+        self:RegisterMessage("ENEMY_SPOTTED")
+        self:RegisterMessage("UNIT_DEATH")
+        self:RegisterMessage("UNIT_SPEC")
+    else
+        self:UnregisterAllMessages()
+    end
 end
 
 function Classicon:CreateFrame(unit)
@@ -191,6 +203,7 @@ function Classicon:GetOptions()
             name = L["Show Spec Icon"],
             desc = L["Shows Spec Icon once spec is detected"],
             order = 4,
+            disabled = function() return not Gladdy.db.classIconEnabled end,
             get = function() return Gladdy.db.classIconSpecIcon end,
             set = function(_, value)
                 Gladdy.db.classIconSpecIcon = value
@@ -210,6 +223,7 @@ function Classicon:GetOptions()
             childGroups = "tree",
             name = L["Frame"],
             order = 4,
+            disabled = function() return not Gladdy.db.classIconEnabled end,
             args = {
                 size = {
                     type = "group",

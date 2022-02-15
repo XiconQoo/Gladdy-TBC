@@ -52,10 +52,22 @@ local RangeCheck = Gladdy:NewModule("Range Check", nil, {
 })
 
 function RangeCheck:Initialize()
-    self:RegisterMessage("JOINED_ARENA")
-    self:RegisterMessage("ENEMY_STEALTH")
-    self:RegisterMessage("ENEMY_SPOTTED")
+    if Gladdy.db.rangeCheckEnabled then
+        self:RegisterMessage("JOINED_ARENA")
+        self:RegisterMessage("ENEMY_STEALTH")
+        self:RegisterMessage("ENEMY_SPOTTED")
+    end
     self.playerClass = select(2, UnitClass("player"))
+end
+
+function RangeCheck:UpdateFrameOnce()
+    if Gladdy.db.rangeCheckEnabled then
+        self:RegisterMessage("JOINED_ARENA")
+        self:RegisterMessage("ENEMY_STEALTH")
+        self:RegisterMessage("ENEMY_SPOTTED")
+    else
+        self:UnregisterAllMessages()
+    end
 end
 
 function RangeCheck:Reset()
@@ -268,6 +280,7 @@ function RangeCheck:GetOptions()
             childGroups = "tree",
             name = L["General"],
             order = 5,
+            disabled = function() return not Gladdy.db.rangeCheckEnabled end,
             args = {
                 general = {
                     type = "group",
@@ -340,6 +353,7 @@ function RangeCheck:GetOptions()
             childGroups = "tree",
             name = L["Spells"],
             order = 5,
+            disabled = function() return not Gladdy.db.rangeCheckEnabled end,
             args = RangeCheck:GetSpells(),
         },
     }

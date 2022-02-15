@@ -48,8 +48,10 @@ local Castbar = Gladdy:NewModule("Cast Bar", 70, {
 
 function Castbar:Initialize()
     self.frames = {}
-    self:RegisterMessage("UNIT_DEATH")
-    self:RegisterMessage("JOINED_ARENA")
+    if Gladdy.db.castBarEnabled then
+        self:RegisterMessage("UNIT_DEATH")
+        self:RegisterMessage("JOINED_ARENA")
+    end
 end
 
 ---------------------------
@@ -131,6 +133,15 @@ function Castbar:CreateFrame(unit)
     Gladdy.buttons[unit].castBar = castBar
     self.frames[unit] = castBar
     self:ResetUnit(unit)
+end
+
+function Castbar:UpdateFrameOnce()
+    if Gladdy.db.castBarEnabled then
+        self:RegisterMessage("UNIT_DEATH")
+        self:RegisterMessage("JOINED_ARENA")
+    else
+        self:UnregisterAllMessages()
+    end
 end
 
 function Castbar:UpdateFrame(unit)
@@ -584,6 +595,7 @@ function Castbar:GetOptions()
             childGroups = "tree",
             name = L["Frame"],
             order = 4,
+            disabled = function() return not Gladdy.db.castBarEnabled end,
             args = {
                 barFrame = {
                     type = "group",

@@ -47,13 +47,22 @@ function ACDFrame:Initialize()
     ACDNumOne:SetPoint("CENTER", ACDNumFrame, "CENTER", 0, 0)
     self.ACDNumOne = ACDNumOne
 
-    self:RegisterMessage("JOINED_ARENA")
-    self:RegisterMessage("ENEMY_SPOTTED")
-    self:RegisterMessage("UNIT_SPEC")
+    if Gladdy.db.countdown then
+        self:RegisterMessage("JOINED_ARENA")
+        self:RegisterMessage("ENEMY_SPOTTED")
+        self:RegisterMessage("UNIT_SPEC")
+    end
     self.faction = UnitFactionGroup("player")
 end
 
 function ACDFrame:UpdateFrameOnce()
+    if Gladdy.db.countdown then
+        self:RegisterMessage("JOINED_ARENA")
+        self:RegisterMessage("ENEMY_SPOTTED")
+        self:RegisterMessage("UNIT_SPEC")
+    else
+        self:UnregisterAllMessages()
+    end
     self.ACDNumFrame:SetFrameStrata(Gladdy.db.arenaCountdownFrameStrata)
     self.ACDNumFrame:SetFrameLevel(Gladdy.db.arenaCountdownFrameLevel)
 end
@@ -189,6 +198,7 @@ function ACDFrame:GetOptions()
             max = 512,
             step = 16,
             width = "full",
+            disabled = function() return not Gladdy.db.countdown end,
         }),
         headerAuraLevel = {
             type = "header",
@@ -201,6 +211,7 @@ function ACDFrame:GetOptions()
             order = 6,
             values = Gladdy.frameStrata,
             sorting = Gladdy.frameStrataSorting,
+            disabled = function() return not Gladdy.db.countdown end,
         }),
         arenaCountdownFrameLevel = Gladdy:option({
             type = "range",
@@ -210,6 +221,7 @@ function ACDFrame:GetOptions()
             step = 1,
             order = 7,
             width = "full",
+            disabled = function() return not Gladdy.db.countdown end,
         }),
     }
 end

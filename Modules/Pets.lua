@@ -31,11 +31,25 @@ local Pets = Gladdy:NewModule("Pets", nil, {
 
 function Pets:Initialize()
     self.frames = {}
-    self:RegisterMessage("JOINED_ARENA")
-    self:RegisterMessage("PET_SPOTTED")
-    self:RegisterMessage("PET_DESTROYED")
-    self:RegisterMessage("PET_STEALTH")
-    self:RegisterMessage("ENEMY_SPOTTED")
+    if Gladdy.db.petEnabled then
+        self:RegisterMessage("JOINED_ARENA")
+        self:RegisterMessage("PET_SPOTTED")
+        self:RegisterMessage("PET_DESTROYED")
+        self:RegisterMessage("PET_STEALTH")
+        self:RegisterMessage("ENEMY_SPOTTED")
+    end
+end
+
+function Pets:UpdateFrameOnce()
+    if Gladdy.db.petEnabled then
+        self:RegisterMessage("JOINED_ARENA")
+        self:RegisterMessage("PET_SPOTTED")
+        self:RegisterMessage("PET_DESTROYED")
+        self:RegisterMessage("PET_STEALTH")
+        self:RegisterMessage("ENEMY_SPOTTED")
+    else
+        self:UnregisterAllMessages()
+    end
 end
 
 function Pets:JOINED_ARENA()
@@ -380,6 +394,7 @@ function Pets:GetOptions()
             childGroups = "tree",
             name = L["Frame"],
             order = 3,
+            disabled = function() return not Gladdy.db.petEnabled end,
             args = {
                 general = {
                     type = "group",

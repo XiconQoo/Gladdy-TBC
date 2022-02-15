@@ -76,13 +76,16 @@ function BuffsDebuffs:Initialize()
     self.icons = {}
     self.trackedCC = {}
     self.framePool = {}
-    self:RegisterMessage("JOINED_ARENA")
-    self:RegisterMessage("UNIT_DESTROYED")
-    self:RegisterMessage("UNIT_DEATH")
-    self:RegisterMessage("AURA_FADE")
-    self:RegisterMessage("AURA_GAIN")
-    self:RegisterMessage("AURA_GAIN_LIMIT")
-    self:SetScript("OnEvent", BuffsDebuffs.OnEvent)
+    if Gladdy.db.buffsEnabled then
+        self:RegisterMessages(
+                "JOINED_ARENA",
+                "UNIT_DESTROYED",
+                "UNIT_DEATH",
+                "AURA_FADE",
+                "AURA_GAIN",
+                "AURA_GAIN_LIMIT")
+        self:SetScript("OnEvent", BuffsDebuffs.OnEvent)
+    end
     spellSchoolToOptionValueTable = {
         curse = Gladdy.db.buffsBorderColorCurse,
         magic = Gladdy.db.buffsBorderColorMagic,
@@ -290,6 +293,22 @@ local function styleIcon(aura, auraType)
     aura.stacks:SetTextColor(Gladdy.db.buffsFontColor.r, Gladdy.db.buffsFontColor.g, Gladdy.db.buffsFontColor.b, 1)
 end
 
+function BuffsDebuffs:UpdateFrameOnce()
+    if Gladdy.db.buffsEnabled then
+        self:RegisterMessages(
+                "JOINED_ARENA",
+                "UNIT_DESTROYED",
+                "UNIT_DEATH",
+                "AURA_FADE",
+                "AURA_GAIN",
+                "AURA_GAIN_LIMIT")
+        self:SetScript("OnEvent", BuffsDebuffs.OnEvent)
+    else
+        self:UnregisterAllMessages()
+        self:SetScript("OnEvent", nil)
+    end
+end
+
 function BuffsDebuffs:UpdateFrame(unit)
     --DEBUFFS
     self.frames[unit].debuffFrame:SetHeight(Gladdy.db.buffsIconSize)
@@ -485,12 +504,14 @@ function BuffsDebuffs:GetOptions()
             name = L["Show CC"],
             desc = L["Shows all debuffs, which are displayed on the ClassIcon as well"],
             order = 4,
+            disabled = function() return not Gladdy.db.buffsEnabled end,
         }),
         group = {
             type = "group",
             childGroups = "tree",
             name = L["Frame"],
             order = 5,
+            disabled = function() return not Gladdy.db.buffsEnabled end,
             args = {
                 buffs = {
                     type = "group",
@@ -919,6 +940,7 @@ function BuffsDebuffs:GetOptions()
             name = L["Debuff Lists"],
             type = "group",
             order = 11,
+            disabled = function() return not Gladdy.db.buffsEnabled end,
             childGroups = "tree",
             args = select(1, Gladdy:GetAuras(AURA_TYPE_DEBUFF)),
             set = function(info, state)
@@ -934,6 +956,7 @@ function BuffsDebuffs:GetOptions()
             name = L["Buff Lists"],
             type = "group",
             order = 12,
+            disabled = function() return not Gladdy.db.buffsEnabled end,
             childGroups = "tree",
             args = select(1, Gladdy:GetAuras(AURA_TYPE_BUFF)),
             set = function(info, state)

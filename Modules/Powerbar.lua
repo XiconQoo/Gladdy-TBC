@@ -29,10 +29,23 @@ local Powerbar = Gladdy:NewModule("Power Bar", 90, {
 function Powerbar:Initialize()
     self.frames = {}
 
-    self:RegisterMessage("ENEMY_SPOTTED")
-    self:RegisterMessage("UNIT_SPEC")
-    self:RegisterMessage("UNIT_DEATH")
-    self:RegisterMessage("UNIT_DESTROYED")
+    if Gladdy.db.powerBarEnabled then
+        self:RegisterMessage("ENEMY_SPOTTED")
+        self:RegisterMessage("UNIT_SPEC")
+        self:RegisterMessage("UNIT_DEATH")
+        self:RegisterMessage("UNIT_DESTROYED")
+    end
+end
+
+function Powerbar:UpdateFrameOnce()
+    if Gladdy.db.powerBarEnabled then
+        self:RegisterMessage("ENEMY_SPOTTED")
+        self:RegisterMessage("UNIT_SPEC")
+        self:RegisterMessage("UNIT_DEATH")
+        self:RegisterMessage("UNIT_DESTROYED")
+    else
+        self:UnregisterAllMessages()
+    end
 end
 
 function Powerbar:CreateFrame(unit)
@@ -147,8 +160,16 @@ function Powerbar:UpdateFrame(unit)
 
     if not Gladdy.db.powerBarEnabled then
         powerBar:Hide()
+        powerBar:UnregisterEvent("UNIT_POWER_UPDATE")
+        powerBar:UnregisterEvent("UNIT_MAXPOWER")
+        powerBar:UnregisterEvent("UNIT_DISPLAYPOWER")
+        powerBar:SetScript("OnEvent", nil)
         return
     else
+        powerBar:RegisterUnitEvent("UNIT_POWER_UPDATE", unit)
+        powerBar:RegisterUnitEvent("UNIT_MAXPOWER", unit)
+        powerBar:RegisterUnitEvent("UNIT_DISPLAYPOWER", unit)
+        powerBar:SetScript("OnEvent", Powerbar.OnEvent)
         powerBar:Show()
     end
     powerBar.bg:SetTexture(Gladdy:SMFetch("statusbar", "powerBarTexture"))
@@ -351,6 +372,7 @@ function Powerbar:GetOptions()
             childGroups = "tree",
             name = L["Frame"],
             order = 4,
+            disabled = function() return not Gladdy.db.powerBarEnabled end,
             args = {
                 general = {
                     type = "group",

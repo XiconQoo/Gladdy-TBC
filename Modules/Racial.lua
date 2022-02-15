@@ -26,9 +26,21 @@ local Racial = Gladdy:NewModule("Racial", 79, {
 function Racial:Initialize()
     self.frames = {}
 
-    self:RegisterMessage("JOINED_ARENA")
-    self:RegisterMessage("ENEMY_SPOTTED")
-    self:RegisterMessage("RACIAL_USED")
+    if Gladdy.db.racialEnabled then
+        self:RegisterMessage("JOINED_ARENA")
+        self:RegisterMessage("ENEMY_SPOTTED")
+        self:RegisterMessage("RACIAL_USED")
+    end
+end
+
+function Racial:UpdateFrameOnce()
+    if Gladdy.db.racialEnabled then
+        self:RegisterMessage("JOINED_ARENA")
+        self:RegisterMessage("ENEMY_SPOTTED")
+        self:RegisterMessage("RACIAL_USED")
+    else
+        self:UnregisterAllMessages()
+    end
 end
 
 local function iconTimer(self,elapsed)
@@ -235,6 +247,7 @@ function Racial:GetOptions()
             childGroups = "tree",
             name = L["Frame"],
             order = 4,
+            disabled = function() return not Gladdy.db.racialEnabled end,
             args = {
                 general = {
                     type = "group",
