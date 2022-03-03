@@ -15,6 +15,8 @@ local Classicon = Gladdy:NewModule("Class Icon", 81, {
     classIconYOffset = 0,
     classIconFrameStrata = "MEDIUM",
     classIconFrameLevel = 5,
+    classIconGroup = false,
+    classIconGroupDirection = "RIGHT"
 })
 
 local classIconPath = "Interface\\Addons\\Gladdy\\Images\\Classes\\"
@@ -132,6 +134,14 @@ function Classicon:UpdateFrame(unit)
     classIcon:SetHeight(Gladdy.db.classIconSize)
 
     Gladdy:SetPosition(classIcon, unit, "classIconXOffset", "classIconYOffset", Classicon:LegacySetPosition(classIcon, unit), Classicon)
+
+    if (Gladdy.db.classIconGroup) then
+        if (unit ~= "arena1") then
+            local previousUnit = "arena" .. string.gsub(unit, "arena", "") - 1
+            self.frames[unit]:ClearAllPoints()
+            self.frames[unit]:SetPoint("LEFT", self.frames[previousUnit], "RIGHT", 0, 0)
+        end
+    end
 
     if (unit == "arena1") then
         Gladdy:CreateMover(classIcon, "classIconXOffset", "classIconYOffset", L["Class Icon"],
