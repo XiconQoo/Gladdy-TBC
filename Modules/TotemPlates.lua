@@ -490,6 +490,7 @@ function TotemPlates:TestOnce()
         self.testFrame:SetWidth(1)
         self.testFrame:SetHeight(32)
         self.testFrame:SetPoint("CENTER", UIParent, "CENTER", 0, -140)
+        self.testFrame:SetIgnoreParentScale(true)
     end
     local totemDataEntry = npcIdToTotemData[5913]
     self.testFrame:Show()
