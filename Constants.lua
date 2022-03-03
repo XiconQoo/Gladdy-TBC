@@ -579,7 +579,13 @@ local importantAuras = {
         priority = 10,
         spellID = 26669,
     },
-
+    -- Riposte
+    [GetSpellInfo(14251)] = {
+        track = AURA_TYPE_DEBUFF,
+        duration = 6,
+        priority = 20,
+        spellID = 14251,
+    },
 
     -- Fear
     [GetSpellInfo(5782)] = {
@@ -708,6 +714,13 @@ local importantAuras = {
         spellSchool = "magic",
         spellID = 12292,
     },
+    --Disarm
+    [GetSpellInfo(676)] = {
+        track = AURA_TYPE_DEBUFF,
+        duration = 10,
+        priority = 20,
+        spellID = 676,
+    },
 
     -- Grounding Totem Effect
     [GetSpellInfo(8178)] = {
@@ -804,6 +817,13 @@ local importantAuras = {
         priority = 15,
         spellID = 5024,
         altName = select(1, GetSpellInfo(5024)) .. " - " .. (select(1, GetItemInfo(4984)) or "Skull of Impending Doom"),
+    },
+    -- Will of the Forsaken
+    [GetSpellInfo(7744)] = {
+        track = AURA_TYPE_BUFF,
+        duration = 5,
+        priority = 15,
+        spellID = 7744,
     },
 }
 function Gladdy:GetImportantAuras()
