@@ -254,6 +254,7 @@ Data.spells = {
 
 	-- Disarm
 	[676] = "disarm",
+	[14251] = "disarm",
 }
 
 -- DR Category names
