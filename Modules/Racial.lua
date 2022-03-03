@@ -169,7 +169,6 @@ function Racial:UpdateFrame(unit)
 end
 
 function Racial:JOINED_ARENA()
-    self:RegisterEvent("ARENA_COOLDOWNS_UPDATE")
     self:SetScript("OnEvent", function(self, event, ...)
         if self[event] then
             self[event](self, ...)
@@ -186,7 +185,7 @@ function Racial:RACIAL_USED(unit, expirationTime, spellName)
     if expirationTime and Gladdy:Racials()[button.race].spellName ~= spellName then
         return
     end
-    local startTime = (expirationTime and expirationTime - Gladdy:Racials()[button.race].duration) or GetTime()
+    local startTime = expirationTime or GetTime()
     Racial:Used(unit, startTime, Gladdy:Racials()[button.race].duration)
 end
 
