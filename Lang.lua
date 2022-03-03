@@ -28,6 +28,34 @@ L["Troll"] = C_CreatureInfo.GetRaceInfo(8).raceName
 L["Blood Elf"] = C_CreatureInfo.GetRaceInfo(10).raceName
 L["Draenei"] = C_CreatureInfo.GetRaceInfo(11).raceName
 
+--Specs
+--[[
+L["Balance"] = BALANCE
+L["Combat"] = COMBAT_LABEL
+L["Fire"] = STRING_SCHOOL_FIRE
+L["Arcane"] = STRING_SCHOOL_ARCANE
+L["Shadow"] = STRING_SCHOOL_SHADOW
+L["Holy"] = STRING_SCHOOL_HOLY
+L["Elemental"] = STRING_SCHOOL_ELEMENTAL
+
+
+--Modules
+--L["Announcements"] = CHAT_ANNOUNCE
+L["Auras"] = COMBAT_TEXT_SHOW_AURAS_TEXT
+L["Cast Bar"] = SHOW_ENEMY_CAST
+L["Buffs and Debuffs"] = BUFFOPTIONS_LABEL
+--L["Class Icon"] = CLASS .. " " .. EMBLEM_SYMBOL
+--L["Clicks"] =
+L["Cooldowns"] = CAPACITANCE_SHIPMENT_COOLDOWN:gsub(": %%s", "")
+--L["Export Import"] =
+--L["Healthbar"]
+L["Highlight"] = HIGHLIGHTING:gsub(":", "")
+L["Pet"] = PET_TYPE_PET
+--L["Racial"] = RACE .. " " .. ABILITIES
+--L["Range Check"] =
+L["Trinket"] = TRINKET0SLOT
+--]]
+
 if (GetLocale() == "ruRU") then
     -- Specs
     L["Balance"] = "Баланс"
