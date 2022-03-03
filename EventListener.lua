@@ -15,7 +15,7 @@ local L = Gladdy.L
 local Cooldowns = Gladdy.modules["Cooldowns"]
 local Diminishings = Gladdy.modules["Diminishings"]
 
-local EventListener = Gladdy:NewModule("EventListener", 10, {
+local EventListener = Gladdy:NewModule("EventListener", 101, {
     test = true,
 })
 
@@ -76,13 +76,13 @@ function Gladdy:SpotEnemy(unit, auraScan)
             if Gladdy.cooldownBuffs[spellName] and unitCaster then -- Check for auras that detect used CDs (like Fear Ward)
                 for arenaUnit,v in pairs(self.buttons) do
                     if (UnitIsUnit(arenaUnit, unitCaster)) then
-                        Cooldowns:CooldownUsed(arenaUnit, v.class, Gladdy.cooldownBuffs[spellName].spellId, expirationTime - GetTime())
+                        Cooldowns:CooldownUsed(arenaUnit, v.class, Gladdy.cooldownBuffs[spellName].spellId, Gladdy.cooldownBuffs[spellName].cd(expirationTime - GetTime()))
                         -- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena5", "PRIEST", 6346, 10)
                     end
                 end
             end
-            if Gladdy.cooldownBuffs.racials[spellName] then
-                Gladdy:SendMessage("RACIAL_USED", unit, expirationTime, spellName)
+            if Gladdy.cooldownBuffs.racials[spellName] and Gladdy.cooldownBuffs.racials[spellName] then
+                Gladdy:SendMessage("RACIAL_USED", unit, spellName, Gladdy.cooldownBuffs.racials[spellName].cd(expirationTime - GetTime()), spellName)
             end
             if Gladdy.specBuffs[spellName] and unitCaster then -- Check for auras that detect a spec
                 local unitPet = string_gsub(unit, "%d$", "pet%1")
@@ -213,10 +213,22 @@ Gladdy.exceptionNames = { -- TODO MOVE ME TO CLASSBUFFS LIB
 }
 
 Gladdy.cooldownBuffs = {
-    [GetSpellInfo(6346)] = { cd = 180, spellId = 6346 }, -- Fear Ward
-    -- TODO sprint, shadowstep
+    [GetSpellInfo(6346)] = { cd = function(expTime) -- 180s uptime == cd
+        return expTime
+    end, spellId = 6346 }, -- Fear Ward
+    [GetSpellInfo(11305)] = { cd = function(expTime) -- 15s uptime
+        return 180 - (15 - expTime)
+    end, spellId = 11305 }, -- Sprint
+    [GetSpellInfo(36554)] = { cd = function(expTime) -- 3s uptime
+        return 30 - (3 - expTime)
+    end, spellId = 36554 }, -- Shadowstep
+    [GetSpellInfo(26889)] = { cd = function(expTime) -- 3s uptime
+        return 180 - (10 - expTime)
+    end, spellId = 26889 }, -- Vanish
     racials = {
-        [GetSpellInfo(20600)] = { cd = 180, spellId = 20600 }, -- Perception
+        [GetSpellInfo(20600)] = { cd = function(expTime) -- 20s uptime
+            return GetTime() - (20 - expTime)
+        end, spellId = 20600 }, -- Perception
     }
 }
 
@@ -241,12 +253,12 @@ function EventListener:UNIT_AURA(unit)
             if Gladdy.cooldownBuffs[spellName] and unitCaster then -- Check for auras that hint used CDs (like Fear Ward)
                 for arenaUnit,v in pairs(Gladdy.buttons) do
                     if (UnitIsUnit(arenaUnit, unitCaster)) then
-                        Cooldowns:CooldownUsed(arenaUnit, v.class, Gladdy.cooldownBuffs[spellName].spellId, expirationTime - GetTime())
+                        Cooldowns:CooldownUsed(arenaUnit, v.class, Gladdy.cooldownBuffs[spellName].spellId, Gladdy.cooldownBuffs[spellName].cd(expirationTime - GetTime()))
                     end
                 end
             end
-            if Gladdy.cooldownBuffs.racials[spellName] then
-                Gladdy:SendMessage("RACIAL_USED", unit, spellName, expirationTime, spellName)
+            if Gladdy.cooldownBuffs.racials[spellName] and Gladdy.cooldownBuffs.racials[spellName] then
+                Gladdy:SendMessage("RACIAL_USED", unit, spellName, Gladdy.cooldownBuffs.racials[spellName].cd(expirationTime - GetTime()), spellName)
             end
             if not button.spec and Gladdy.specBuffs[spellName] and unitCaster then
                 local unitPet = string_gsub(unit, "%d$", "pet%1")
