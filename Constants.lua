@@ -13,6 +13,34 @@ tbl_sort(Gladdy.CLASSES)
 Gladdy.RACES = {"Scourge", "BloodElf", "Tauren", "Orc", "Troll", "NightElf", "Draenei", "Human", "Gnome", "Dwarf"}
 tbl_sort(Gladdy.RACES)
 
+local RACE_ICON_TCOORDS = {
+    ["HUMAN_MALE"]		= {0, 0.125, 0, 0.25},
+    ["DWARF_MALE"]		= {0.125, 0.25, 0, 0.25},
+    ["GNOME_MALE"]		= {0.25, 0.375, 0, 0.25},
+    ["NIGHTELF_MALE"]	= {0.375, 0.5, 0, 0.25},
+
+    ["TAUREN_MALE"]		= {0, 0.125, 0.25, 0.5},
+    ["SCOURGE_MALE"]	= {0.125, 0.25, 0.25, 0.5},
+    ["TROLL_MALE"]		= {0.25, 0.375, 0.25, 0.5},
+    ["ORC_MALE"]		= {0.375, 0.5, 0.25, 0.5},
+
+    ["HUMAN_FEMALE"]	= {0, 0.125, 0.5, 0.75},
+    ["DWARF_FEMALE"]	= {0.125, 0.25, 0.5, 0.75},
+    ["GNOME_FEMALE"]	= {0.25, 0.375, 0.5, 0.75},
+    ["NIGHTELF_FEMALE"]	= {0.375, 0.5, 0.5, 0.75},
+
+    ["TAUREN_FEMALE"]	= {0, 0.125, 0.75, 1.0},
+    ["SCOURGE_FEMALE"]	= {0.125, 0.25, 0.75, 1.0},
+    ["TROLL_FEMALE"]	= {0.25, 0.375, 0.75, 1.0},
+    ["ORC_FEMALE"]		= {0.375, 0.5, 0.75, 1.0},
+
+    ["BLOODELF_MALE"]	= {0.5, 0.625, 0.25, 0.5},
+    ["BLOODELF_FEMALE"]	= {0.5, 0.625, 0.75, 1.0},
+
+    ["DRAENEI_MALE"]	= {0.5, 0.625, 0, 0.25},
+    ["DRAENEI_FEMALE"]	= {0.5, 0.625, 0.5, 0.75},
+}
+
 local specBuffs = {
     -- DRUID
     [GetSpellInfo(45283)] = L["Restoration"], -- Natural Perfection
@@ -958,23 +986,28 @@ local cooldownList = {
         [19503] = 30, -- Scatter Shot
         [14327] = 30, -- Scare Beast
         [19263] = 300, -- Deterrence; not on BM but can't do 2 specs
-        [14311] = { cd = 30, -- Freezing Trap
-                    sharedCD = {
-                        [13809] = true, -- Frost Trap
-                        [34600] = true, -- Snake Trap
-                    },
-        },
+
+
         [13809] = { cd = 30, -- Frost Trap
                     sharedCD = {
                         [14311] = true, -- Freezing Trap
                         [34600] = true, -- Snake Trap
                     },
+                    icon = select(3, GetSpellInfo(14311)),
+        },
+        [14311] = { cd = 30, -- Freezing Trap
+                    sharedCD = {
+                        [13809] = true, -- Frost Trap
+                        [34600] = true, -- Snake Trap
+                    },
+                    icon = select(3, GetSpellInfo(14311)),
         },
         [34600] = { cd = 30, -- Snake Trap
                     sharedCD = {
                         [14311] = true, -- Freezing Trap
                         [13809] = true, -- Frost Trap
                     },
+                    icon = select(3, GetSpellInfo(14311)),
         },
         [34490] = { cd = 20, spec = L["Marksmanship"], }, -- Silencing Shot
         [19386] = { cd = 60, spec = L["Survival"], }, -- Wyvern Sting
@@ -1024,19 +1057,19 @@ local cooldownList = {
 
     },
     ["NightElf"] = {
-        [2651] = { cd = 180, spec = L["Discipline"], }, -- Elune's Grace
-        [10797] = { cd = 30, spec = L["Discipline"], }, -- Star Shards
+        [2651] = { cd = 180, spec = L["Discipline"], class = "PRIEST"}, -- Elune's Grace
+        [10797] = { cd = 30, spec = L["Discipline"], class = "PRIEST"}, -- Star Shards
     },
     ["Draenei"] = {
-        [32548] = { cd = 300, spec = L["Discipline"], }, -- Hymn of Hope
+        [32548] = { cd = 300, spec = L["Discipline"], class = "PRIEST"}, -- Hymn of Hope
     },
     ["Human"] = {
-        [13908] = { cd = 600, spec = L["Discipline"], }, -- Desperate Prayer
+        [13908] = { cd = 600, spec = L["Discipline"], class = "PRIEST"}, -- Desperate Prayer
     },
     ["Gnome"] = {
     },
     ["Dwarf"] = {
-        [13908] = { cd = 600, spec = L["Discipline"], }, -- Desperate Prayer
+        [13908] = { cd = 600, spec = L["Discipline"], class = "PRIEST"}, -- Desperate Prayer
     },
 }
 function Gladdy:GetCooldownList()

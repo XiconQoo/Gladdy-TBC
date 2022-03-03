@@ -1,52 +1,49 @@
 local type, pairs, ipairs, ceil, tonumber, mod, tostring, upper, select, tinsert, tremove = type, pairs, ipairs, ceil, tonumber, mod, tostring, string.upper, select, tinsert, tremove
+local tbl_sort = table.sort
 local GetTime = GetTime
 local CreateFrame = CreateFrame
-local RACE_ICON_TCOORDS = {
-    ["HUMAN_MALE"]		= {0, 0.125, 0, 0.25},
-    ["DWARF_MALE"]		= {0.125, 0.25, 0, 0.25},
-    ["GNOME_MALE"]		= {0.25, 0.375, 0, 0.25},
-    ["NIGHTELF_MALE"]	= {0.375, 0.5, 0, 0.25},
-
-    ["TAUREN_MALE"]		= {0, 0.125, 0.25, 0.5},
-    ["SCOURGE_MALE"]	= {0.125, 0.25, 0.25, 0.5},
-    ["TROLL_MALE"]		= {0.25, 0.375, 0.25, 0.5},
-    ["ORC_MALE"]		= {0.375, 0.5, 0.25, 0.5},
-
-    ["HUMAN_FEMALE"]	= {0, 0.125, 0.5, 0.75},
-    ["DWARF_FEMALE"]	= {0.125, 0.25, 0.5, 0.75},
-    ["GNOME_FEMALE"]	= {0.25, 0.375, 0.5, 0.75},
-    ["NIGHTELF_FEMALE"]	= {0.375, 0.5, 0.5, 0.75},
-
-    ["TAUREN_FEMALE"]	= {0, 0.125, 0.75, 1.0},
-    ["SCOURGE_FEMALE"]	= {0.125, 0.25, 0.75, 1.0},
-    ["TROLL_FEMALE"]	= {0.25, 0.375, 0.75, 1.0},
-    ["ORC_FEMALE"]		= {0.375, 0.5, 0.75, 1.0},
-
-    ["BLOODELF_MALE"]	= {0.5, 0.625, 0.25, 0.5},
-    ["BLOODELF_FEMALE"]	= {0.5, 0.625, 0.75, 1.0},
-
-    ["DRAENEI_MALE"]	= {0.5, 0.625, 0, 0.25},
-    ["DRAENEI_FEMALE"]	= {0.5, 0.625, 0.5, 0.75},
-}
-
 local GetSpellInfo = GetSpellInfo
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 
+local function tableLength(tbl)
+    local getN = 0
+    for n in pairs(tbl) do
+        getN = getN + 1
+    end
+    return getN
+end
+
 local function getDefaultCooldown()
     local cooldowns = {}
-    for _,spellTable in pairs(Gladdy:GetCooldownList()) do
-        for spellId,_ in pairs(spellTable) do
+    local cooldownsOrder = {}
+    for class,spellTable in pairs(Gladdy:GetCooldownList()) do
+        if not spellTable.class and not cooldownsOrder[class] then
+            cooldownsOrder[class] = {}
+        end
+        for spellId,val in pairs(spellTable) do
             local spellName = GetSpellInfo(spellId)
             if spellName then
                 cooldowns[tostring(spellId)] = true
+                if type(val) == "table" and val.class then
+                    if val.class and not cooldownsOrder[val.class] then
+                        cooldownsOrder[val.class] = {}
+                    end
+                    if not cooldownsOrder[val.class][tostring(spellId)] then
+                        cooldownsOrder[val.class][tostring(spellId)] = tableLength(cooldownsOrder[val.class]) + 1
+                    end
+                else
+                    if not cooldownsOrder[class][tostring(spellId)] then
+                        cooldownsOrder[class][tostring(spellId)] = tableLength(cooldownsOrder[class]) + 1
+                    end
+                end
             else
                 Gladdy:Debug("ERROR", "spellid does not exist  " .. spellId)
             end
         end
     end
-    return cooldowns
+    return cooldowns, cooldownsOrder
 end
 
 local Cooldowns = Gladdy:NewModule("Cooldowns", nil, {
@@ -67,17 +64,24 @@ local Cooldowns = Gladdy:NewModule("Cooldowns", nil, {
     cooldownDisableCircle = false,
     cooldownCooldownAlpha = 1,
     cooldownCooldowns = getDefaultCooldown(),
+    cooldownCooldownsOrder = select(2, getDefaultCooldown()),
     cooldownFrameStrata = "MEDIUM",
     cooldownFrameLevel = 3,
+    cooldownGroup = false,
+    cooldownGroupDirection = "DOWN"
 })
 
 function Cooldowns:Initialize()
+    self.frames = {}
     self.cooldownSpellIds = {}
     self.spellTextures = {}
     self.iconCache = {}
     for _,spellTable in pairs(Gladdy:GetCooldownList()) do
-        for spellId,_ in pairs(spellTable) do
+        for spellId,val in pairs(spellTable) do
             local spellName, _, texture = GetSpellInfo(spellId)
+            if type(val) == "table" and val.icon then
+                texture = val.icon
+            end
             if spellName then
                 self.cooldownSpellIds[spellName] = spellId
                 self.spellTextures[spellId] = texture
@@ -106,6 +110,7 @@ function Cooldowns:CreateFrame(unit)
     spellCooldownFrame:SetFrameLevel(Gladdy.db.cooldownFrameLevel)
     spellCooldownFrame.icons = {}
     button.spellCooldownFrame = spellCooldownFrame
+    self.frames[unit] = spellCooldownFrame
 end
 
 function Cooldowns:CreateIcon() -- returns iconFrame
@@ -167,7 +172,15 @@ function Cooldowns:UpdateIcon(icon)
 end
 
 function Cooldowns:IconsSetPoint(button)
-    for i,icon in ipairs(button.spellCooldownFrame.icons) do
+    local orderedIcons = {}
+    for _,icon in pairs(button.spellCooldownFrame.icons) do
+        tinsert(orderedIcons, icon)
+    end
+    tbl_sort(orderedIcons, function(a, b)
+        return Gladdy.db.cooldownCooldownsOrder[button.class][tostring(a.spellId)] < Gladdy.db.cooldownCooldownsOrder[button.class][tostring(b.spellId)]
+    end)
+
+    for i,icon in ipairs(orderedIcons) do
         icon:SetParent(button.spellCooldownFrame)
         icon:ClearAllPoints()
         if (Gladdy.db.cooldownXGrowDirection == "LEFT") then
@@ -175,12 +188,12 @@ function Cooldowns:IconsSetPoint(button)
                 icon:SetPoint("LEFT", button.spellCooldownFrame, "LEFT", 0, 0)
             elseif (mod(i-1,Gladdy.db.cooldownMaxIconsPerLine) == 0) then
                 if (Gladdy.db.cooldownYGrowDirection == "DOWN") then
-                    icon:SetPoint("TOP", button.spellCooldownFrame.icons[i-Gladdy.db.cooldownMaxIconsPerLine], "BOTTOM", 0, -Gladdy.db.cooldownIconPadding)
+                    icon:SetPoint("TOP", orderedIcons[i-Gladdy.db.cooldownMaxIconsPerLine], "BOTTOM", 0, -Gladdy.db.cooldownIconPadding)
                 else
-                    icon:SetPoint("BOTTOM", button.spellCooldownFrame.icons[i-Gladdy.db.cooldownMaxIconsPerLine], "TOP", 0, Gladdy.db.cooldownIconPadding)
+                    icon:SetPoint("BOTTOM", orderedIcons[i-Gladdy.db.cooldownMaxIconsPerLine], "TOP", 0, Gladdy.db.cooldownIconPadding)
                 end
             else
-                icon:SetPoint("RIGHT", button.spellCooldownFrame.icons[i-1], "LEFT", -Gladdy.db.cooldownIconPadding, 0)
+                icon:SetPoint("RIGHT", orderedIcons[i-1], "LEFT", -Gladdy.db.cooldownIconPadding, 0)
             end
         end
         if (Gladdy.db.cooldownXGrowDirection == "RIGHT") then
@@ -188,12 +201,12 @@ function Cooldowns:IconsSetPoint(button)
                 icon:SetPoint("LEFT", button.spellCooldownFrame, "LEFT", 0, 0)
             elseif (mod(i-1,Gladdy.db.cooldownMaxIconsPerLine) == 0) then
                 if (Gladdy.db.cooldownYGrowDirection == "DOWN") then
-                    icon:SetPoint("TOP", button.spellCooldownFrame.icons[i-Gladdy.db.cooldownMaxIconsPerLine], "BOTTOM", 0, -Gladdy.db.cooldownIconPadding)
+                    icon:SetPoint("TOP", orderedIcons[i-Gladdy.db.cooldownMaxIconsPerLine], "BOTTOM", 0, -Gladdy.db.cooldownIconPadding)
                 else
-                    icon:SetPoint("BOTTOM", button.spellCooldownFrame.icons[i-Gladdy.db.cooldownMaxIconsPerLine], "TOP", 0, Gladdy.db.cooldownIconPadding)
+                    icon:SetPoint("BOTTOM", orderedIcons[i-Gladdy.db.cooldownMaxIconsPerLine], "TOP", 0, Gladdy.db.cooldownIconPadding)
                 end
             else
-                icon:SetPoint("LEFT", button.spellCooldownFrame.icons[i-1], "RIGHT", Gladdy.db.cooldownIconPadding, 0)
+                icon:SetPoint("LEFT", orderedIcons[i-1], "RIGHT", Gladdy.db.cooldownIconPadding, 0)
             end
         end
     end
@@ -221,6 +234,15 @@ function Cooldowns:UpdateFrame(unit)
                     {"TOPLEFT", "TOPLEFT"},
                     Gladdy.db.cooldownSize * Gladdy.db.cooldownWidthFactor, Gladdy.db.cooldownSize, 0, 0, "cooldown")
         end
+
+        if (Gladdy.db.cooldownGroup) then
+            if (unit ~= "arena1") then
+                local previousUnit = "arena" .. string.gsub(unit, "arena", "") - 1
+                self.frames[unit]:ClearAllPoints()
+                self.frames[unit]:SetPoint("TOP", self.frames[previousUnit], "BOTTOM", 0, -Gladdy.db.cooldownIconPadding)
+            end
+        end
+
         -- Update each cooldown icon
         for _,icon in pairs(button.spellCooldownFrame.icons) do
             self:UpdateIcon(icon)
@@ -275,13 +297,15 @@ end
 ---------------------
 
 function Cooldowns:Test(unit)
-    local button = Gladdy.buttons[unit]
-    if Gladdy.db.cooldown then
-        button.spellCooldownFrame:Show()
-    else
-        button.spellCooldownFrame:Hide()
+    if Gladdy.frame.testing then
+        local button = Gladdy.buttons[unit]
+        if Gladdy.db.cooldown then
+            button.spellCooldownFrame:Show()
+        else
+            button.spellCooldownFrame:Hide()
+        end
+        self:UpdateTestCooldowns(unit)
     end
-    self:UpdateTestCooldowns(unit)
 end
 
 function Cooldowns:UpdateTestCooldowns(unit)
@@ -455,6 +479,7 @@ function Cooldowns:AddCooldown(spellID, value, button)
             for _,icon in pairs(button.spellCooldownFrame.icons) do
                 if (icon.spellId == spellId) then
                     sharedCD = true
+                    break
                 end
             end
         end
@@ -462,6 +487,7 @@ function Cooldowns:AddCooldown(spellID, value, button)
     for _,icon in pairs(button.spellCooldownFrame.icons) do
         if (icon and icon.spellId == spellID) then
             sharedCD = true
+            break
         end
     end
     if (not sharedCD) then
@@ -493,7 +519,7 @@ function Cooldowns:UpdateCooldowns(button)
             end
         end
     end
-    for k, v in pairs(Gladdy:GetCooldownList()[button.race]) do
+    for k, v in pairs(Gladdy:GetCooldownList()[race]) do
         if Gladdy.db.cooldownCooldowns[tostring(k)] then
             if (type(v) ~= "table" or (type(v) == "table" and v.spec == nil)) then
                 Cooldowns:AddCooldown(k, v, button)
@@ -527,6 +553,7 @@ function Cooldowns:GetOptions()
             childGroups = "tree",
             name = L["Frame"],
             order = 3,
+            disabled = function() return not Gladdy.db.cooldown end,
             args = {
                 icon = {
                     type = "group",
@@ -774,10 +801,13 @@ function Cooldowns:GetOptions()
             childGroups = "tree",
             name = L["Cooldowns"],
             order = 4,
+            disabled = function() return not Gladdy.db.cooldown end,
             args = Cooldowns:GetCooldownOptions(),
         },
     }
 end
+
+
 
 function Cooldowns:GetCooldownOptions()
     local group = {}
@@ -792,52 +822,163 @@ function Cooldowns:GetCooldownOptions()
             iconCoords = CLASS_ICON_TCOORDS[class],
             args = {}
         }
-        local o = 1
+        local tblLength = tableLength(Gladdy.db.cooldownCooldownsOrder[class])
         for spellId,cooldown in pairs(Gladdy:GetCooldownList()[class]) do
             group[class].args[tostring(spellId)] = {
-                type = "toggle",
-                name = select(1, GetSpellInfo(spellId)) .. (type(cooldown) == "table" and cooldown.spec and (" - " .. cooldown.spec) or ""),
-                order = o,
-                width = "full",
-                image = select(3, GetSpellInfo(spellId)),
-                get = function()
-                    return Gladdy.db.cooldownCooldowns[tostring(spellId)]
-                end,
-                set = function(_, value)
-                    Gladdy.db.cooldownCooldowns[tostring(spellId)] = value
-                    Gladdy:UpdateFrame()
-                end
+                name = "",
+                type = "group",
+                inline = true,
+                order = Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)],
+                args = {
+                    toggle = {
+                        type = "toggle",
+                        name = select(1, GetSpellInfo(spellId)) .. (type(cooldown) == "table" and cooldown.spec and (" - " .. cooldown.spec) or ""),
+                        order = 1,
+                        width = 1.1,
+                        image = select(3, GetSpellInfo(spellId)),
+                        get = function()
+                            return Gladdy.db.cooldownCooldowns[tostring(spellId)]
+                        end,
+                        set = function(_, value)
+                            Gladdy.db.cooldownCooldowns[tostring(spellId)] = value
+                            for unit in pairs(Gladdy.buttons) do
+                                Cooldowns:ResetUnit(unit)
+                                Cooldowns:Test(unit)
+                            end
+                            Gladdy:UpdateFrame()
+                        end
+                    },
+                    uparrow = {
+                        type = "execute",
+                        name = "",
+                        order = 2,
+                        width = 0.1,
+                        image = "Interface\\Addons\\Gladdy\\Images\\uparrow",
+                        imageWidth = 20,
+                        imageHeight = 20,
+                        func = function()
+                            if (Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)] > 1) then
+                                local current = Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)]
+                                local next
+                                for k,v in pairs(Gladdy.db.cooldownCooldownsOrder[class]) do
+                                    if v == current - 1 then
+                                        next = k
+                                    end
+                                end
+                                Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)] = Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)] - 1
+                                Gladdy.db.cooldownCooldownsOrder[class][next] = Gladdy.db.cooldownCooldownsOrder[class][next] + 1
+                                Gladdy.options.args["Cooldowns"].args.cooldowns.args[class].args[tostring(spellId)].order = Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)]
+                                Gladdy.options.args["Cooldowns"].args.cooldowns.args[class].args[next].order = Gladdy.db.cooldownCooldownsOrder[class][next]
+                                Gladdy:UpdateFrame()
+                            end
+                        end,
+                    },
+                    downarrow = {
+                        type = "execute",
+                        name = "",
+                        order = 3,
+                        width = 0.1,
+                        image = "Interface\\Addons\\Gladdy\\Images\\downarrow",
+                        imageWidth = 20,
+                        imageHeight = 20,
+                        func = function()
+                            if (Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)] < tblLength) then
+                                local current = Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)]
+                                local next
+                                for k,v in pairs(Gladdy.db.cooldownCooldownsOrder[class]) do
+                                    if v == current + 1 then
+                                        next = k
+                                    end
+                                end
+                                Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)] = Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)] + 1
+                                Gladdy.db.cooldownCooldownsOrder[class][next] = Gladdy.db.cooldownCooldownsOrder[class][next] - 1
+                                Gladdy.options.args["Cooldowns"].args.cooldowns.args[class].args[tostring(spellId)].order = Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)]
+                                Gladdy.options.args["Cooldowns"].args.cooldowns.args[class].args[next].order = Gladdy.db.cooldownCooldownsOrder[class][next]
+                                Gladdy:UpdateFrame()
+                            end
+                        end,
+                    }
+                }
             }
-            o = o + 1
         end
         p = p + i
     end
     for i,race in ipairs(Gladdy.RACES) do
-        group[race] = {
-            type = "group",
-            name = L[race],
-            order = i + p,
-            icon = "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Races",
-            iconCoords = RACE_ICON_TCOORDS[upper(race) .. "_FEMALE"],
-            args = {}
-        }
-        local o = 1
         for spellId,cooldown in pairs(Gladdy:GetCooldownList()[race]) do
-            group[race].args[tostring(spellId)] = {
-                type = "toggle",
-                name = select(1, GetSpellInfo(spellId)) .. (type(cooldown) == "table" and cooldown.spec and (" - " .. cooldown.spec) or ""),
-                order = o,
-                width = "full",
-                image = select(3, GetSpellInfo(spellId)),
-                get = function()
-                    return Gladdy.db.cooldownCooldowns[tostring(spellId)]
-                end,
-                set = function(_, value)
-                    Gladdy.db.cooldownCooldowns[tostring(spellId)] = value
-                    Gladdy:UpdateFrame()
-                end
+            local tblLength = tableLength(Gladdy.db.cooldownCooldownsOrder[cooldown.class])
+            local class = cooldown.class
+            group[class].args[tostring(spellId)] = {
+                name = "",
+                type = "group",
+                inline = true,
+                order = Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)],
+                args = {
+                    toggle = {
+                        type = "toggle",
+                        name = select(1, GetSpellInfo(spellId)) .. (type(cooldown) == "table" and cooldown.spec and (" - " .. cooldown.spec) or ""),
+                        order = 1,
+                        width = 1.1,
+                        image = select(3, GetSpellInfo(spellId)),
+                        get = function()
+                            return Gladdy.db.cooldownCooldowns[tostring(spellId)]
+                        end,
+                        set = function(_, value)
+                            Gladdy.db.cooldownCooldowns[tostring(spellId)] = value
+                            Gladdy:UpdateFrame()
+                        end
+                    },
+                    uparrow = {
+                        type = "execute",
+                        name = "",
+                        order = 2,
+                        width = 0.1,
+                        image = "Interface\\Addons\\Gladdy\\Images\\uparrow",
+                        imageWidth = 20,
+                        imageHeight = 20,
+                        func = function()
+                            if (Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)] > 1) then
+                                local current = Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)]
+                                local next
+                                for k,v in pairs(Gladdy.db.cooldownCooldownsOrder[class]) do
+                                    if v == current - 1 then
+                                        next = k
+                                    end
+                                end
+                                Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)] = Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)] - 1
+                                Gladdy.db.cooldownCooldownsOrder[class][next] = Gladdy.db.cooldownCooldownsOrder[class][next] + 1
+                                Gladdy.options.args["Cooldowns"].args.cooldowns.args[class].args[tostring(spellId)].order = Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)]
+                                Gladdy.options.args["Cooldowns"].args.cooldowns.args[class].args[next].order = Gladdy.db.cooldownCooldownsOrder[class][next]
+                                Gladdy:UpdateFrame()
+                            end
+                        end,
+                    },
+                    downarrow = {
+                        type = "execute",
+                        name = "",
+                        order = 3,
+                        width = 0.1,
+                        image = "Interface\\Addons\\Gladdy\\Images\\downarrow",
+                        imageWidth = 20,
+                        imageHeight = 20,
+                        func = function()
+                            if (Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)] < tblLength) then
+                                local current = Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)]
+                                local next
+                                for k,v in pairs(Gladdy.db.cooldownCooldownsOrder[class]) do
+                                    if v == current + 1 then
+                                        next = k
+                                    end
+                                end
+                                Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)] = Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)] + 1
+                                Gladdy.db.cooldownCooldownsOrder[class][next] = Gladdy.db.cooldownCooldownsOrder[class][next] - 1
+                                Gladdy.options.args["Cooldowns"].args.cooldowns.args[class].args[tostring(spellId)].order = Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)]
+                                Gladdy.options.args["Cooldowns"].args.cooldowns.args[class].args[next].order = Gladdy.db.cooldownCooldownsOrder[class][next]
+                                Gladdy:UpdateFrame()
+                            end
+                        end,
+                    }
+                }
             }
-            o = o + 1
         end
     end
     return group
