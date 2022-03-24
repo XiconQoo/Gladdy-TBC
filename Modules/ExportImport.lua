@@ -111,6 +111,7 @@ local deletedOptions = { -- backwards compatibility
     trinketPos = true,
     padding = true,
     growUp = true,
+    powerBarFontSize = true,
 }
 
 local function checkIsDeletedOption(k, str, msg, errorFound, errorMsg)

@@ -43,9 +43,9 @@ local function getTagText(unit, tag, current, max, status)
     if str_find(tag, "percent") then
         return current and max and floor(current * 100 / max) .. "%%" or ""
     elseif str_find(tag, "current") then
-        return current or ""
+        return current and max > 999 and ("%.1fk"):format(current / 1000) or current or ""
     elseif str_find(tag, "max") then
-        return max or ""
+        return max and max > 999 and ("%.1fk"):format(max / 1000) or max or ""
     elseif str_find(tag, "status") then
         if str_find(tag, "%|") and status == nil then
             return nil
@@ -55,11 +55,12 @@ local function getTagText(unit, tag, current, max, status)
     elseif str_find(tag, "name") then
         return button.name or ""
     elseif str_find(tag, "class") then
-        return button.classLoc  or ""
+        return button.classLoc or ""
     elseif str_find(tag, "race") then
-        return button.raceLoc  or ""
+        return button.raceLoc or ""
     elseif str_find(tag, "arena") then
-        return str_gsub(unit, "arena", "")
+        local str,found = str_gsub(unit, "arena", "")
+        return found == 1 and str or ""
     elseif str_find(tag, "spec") then
         if str_find(tag, "%|") and button.spec == nil then
             return nil

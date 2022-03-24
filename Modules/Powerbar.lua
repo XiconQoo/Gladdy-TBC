@@ -16,7 +16,8 @@ local Powerbar = Gladdy:NewModule("Power Bar", 90, {
     powerBarBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     powerBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
     powerBarBgColor = { r = 0.3, g = 0.3, b = 0.3, a = 0.7 },
-    powerBarFontSize = 10,
+    powerBarRaceFontSize = 10,
+    powerBarPowerFontSize = 10,
     powerShowSpec = true,
     powerShowRace = true,
     powerActual = true,
@@ -24,6 +25,15 @@ local Powerbar = Gladdy:NewModule("Power Bar", 90, {
     powerPercentage = false,
     powerFrameStrata = "MEDIUM",
     powerFrameLevel = 1,
+    powerCustomTagsEnabled = false,
+    powerTextLeft = "[spec] [race]",
+    powerTextRight = "[current]/[max]",
+    powerTextLeftOutline = false,
+    powerTextRightOutline = false,
+    powerTextLeftVOffset = 1,
+    powerTextLeftHOffset = 5,
+    powerTextRightVOffset = 1,
+    powerTextRightHOffset = -5,
 })
 
 function Powerbar:Initialize()
@@ -72,83 +82,29 @@ function Powerbar:CreateFrame(unit)
     powerBar.bg:SetVertexColor(Gladdy:SetColor(Gladdy.db.powerBarBgColor))
 
     powerBar.raceText = powerBar:CreateFontString(nil, "LOW")
-    powerBar.raceText:SetFont(Gladdy:SMFetch("font", "powerBarFont"), Gladdy.db.powerBarFontSize)
+    powerBar.raceText:SetFont(Gladdy:SMFetch("font", "powerBarFont"), Gladdy.db.powerBarRaceFontSize, Gladdy.db.powerTextLeftOutline and "OUTLINE")
     powerBar.raceText:SetTextColor(Gladdy:SetColor(Gladdy.db.powerBarFontColor))
     powerBar.raceText:SetShadowOffset(1, -1)
     powerBar.raceText:SetShadowColor(0, 0, 0, 1)
     powerBar.raceText:SetJustifyH("CENTER")
-    powerBar.raceText:SetPoint("LEFT", 5, 1)
+    powerBar.raceText:SetPoint("LEFT", Gladdy.db.powerTextLeftHOffset, Gladdy.db.powerTextLeftVOffset)
 
     powerBar.powerText = powerBar:CreateFontString(nil, "LOW")
-    powerBar.powerText:SetFont(Gladdy:SMFetch("font", "powerBarFont"), Gladdy.db.powerBarFontSize)
+    powerBar.powerText:SetFont(Gladdy:SMFetch("font", "powerBarFont"), Gladdy.db.powerBarPowerFontSize, Gladdy.db.powerTextRightOutline and "OUTLINE")
     powerBar.powerText:SetTextColor(Gladdy:SetColor(Gladdy.db.powerBarFontColor))
     powerBar.powerText:SetShadowOffset(1, -1)
     powerBar.powerText:SetShadowColor(0, 0, 0, 1)
     powerBar.powerText:SetJustifyH("CENTER")
-    powerBar.powerText:SetPoint("RIGHT", -5, 1)
+    powerBar.powerText:SetPoint("RIGHT", Gladdy.db.powerTextRightHOffset, Gladdy.db.powerTextRightVOffset)
 
     button.powerBar = powerBar
     self.frames[unit] = powerBar
     self:ResetUnit(unit)
+    powerBar.unit = unit
     powerBar:RegisterUnitEvent("UNIT_POWER_UPDATE", unit)
     powerBar:RegisterUnitEvent("UNIT_MAXPOWER", unit)
     powerBar:RegisterUnitEvent("UNIT_DISPLAYPOWER", unit)
     powerBar:SetScript("OnEvent", Powerbar.OnEvent)
-end
-
-function Powerbar.OnEvent(powerBar, event, unit)
-    if event == "UNIT_POWER_UPDATE" then
-        Powerbar:SetPower(powerBar, UnitPower(unit, UnitPowerType(unit), true), UnitPowerMax(unit, UnitPowerType(unit), true), UnitPowerType(unit))
-    elseif event == "UNIT_MAXPOWER" then
-        Powerbar:SetPower(powerBar, UnitPower(unit, UnitPowerType(unit), true), UnitPowerMax(unit, UnitPowerType(unit), true), UnitPowerType(unit))
-    elseif event == "UNIT_DISPLAYPOWER" then
-        Powerbar:SetPower(powerBar, UnitPower(unit, UnitPowerType(unit), true), UnitPowerMax(unit, UnitPowerType(unit), true), UnitPowerType(unit))
-    end
-end
-
-function Powerbar:SetPower(powerBar, power, powerMax, powerType)
-    local powerPercentage = floor(power * 100 / powerMax)
-    local powerText
-
-    if (Gladdy.db.powerActual) then
-        powerText = powerMax > 999 and ("%.1fk"):format(power / 1000) or power
-    end
-
-    if (Gladdy.db.powerMax) then
-        local text = powerMax > 999 and ("%.1fk"):format(powerMax / 1000) or powerMax
-        if (powerText) then
-            powerText = ("%s/%s"):format(powerText, text)
-        else
-            powerText = text
-        end
-    end
-
-    if (Gladdy.db.powerPercentage) then
-        if (powerText) then
-            powerText = ("%s (%d%%)"):format(powerText, powerPercentage)
-        else
-            powerText = ("%d%%"):format(powerPercentage)
-        end
-    end
-
-    if (powerType == 1 and powerBar.powerType ~= powerType) then
-        powerBar.energy:SetStatusBarColor(1, 0, 0, 1)
-        powerBar.powerColor = {r = 1, g = 0, b = 0}
-        powerBar.powerType = powerType
-    elseif (powerType == 3 and powerBar.powerType ~= powerType) then
-        powerBar.energy:SetStatusBarColor(1, 1, 0, 1)
-        powerBar.powerColor = {r = 1, g = 1, b = 0}
-        powerBar.powerType = powerType
-    elseif powerBar.powerType ~= powerType then
-        powerBar.energy:SetStatusBarColor(.18, .44, .75, 1)
-        powerBar.powerColor = {r = .18, g = .44, b = .75}
-        powerBar.powerType = powerType
-    end
-
-    powerBar.powerText:SetText(powerText)
-    powerBar.energy:SetMinMaxValues(0, powerMax)
-    powerBar.energy:SetValue(power)
-
 end
 
 function Powerbar:UpdateFrame(unit)
@@ -182,7 +138,7 @@ function Powerbar:UpdateFrame(unit)
     powerBar:SetPoint("TOPLEFT", healthBar, "BOTTOMLEFT", 0, -1)
 
     powerBar:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "powerBarBorderStyle"),
-                                  edgeSize = Gladdy.db.powerBarBorderSize })
+                           edgeSize = Gladdy.db.powerBarBorderSize })
     powerBar:SetBackdropBorderColor(Gladdy:SetColor(Gladdy.db.powerBarBorderColor))
 
     powerBar.energy:SetStatusBarTexture(Gladdy:SMFetch("statusbar", "powerBarTexture"))
@@ -190,15 +146,95 @@ function Powerbar:UpdateFrame(unit)
     powerBar.energy:SetPoint("TOPLEFT", powerBar, "TOPLEFT", (Gladdy.db.powerBarBorderSize/Gladdy.db.statusbarBorderOffset), -(Gladdy.db.powerBarBorderSize/Gladdy.db.statusbarBorderOffset))
     powerBar.energy:SetPoint("BOTTOMRIGHT", powerBar, "BOTTOMRIGHT", -(Gladdy.db.powerBarBorderSize/Gladdy.db.statusbarBorderOffset), (Gladdy.db.powerBarBorderSize/Gladdy.db.statusbarBorderOffset))
 
-    powerBar.raceText:SetFont(Gladdy:SMFetch("font", "powerBarFont"), Gladdy.db.powerBarFontSize)
+    powerBar.raceText:SetFont(Gladdy:SMFetch("font", "powerBarFont"), Gladdy.db.powerBarRaceFontSize, Gladdy.db.powerTextLeftOutline and "OUTLINE")
     powerBar.raceText:SetTextColor(Gladdy:SetColor(Gladdy.db.powerBarFontColor))
-    powerBar.powerText:SetFont(Gladdy:SMFetch("font", "powerBarFont"), Gladdy.db.powerBarFontSize)
+    powerBar.raceText:SetPoint("LEFT", Gladdy.db.powerTextLeftHOffset, Gladdy.db.powerTextLeftVOffset)
+
+    powerBar.powerText:SetFont(Gladdy:SMFetch("font", "powerBarFont"), Gladdy.db.powerBarPowerFontSize, Gladdy.db.powerTextRightOutline and "OUTLINE")
     powerBar.powerText:SetTextColor(Gladdy:SetColor(Gladdy.db.powerBarFontColor))
+    powerBar.powerText:SetPoint("RIGHT", Gladdy.db.powerTextRightHOffset, Gladdy.db.powerTextRightVOffset)
 
     powerBar:SetFrameStrata(Gladdy.db.powerFrameStrata)
     powerBar:SetFrameLevel(Gladdy.db.powerFrameLevel)
     powerBar.energy:SetFrameStrata(Gladdy.db.powerFrameStrata)
     powerBar.energy:SetFrameLevel(Gladdy.db.powerFrameLevel - 1)
+end
+
+function Powerbar.OnEvent(powerBar, event, unit)
+    if event == "UNIT_POWER_UPDATE" then
+        Powerbar:SetPower(powerBar, unit, UnitPower(unit, UnitPowerType(unit), true), UnitPowerMax(unit, UnitPowerType(unit), true), UnitPowerType(unit))
+    elseif event == "UNIT_MAXPOWER" then
+        Powerbar:SetPower(powerBar, unit, UnitPower(unit, UnitPowerType(unit), true), UnitPowerMax(unit, UnitPowerType(unit), true), UnitPowerType(unit))
+    elseif event == "UNIT_DISPLAYPOWER" then
+        Powerbar:SetPower(powerBar, unit, UnitPower(unit, UnitPowerType(unit), true), UnitPowerMax(unit, UnitPowerType(unit), true), UnitPowerType(unit))
+    end
+end
+
+function Powerbar:SetText(unit, power, powerMax, status)
+    local button = Gladdy.buttons[unit]
+    if not Gladdy.buttons[unit] then
+        return
+    end
+    local powerBar = button.powerBar
+    if Gladdy.db.powerCustomTagsEnabled then
+        powerBar.powerText:SetText(Gladdy:SetTag(unit, Gladdy.db.powerTextRight, power, powerMax, status))
+        powerBar.raceText:SetText(Gladdy:SetTag(unit, Gladdy.db.powerTextLeft, power, powerMax, status))
+    else
+        if power then
+            local powerPercentage = floor(power * 100 / powerMax)
+            local powerText
+            if (Gladdy.db.powerActual) then
+                powerText = powerMax > 999 and ("%.1fk"):format(power / 1000) or power
+            end
+            if (Gladdy.db.powerMax) then
+                local text = powerMax > 999 and ("%.1fk"):format(powerMax / 1000) or powerMax
+                if (powerText) then
+                    powerText = ("%s/%s"):format(powerText, text)
+                else
+                    powerText = text
+                end
+            end
+            if (Gladdy.db.powerPercentage) then
+                if (powerText) then
+                    powerText = ("%s (%d%%)"):format(powerText, powerPercentage)
+                else
+                    powerText = ("%d%%"):format(powerPercentage)
+                end
+            end
+            powerBar.powerText:SetText(powerText)
+        end
+
+        local raceText = Gladdy.db.powerShowRace and button.raceLoc or ""
+        if (button.spec and Gladdy.db.powerShowSpec) then
+            raceText = button.spec .. " " .. raceText
+        end
+        powerBar.raceText:SetText(raceText)
+    end
+end
+
+function Powerbar:SetPower(powerBar, unit, power, powerMax, powerType, status)
+    Powerbar:SetText(unit, power, powerMax, status)
+    powerBar.energy.current = power
+    powerBar.energy.max = powerMax
+    powerBar.energy.powerType = powerType
+
+    if (powerType == 1 and powerBar.powerType ~= powerType) then
+        powerBar.energy:SetStatusBarColor(1, 0, 0, 1)
+        powerBar.powerColor = {r = 1, g = 0, b = 0}
+        powerBar.powerType = powerType
+    elseif (powerType == 3 and powerBar.powerType ~= powerType) then
+        powerBar.energy:SetStatusBarColor(1, 1, 0, 1)
+        powerBar.powerColor = {r = 1, g = 1, b = 0}
+        powerBar.powerType = powerType
+    elseif powerBar.powerType ~= powerType then
+        powerBar.energy:SetStatusBarColor(.18, .44, .75, 1)
+        powerBar.powerColor = {r = .18, g = .44, b = .75}
+        powerBar.powerType = powerType
+    end
+
+    powerBar.energy:SetMinMaxValues(0, powerMax)
+    powerBar.energy:SetValue(power)
+
 end
 
 function Powerbar:ResetUnit(unit)
@@ -222,8 +258,14 @@ function Powerbar:Test(unit)
         return
     end
 
+    powerBar.energy.current = button.power
+    powerBar.energy.max = button.powerMax
+    powerBar.energy.powerType = button.powerType
     self:ENEMY_SPOTTED(unit)
     self:UNIT_POWER(unit, button.power, button.powerMax, button.powerType)
+    if unit == "arena1" then
+        self:UNIT_DEATH(unit)
+    end
 end
 
 function Powerbar:ENEMY_SPOTTED(unit)
@@ -233,13 +275,6 @@ function Powerbar:ENEMY_SPOTTED(unit)
         return
     end
 
-    local raceText = Gladdy.db.powerShowRace and button.raceLoc or ""
-
-    if (button.spec and Gladdy.db.powerShowSpec) then
-        raceText = button.spec .. " " .. raceText
-    end
-
-    powerBar.raceText:SetText(raceText)
     if UnitExists(unit) then
         Powerbar:SetPower(powerBar, UnitPower(unit, UnitPowerType(unit), true), UnitPowerMax(unit, UnitPowerType(unit), true), UnitPowerType(unit))
     end
@@ -251,13 +286,10 @@ function Powerbar:UNIT_SPEC(unit, spec)
     if (not powerBar or not button) then
         return
     end
-    local raceText = Gladdy.db.powerShowRace and button.raceLoc or ""
 
-    if (button.spec and Gladdy.db.powerShowSpec) then
-        raceText = spec .. " " .. raceText
+    if UnitExists(unit) then
+        Powerbar:SetPower(powerBar, unit, powerBar.energy.current, powerBar.energy.max, powerBar.energy.powerType)
     end
-
-    powerBar.raceText:SetText(raceText)
 end
 
 function Powerbar:UNIT_POWER(unit, power, powerMax, powerType)
@@ -269,44 +301,7 @@ function Powerbar:UNIT_POWER(unit, power, powerMax, powerType)
     if not Gladdy.buttons[unit].class then
         Gladdy:SpotEnemy(unit, true)
     end
-
-    local powerPercentage = floor(power * 100 / powerMax)
-    local powerText
-
-    if (Gladdy.db.powerActual) then
-        powerText = powerMax > 999 and ("%.1fk"):format(power / 1000) or power
-    end
-
-    if (Gladdy.db.powerMax) then
-        local text = powerMax > 999 and ("%.1fk"):format(powerMax / 1000) or powerMax
-        if (powerText) then
-            powerText = ("%s/%s"):format(powerText, text)
-        else
-            powerText = text
-        end
-    end
-
-    if (Gladdy.db.powerPercentage) then
-        if (powerText) then
-            powerText = ("%s (%d%%)"):format(powerText, powerPercentage)
-        else
-            powerText = ("%d%%"):format(powerPercentage)
-        end
-    end
-
-    if (powerType == 1) then
-        powerBar.energy:SetStatusBarColor(1, 0, 0, 1)
-        powerBar.powerColor = {r = 1, g = 0, b = 0}
-    elseif (powerType == 3) then
-        powerBar.energy:SetStatusBarColor(1, 1, 0, 1)
-        powerBar.powerColor = {r = 1, g = 1, b = 0}
-    else
-        powerBar.energy:SetStatusBarColor(.18, .44, .75, 1)
-        powerBar.powerColor = {r = .18, g = .44, b = .75}
-    end
-
-    powerBar.powerText:SetText(powerText)
-    powerBar.energy:SetValue(powerPercentage)
+    Powerbar:SetPower(powerBar, unit, power, powerMax, powerType)
 end
 
 function Powerbar:UNIT_DEATH(unit)
@@ -314,9 +309,7 @@ function Powerbar:UNIT_DEATH(unit)
     if (not powerBar) then
         return
     end
-
-    powerBar.energy:SetValue(0)
-    powerBar.powerText:SetText("0%")
+    Powerbar:SetPower(powerBar, unit, 0, powerBar.energy.max, powerBar.energy.powerType, L["DEAD"])
 end
 
 function Powerbar:UNIT_DESTROYED(unit)
@@ -324,8 +317,7 @@ function Powerbar:UNIT_DESTROYED(unit)
     if (not powerBar) then
         return
     end
-    powerBar.energy:SetValue(0)
-    powerBar.powerText:SetText("0%")
+    Powerbar:SetPower(powerBar, unit, 0, powerBar.energy.max, powerBar.energy.powerType, L["LEAVE"])
 end
 
 local function option(params)
@@ -341,8 +333,10 @@ local function option(params)
             if Gladdy.db.powerBarBorderSize > Gladdy.db.powerBarHeight/2 then
                 Gladdy.db.powerBarBorderSize = Gladdy.db.powerBarHeight/2
             end
-            for i=1,Gladdy.curBracket do
-                Powerbar:Test("arena" .. i)
+            if Gladdy.frame.testing then
+                for i=1,Gladdy.curBracket do
+                    Powerbar:Test("arena" .. i)
+                end
             end
             Gladdy:UpdateFrame()
         end,
@@ -436,14 +430,82 @@ function Powerbar:GetOptions()
                             order = 12,
                             hasAlpha = true,
                         }),
-                        powerBarFontSize = option({
-                            type = "range",
-                            name = L["Font size"],
-                            desc = L["Size of the text"],
+                        powerTextLeftOutline = option({
+                            type = "toggle",
+                            name = L["Left Font Outline"],
                             order = 13,
+                            width = "full",
+                        }),
+                        powerTextRightOutline = option({
+                            type = "toggle",
+                            name = L["Right Font Outline"],
+                            order = 14,
+                            width = "full",
+                        }),
+                        headerSize = {
+                            type = "header",
+                            name = L["Size"],
+                            order = 20,
+                        },
+                        powerBarRaceFontSize = option({
+                            type = "range",
+                            name = L["Race font size"],
+                            desc = L["Size of the race text"],
+                            order = 21,
                             step = 0.1,
-                            min = 1,
+                            min = 0,
                             max = 20,
+                            width = "full",
+                        }),
+                        powerBarPowerFontSize = option({
+                            type = "range",
+                            name = L["Power font size"],
+                            desc = L["Size of the power text"],
+                            order = 22,
+                            step = 0.1,
+                            min = 0,
+                            max = 20,
+                            width = "full",
+                        }),
+                        headerOffsets = {
+                            type = "header",
+                            name = L["Offsets"],
+                            order = 30,
+                        },
+                        powerTextLeftVOffset = option({
+                            type = "range",
+                            name = L["Left Text Vertical Offset"],
+                            order = 31,
+                            step = 0.1,
+                            min = -200,
+                            max = 200,
+                            width = "full",
+                        }),
+                        powerTextLeftHOffset = option({
+                            type = "range",
+                            name = L["Left Text Horizontal Offset"],
+                            order = 32,
+                            step = 0.1,
+                            min = -200,
+                            max = 200,
+                            width = "full",
+                        }),
+                        powerTextRightVOffset = option({
+                            type = "range",
+                            name = L["Right Text Vertical Offset"],
+                            order = 33,
+                            step = 0.1,
+                            min = -200,
+                            max = 200,
+                            width = "full",
+                        }),
+                        powerTextRightHOffset = option({
+                            type = "range",
+                            name = L["Right Text Horizontal Offset"],
+                            order = 34,
+                            step = 0.1,
+                            min = -200,
+                            max = 200,
                             width = "full",
                         }),
                     },
@@ -528,31 +590,44 @@ function Powerbar:GetOptions()
                             name = L["Show race"],
                             desc = L["Show race"],
                             order = 2,
+                            disabled = function() return Gladdy.db.powerCustomTagsEnabled end,
                         }),
                         powerShowSpec= option({
                             type = "toggle",
                             name = L["Show spec"],
                             desc = L["Show spec"],
                             order = 3,
+                            disabled = function() return Gladdy.db.powerCustomTagsEnabled end,
                         }),
                         powerActual = option({
                             type = "toggle",
                             name = L["Show the actual power"],
                             desc = L["Show the actual power on the power bar"],
-                            order = 31,
+                            order = 4,
+                            disabled = function() return Gladdy.db.powerCustomTagsEnabled end,
                         }),
                         powerMax = option({
                             type = "toggle",
                             name = L["Show max power"],
                             desc = L["Show max power on the power bar"],
-                            order = 32,
+                            order = 5,
+                            disabled = function() return Gladdy.db.powerCustomTagsEnabled end,
                         }),
                         powerPercentage = option({
                             type = "toggle",
                             name = L["Show power percentage"],
                             desc = L["Show power percentage on the power bar"],
-                            order = 33,
+                            order = 6,
+                            disabled = function() return Gladdy.db.powerCustomTagsEnabled end,
                         }),
+                        header = {
+                            type = "header",
+                            name = L["Custom Tags"],
+                            order = 10,
+                        },
+                        powerCustomTagsEnabled = Gladdy:GetTagOption(L["Custom Tags Enabled"], 11, nil, option, true),
+                        powerTextLeft = Gladdy:GetTagOption(L["Left Text"], 12, "powerCustomTagsEnabled", option),
+                        powerTextRight = Gladdy:GetTagOption(L["Right Text"], 13, "powerCustomTagsEnabled", option),
                     },
                 },
             },

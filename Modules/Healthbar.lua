@@ -28,7 +28,6 @@ local Healthbar = Gladdy:NewModule("Health Bar", 100, {
     healthFrameStrata = "MEDIUM",
     healthFrameLevel = 1,
     healthCustomTagsEnabled = false,
-    healthTextRight = "[percent|status]",
     healthTextLeft = "[name]",
     healthTextRight = "[percent|status]",
     healthTextLeftOutline = false,
@@ -122,12 +121,13 @@ function Healthbar.OnEvent(self, event, unit)
         self.hp:SetMinMaxValues(0, healthMax)
         self.hp:SetValue(health)
         self.hp.current = health
+        self.hp.max = healthMax
         Healthbar:SetText(unit, health, healthMax)
         --Healthbar:SetHealthText(self, health, healthMax)
     elseif event == "UNIT_NAME_UPDATE" then
         local name = UnitName(unit)
         Gladdy.buttons[unit].name = name
-        Healthbar:SetText(unit, self.hp.current, 100)
+        Healthbar:SetText(unit, self.hp.current, self.hp.max)
     end
     if not Gladdy.buttons[unit].class then
         Gladdy:SpotEnemy(unit, true)
@@ -245,6 +245,7 @@ function Healthbar:Test(unit)
     --self:JOINED_ARENA()
     Gladdy:SendMessage("UNIT_HEALTH", unit, button.health, button.healthMax)
     healthBar.hp.current = button.health
+    healthBar.hp.max = button.healthMax
     self:ENEMY_SPOTTED(unit)
     self:SetText(unit, button.health, button.healthMax)
     healthBar.hp:SetValue(button.health)
@@ -259,7 +260,7 @@ function Healthbar:UNIT_SPEC(unit)
     if not button then
         return
     end
-    self:SetText(unit, button.healthBar.hp.current, 100)
+    self:SetText(unit, button.healthBar.hp.current, button.healthBar.hp.max)
     --button.healthBar.nameText:SetText(Gladdy:SetTag(unit, Gladdy.db.healthTextLeft, button.health, button.healthMax))
 end
 
@@ -282,6 +283,7 @@ function Healthbar:ENEMY_SPOTTED(unit)
         healthBar.hp:SetMinMaxValues(0, healthMax)
         healthBar.hp:SetValue(health)
         healthBar.hp.current = health
+        healthBar.hp.max = healthMax
         Healthbar:SetText(unit, health, healthMax)
         --Healthbar:SetHealthText(healthBar, health, healthMax)
     end
@@ -310,8 +312,7 @@ function Healthbar:UNIT_DESTROYED(unit)
 
     healthBar.hp:SetValue(0)
     healthBar.hp.current = 0
-    healthBar.healthText:SetText(L["LEAVE"])
-    healthBar.nameText:SetText("")
+    Healthbar:SetText(unit, 0, 100, L["LEAVE"])
 end
 
 local function option(params)
@@ -455,7 +456,7 @@ function Healthbar:GetOptions()
                             max = 20,
                             width = "full",
                         }),
-                        headerLeftText = {
+                        headerOffsets = {
                             type = "header",
                             name = L["Offsets"],
                             order = 30,
