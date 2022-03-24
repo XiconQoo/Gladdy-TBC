@@ -311,13 +311,17 @@ end
 function Cooldowns:UpdateTestCooldowns(unit)
     local button = Gladdy.buttons[unit]
     self:UpdateCooldowns(button)
-    -- use class spells
-    for spellId,_ in pairs(Gladdy:GetCooldownList()[button.class]) do
-        self:CooldownUsed(unit, button.class, spellId)
+
+    local orderedIcons = {}
+    for _,icon in pairs(button.spellCooldownFrame.icons) do
+        tinsert(orderedIcons, icon)
     end
-    -- use race spells
-    for spellId,_ in pairs(Gladdy:GetCooldownList()[button.race]) do
-        self:CooldownUsed(unit, button.race, spellId)
+    tbl_sort(orderedIcons, function(a, b)
+        return Gladdy.db.cooldownCooldownsOrder[button.class][tostring(a.spellId)] < Gladdy.db.cooldownCooldownsOrder[button.class][tostring(b.spellId)]
+    end)
+
+    for _,icon in ipairs(orderedIcons) do
+        self:CooldownUsed(unit, button.class, icon.spellId)
     end
 end
 
