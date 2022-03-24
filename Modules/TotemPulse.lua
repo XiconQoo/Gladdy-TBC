@@ -1,10 +1,12 @@
 local select, pairs, tremove, tinsert, format, strsplit, tonumber = select, pairs, tremove, tinsert, format, strsplit, tonumber
+local type = type
 local C_NamePlate = C_NamePlate
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local GetSpellInfo, CreateFrame = GetSpellInfo, CreateFrame
 local GetTime, UnitIsEnemy, UnitGUID = GetTime, UnitIsEnemy, UnitGUID
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
+local UIParent = UIParent
 
 ---------------------------------------------------
 
@@ -118,10 +120,10 @@ local TotemPulse = Gladdy:NewModule("Totem Pulse", 1, {
     --bar
     totemPulseBarWidth = 40,
     totemPulseBarHeight = 20,
-    totemPulseBarColor =  { r = 1, g = 0, b = 0, a = 1 },
-    totemPulseBarBgColor =  { r = 0, g = 1, b = 0, a = 1 },
+    totemPulseBarColor =  { r = 1, g = 0, b = 0, a = .5 },
+    totemPulseBarBgColor =  { r = 0, g = 1, b = 0, a = .5 },
     totemPulseBarBorderColor = { r = 0, g = 0, b = 0, a = 1 },
-    totemPulseBarBorderSize = 5,
+    totemPulseBarBorderSize = 4,
     totemPulseBarBorderStyle = "Gladdy Tooltip squared",
     totemPulseBarTexture = "Flat",
     totemPulseBarReverse = false,
@@ -329,24 +331,10 @@ end
 
 function TotemPulse:AddTimerFrame(nameplate, timestamp, test)
     if (nameplate:IsShown() or test) and timestamp then
-        local gladdyTotemFrame = Gladdy.db.totemPulseTotems["totem" .. timestamp.id].attachToGladdyTotemFrame and nameplate.gladdyTotemFrame
         if not nameplate.totemTick then
             nameplate.totemTick = TotemPulse:CreateCooldownFrame(Gladdy.db.totemPulseTotems["totem" .. timestamp.id].style)
         end
-        nameplate.totemTick:SetParent(nameplate.gladdyTotemFrame or nameplate)
-        --nameplate.totemTick:ClearAllPoints()
-        --[[if gladdyTotemFrame then
-            nameplate.totemTick:SetPoint("TOPLEFT", gladdyTotemFrame, "TOPLEFT", Gladdy.db.npTotemPlatesSize/16, -Gladdy.db.npTotemPlatesSize/16)
-            nameplate.totemTick:SetPoint("BOTTOMRIGHT", gladdyTotemFrame, "BOTTOMRIGHT", -Gladdy.db.npTotemPlatesSize/16, Gladdy.db.npTotemPlatesSize/16)
-            if nameplate.totemTick.bar then
-                nameplate.totemTick.spark:SetHeight(Gladdy.db.totemPulseTotems["totem" .. timestamp.id].style == "Vertical" and gladdyTotemFrame:GetWidth() or gladdyTotemFrame:GetHeight())
-            end
-        else
-            nameplate.totemTick:SetPoint("TOP", nameplate.gladdyTotemFrame, "BOTTOM", 0, -5)
-            if nameplate.totemTick.bar then
-                nameplate.totemTick.spark:SetHeight(Gladdy.db.totemPulseTotems["totem" .. timestamp.id].style == "Vertical" and Gladdy.db.totemPulseBarWidth or Gladdy.db.totemPulseBarHeight)
-            end
-        end--]]
+        nameplate.totemTick:SetParent(nameplate)
 
         local cd = type(timestamp.pulse) == "table" and timestamp.pulse.cd or timestamp.pulse
         local once = type(timestamp.pulse) == "table"
@@ -444,30 +432,21 @@ function TotemPulse:UpdateBarPartial(bar)
     bar.spark:SetHeight(style == "Vertical" and Gladdy.db.totemPulseBarWidth or Gladdy.db.totemPulseBarHeight)
     bar.spark:SetRotation(style == "Vertical" and ninetyDegreeInRad or 0)
 
-    if (bar:GetParent()) then
-        if bar:GetParent().gladdyTotemFrame then
-            bar:SetParent(bar:GetParent().gladdyTotemFrame)
-        else
-            bar:SetParent(bar:GetParent())
-        end
-        --[[if bar.id and Gladdy.db.totemPulseTotems["totem" .. bar.id].attachToGladdyTotemFrame then
-            if not bar:GetParent().totemIcon and bar:GetParent().gladdyTotemFrame then
-                bar:SetParent(bar:GetParent().gladdyTotemFrame)
-            end
-        elseif bar.id and not Gladdy.db.totemPulseTotems["totem" .. bar.id].attachToGladdyTotemFrame then
-            if bar:GetParent().totemIcon then
-                bar:SetParent(bar:GetParent():GetParent())
-            end
-        end--]]
+
+    if bar:GetParent() and bar:GetParent() ~= UIParent then
+        local gladdyTotemFrame = bar:GetParent().gladdyTotemFrame and bar:GetParent().gladdyTotemFrame
+        local nameplate = bar:GetParent()
         bar:ClearAllPoints()
-        if (bar.id and bar:GetParent().totemIcon and Gladdy.db.totemPulseTotems["totem" .. bar.id].attachToGladdyTotemFrame) then
-            bar:SetPoint("TOPLEFT", bar:GetParent(), "TOPLEFT", Gladdy.db.npTotemPlatesSize/16, -Gladdy.db.npTotemPlatesSize/16)
-            bar:SetPoint("BOTTOMRIGHT", bar:GetParent(), "BOTTOMRIGHT", -Gladdy.db.npTotemPlatesSize/16, Gladdy.db.npTotemPlatesSize/16)
+        if bar.id and gladdyTotemFrame and gladdyTotemFrame:IsShown() and Gladdy.db.totemPulseTotems["totem" .. bar.id].attachToGladdyTotemFrame then
+            bar:SetPoint("TOPLEFT", gladdyTotemFrame, "TOPLEFT", Gladdy.db.npTotemPlatesSize/16, -Gladdy.db.npTotemPlatesSize/16)
+            bar:SetPoint("BOTTOMRIGHT", gladdyTotemFrame, "BOTTOMRIGHT", -Gladdy.db.npTotemPlatesSize/16, Gladdy.db.npTotemPlatesSize/16)
             if style then
-                bar.spark:SetHeight(style == "Vertical" and bar:GetParent():GetWidth() or bar:GetParent():GetHeight())
+                bar.spark:SetHeight(style == "Vertical" and gladdyTotemFrame:GetWidth() or gladdyTotemFrame:GetHeight())
             end
+        elseif bar.id and gladdyTotemFrame and gladdyTotemFrame:IsShown() and not Gladdy.db.totemPulseTotems["totem" .. bar.id].attachToGladdyTotemFrame then
+            bar:SetPoint("TOP", gladdyTotemFrame, "BOTTOM", 0, -0.5)
         else
-            bar:SetPoint("TOP", bar:GetParent(), "BOTTOM", 0, 0)
+            bar:SetPoint("TOP", nameplate, "BOTTOM", 0, -0.5)
         end
     end
     bar.bar:SetOrientation(style ~= "COOLDOWN" and style or bar.bar:GetOrientation())
@@ -495,35 +474,26 @@ function TotemPulse:UpdateCooldown(cooldown)
     cooldown:SetWidth(Gladdy.db.totemPulseCooldownWidth)
     cooldown:SetHeight(Gladdy.db.totemPulseCooldownHeight)
 
-    if cooldown:GetParent() then
-        --[[if cooldown.id and Gladdy.db.totemPulseTotems["totem" .. cooldown.id].attachToGladdyTotemFrame then
-            if not cooldown:GetParent().totemIcon and cooldown:GetParent().gladdyTotemFrame then
-                cooldown:SetParent(cooldown:GetParent().gladdyTotemFrame)
-            end
-        elseif cooldown.id and not Gladdy.db.totemPulseTotems["totem" .. cooldown.id].attachToGladdyTotemFrame then
-            if cooldown:GetParent().totemIcon then
-                cooldown:SetParent(cooldown:GetParent():GetParent())
-            end
-        end--]]
-        if cooldown:GetParent().gladdyTotemFrame then
-            cooldown:SetParent(cooldown:GetParent().gladdyTotemFrame)
-        else
-            cooldown:SetParent(cooldown:GetParent())
-        end
-        cooldown:ClearAllPoints()
-        if cooldown.id and Gladdy.db.totemPulseTotems["totem" .. cooldown.id].attachToGladdyTotemFrame and cooldown:GetParent().totemIcon then
-            cooldown:SetPoint("TOPLEFT", cooldown:GetParent(), "TOPLEFT", Gladdy.db.npTotemPlatesSize/16, -Gladdy.db.npTotemPlatesSize/16)
-            cooldown:SetPoint("BOTTOMRIGHT", cooldown:GetParent(), "BOTTOMRIGHT", -Gladdy.db.npTotemPlatesSize/16, Gladdy.db.npTotemPlatesSize/16)
-        else
-            cooldown:SetPoint("TOP", cooldown:GetParent(), "BOTTOM", 0, -0.5)
-        end
-    end
-
     cooldown.cd:SetCooldown(0,0)
     cooldown.cd:SetReverse(Gladdy.db.totemPulseCooldownReverse)
     cooldown.cd:SetAlpha(Gladdy.db.totemPulseCooldownAlpha)
+
     cooldown.text:SetFont(Gladdy:SMFetch("font", "totemPulseTextFont"), Gladdy.db.totemPulseTextSize, "OUTLINE")
     cooldown.text:SetTextColor(Gladdy:SetColor(Gladdy.db.totemPulseTextColor))
+
+    if cooldown:GetParent() and cooldown:GetParent() ~= UIParent then
+        local gladdyTotemFrame = cooldown:GetParent().gladdyTotemFrame and cooldown:GetParent().gladdyTotemFrame
+        local nameplate = cooldown:GetParent()
+        cooldown:ClearAllPoints()
+        if cooldown.id and gladdyTotemFrame and gladdyTotemFrame:IsShown() and Gladdy.db.totemPulseTotems["totem" .. cooldown.id].attachToGladdyTotemFrame then
+            cooldown:SetPoint("TOPLEFT", gladdyTotemFrame, "TOPLEFT", Gladdy.db.npTotemPlatesSize/16, -Gladdy.db.npTotemPlatesSize/16)
+            cooldown:SetPoint("BOTTOMRIGHT", gladdyTotemFrame, "BOTTOMRIGHT", -Gladdy.db.npTotemPlatesSize/16, Gladdy.db.npTotemPlatesSize/16)
+        elseif cooldown.id and gladdyTotemFrame and gladdyTotemFrame:IsShown() and not Gladdy.db.totemPulseTotems["totem" .. cooldown.id].attachToGladdyTotemFrame then
+            cooldown:SetPoint("TOP", gladdyTotemFrame, "BOTTOM", 0, -0.5)
+        else
+            cooldown:SetPoint("TOP", nameplate, "BOTTOM", 0, -0.5)
+        end
+    end
 end
 
 function TotemPulse:UpdateFrameOnce()

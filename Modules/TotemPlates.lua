@@ -306,6 +306,7 @@ end
 
 function TotemPlates:CreateTotemFrame(nameplate)
     nameplate.gladdyTotemFrame = CreateFrame("Frame")
+    nameplate.gladdyTotemFrame:SetFrameLevel(1)
     nameplate.gladdyTotemFrame:SetIgnoreParentAlpha(true)
     nameplate.gladdyTotemFrame:SetWidth(Gladdy.db.npTotemPlatesSize * Gladdy.db.npTotemPlatesWidthFactor)
     nameplate.gladdyTotemFrame:SetHeight(Gladdy.db.npTotemPlatesSize)
