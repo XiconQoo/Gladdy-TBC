@@ -104,7 +104,7 @@ function Healthbar:CreateFrame(unit)
     self.frames[unit] = healthBar
     button.healthBar = healthBar
     self:ResetUnit(unit)
-    healthBar:RegisterUnitEvent("UNIT_HEALTH", unit)
+    healthBar:RegisterUnitEvent("UNIT_HEALTH_FREQUENT", unit)
     healthBar:RegisterUnitEvent("UNIT_MAXHEALTH", unit)
     healthBar:RegisterUnitEvent("UNIT_NAME_UPDATE", unit)
     healthBar:SetScript("OnEvent", Healthbar.OnEvent)

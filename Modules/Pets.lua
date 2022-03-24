@@ -233,7 +233,7 @@ function Pets:CreateFrame(unitId)
     healthBar.unit = unit
     button.healthBar = healthBar
 
-    healthBar:RegisterUnitEvent("UNIT_HEALTH", unit)
+    healthBar:RegisterUnitEvent("UNIT_HEALTH_FREQUENT", unit)
     healthBar:RegisterUnitEvent("UNIT_MAXHEALTH", unit)
     healthBar:RegisterUnitEvent("UNIT_PORTRAIT_UPDATE", unit)
     healthBar:RegisterUnitEvent("UNIT_NAME_UPDATE", unit)
