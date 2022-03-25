@@ -25,6 +25,7 @@ local Castbar = Gladdy:NewModule("Cast Bar", 70, {
     castBarIconSize = 22,
     castBarBorderSize = 8,
     castBarFontSize = 12,
+    castBarFontOutline = false,
     castBarTexture = "Smooth",
     castBarIconStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     castBarBorderStyle = "Gladdy Tooltip round",
@@ -115,7 +116,7 @@ function Castbar:CreateFrame(unit)
     end
 
     castBar.spellText = castBar:CreateFontString(nil, "LOW")
-    castBar.spellText:SetFont(Gladdy:SMFetch("font", "auraFont"), Gladdy.db.castBarFontSize)
+    castBar.spellText:SetFont(Gladdy:SMFetch("font", "auraFont"), Gladdy.db.castBarFontSize, Gladdy.db.castBarFontOutline and "OUTLINE")
     castBar.spellText:SetTextColor(Gladdy:SetColor(Gladdy.db.castBarFontColor))
     castBar.spellText:SetShadowOffset(1, -1)
     castBar.spellText:SetShadowColor(0, 0, 0, 1)
@@ -123,7 +124,7 @@ function Castbar:CreateFrame(unit)
     castBar.spellText:SetPoint("LEFT", 7, 0) -- Text of the spell
 
     castBar.timeText = castBar:CreateFontString(nil, "LOW")
-    castBar.timeText:SetFont(Gladdy:SMFetch("font", "auraFont"), Gladdy.db.castBarFontSize)
+    castBar.timeText:SetFont(Gladdy:SMFetch("font", "auraFont"), Gladdy.db.castBarFontSize, Gladdy.db.castBarFontOutline and "OUTLINE")
     castBar.timeText:SetTextColor(Gladdy:SetColor(Gladdy.db.castBarFontColor))
     castBar.timeText:SetShadowOffset(1, -1)
     castBar.timeText:SetShadowColor(0, 0, 0, 1)
@@ -203,10 +204,10 @@ function Castbar:UpdateFrame(unit)
 
     Gladdy:SetPosition(castBar, unit, "castBarXOffset", "castBarYOffset", Castbar:LegacySetPosition(castBar, unit, leftMargin, rightMargin), Castbar)
 
-    castBar.spellText:SetFont(Gladdy:SMFetch("font", "castBarFont"), Gladdy.db.castBarFontSize)
+    castBar.spellText:SetFont(Gladdy:SMFetch("font", "castBarFont"), Gladdy.db.castBarFontSize, Gladdy.db.castBarFontOutline and "OUTLINE")
     castBar.spellText:SetTextColor(Gladdy:SetColor(Gladdy.db.castBarFontColor))
 
-    castBar.timeText:SetFont(Gladdy:SMFetch("font", "castBarFont"), Gladdy.db.castBarFontSize)
+    castBar.timeText:SetFont(Gladdy:SMFetch("font", "castBarFont"), Gladdy.db.castBarFontSize, Gladdy.db.castBarFontOutline and "OUTLINE")
     castBar.timeText:SetTextColor(Gladdy:SetColor(Gladdy.db.castBarFontColor))
 
     castBar.icon.texture.overlay:SetTexture(Gladdy.db.castBarIconStyle)
@@ -783,6 +784,12 @@ function Castbar:GetOptions()
                             order = 4,
                             min = 1,
                             max = 20,
+                            width = "full",
+                        }),
+                        castBarFontOutline = option({
+                            type = "toggle",
+                            name = L["Outline"],
+                            order = 5,
                             width = "full",
                         }),
                         headerFormat = {
