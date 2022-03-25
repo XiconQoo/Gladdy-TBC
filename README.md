@@ -107,6 +107,7 @@ Thank you!
 - added disarm DRs
 - improved some class icons
 - fixed health bug since 2.5.4
+- updated Mir Profile
 
 ### v2.00-Release
 
