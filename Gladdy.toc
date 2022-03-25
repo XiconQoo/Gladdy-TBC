@@ -1,7 +1,7 @@
-## Interface: 20503
+## Interface: 20504
 ## Title: Gladdy - TBC
-## Version: 2.00-Release
-## Notes: The most powerful arena AddOn for WoW 2.5.3
+## Version: 2.10-Release
+## Notes: The most powerful arena AddOn for WoW 2.5.4
 ## Author: XiconQoo, DnB_Junkee, Knall
 ## X-Email: contact me on discord Knall#1751
 ## SavedVariables: GladdyXZ
