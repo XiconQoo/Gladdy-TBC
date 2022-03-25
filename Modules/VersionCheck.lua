@@ -1,4 +1,4 @@
-local tonumber, tostring = tonumber, tostring
+local tonumber, tostring, str_format = tonumber, tostring, string.format
 
 local UnitName = UnitName
 local IsInGroup, IsInRaid = IsInGroup, IsInRaid
@@ -24,11 +24,11 @@ end
 function VersionCheck:JOINED_ARENA()
     self:RegisterComm("GladdyVCheck", VersionCheck.OnCommReceived)
     if IsInRaid(LE_PARTY_CATEGORY_HOME) then
-        self:SendCommMessage("GladdyVCheck", tostring(Gladdy.version_num), "RAID", self.playerName)
+        self:SendCommMessage("GladdyVCheck", str_format("%.2f", Gladdy.version_num), "RAID", self.playerName)
     elseif IsInGroup(LE_PARTY_CATEGORY_INSTANCE) or IsInRaid(LE_PARTY_CATEGORY_INSTANCE) then
-        self:SendCommMessage("GladdyVCheck", tostring(Gladdy.version_num), "INSTANCE_CHAT", self.playerName)
+        self:SendCommMessage("GladdyVCheck", str_format("%.2f", Gladdy.version_num), "INSTANCE_CHAT", self.playerName)
     elseif IsInGroup(LE_PARTY_CATEGORY_HOME) then
-        self:SendCommMessage("GladdyVCheck", tostring(Gladdy.version_num), "PARTY", self.playerName)
+        self:SendCommMessage("GladdyVCheck", str_format("%.2f", Gladdy.version_num), "PARTY", self.playerName)
     end
 end
 
@@ -41,9 +41,9 @@ end
 
 function VersionCheck.OnCommReceived(prefix, message, distribution, sender)
     if sender ~= VersionCheck.playerName then
-        local addonVersion = Gladdy.version_num
-        message = tonumber(message)
-        if message and message <= Gladdy.version_num then
+        local addonVersion = str_format("%.2f", Gladdy.version_num)
+        local message_num = tonumber(message) or 0
+        if message and message_num <= Gladdy.version_num then
             --Gladdy:Print("Version", "\"".. addonVersion.."\"", "is up to date")
         else
             Gladdy:Warn("Current version", "\"".. addonVersion.."\"", "is outdated. Most recent version is", "\"".. message.."\"")
