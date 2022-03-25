@@ -70,7 +70,7 @@ end
 function ACDFrame.OnUpdate(self, elapse)
     if (self.countdown > 0 and Gladdy.db.countdown) then
         self.hidden = false;
-
+        self.ACDNumFrame:Show()
         if ((floor(self.countdown) ~= floor(self.countdown - elapse)) and (floor(self.countdown - elapse) >= 0)) then
             local str = tostring(floor(self.countdown - elapse));
 
@@ -109,7 +109,6 @@ end
 
 function ACDFrame:JOINED_ARENA()
     if Gladdy.db.countdown then
-        self.ACDNumFrame:Show()
         self:RegisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
         self:SetScript("OnEvent", ACDFrame.OnEvent)
         self.endTime = GetTime() + 70
