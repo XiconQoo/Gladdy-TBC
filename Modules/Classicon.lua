@@ -1,4 +1,4 @@
-local select = select
+local select, str_gsub = select, string.gsub
 
 local Gladdy = LibStub("Gladdy")
 local CreateFrame = CreateFrame
@@ -16,7 +16,7 @@ local Classicon = Gladdy:NewModule("Class Icon", 81, {
     classIconFrameStrata = "MEDIUM",
     classIconFrameLevel = 5,
     classIconGroup = false,
-    classIconGroupDirection = "RIGHT"
+    classIconGroupDirection = "DOWN"
 })
 
 local classIconPath = "Interface\\Addons\\Gladdy\\Images\\Classes\\"
@@ -137,9 +137,17 @@ function Classicon:UpdateFrame(unit)
 
     if (Gladdy.db.classIconGroup) then
         if (unit ~= "arena1") then
-            local previousUnit = "arena" .. string.gsub(unit, "arena", "") - 1
+            local previousUnit = "arena" .. str_gsub(unit, "arena", "") - 1
             self.frames[unit]:ClearAllPoints()
-            self.frames[unit]:SetPoint("LEFT", self.frames[previousUnit], "RIGHT", 0, 0)
+            if Gladdy.db.classIconGroupDirection == "RIGHT" then
+                self.frames[unit]:SetPoint("LEFT", self.frames[previousUnit], "RIGHT", 0, 0)
+            elseif Gladdy.db.classIconGroupDirection == "LEFT" then
+                self.frames[unit]:SetPoint("RIGHT", self.frames[previousUnit], "LEFT", 0, 0)
+            elseif Gladdy.db.classIconGroupDirection == "UP" then
+                self.frames[unit]:SetPoint("BOTTOM", self.frames[previousUnit], "TOP", 0, 0)
+            elseif Gladdy.db.classIconGroupDirection == "DOWN" then
+                self.frames[unit]:SetPoint("TOP", self.frames[previousUnit], "BOTTOM", 0, 0)
+            end
         end
     end
 
@@ -228,11 +236,31 @@ function Classicon:GetOptions()
                 end
             end
         },
+        classIconGroup = Gladdy:option({
+            type = "toggle",
+            name = L["Group"] .. " " .. L["Class Icon"],
+            order = 5,
+            disabled = function() return not Gladdy.db.classIconEnabled end,
+        }),
+        classIconGroupDirection = Gladdy:option({
+            type = "select",
+            name = L["Group direction"],
+            order = 6,
+            values = {
+                ["RIGHT"] = L["Right"],
+                ["LEFT"] = L["Left"],
+                ["UP"] = L["Up"],
+                ["DOWN"] = L["Down"],
+            },
+            disabled = function()
+                return not Gladdy.db.classIconGroup or not Gladdy.db.classIconEnabled
+            end,
+        }),
         group = {
             type = "group",
             childGroups = "tree",
             name = L["Frame"],
-            order = 4,
+            order = 7,
             disabled = function() return not Gladdy.db.classIconEnabled end,
             args = {
                 size = {

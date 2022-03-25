@@ -236,6 +236,7 @@ function Cooldowns:UpdateFrame(unit)
         end
 
         if (Gladdy.db.cooldownGroup) then
+            --TODO fix overlapping
             if (unit ~= "arena1") then
                 local previousUnit = "arena" .. string.gsub(unit, "arena", "") - 1
                 self.frames[unit]:ClearAllPoints()
@@ -552,6 +553,12 @@ function Cooldowns:GetOptions()
             desc = L["Enabled cooldown module"],
             order = 2,
         }),
+        cooldownGroup = Gladdy:option({
+            type = "toggle",
+            name = L["Group"] .. " " .. L["Cooldown"],
+            order = 3,
+            disabled = function() return not Gladdy.db.cooldown end,
+        }),
         group = {
             type = "group",
             childGroups = "tree",
@@ -858,8 +865,8 @@ function Cooldowns:GetCooldownOptions()
                         order = 2,
                         width = 0.1,
                         image = "Interface\\Addons\\Gladdy\\Images\\uparrow",
-                        imageWidth = 20,
-                        imageHeight = 20,
+                        imageWidth = 15,
+                        imageHeight = 15,
                         func = function()
                             if (Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)] > 1) then
                                 local current = Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)]
@@ -883,8 +890,8 @@ function Cooldowns:GetCooldownOptions()
                         order = 3,
                         width = 0.1,
                         image = "Interface\\Addons\\Gladdy\\Images\\downarrow",
-                        imageWidth = 20,
-                        imageHeight = 20,
+                        imageWidth = 15,
+                        imageHeight = 15,
                         func = function()
                             if (Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)] < tblLength) then
                                 local current = Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)]

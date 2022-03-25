@@ -389,6 +389,11 @@ function Pets:GetOptions()
             desc = L["Enables Pets module"],
             order = 3,
         }),
+        petGroup = option({
+            type = "toggle",
+            name = L["Group Pets"],
+            order = 4,
+        }),
         group = {
             type = "group",
             childGroups = "tree",
@@ -425,11 +430,6 @@ function Pets:GetOptions()
                             max = 300,
                             step = 1,
                             width = "full",
-                        }),
-                        petGroup = option({
-                            type = "toggle",
-                            name = L["Group Pets"],
-                            order = 5,
                         }),
                         petMargin = option({
                             type = "range",
