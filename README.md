@@ -34,6 +34,7 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 - **Range Check** (checks the range to a unit by a configurable spell)
 - **Shadowsight Timer** (shows a little movable frame with time left until Shadow Eyes spawn)
 - **TotemPlates** (show totem icons instead of normal nameplates, compatible with **Plater, NeatPlates, KUI, ThreatPlates, ElvUI, TukUI**)
+- **TotemPulse** (shows pulse on TotemPlate icon or beneath nameplate)
 - **Trinket** (tracks trinket usage)
 - **VersionCheck** (checks if you use an older version that your teammate)
 - **XiconProfiles** (predefined profiles to start your configuration from)
@@ -106,6 +107,7 @@ Thank you!
 - added some auras (e.g. disarm)
 - added disarm DRs
 - improved some class icons
+- added font OUTLINE option for Health-/Power-/CastBar texts
 - fixed health bug since 2.5.4
 - updated Mir Profile
 
