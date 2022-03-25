@@ -22,30 +22,30 @@ function ACDFrame:Initialize()
     self.texturePath = "Interface\\AddOns\\Gladdy\\Images\\Countdown\\";
 
     local ACDNumFrame = CreateFrame("Frame", "ACDNumFrame", UIParent)
-    ACDNumFrame:EnableMouse(false)
-    ACDNumFrame:SetHeight(512)
-    ACDNumFrame:SetWidth(512)
-    ACDNumFrame:SetPoint("CENTER", 0, 256)
-    ACDNumFrame:Hide()
     self.ACDNumFrame = ACDNumFrame
+    self.ACDNumFrame:EnableMouse(false)
+    self.ACDNumFrame:SetHeight(Gladdy.db.arenaCountdownSize)
+    self.ACDNumFrame:SetWidth(Gladdy.db.arenaCountdownSize)
+    self.ACDNumFrame:SetPoint("CENTER", 0, 128)
+    self.ACDNumFrame:Hide()
 
     local ACDNumTens = ACDNumFrame:CreateTexture("ACDNumTens", "HIGH")
-    ACDNumTens:SetWidth(256)
-    ACDNumTens:SetHeight(256)
-    ACDNumTens:SetPoint("CENTER", ACDNumFrame, "CENTER", -50, 0)
     self.ACDNumTens = ACDNumTens
+    self.ACDNumTens:SetWidth(Gladdy.db.arenaCountdownSize)
+    self.ACDNumTens:SetHeight(Gladdy.db.arenaCountdownSize)
+    self.ACDNumTens:SetPoint("CENTER", self.ACDNumFrame, "CENTER", -(Gladdy.db.arenaCountdownSize/8 + Gladdy.db.arenaCountdownSize/8/2), 0)
 
     local ACDNumOnes = ACDNumFrame:CreateTexture("ACDNumOnes", "HIGH")
-    ACDNumOnes:SetWidth(256)
-    ACDNumOnes:SetHeight(256)
-    ACDNumOnes:SetPoint("CENTER", ACDNumFrame, "CENTER", 50, 0)
     self.ACDNumOnes = ACDNumOnes
+    self.ACDNumOnes:SetWidth(Gladdy.db.arenaCountdownSize)
+    self.ACDNumOnes:SetHeight(Gladdy.db.arenaCountdownSize)
+    self.ACDNumOnes:SetPoint("CENTER", self.ACDNumFrame, "CENTER", (Gladdy.db.arenaCountdownSize/8 + Gladdy.db.arenaCountdownSize/8/2), 0)
 
     local ACDNumOne = ACDNumFrame:CreateTexture("ACDNumOne", "HIGH")
-    ACDNumOne:SetWidth(256)
-    ACDNumOne:SetHeight(256)
-    ACDNumOne:SetPoint("CENTER", ACDNumFrame, "CENTER", 0, 0)
     self.ACDNumOne = ACDNumOne
+    self.ACDNumOne:SetWidth(Gladdy.db.arenaCountdownSize)
+    self.ACDNumOne:SetHeight(Gladdy.db.arenaCountdownSize)
+    self.ACDNumOne:SetPoint("CENTER", self.ACDNumFrame, "CENTER", 0, 0)
 
     if Gladdy.db.countdown then
         self:RegisterMessage("JOINED_ARENA")
@@ -65,6 +65,22 @@ function ACDFrame:UpdateFrameOnce()
     end
     self.ACDNumFrame:SetFrameStrata(Gladdy.db.arenaCountdownFrameStrata)
     self.ACDNumFrame:SetFrameLevel(Gladdy.db.arenaCountdownFrameLevel)
+
+    self.ACDNumFrame:SetHeight(Gladdy.db.arenaCountdownSize)
+    self.ACDNumFrame:SetWidth(Gladdy.db.arenaCountdownSize)
+    self.ACDNumFrame:SetPoint("CENTER", 0, 128)
+
+    self.ACDNumTens:SetWidth(Gladdy.db.arenaCountdownSize)
+    self.ACDNumTens:SetHeight(Gladdy.db.arenaCountdownSize)
+    self.ACDNumTens:SetPoint("CENTER", self.ACDNumFrame, "CENTER", -(Gladdy.db.arenaCountdownSize/8 + Gladdy.db.arenaCountdownSize/8/2), 0)
+
+    self.ACDNumOnes:SetWidth(Gladdy.db.arenaCountdownSize)
+    self.ACDNumOnes:SetHeight(Gladdy.db.arenaCountdownSize)
+    self.ACDNumOnes:SetPoint("CENTER", self.ACDNumFrame, "CENTER", (Gladdy.db.arenaCountdownSize/8 + Gladdy.db.arenaCountdownSize/8/2), 0)
+
+    self.ACDNumOne:SetWidth(Gladdy.db.arenaCountdownSize)
+    self.ACDNumOne:SetHeight(Gladdy.db.arenaCountdownSize)
+    self.ACDNumOne:SetPoint("CENTER", self.ACDNumFrame, "CENTER", 0, 0)
 end
 
 function ACDFrame.OnUpdate(self, elapse)
@@ -140,25 +156,7 @@ function ACDFrame:CHAT_MSG_BG_SYSTEM_NEUTRAL(msg)
     end
 end
 
-function ACDFrame:UpdateFrame()
-    self.ACDNumFrame:SetHeight(Gladdy.db.arenaCountdownSize)
-    self.ACDNumFrame:SetWidth(Gladdy.db.arenaCountdownSize)
-    self.ACDNumFrame:SetPoint("CENTER", 0, 128)
-
-    self.ACDNumTens:SetWidth(Gladdy.db.arenaCountdownSize)
-    self.ACDNumTens:SetHeight(Gladdy.db.arenaCountdownSize)
-    self.ACDNumTens:SetPoint("CENTER", self.ACDNumFrame, "CENTER", -(Gladdy.db.arenaCountdownSize/8 + Gladdy.db.arenaCountdownSize/8/2), 0)
-
-    self.ACDNumOnes:SetWidth(Gladdy.db.arenaCountdownSize)
-    self.ACDNumOnes:SetHeight(Gladdy.db.arenaCountdownSize)
-    self.ACDNumOnes:SetPoint("CENTER", self.ACDNumFrame, "CENTER", (Gladdy.db.arenaCountdownSize/8 + Gladdy.db.arenaCountdownSize/8/2), 0)
-
-    self.ACDNumOne:SetWidth(Gladdy.db.arenaCountdownSize)
-    self.ACDNumOne:SetHeight(Gladdy.db.arenaCountdownSize)
-    self.ACDNumOne:SetPoint("CENTER", self.ACDNumFrame, "CENTER", 0, 0)
-end
-
-function ACDFrame:Test()
+function ACDFrame:TestOnce()
     self.countdown = 30
     self:JOINED_ARENA()
 end
