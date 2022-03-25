@@ -111,7 +111,7 @@ end
 
 function Healthbar.OnEvent(self, event, unit)
     local isDead = UnitExists(unit) and UnitIsDeadOrGhost(unit)
-    if event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH" then
+    if event == "UNIT_HEALTH_FREQUENT" or event == "UNIT_MAXHEALTH" then
         if isDead then
             Gladdy:SendMessage("UNIT_DEATH", unit)
             return
