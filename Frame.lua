@@ -134,6 +134,8 @@ function Gladdy:UpdateFrame()
     local height = (self.db.healthBarHeight + powerBarHeight) * teamSize
             + (self.db.highlightInset and 0 or self.db.highlightBorderSize * 2 * teamSize)
             + self.db.bottomMargin * (teamSize - 1)
+    local singleFrameHeight = self.db.healthBarHeight + powerBarHeight +
+            (self.db.highlightInset and 0 or self.db.highlightBorderSize * 2) + self.db.bottomMargin
 
     -- Highlight
     margin = margin + highlightBorderSize
@@ -155,10 +157,13 @@ function Gladdy:UpdateFrame()
         self.frame:SetPoint("CENTER")
     else
         local scale = self.frame:GetEffectiveScale()
+        local growMiddle = self.db.growMiddle and teamSize > 0 and teamSize / 2 >= 1 and (teamSize - 1) * (singleFrameHeight / 2) or 0
         if (self.db.growDirection == "TOP") then
-            self.frame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", self.db.x / scale, self.db.y / scale)
+            self.frame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", self.db.x / scale, (self.db.y / scale) - growMiddle)
+        elseif self.db.growDirection == "BOTTOM" then
+            self.frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.x / scale, (self.db.y / scale) + growMiddle)
         else
-            self.frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.x / scale, self.db.y / scale)
+            self.frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.x / scale, (self.db.y / scale))
         end
     end
 

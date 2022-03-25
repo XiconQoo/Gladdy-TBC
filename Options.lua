@@ -48,6 +48,7 @@ Gladdy.defaults = {
         x = 0,
         y = 0,
         growDirection = "BOTTOM",
+        growMiddle = false,
         frameScale = 1,
         pixelPerfect = false,
         barWidth = 180,
@@ -311,7 +312,7 @@ function Gladdy:SetupOptions()
                     group = {
                         type = "group",
                         name = L["General"],
-                        order = 5,
+                        order = 6,
                         childGroups = "tree",
                         args = {
                             frameGeneral = {
@@ -322,6 +323,12 @@ function Gladdy:SetupOptions()
                                     headerFrame = {
                                         type = "header",
                                         name = L["Frame General"],
+                                        order = 2,
+                                    },
+                                    growMiddle = {
+                                        type = "toggle",
+                                        name = L["Grow Middle"],
+                                        desc = L["Frames expand along a centric anchor"],
                                         order = 3,
                                     },
                                     pixelPerfect = {
