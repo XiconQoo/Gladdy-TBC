@@ -1,10 +1,10 @@
 # Gladdy - TBC
 
-### The most powerful arena addon for WoW TBC 2.5.1
+### The most powerful arena addon for WoW TBC 2.5.4
 
 ---
 
-## [v2.00-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.00-Release/Gladdy_TBC-Classic_v2.00-Release.zip)
+## [v2.10-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.10-Release/Gladdy_TBC-Classic_v2.10-Release.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -34,6 +34,7 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 - **Range Check** (checks the range to a unit by a configurable spell)
 - **Shadowsight Timer** (shows a little movable frame with time left until Shadow Eyes spawn)
 - **TotemPlates** (show totem icons instead of normal nameplates, compatible with **Plater, NeatPlates, KUI, ThreatPlates, ElvUI, TukUI**)
+- **TotemPulse** (shows pulse on TotemPlate icon or beneath nameplate)
 - **Trinket** (tracks trinket usage)
 - **VersionCheck** (checks if you use an older version that your teammate)
 - **XiconProfiles** (predefined profiles to start your configuration from)
@@ -77,6 +78,38 @@ Thank you!
 ---
 
 ### Changes
+
+### v2.10-Release
+
+- **Totems**:
+  - added new module **TotemPulse** (sorry Shamans)
+    - displays pulse ticks on all totems that have a pulse mechanic (e.g. tremor totem)
+    - either cooldown or bar style
+    - attaches to TotemPlates if enabled (con be configured individually by totem)
+  - completely hide totem nameplate option added
+  - added a dummy totemplate in config mode
+  - totem detection is completely localization independent now
+- **Cooldowns**:
+  - completely refactored to fix general bugs
+  - can now be ordered individually
+  - some cooldown tracking improved for units coming out of stealth (e.g. perception, sprint, shadowstep)
+- **Custom Text Tags**
+  - PowerBar and HealthBar can now have custom tags. Check it out
+  - also the texts can be moved to achieve a Blizzlike style with names above HealthBar
+- general improvements to spec detection
+  - no more restoration warlocks :D
+  - tree of life spec detection should work now
+- fix Announcements
+- added grouping option for Auras (+ Interrupts) in detached mode, ClassIcon, Cooldowns, Trinket, Racial
+- added a "Grow Middle" option, which aligns the gladdy frames on a centric point
+- added frFR localization by Macumba
+- added Flat statusbar texture
+- added some auras (e.g. disarm)
+- added disarm DRs
+- improved some class icons
+- added font OUTLINE option for Health-/Power-/CastBar texts
+- fixed health bug since 2.5.4
+- updated Mir Profile
 
 ### v2.00-Release
 

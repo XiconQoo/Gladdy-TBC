@@ -1,5 +1,5 @@
 local type, pairs, tinsert, tsort = type, pairs, table.insert, table.sort
-local tostring, str_match, tonumber, string_format = tostring, string.match, tonumber, string.format
+local tostring, str_match, tonumber, str_format = tostring, string.match, tonumber, string.format
 local ceil, floor = ceil, floor
 local ReloadUI = ReloadUI
 
@@ -31,7 +31,7 @@ function Gladdy:FormatTimer(fontString, timeLeft, milibreakpoint, showSeconds)
     else
         if time >= 60 then
             if showSeconds then
-                fontString:SetText(floor(timeLeft / 60) .. ":" .. string_format("%02.f", floor(timeLeft - floor(timeLeft / 60) * 60)))
+                fontString:SetText(floor(timeLeft / 60) .. ":" .. str_format("%02.f", floor(timeLeft - floor(timeLeft / 60) * 60)))
             else
                 fontString:SetText(ceil(ceil(time / 60)) .. "m")
             end
@@ -48,6 +48,7 @@ Gladdy.defaults = {
         x = 0,
         y = 0,
         growDirection = "BOTTOM",
+        growMiddle = false,
         frameScale = 1,
         pixelPerfect = false,
         barWidth = 180,
@@ -278,7 +279,7 @@ function Gladdy:SetupOptions()
                 order = 5,
                 width = 1,
                 type = "description",
-                name = "     Gladdy v" .. Gladdy.version_num .. "-" .. Gladdy.version_releaseType
+                name = "     " .. Gladdy.version
             },
             general = {
                 type = "group",
@@ -311,7 +312,7 @@ function Gladdy:SetupOptions()
                     group = {
                         type = "group",
                         name = L["General"],
-                        order = 5,
+                        order = 6,
                         childGroups = "tree",
                         args = {
                             frameGeneral = {
@@ -322,6 +323,12 @@ function Gladdy:SetupOptions()
                                     headerFrame = {
                                         type = "header",
                                         name = L["Frame General"],
+                                        order = 2,
+                                    },
+                                    growMiddle = {
+                                        type = "toggle",
+                                        name = L["Grow Middle"],
+                                        desc = L["Frames expand along a centric anchor"],
                                         order = 3,
                                     },
                                     pixelPerfect = {

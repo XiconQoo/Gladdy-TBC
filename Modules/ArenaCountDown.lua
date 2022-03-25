@@ -22,46 +22,71 @@ function ACDFrame:Initialize()
     self.texturePath = "Interface\\AddOns\\Gladdy\\Images\\Countdown\\";
 
     local ACDNumFrame = CreateFrame("Frame", "ACDNumFrame", UIParent)
-    ACDNumFrame:EnableMouse(false)
-    ACDNumFrame:SetHeight(512)
-    ACDNumFrame:SetWidth(512)
-    ACDNumFrame:SetPoint("CENTER", 0, 256)
-    ACDNumFrame:Show()
     self.ACDNumFrame = ACDNumFrame
+    self.ACDNumFrame:EnableMouse(false)
+    self.ACDNumFrame:SetHeight(Gladdy.db.arenaCountdownSize)
+    self.ACDNumFrame:SetWidth(Gladdy.db.arenaCountdownSize)
+    self.ACDNumFrame:SetPoint("CENTER", 0, 128)
+    self.ACDNumFrame:Hide()
 
     local ACDNumTens = ACDNumFrame:CreateTexture("ACDNumTens", "HIGH")
-    ACDNumTens:SetWidth(256)
-    ACDNumTens:SetHeight(256)
-    ACDNumTens:SetPoint("CENTER", ACDNumFrame, "CENTER", -50, 0)
     self.ACDNumTens = ACDNumTens
+    self.ACDNumTens:SetWidth(Gladdy.db.arenaCountdownSize)
+    self.ACDNumTens:SetHeight(Gladdy.db.arenaCountdownSize)
+    self.ACDNumTens:SetPoint("CENTER", self.ACDNumFrame, "CENTER", -(Gladdy.db.arenaCountdownSize/8 + Gladdy.db.arenaCountdownSize/8/2), 0)
 
     local ACDNumOnes = ACDNumFrame:CreateTexture("ACDNumOnes", "HIGH")
-    ACDNumOnes:SetWidth(256)
-    ACDNumOnes:SetHeight(256)
-    ACDNumOnes:SetPoint("CENTER", ACDNumFrame, "CENTER", 50, 0)
     self.ACDNumOnes = ACDNumOnes
+    self.ACDNumOnes:SetWidth(Gladdy.db.arenaCountdownSize)
+    self.ACDNumOnes:SetHeight(Gladdy.db.arenaCountdownSize)
+    self.ACDNumOnes:SetPoint("CENTER", self.ACDNumFrame, "CENTER", (Gladdy.db.arenaCountdownSize/8 + Gladdy.db.arenaCountdownSize/8/2), 0)
 
     local ACDNumOne = ACDNumFrame:CreateTexture("ACDNumOne", "HIGH")
-    ACDNumOne:SetWidth(256)
-    ACDNumOne:SetHeight(256)
-    ACDNumOne:SetPoint("CENTER", ACDNumFrame, "CENTER", 0, 0)
     self.ACDNumOne = ACDNumOne
+    self.ACDNumOne:SetWidth(Gladdy.db.arenaCountdownSize)
+    self.ACDNumOne:SetHeight(Gladdy.db.arenaCountdownSize)
+    self.ACDNumOne:SetPoint("CENTER", self.ACDNumFrame, "CENTER", 0, 0)
 
-    self:RegisterMessage("JOINED_ARENA")
-    self:RegisterMessage("ENEMY_SPOTTED")
-    self:RegisterMessage("UNIT_SPEC")
+    if Gladdy.db.countdown then
+        self:RegisterMessage("JOINED_ARENA")
+        self:RegisterMessage("ENEMY_SPOTTED")
+        self:RegisterMessage("UNIT_SPEC")
+    end
     self.faction = UnitFactionGroup("player")
 end
 
 function ACDFrame:UpdateFrameOnce()
+    if Gladdy.db.countdown then
+        self:RegisterMessage("JOINED_ARENA")
+        self:RegisterMessage("ENEMY_SPOTTED")
+        self:RegisterMessage("UNIT_SPEC")
+    else
+        self:UnregisterAllMessages()
+    end
     self.ACDNumFrame:SetFrameStrata(Gladdy.db.arenaCountdownFrameStrata)
     self.ACDNumFrame:SetFrameLevel(Gladdy.db.arenaCountdownFrameLevel)
+
+    self.ACDNumFrame:SetHeight(Gladdy.db.arenaCountdownSize)
+    self.ACDNumFrame:SetWidth(Gladdy.db.arenaCountdownSize)
+    self.ACDNumFrame:SetPoint("CENTER", 0, 128)
+
+    self.ACDNumTens:SetWidth(Gladdy.db.arenaCountdownSize)
+    self.ACDNumTens:SetHeight(Gladdy.db.arenaCountdownSize)
+    self.ACDNumTens:SetPoint("CENTER", self.ACDNumFrame, "CENTER", -(Gladdy.db.arenaCountdownSize/8 + Gladdy.db.arenaCountdownSize/8/2), 0)
+
+    self.ACDNumOnes:SetWidth(Gladdy.db.arenaCountdownSize)
+    self.ACDNumOnes:SetHeight(Gladdy.db.arenaCountdownSize)
+    self.ACDNumOnes:SetPoint("CENTER", self.ACDNumFrame, "CENTER", (Gladdy.db.arenaCountdownSize/8 + Gladdy.db.arenaCountdownSize/8/2), 0)
+
+    self.ACDNumOne:SetWidth(Gladdy.db.arenaCountdownSize)
+    self.ACDNumOne:SetHeight(Gladdy.db.arenaCountdownSize)
+    self.ACDNumOne:SetPoint("CENTER", self.ACDNumFrame, "CENTER", 0, 0)
 end
 
 function ACDFrame.OnUpdate(self, elapse)
     if (self.countdown > 0 and Gladdy.db.countdown) then
         self.hidden = false;
-
+        self.ACDNumFrame:Show()
         if ((floor(self.countdown) ~= floor(self.countdown - elapse)) and (floor(self.countdown - elapse) >= 0)) then
             local str = tostring(floor(self.countdown - elapse));
 
@@ -88,6 +113,7 @@ function ACDFrame.OnUpdate(self, elapse)
         self.countdown = self.countdown - elapse;
     else
         self.hidden = true;
+        self.ACDNumFrame:Hide()
         self.ACDNumTens:Hide();
         self.ACDNumOnes:Hide();
         self.ACDNumOne:Hide();
@@ -99,7 +125,6 @@ end
 
 function ACDFrame:JOINED_ARENA()
     if Gladdy.db.countdown then
-        self.ACDNumFrame:Show()
         self:RegisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
         self:SetScript("OnEvent", ACDFrame.OnEvent)
         self.endTime = GetTime() + 70
@@ -131,25 +156,7 @@ function ACDFrame:CHAT_MSG_BG_SYSTEM_NEUTRAL(msg)
     end
 end
 
-function ACDFrame:UpdateFrame()
-    self.ACDNumFrame:SetHeight(Gladdy.db.arenaCountdownSize)
-    self.ACDNumFrame:SetWidth(Gladdy.db.arenaCountdownSize)
-    self.ACDNumFrame:SetPoint("CENTER", 0, 128)
-
-    self.ACDNumTens:SetWidth(Gladdy.db.arenaCountdownSize)
-    self.ACDNumTens:SetHeight(Gladdy.db.arenaCountdownSize)
-    self.ACDNumTens:SetPoint("CENTER", self.ACDNumFrame, "CENTER", -(Gladdy.db.arenaCountdownSize/8 + Gladdy.db.arenaCountdownSize/8/2), 0)
-
-    self.ACDNumOnes:SetWidth(Gladdy.db.arenaCountdownSize)
-    self.ACDNumOnes:SetHeight(Gladdy.db.arenaCountdownSize)
-    self.ACDNumOnes:SetPoint("CENTER", self.ACDNumFrame, "CENTER", (Gladdy.db.arenaCountdownSize/8 + Gladdy.db.arenaCountdownSize/8/2), 0)
-
-    self.ACDNumOne:SetWidth(Gladdy.db.arenaCountdownSize)
-    self.ACDNumOne:SetHeight(Gladdy.db.arenaCountdownSize)
-    self.ACDNumOne:SetPoint("CENTER", self.ACDNumFrame, "CENTER", 0, 0)
-end
-
-function ACDFrame:Test()
+function ACDFrame:TestOnce()
     self.countdown = 30
     self:JOINED_ARENA()
 end
@@ -188,6 +195,7 @@ function ACDFrame:GetOptions()
             max = 512,
             step = 16,
             width = "full",
+            disabled = function() return not Gladdy.db.countdown end,
         }),
         headerAuraLevel = {
             type = "header",
@@ -200,6 +208,7 @@ function ACDFrame:GetOptions()
             order = 6,
             values = Gladdy.frameStrata,
             sorting = Gladdy.frameStrataSorting,
+            disabled = function() return not Gladdy.db.countdown end,
         }),
         arenaCountdownFrameLevel = Gladdy:option({
             type = "range",
@@ -209,6 +218,7 @@ function ACDFrame:GetOptions()
             step = 1,
             order = 7,
             width = "full",
+            disabled = function() return not Gladdy.db.countdown end,
         }),
     }
 end

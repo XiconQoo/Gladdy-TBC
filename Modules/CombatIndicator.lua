@@ -20,7 +20,9 @@ local CombatIndicator = Gladdy:NewModule("Combat Indicator", nil, {
 
 function CombatIndicator:Initialize()
     self.frames = {}
-    self:RegisterMessage("JOINED_ARENA")
+    if Gladdy.db.ciEnabled then
+        self:RegisterMessage("JOINED_ARENA")
+    end
     self.updateInterval = 0.05
     self.combatIndicatorIcon = select(3, GetSpellInfo(674))
 end
@@ -55,6 +57,14 @@ function CombatIndicator:CreateFrame(unit)
 
     self.frames[unit] = ciFrame
     button.ciFrame = ciFrame
+end
+
+function CombatIndicator:UpdateFrameOnce()
+    if Gladdy.db.ciEnabled then
+        self:RegisterMessage("JOINED_ARENA")
+    else
+        self:UnregisterAllMessages()
+    end
 end
 
 function CombatIndicator:UpdateFrame(unit)
@@ -133,6 +143,7 @@ function CombatIndicator:GetOptions()
             childGroups = "tree",
             name = L["Frame"],
             order = 4,
+            disabled = function() return not Gladdy.db.ciEnabled end,
             args = {
                 general = {
                     type = "group",

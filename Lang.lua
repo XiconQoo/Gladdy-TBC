@@ -28,6 +28,34 @@ L["Troll"] = C_CreatureInfo.GetRaceInfo(8).raceName
 L["Blood Elf"] = C_CreatureInfo.GetRaceInfo(10).raceName
 L["Draenei"] = C_CreatureInfo.GetRaceInfo(11).raceName
 
+--Specs
+--[[
+L["Balance"] = BALANCE
+L["Combat"] = COMBAT_LABEL
+L["Fire"] = STRING_SCHOOL_FIRE
+L["Arcane"] = STRING_SCHOOL_ARCANE
+L["Shadow"] = STRING_SCHOOL_SHADOW
+L["Holy"] = STRING_SCHOOL_HOLY
+L["Elemental"] = STRING_SCHOOL_ELEMENTAL
+
+
+--Modules
+--L["Announcements"] = CHAT_ANNOUNCE
+L["Auras"] = COMBAT_TEXT_SHOW_AURAS_TEXT
+L["Cast Bar"] = SHOW_ENEMY_CAST
+L["Buffs and Debuffs"] = BUFFOPTIONS_LABEL
+--L["Class Icon"] = CLASS .. " " .. EMBLEM_SYMBOL
+--L["Clicks"] =
+L["Cooldowns"] = CAPACITANCE_SHIPMENT_COOLDOWN:gsub(": %%s", "")
+--L["Export Import"] =
+--L["Healthbar"]
+L["Highlight"] = HIGHLIGHTING:gsub(":", "")
+L["Pet"] = PET_TYPE_PET
+--L["Racial"] = RACE .. " " .. ABILITIES
+--L["Range Check"] =
+L["Trinket"] = TRINKET0SLOT
+--]]
+
 if (GetLocale() == "ruRU") then
     -- Specs
     L["Balance"] = "Баланс"
@@ -1413,6 +1441,359 @@ elseif GetLocale() == "zhCN" then
     L["Background Color of the frame"] = "框架的背景顏色"
 
     L["Gladdy"] = "Gladdy框架"  --Line 210, 709, 727
+elseif GetLocale() == "frFR" then
+    -- Announcements.lua
+    L["Announcements"] = "ANNONCE"
+    L["RESURRECTING: %s (%s)"] = "EN TRAIN DE RESSUSCITER: %s (%s)"
+    L["SPEC DETECTED: %s - %s (%s)"] = "SPEC DETECTÉ: %s - %s (%s)"
+    L["LOW HEALTH: %s (%s)"] = "VIE BASSE: %s (%s)"
+    L["TRINKET USED: %s (%s)"] = "TRINKET UTILISÉ: %s (%s)"
+    L["TRINKET READY: %s (%s)"] = "TRINKET PRÊT: %s (%s)"
+    L["DRINKING: %s (%s)"] = "EN TRAIN DE BOIRE: %s (%s)"
+    L["Self"] = "Soi"
+    L["Party"] = "Groupe"
+    L["Raid Warning"] = "Avertissement de raid"
+    L["Blizzard's Floating Combat Text"] = "Texte de combat flottant de Blizzard"
+    L["Trinket used"] = "Trinket utilisé"
+    L["Announce when an enemy's trinket is used"] = "Annonce quand un trinket ennemie est utilisé"
+    L["Trinket ready"] = "Trinket prêt"
+    L["Announce when an enemy's trinket is ready again"] = "Annonce quand un trinket ennemie est prêt de nouveau"
+    L["Drinking"] = "En train de boire"
+    L["Announces when enemies sit down to drink"] = "Annonce quand les ennemies s'assoient pour boire"
+    L["Resurrection"] = "Resurrection"
+    L["Announces when an enemy tries to resurrect a teammate"] = "Annonce quand un ennemie essaie de ressusciter un membre de son groupe"
+    L["New enemies"] = "Nouveaux ennemis"
+    L["Announces when new enemies are discovered"] = "Annonce quand les ennemies sont découverts"
+    L["Spec Detection"] = "Détection des SPEC"
+    L["Announces when the spec of an enemy was detected"] = "Annonce quand une spec d'un ennemie est détecté"
+    L["Low health"] = "Vie Basse"
+    L["Announces when an enemy drops below a certain health threshold"] = "Annonce quand un ennemie tombe en dessous d'un certain seuil de points de vie"
+    L["Low health threshold"] = "Seuil de points de vie bas"
+    L["Choose how low an enemy must be before low health is announced"] = "Choisissez à quel point un ennemi doit être bas avant d'annoncer une santé faible"
+    L["Destination"] = "Destination"
+    L["Choose how your announcements are displayed"] = "Choisissez comment vos annonces sont affichées"
+
+    -- ArenaCountDown.lua
+    L["Arena Countdown"] = "Compte à rebours de l'arène"
+    L["Turn on/off"] = "Activer / désactiver"
+    L["Turns countdown before the start of an arena match on/off."] = "Active / désactive le compte à rebours avant le début d'un match d'arène"
+    L["Size"] = "Taille"
+
+    -- Auras.lua
+    L["Auras"] = "Auras"
+    L["Frame"] = "Cadre"
+    L["Cooldown"] = "Temps de recharge"
+    L["No Cooldown Circle"] = "Pas de Balayage du temps de recharge"
+    L["Cooldown circle alpha"] = "Alpha du Balayage du temps de recharge"
+    L["Font"] = "Police de caractère"
+    L["Font of the cooldown"] = "Police du temps de recharge"
+    L["Font scale"] = "Échelle de police"
+    L["Scale of the text"] = "Échelle du texte"
+    L["Font color"] = "Couleur de la police"
+    L["Color of the text"] = "Couleur du texte"
+    L["Border"] = "Bordure"
+    L["Border style"] = "Style de bordure"
+    L["Buff color"] = "Couleur des buff"
+    L["Debuff color"] = "Couleur des Debuff"
+    L["Check All"] = "Vérifie tout"
+    L["Uncheck All"] = "Décocher tout"
+    L["Enabled"] = "Activé"
+    L["Priority"] = "Priorité"
+
+    -- BuffsDebuffs.lua
+    L["Buffs and Debuffs"] = "Buffs et Debuffs"
+    L["Enable"] = "Activé"
+    L["Enabled Buffs and Debuffs module"] = "Module de buffs et debuffs activés"
+    L["Show CC"] = "Montrer les CC"
+    L["Shows all debuffs, which are displayed on the ClassIcon as well"] = "Montrer tout les debuffs, qui sont affichés sur l'icone de classe aussi"
+    L["Buffs"] = "Buffs"
+    L["Size & Padding"] = "Taille et remplissage"
+    L["Icon Size"] = "Taille de l'icône"
+    L["Size of the DR Icons"] = "Taille des icones de DR"
+    L["Icon Width Factor"] = "Facteur de largeur d'icône"
+    L["Stretches the icon"] = "Étire l'icône"
+    L["Icon Padding"] = "Remplissage d'icônes"
+    L["Space between Icons"] = "Espace entre les icônes"
+    L["Position"] = "Position"
+    L["Aura Position"] = "Position de l'aura"
+    L["Position of the aura icons"] = "Position de l'icône de l'aura"
+    L["Top"] = "Haut"
+    L["Bottom"] = "Bas"
+    L["Left"] = "Gauche"
+    L["Right"] = "Droite"
+    L["Grow Direction"] = "Direction de croissance"
+    L["Grow Direction of the aura icons"] = "Direction de croissance de l'icônr de l'aura"
+    L["Horizontal offset"] = "Décalage horizontal"
+    L["Vertical offset"] = "Décalage verticale"
+    L["Alpha"] = "Alpha"
+    L["Debuffs"] = "Debuffs"
+    L["Dynamic Timer Color"] = "Couleur de la minuterie dynamique"
+    L["Show dynamic color on cooldown numbers"] = "Afficher la couleur dynamique sur les numéros de recharge"
+    L["Color of the cooldown timer and stacks"] = "Couleur du temps de recharge et des piles"
+    L["Spell School Colors"] = "Couleurs de l'école de sorts"
+    L["Spell School Colors Enabled"] = "Couleurs de l'école de sorts"
+    L["Show border colors by spell school"] = "Afficher les couleurs des bordures par école de sorts"
+    L["Curse"] = "Malédiction"
+    L["Color of the border"] = "Couleur de la bordure"
+    L["Magic"] = "Magique"
+    L["Poison"] = "Poison"
+    L["Physical"] = "Physique"
+    L["Immune"] = "Immunisé"
+    L["Disease"] = "Maladie"
+    L["Aura"] = "Aura"
+    L["Form"] = "Forme"
+
+    -- Castbar.lua
+    L["Cast Bar"] = "Barre d'incantation"
+    L["Bar"] = "Barre"
+    L["Bar Size"] = "Taille de la barre"
+    L["Bar height"] = "Hauteur de la barre"
+    L["Height of the bar"] = "Hauteur de la barre"
+    L["Bar width"] = "Largeur de la barre"
+    L["Width of the bars"] = "Largeur de la barre"
+    L["Texture"] = "Texture"
+    L["Bar texture"] = "Texture de la barre"
+    L["Texture of the bar"] = "Texture de la barre"
+    L["Bar color"] = "Couleur de la barre"
+    L["Color of the cast bar"] = "Couleur de la barre d'incantation"
+    L["Background color"] = "Couleur de l'Arrière plan"
+    L["Color of the cast bar background"] = "Couleur de l'Arrière plan de la barre d'incantation"
+    L["Border size"] = "taille de la bordure"
+    L["Status Bar border"] = "Bordure de la barre de statut"
+    L["Status Bar border color"] = "Couleur de la bordure de la barre de statut"
+    L["Icon"] = "Icone"
+    L["Icon size"] = "Taille de l'icone"
+    L["Icon border"] = "Bordure de l'icone"
+    L["Icon border color"] = "Couleur de la bordure de l'icone"
+    L["Spark"] = "Etincelle"
+    L["Spark enabled"] = "Etincelle activé"
+    L["Spark color"] = "Couleur de l'étincelle"
+    L["Color of the cast bar spark"] = "Couleur de l'étincelle de la barre d'incantation"
+    L["Font of the castbar"] = "Police de la barre d'incantation"
+    L["Font size"] = "Taille de la police"
+    L["Size of the text"] = "Taille du texte"
+    L["Format"] = "Format"
+    L["Timer Format"] = "Format du timer"
+    L["Remaining"] = "Restant"
+    L["Total"] = "Total"
+    L["Both"] = "Les deux"
+    L["Castbar position"] = "Position de la barre d'incantation"
+    L["Icon position"] = "Position de l'icone"
+    L["Offsets"] = "Décalage"
+
+    -- Classicon.lua
+    L["Class Icon"] = "Icone de la classe"
+    L["Balance"] = "Equilibre"
+    L["Feral"] = "Combat farouche"
+    L["Restoration"] = "Restauration"
+    L["Beast Mastery"] = "Maîtrise des bêtes"
+    L["Marksmanship"] = "Précision"
+    L["Survival"] = "Survie"
+    L["Arcane"] = "Arcane"
+    L["Fire"] = "Feu"
+    L["Frost"] = "Givre"
+    L["Holy"] = "Sacré"
+    L["Retribution"] = "Vindicte"
+    L["Protection"] = "Protection"
+    L["Discipline"] = "Discipline"
+    L["Shadow"] = "Ombre"
+    L["Assassination"] = "Assassinat"
+    L["Combat"] = "Combat"
+    L["Subtlety"] = "Finesse"
+    L["Elemental"] = "Elementaire"
+    L["Enhancement"] = "Amélioration"
+    L["Affliction"] = "Affliction"
+    L["Demonology"] = "Démonologie"
+    L["Destruction"] = "Destruction"
+    L["Arms"] = "Armes"
+    L["Fury"] = "Fureur"
+    L["Show Spec Icon"] = "Afficher l'icone des spécialisations"
+    L["Shows Spec Icon once spec is detected"] = "Afficher l'icone des spécialisations une fois que les spé sont détectés"
+    L["Icon width factor"] = "Facteur de largeur d'icône"
+    L["This changes positions with trinket"] = "Cela change de position avec le trinket"
+    L["Border color"] = "Couleur de la bordure"
+
+    --CombatIndicator.lua
+    L["Combat Indicator"] = "Indicateur de combat"
+    L["Enable Combat Indicator icon"] = "Activer l'icone de l'indicateur de combat"
+    L["Anchor"] = "Ancre"
+    L["This changes the anchor of the ci icon"] = "Cela change l'ancre de l'icône de l'indicateur de combat"
+    L["This changes position relative to its anchor of the ci icon"] = "Cela change la position par rapport à son ancre de l'icône de l'indicateur de combat"
+
+    -- Cooldowns.lua
+    L["Cooldowns"] = "Temps de recharge (CD)"
+    L["COOLDOWN USED: %s (%s) used %s - %s sec. cooldown"] = "CD utilisé : %s (%s) utilisé %s - %s sec. cd"
+    L["Enabled cooldown module"] = "Module du temps de recharge activé"
+    L["Cooldown size"] = "Taille du temps de recharge"
+    L["Size of each cd icon"] = "Taille de chaque icone de CD"
+    L["Max Icons per row"] = "Nombre maximal d'icônes par ligne"
+    L["Scale of the font"] = "Échelle de la police"
+    L["Anchor of the cooldown icons"] = "Ancre de l'icone du temps de recharge"
+    L["Grow Direction of the cooldown icons"] = "Direction de croissance des icônes de temps de recharge"
+    L["Offset"] = "Décalage"
+
+    -- Diminishings.lua
+    L["Diminishings"] = "Rendements décroissants (DR)"
+    L["Enabled DR module"] = "Activer le module DR"
+    L["DR Cooldown position"] = "Position du temps de recharge des DR"
+    L["Position of the cooldown icons"] = "Position des icones de temps de recharge"
+    L["DR Border Colors"] = "Couleur de la bordure des DR"
+    L["Dr Border Colors Enabled"] = "Couleur de la bordure des DR activé"
+    L["Colors borders of DRs in respective DR-color below"] = "Couleurs des bordures des DR dans la couleur DR respective ci-dessous"
+    L["Half"] = "Demi"
+    L["Quarter"] = "Quart"
+    L["Categories"] = "Catégories"
+    L["Force Icon"] = "Forcer les icones"
+    L["Icon of the DR"] = "Icones des DR"
+
+    -- ExportImport.lua
+    L["Export Import"] = "Exporter Importer"
+    L["Profile Export Import"] = "Profile de l'Exporter Importer"
+
+    -- Healthbar.lua
+    L["Health Bar"] = "Barre de vie"
+    L["DEAD"] = "MORT"
+    L["LEAVE"] = "QUITTER"
+    L["General"] = "Général"
+    L["Color of the status bar background"] = "Couleur de l'arrière-plan de la barre d'état"
+    L["Font of the bar"] = "Police de la barre"
+    L["Name font size"] = "Taille de la police du nom"
+    L["Size of the name text"] = "Taille du texte du nom"
+    L["Health font size"] = "Taille de la police de la santé"
+    L["Size of the health text"] = "Taille du texte de la santé"
+    L["Size of the border"] = "Taille de la bordure"
+    L["Health Bar Text"] = "Texte de la barre de santé"
+    L["Show name text"] = "Afficher le texte du nom"
+    L["Show the units name"] = "Afficher le nom des unités"
+    L["Show ArenaX"] = "Afficher ArenaX"
+    L["Show Arena1-5 as name instead"] = "Afficher Arena1-5 comme nom à la place"
+    L["Show the actual health"] = "Afficher la santé réelle"
+    L["Show the actual health on the health bar"] = "Afficher la santé réelle sur la barre de santé"
+    L["Show max health"] = "Afficher la santé maximale"
+    L["Show max health on the health bar"] = "Afficher la santé maximale sur la barre de santé"
+    L["Show health percentage"] = "Afficher le pourcentage de santé"
+    L["Show health percentage on the health bar"] = "Afficher le pourcentage de santé sur la barre de santé"
+
+    -- Highlight.lua
+    L["Highlight"] = "Surbrillance"
+    L["Show Inside"] = "Afficher dedans"
+    L["Show Highlight border inside of frame"] = "Afficher la bordure de surbrillance à l'intérieur du cadre"
+    L["Colors"] = "Couleurs"
+    L["Target border color"] = "Couleur de la bordure cible"
+    L["Color of the selected targets border"] = "Couleur de la bordure des cibles sélectionnées"
+    L["Focus border color"] = "Couleur de la bordure du Focus"
+    L["Color of the focus border"] = "Couleur de la bordure du Focus"
+    L["Highlight target"] = "Mettre la cible en surbrillance"
+    L["Toggle if the selected target should be highlighted"] = "Basculer si la cible sélectionnée doit être mise en surbrillance"
+    L["Show border around target"] = "Afficher la bordure autour de la cible"
+    L["Toggle if a border should be shown around the selected target"] = "Basculer si une bordure doit être affichée autour de la cible sélectionnée"
+    L["Show border around focus"] = "Afficher la bordure autour du focus"
+    L["Toggle of a border should be shown around the current focus"] = "La bascule d'une bordure doit être affichée autour du focus actuel"
+
+    -- Pets.lua
+    L["Pets"] = "Familier"
+    L["Enables Pets module"] = "Activer le module familier (pet)"
+    L["Width of the bar"] = "Largeur de la barre"
+    L["Health color"] = "Couleur de la santé"
+    L["Color of the status bar"] = "Couleur de la barre d'état"
+    L["Portrait"] = "Portrait"
+    L["Health Values"] = "Valeurs de santé"
+
+    -- Powerbar.lua
+    L["Power Bar"] = "Barre de puissance"
+    L["Power Bar Text"] = "Texte de la barre de puissance"
+    L["Power Texts"] = "Textes de puissance"
+    L["Show race"] = "Afficher la race"
+    L["Show spec"] = "Afficher la spé"
+    L["Show the actual power"] = "Afficher la puissance actuelle"
+    L["Show the actual power on the power bar"] = "Afficher la puissance actuelle sur la barre de puissance"
+    L["Show max power"] = "Afficher la puissance maximale"
+    L["Show max power on the power bar"] = "Afficher la puissance maximale sur la barre de puissance"
+    L["Show power percentage"] = "Afficher le pourcentage de puissance"
+    L["Show power percentage on the power bar"] = "Afficher le pourcentage de puissance sur la barre de puissance"
+
+    -- Racial.lua
+    L["Racial"] = "Raciale"
+    L["Enable racial icon"] = "Activer l'icone du raciale"
+    L["This changes the anchor of the racial icon"] = "Cela change l'ancre de l'icône du raciale"
+    L["This changes position relative to its anchor of the racial icon"] = "Cela change de position par rapport à son ancre de l'icône du raciale"
+
+    -- TotemPlates.lua
+    L["Totem Plates"] = "Totem Plates"
+    L["Customize Totems"] = "Personnaliser les totems"
+    L["Custom totem name"] = "Personnaliser le nom des totems"
+    L["Totem General"] = "Totem Général"
+    L["Turns totem icons instead of nameplates on or off. (Requires reload)"] = "Active ou désactive les icônes totem au lieu des nameplates. (Nécessite un rechargement)"
+    L["Show friendly"] = "Montrer les amis"
+    L["Show enemy"] = "Montrer les ennemies"
+    L["Totem size"] = "Taille du totem"
+    L["Size of totem icons"] = "Taille de l'icone du totem"
+    L["Font of the custom totem name"] = "Police du nom du totem personnalisé"
+    L["Apply alpha when no target"] = "Appliquer l'alpha en l'absence de cible"
+    L["Always applies alpha, even when you don't have a target. Else it is 1."] = "Applique toujours l'alpha, même lorsque vous n'avez pas de cible. Sinon c'est 1."
+    L["Apply alpha when targeted"] = "Appliquer l'alpha lorsque ciblé"
+    L["Always applies alpha, even when you target the totem. Else it is 1."] = "Applique toujours l'alpha, même lorsque vous ciblez le totem. Sinon c'est 1."
+    L["All totem border alphas (configurable per totem)"] = "Tous les alphas de bordure de totem (configurables par totem)"
+    L["Totem icon border style"] = "Style de bordure d'icône totem"
+    L["All totem border color"] = "Toutes les couleurs de bordure de totem"
+
+    -- Trinket.lua
+    L["Trinket"] = "Trinket (Bijoux PvP)"
+    L["Enable trinket icon"] = "Activer l'icone du trinket"
+    L["This changes positions of the trinket"] = "Cela change les positions du trinket"
+
+    -- XiconProfiles.lua
+    L["Profile"] = "Profile"
+
+    -- Frame.lua
+    L["Gladdy - drag to move"] = "Gladdy - faites glisser pour déplacer"
+
+    -- Gladdy.lua
+    L["Welcome to Gladdy!"] = "Bienvenue chez Gladdy !"
+    L["First run has been detected, displaying test frame."] = "La première exécution a été détectée, affichant la trame de test."
+    L["Valid slash commands are:"] = "Les commandes de slash valides sont :"
+    L["If this is not your first run please lock or move the frame to prevent this from happening."] = "S'il ne s'agit pas de votre première utilisation, veuillez verrouiller ou déplacer le cadre pour éviter que cela ne se produise."
+
+    -- Options.lua
+    L["settings"] = "paramètres"
+    L["Reset module"] = "Réinitialiser le module"
+    L["Reset module to defaults"] = "Réinitialiser le module"
+    L["No settings"] = "Pas de paramètres"
+    L["Module has no settings"] = "Le module n'a pas de paramètres"
+    L["General settings"] = "Paramètres général"
+    L["Lock frame"] = "Verouiller le cadre"
+    L["Toggle if frame can be moved"] = "Cliquez si le cadre peut être bougé"
+    L["Grow frame upwards"] = "Agrandir le cadre vers le haut"
+    L["If enabled the frame will grow upwards instead of downwards"] = "Si activé, le cadre grandira vers le haut au lieu de vers le bas"
+    L["Down"] = "Vers la bas"
+    L["Up"] = "Vers le haut"
+    L["Frame General"] = "Cadre général"
+    L["Frame scale"] = "Taille du cadre"
+    L["Scale of the frame"] = "Taille du cadre"
+    L["Frame padding"] = "Remplissage du cadre"
+    L["Padding of the frame"] = "Remplissage du cadre"
+    L["Frame width"] = "Largeur du cadre"
+    L["Margin"] = "Marge"
+    L["Margin between each button"] = "Marge entre chaque bouton"
+    L["Cooldown General"] = "Temps de recharge Général"
+    L["Font General"] = "Police Général"
+    L["General Font"] = "Police Général"
+    L["Font color text"] = "Texte de la couleur de la police"
+    L["Font color timer"] = "Texte de la couleur de la police"
+    L["Color of the timers"] = "Couleur des minuteurs"
+    L["Icons General"] = "Icônes Général"
+    L["Icon border style"] = "Style de bordure d'icône"
+    L["This changes the border style of all icons"] = "Cela change le style de bordure de toutes les icônes"
+    L["This changes the border color of all icons"] = "Cela change la couleur de bordure de toutes les icônes"
+    L["Statusbar General"] = "Barre d'état Général"
+    L["Statusbar texture"] = "Texture de la Barre d'état"
+    L["This changes the texture of all statusbar frames"] = "Cela change la texture de tous les cadres de la barre d'état"
+    L["Statusbar border style"] = "Style de bordure de la barre d'état"
+    L["This changes the border style of all statusbar frames"] = "Cela modifie le style de bordure de tous les cadres de la barre d'état"
+    L["Statusbar border offset divider (smaller is higher offset)"] = "Diviseur de décalage de bordure de barre d'état (le plus petit est le décalage le plus élevé)"
+    L["Offset of border to statusbar (in case statusbar shows beyond the border)"] = "Décalage de la bordure par rapport à la barre d'état (au cas où la barre d'état s'afficherait au-delà de la bordure)"
+    L["Statusbar border color"] = "Couleur de la bordure de la barre d'état"
+    L["This changes the border color of all statusbar frames"] = "Cela change la couleur de la bordure de tous les cadres de la barre d'état"
 end
 
 

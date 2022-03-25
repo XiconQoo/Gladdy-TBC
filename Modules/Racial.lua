@@ -1,4 +1,4 @@
-local ceil = ceil
+local ceil, str_gsub = ceil, string.gsub
 
 local CreateFrame = CreateFrame
 local GetTime = GetTime
@@ -20,15 +20,29 @@ local Racial = Gladdy:NewModule("Racial", 79, {
     racialCooldownNumberAlpha = 1,
     racialFrameStrata = "MEDIUM",
     racialFrameLevel = 5,
+    racialGroup = false,
+    racialGroupDirection = "DOWN",
 })
 
 
 function Racial:Initialize()
     self.frames = {}
 
-    self:RegisterMessage("JOINED_ARENA")
-    self:RegisterMessage("ENEMY_SPOTTED")
-    self:RegisterMessage("RACIAL_USED")
+    if Gladdy.db.racialEnabled then
+        self:RegisterMessage("JOINED_ARENA")
+        self:RegisterMessage("ENEMY_SPOTTED")
+        self:RegisterMessage("RACIAL_USED")
+    end
+end
+
+function Racial:UpdateFrameOnce()
+    if Gladdy.db.racialEnabled then
+        self:RegisterMessage("JOINED_ARENA")
+        self:RegisterMessage("ENEMY_SPOTTED")
+        self:RegisterMessage("RACIAL_USED")
+    else
+        self:UnregisterAllMessages()
+    end
 end
 
 local function iconTimer(self,elapsed)
@@ -141,6 +155,22 @@ function Racial:UpdateFrame(unit)
 
     Gladdy:SetPosition(racial, unit, "racialXOffset", "racialYOffset", Racial:LegacySetPosition(racial, unit), Racial)
 
+    if (Gladdy.db.racialGroup) then
+        if (unit ~= "arena1") then
+            local previousUnit = "arena" .. str_gsub(unit, "arena", "") - 1
+            self.frames[unit]:ClearAllPoints()
+            if Gladdy.db.racialGroupDirection == "RIGHT" then
+                self.frames[unit]:SetPoint("LEFT", self.frames[previousUnit], "RIGHT", 0, 0)
+            elseif Gladdy.db.racialGroupDirection == "LEFT" then
+                self.frames[unit]:SetPoint("RIGHT", self.frames[previousUnit], "LEFT", 0, 0)
+            elseif Gladdy.db.racialGroupDirection == "UP" then
+                self.frames[unit]:SetPoint("BOTTOM", self.frames[previousUnit], "TOP", 0, 0)
+            elseif Gladdy.db.racialGroupDirection == "DOWN" then
+                self.frames[unit]:SetPoint("TOP", self.frames[previousUnit], "BOTTOM", 0, 0)
+            end
+        end
+    end
+
     if (unit == "arena1") then
         Gladdy:CreateMover(racial,"racialXOffset", "racialYOffset", L["Racial"],
                 {"TOPLEFT", "TOPLEFT"},
@@ -157,7 +187,6 @@ function Racial:UpdateFrame(unit)
 end
 
 function Racial:JOINED_ARENA()
-    self:RegisterEvent("ARENA_COOLDOWNS_UPDATE")
     self:SetScript("OnEvent", function(self, event, ...)
         if self[event] then
             self[event](self, ...)
@@ -165,13 +194,17 @@ function Racial:JOINED_ARENA()
     end)
 end
 
-function Racial:RACIAL_USED(unit)
+function Racial:RACIAL_USED(unit, expirationTime, spellName)
     local racial = self.frames[unit]
     local button = Gladdy.buttons[unit]
     if (not racial or not button or not button.race) then
         return
     end
-    Racial:Used(unit, GetTime(), Gladdy:Racials()[button.race].duration)
+    if expirationTime and Gladdy:Racials()[button.race].spellName ~= spellName then
+        return
+    end
+    local startTime = expirationTime or GetTime()
+    Racial:Used(unit, startTime, Gladdy:Racials()[button.race].duration)
 end
 
 function Racial:Used(unit, startTime, duration)
@@ -226,11 +259,32 @@ function Racial:GetOptions()
             desc = L["Enable racial icon"],
             order = 3,
         }),
+        racialGroup = Gladdy:option({
+            type = "toggle",
+            name = L["Group"] .. " " .. L["Racial"],
+            order = 4,
+            disabled = function() return not Gladdy.db.racialEnabled end,
+        }),
+        racialGroupDirection = Gladdy:option({
+            type = "select",
+            name = L["Group direction"],
+            order = 5,
+            values = {
+                ["RIGHT"] = L["Right"],
+                ["LEFT"] = L["Left"],
+                ["UP"] = L["Up"],
+                ["DOWN"] = L["Down"],
+            },
+            disabled = function()
+                return not Gladdy.db.racialGroup or not Gladdy.db.racialEnabled
+            end,
+        }),
         group = {
             type = "group",
             childGroups = "tree",
             name = L["Frame"],
-            order = 4,
+            order = 6,
+            disabled = function() return not Gladdy.db.racialEnabled end,
             args = {
                 general = {
                     type = "group",

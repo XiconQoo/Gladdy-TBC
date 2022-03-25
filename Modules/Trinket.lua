@@ -1,4 +1,4 @@
-local ceil = ceil
+local ceil, str_gsub = ceil, string.gsub
 local C_PvP = C_PvP
 
 local CreateFrame = CreateFrame
@@ -25,12 +25,23 @@ local Trinket = Gladdy:NewModule("Trinket", 80, {
     trinketColored = false,
     trinketColoredCd = { r = 1, g = 0, b = 0, a = 1 },
     trinketColoredNoCd = { r = 0, g = 1, b = 0, a = 1 },
+    trinketGroup = false,
+    trinketGroupDirection = "DOWN",
 })
 
 function Trinket:Initialize()
     self.frames = {}
+    if Gladdy.db.trinketEnabled then
+        self:RegisterMessage("JOINED_ARENA")
+    end
+end
 
-    self:RegisterMessage("JOINED_ARENA")
+function Trinket:UpdateFrameOnce()
+    if Gladdy.db.trinketEnabled then
+        self:RegisterMessage("JOINED_ARENA")
+    else
+        self:UnregisterAllMessages()
+    end
 end
 
 local function iconTimer(self, elapsed)
@@ -166,6 +177,22 @@ function Trinket:UpdateFrame(unit)
 
     Gladdy:SetPosition(trinket, unit, "trinketXOffset", "trinketYOffset", Trinket:LegacySetPosition(trinket, unit), Trinket)
 
+    if (Gladdy.db.trinketGroup) then
+        if (unit ~= "arena1") then
+            local previousUnit = "arena" .. str_gsub(unit, "arena", "") - 1
+            self.frames[unit]:ClearAllPoints()
+            if Gladdy.db.trinketGroupDirection == "RIGHT" then
+                self.frames[unit]:SetPoint("LEFT", self.frames[previousUnit], "RIGHT", 0, 0)
+            elseif Gladdy.db.trinketGroupDirection == "LEFT" then
+                self.frames[unit]:SetPoint("RIGHT", self.frames[previousUnit], "LEFT", 0, 0)
+            elseif Gladdy.db.trinketGroupDirection == "UP" then
+                self.frames[unit]:SetPoint("BOTTOM", self.frames[previousUnit], "TOP", 0, 0)
+            elseif Gladdy.db.trinketGroupDirection == "DOWN" then
+                self.frames[unit]:SetPoint("TOP", self.frames[previousUnit], "BOTTOM", 0, 0)
+            end
+        end
+    end
+
     if (unit == "arena1") then
         Gladdy:CreateMover(trinket,"trinketXOffset", "trinketYOffset", L["Trinket"],
                 {"TOPLEFT", "TOPLEFT"},
@@ -272,6 +299,7 @@ function Trinket:GetOptions()
             name = L["Colored trinket"],
             desc = L["Shows a solid colored icon when off/off CD."],
             order = 4,
+            disabled = function() return not Gladdy.db.trinketEnabled end,
         }),
         trinketColoredCd = Gladdy:colorOption({
             type = "color",
@@ -279,9 +307,7 @@ function Trinket:GetOptions()
             desc = L["Color of the border"],
             order = 5,
             hasAlpha = true,
-            disabled = function()
-                return not Gladdy.db.trinketColored
-            end,
+            disabled = function() return not Gladdy.db.trinketEnabled end,
         }),
         trinketColoredNoCd = Gladdy:colorOption({
             type = "color",
@@ -289,8 +315,26 @@ function Trinket:GetOptions()
             desc = L["Color of the border"],
             order = 6,
             hasAlpha = true,
+            disabled = function() return not Gladdy.db.trinketEnabled end,
+        }),
+        trinketGroup = Gladdy:option({
+            type = "toggle",
+            name = L["Group Class Icons"],
+            order = 7,
+            disabled = function() return not Gladdy.db.trinketEnabled end,
+        }),
+        trinketGroupDirection = Gladdy:option({
+            type = "select",
+            name = L["Group direction"],
+            order = 8,
+            values = {
+                ["RIGHT"] = L["Right"],
+                ["LEFT"] = L["Left"],
+                ["UP"] = L["Up"],
+                ["DOWN"] = L["Down"],
+            },
             disabled = function()
-                return not Gladdy.db.trinketColored
+                return not Gladdy.db.trinketGroup or not Gladdy.db.trinketEnabled
             end,
         }),
         group = {
@@ -298,6 +342,7 @@ function Trinket:GetOptions()
             childGroups = "tree",
             name = L["Frame"],
             order = 5,
+            disabled = function() return not Gladdy.db.trinketEnabled end,
             args = {
                 general = {
                     type = "group",

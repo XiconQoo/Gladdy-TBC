@@ -79,7 +79,7 @@ end
 
 function Diminishings:Initialize()
     self.frames = {}
-    self:RegisterMessage("UNIT_DEATH", "ResetUnit", "AURA_FADE", "UNIT_DESTROYED")
+    self:RegisterMessage("UNIT_DESTROYED")
 end
 
 function Diminishings:CreateFrame(unit)
@@ -434,6 +434,7 @@ function Diminishings:GetOptions()
             name = L["DR Duration"],
             desc = L["Change the DR Duration in seconds (DR is dynamic between 15-20s)"],
             order = 4,
+            disabled = function() return not Gladdy.db.drEnabled end,
             min = 15,
             max = 20,
             step = .1,
@@ -443,6 +444,7 @@ function Diminishings:GetOptions()
             childGroups = "tree",
             name = L["Frame"],
             order = 5,
+            disabled = function() return not Gladdy.db.drEnabled end,
             args = {
                 icon = {
                     type = "group",
@@ -781,6 +783,7 @@ function Diminishings:GetOptions()
             type = "group",
             name = L["Categories"],
             order = 6,
+            disabled = function() return not Gladdy.db.drEnabled end,
             args = Diminishings:CategoryOptions(),
         },
     }

@@ -17,7 +17,7 @@ local IsActiveBattlefieldArena = IsActiveBattlefieldArena
 local IsInInstance = IsInInstance
 local GetNumArenaOpponents = GetNumArenaOpponents
 local RELEASE_TYPES = { alpha = "Alpha", beta = "Beta", release = "Release"}
-local PREFIX = "TBC-Classic_v"
+local PREFIX = "Gladdy v"
 local VERSION_REGEX = PREFIX .. "(%d+%.%d+)%-(%a)"
 local LibStub = LibStub
 
@@ -27,14 +27,14 @@ local LibStub = LibStub
 
 ---------------------------
 
-local MAJOR, MINOR = "Gladdy", 5
+local MAJOR, MINOR = "Gladdy", 6
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
 Gladdy.version_major_num = 2
-Gladdy.version_minor_num = 0.00
+Gladdy.version_minor_num = 0.10
 Gladdy.version_num = Gladdy.version_major_num + Gladdy.version_minor_num
 Gladdy.version_releaseType = RELEASE_TYPES.release
-Gladdy.version = PREFIX .. Gladdy.version_num .. "-" .. Gladdy.version_releaseType
+Gladdy.version = PREFIX .. string.format("%.2f", Gladdy.version_num) .. "-" .. Gladdy.version_releaseType
 Gladdy.VERSION_REGEX = VERSION_REGEX
 
 Gladdy.debug = false
@@ -187,12 +187,24 @@ function Gladdy:NewModule(name, priority, defaults)
     module.defaults = defaults or {}
     module.messages = {}
 
+    module.RegisterMessages = function(self, ...)
+        for _,message in pairs({...}) do
+            self.messages[message] = message
+        end
+    end
+
     module.RegisterMessage = function(self, message, func)
         self.messages[message] = func or message
     end
 
     module.UnregisterMessage = function(self, message)
         self.messages[message] = nil
+    end
+
+    module.UnregisterMessages = function(self, ...)
+        for _,message in pairs({...}) do
+            self.messages[message] = nil
+        end
     end
 
     module.UnregisterAllMessages = function(self)
@@ -268,6 +280,7 @@ function Gladdy:OnInitialize()
     self.LSM:Register("statusbar", "Smooth", "Interface\\AddOns\\Gladdy\\Images\\Smooth")
     self.LSM:Register("statusbar", "Minimalist", "Interface\\AddOns\\Gladdy\\Images\\Minimalist")
     self.LSM:Register("statusbar", "LiteStep", "Interface\\AddOns\\Gladdy\\Images\\LiteStep.tga")
+    self.LSM:Register("statusbar", "Flat", "Interface\\AddOns\\Gladdy\\Images\\UI-StatusBar")
     self.LSM:Register("border", "Gladdy Tooltip round", "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round_selfmade")
     self.LSM:Register("border", "Gladdy Tooltip squared", "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_square_selfmade")
     self.LSM:Register("font", "DorisPP", "Interface\\AddOns\\Gladdy\\Images\\DorisPP.TTF")
@@ -276,11 +289,11 @@ function Gladdy:OnInitialize()
     L = self.L
 
     self.testData = {
-        ["arena1"] = { name = "Swift", raceLoc = L["NightElf"], classLoc = L["Warrior"], class = "WARRIOR", health = 9635, healthMax = 14207, power = 76, powerMax = 100, powerType = 1, testSpec = L["Arms"], race = "NightElf" },
-        ["arena2"] = { name = "Vilden", raceLoc = L["Undead"], classLoc = L["Mage"], class = "MAGE", health = 10969, healthMax = 11023, power = 7833, powerMax = 10460, powerType = 0, testSpec = L["Frost"], race = "Scourge" },
-        ["arena3"] = { name = "Krymu", raceLoc = L["Human"], classLoc = L["Rogue"], class = "ROGUE", health = 1592, healthMax = 11740, power = 45, powerMax = 110, powerType = 3, testSpec = L["Subtlety"], race = "Human" },
-        ["arena4"] = { name = "Talmon", raceLoc = L["Human"], classLoc = L["Warlock"], class = "WARLOCK", health = 10221, healthMax = 14960, power = 9855, powerMax = 9855, powerType = 0, testSpec = L["Demonology"], race = "Human" },
-        ["arena5"] = { name = "Hydra", raceLoc = L["Undead"], classLoc = L["Priest"], class = "PRIEST", health = 11960, healthMax = 11960, power = 2515, powerMax = 10240, powerType = 0, testSpec = L["Discipline"], race = "Human" },
+        ["arena1"] = { name = "Swift", raceLoc = L["NightElf"], classLoc = L["Hunter"], class = "HUNTER", health = 67, healthMax = 100, power = 76, powerMax = 100, powerType = 1, testSpec = L["Marksmanship"], race = "NightElf" },
+        ["arena2"] = { name = "Vilden", raceLoc = L["Undead"], classLoc = L["Mage"], class = "MAGE", health = 99, healthMax = 100, power = 7833, powerMax = 10460, powerType = 0, testSpec = L["Frost"], race = "Scourge" },
+        ["arena3"] = { name = "Krymu", raceLoc = L["Human"], classLoc = L["Rogue"], class = "ROGUE", health = 13, healthMax = 100, power = 45, powerMax = 110, powerType = 3, testSpec = L["Subtlety"], race = "Human" },
+        ["arena4"] = { name = "Talmon", raceLoc = L["Human"], classLoc = L["Warlock"], class = "WARLOCK", health = 68, healthMax = 100, power = 9855, powerMax = 9855, powerType = 0, testSpec = L["Demonology"], race = "Human" },
+        ["arena5"] = { name = "Hydra", raceLoc = L["Undead"], classLoc = L["Priest"], class = "PRIEST", health = 100, healthMax = 100, power = 2515, powerMax = 10240, powerType = 0, testSpec = L["Discipline"], race = "Human" },
     }
 
     self.cooldownSpellIds = {}
@@ -393,6 +406,9 @@ function Gladdy:Test()
             end
 
             button:SetAlpha(1)
+        end
+        for _, module in self:IterModules() do
+            self:Call(module, "TestOnce")
         end
     end
 end

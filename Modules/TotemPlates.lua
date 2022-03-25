@@ -1,103 +1,41 @@
-local select, pairs, string_lower, tremove, tinsert, format, string_gsub, ipairs = select, pairs, string.lower, tremove, tinsert, format, string.gsub, ipairs
-local UnitExists, UnitIsUnit, UnitName, UnitIsEnemy = UnitExists, UnitIsUnit, UnitName, UnitIsEnemy
+local select, pairs, tremove, tinsert, format, strsplit, tonumber, ipairs = select, pairs, tremove, tinsert, format, strsplit, tonumber, ipairs
+local UnitExists, UnitIsUnit, UnitIsEnemy, UnitGUID = UnitExists, UnitIsUnit, UnitIsEnemy, UnitGUID
 local C_NamePlate = C_NamePlate
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local GetSpellInfo, CreateFrame = GetSpellInfo, CreateFrame
+local totemData, npcIdToTotemData = Gladdy:GetTotemData()
 
 ---------------------------------------------------
 
--- Constants
+-- Option Helpers
 
 ---------------------------------------------------
-
-local totemData = {
-    -- Fire
-    [string_lower("Searing Totem")] = {id = 3599,texture = select(3, GetSpellInfo(3599)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Searing Totem
-    [string_lower("Flametongue Totem")] = {id = 8227,texture = select(3, GetSpellInfo(8227)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Flametongue Totem
-    [string_lower("Magma Totem")] = {id = 8190,texture = select(3, GetSpellInfo(8190)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Magma Totem
-    [string_lower("Fire Nova Totem")] = {id = 1535,texture = select(3, GetSpellInfo(1535)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Fire Nova Totem
-    [string_lower("Totem of Wrath")] = {id = 30706,texture = select(3, GetSpellInfo(30706)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 1}, -- Totem of Wrath
-    [string_lower("Fire Elemental Totem")] = {id = 32982,texture = select(3, GetSpellInfo(32982)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Fire Elemental Totem
-    [string_lower("Frost Resistance Totem")] = {id = 8181,texture = select(3, GetSpellInfo(8181)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Frost Resistance Totem
-    -- Water
-    [string_lower("Fire Resistance Totem")] = {id = 8184,texture = select(3, GetSpellInfo(8184)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Fire Resistance Totem
-    [string_lower("Poison Cleansing Totem")] = {id = 8166,texture = select(3, GetSpellInfo(8166)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Poison Cleansing Totem
-    [string_lower("Disease Cleansing Totem")] = {id = 8170,texture = select(3, GetSpellInfo(8170)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Disease Cleansing Totem
-    [string_lower("Healing Stream Totem")] = {id = 5394,texture = select(3, GetSpellInfo(5394)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Healing Stream Totem
-    [string_lower("Mana Tide Totem")] = {id = 16190,texture = select(3, GetSpellInfo(16190)), color = {r = 0.078, g = 0.9, b = 0.16, a = 1}, enabled = true, priority = 3}, -- Mana Tide Totem
-    [string_lower("Mana Spring Totem")] = {id = 5675,texture = select(3, GetSpellInfo(5675)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 1}, -- Mana Spring Totem
-    -- Earth
-    [string_lower("Earthbind Totem")] = {id = 2484,texture = select(3, GetSpellInfo(2484)), color = {r = 0.5, g = 0.5, b = 0.5, a = 1}, enabled = true, priority = 1}, -- Earthbind Totem
-    [string_lower("Stoneclaw Totem")] = {id = 5730,texture = select(3, GetSpellInfo(5730)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Stoneclaw Totem
-    [string_lower("Stoneskin Totem")] = {id = 8071,texture = select(3, GetSpellInfo(8071)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Stoneskin Totem
-    [string_lower("Strength of Earth Totem")] = {id = 8075,texture = select(3, GetSpellInfo(8075)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Strength of Earth Totem
-    [string_lower("Earth Elemental Totem")] = {id = 33663,texture = select(3, GetSpellInfo(33663)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Earth Elemental Totem
-    [string_lower("Tremor Totem")] = {id = 8143,texture = select(3, GetSpellInfo(8143)), color = {r = 1, g = 0.9, b = 0.1, a = 1}, enabled = true, priority = 3}, -- Tremor Totem
-    -- Air
-    [string_lower("Grounding Totem")] = {id = 8177,texture = select(3, GetSpellInfo(8177)), color = {r = 0, g = 0.53, b = 0.92, a = 1}, enabled = true, priority = 3}, -- Grounding Totem
-    [string_lower("Grace of Air Totem")] = {id = 8835,texture = select(3, GetSpellInfo(8835)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Grace of Air Totem
-    [string_lower("Nature Resistance Totem")] = {id = 10595,texture = select(3, GetSpellInfo(10595)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Nature Resistance Totem
-    [string_lower("Windfury Totem")] = {id = 8512,texture = select(3, GetSpellInfo(8512)), color = {r = 0.96, g = 0, b = 0.07, a = 1}, enabled = true, priority = 2}, -- Windfury Totem
-    [string_lower("Sentry Totem")] = {id = 6495, texture = select(3, GetSpellInfo(6495)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Sentry Totem
-    [string_lower("Windwall Totem")] = {id = 15107,texture = select(3, GetSpellInfo(15107)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Windwall Totem
-    [string_lower("Wrath of Air Totem")] = {id = 3738,texture = select(3, GetSpellInfo(3738)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Wrath of Air Totem
-    [string_lower("Tranquil Air Totem")] = {id = 25908,texture = select(3, GetSpellInfo(25908)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Tranquil Air Totem
-}
-local localizedTotemData = {
-    ["default"] = {
-        [string_lower(select(1, GetSpellInfo(3599)))] = totemData[string_lower("Searing Totem")], -- Searing Totem
-        [string_lower(select(1, GetSpellInfo(8227)))] = totemData[string_lower("Flametongue Totem")], -- Flametongue Totem
-        [string_lower(select(1, GetSpellInfo(8190)))] = totemData[string_lower("Magma Totem")], -- Magma Totem
-        [string_lower(select(1, GetSpellInfo(1535)))] = totemData[string_lower("Fire Nova Totem")], -- Fire Nova Totem
-        [string_lower(select(1, GetSpellInfo(30706)))] = totemData[string_lower("Totem of Wrath")], -- Totem of Wrath
-        [string_lower(select(1, GetSpellInfo(32982)))] = totemData[string_lower("Fire Elemental Totem")], -- Fire Elemental Totem
-        [string_lower(select(1, GetSpellInfo(8181)))] = totemData[string_lower("Frost Resistance Totem")], -- Frost Resistance Totem
-        -- Water
-        [string_lower(select(1, GetSpellInfo(8184)))] = totemData[string_lower("Fire Resistance Totem")], -- Fire Resistance Totem
-        [string_lower(select(1, GetSpellInfo(8166)))] = totemData[string_lower("Poison Cleansing Totem")], -- Poison Cleansing Totem
-        [string_lower(select(1, GetSpellInfo(8170)))] = totemData[string_lower("Disease Cleansing Totem")], -- Disease Cleansing Totem
-        [string_lower(select(1, GetSpellInfo(5394)))] = totemData[string_lower("Healing Stream Totem")], -- Healing Stream Totem
-        [string_lower(select(1, GetSpellInfo(16190)))] = totemData[string_lower("Mana Tide Totem")], -- Mana Tide Totem
-        [string_lower(select(1, GetSpellInfo(5675)))] = totemData[string_lower("Mana Spring Totem")], -- Mana Spring Totem
-        -- Earth
-        [string_lower(select(1, GetSpellInfo(2484)))] = totemData[string_lower("Earthbind Totem")], -- Earthbind Totem
-        [string_lower(select(1, GetSpellInfo(5730)))] = totemData[string_lower("Stoneclaw Totem")], -- Stoneclaw Totem
-        [string_lower(select(1, GetSpellInfo(8071)))] = totemData[string_lower("Stoneskin Totem")], -- Stoneskin Totem
-        [string_lower(select(1, GetSpellInfo(8075)))] = totemData[string_lower("Strength of Earth Totem")], -- Strength of Earth Totem
-        [string_lower(select(1, GetSpellInfo(33663)))] = totemData[string_lower("Earth Elemental Totem")], -- Earth Elemental Totem
-        [string_lower(select(1, GetSpellInfo(8143)))] = totemData[string_lower("Tremor Totem")], -- Tremor Totem
-        -- Air
-        [string_lower(select(1, GetSpellInfo(8177)))] = totemData[string_lower("Grounding Totem")], -- Grounding Totem
-        [string_lower(select(1, GetSpellInfo(8835)))] = totemData[string_lower("Grace of Air Totem")], -- Grace of Air Totem
-        [string_lower(select(1, GetSpellInfo(10595)))] = totemData[string_lower("Nature Resistance Totem")], -- Nature Resistance Totem
-        [string_lower(select(1, GetSpellInfo(8512)))] = totemData[string_lower("Windfury Totem")], -- Windfury Totem
-        [string_lower(select(1, GetSpellInfo(6495)))] = totemData[string_lower("Sentry Totem")], -- Sentry Totem
-        [string_lower(select(1, GetSpellInfo(15107)))] = totemData[string_lower("Windwall Totem")], -- Windwall Totem
-        [string_lower(select(1, GetSpellInfo(3738)))] = totemData[string_lower("Wrath of Air Totem")], -- Wrath of Air Totem
-        [string_lower(select(1, GetSpellInfo(25908)))] = totemData[string_lower("Tranquil Air Totem")], -- Tranquil Air Totem
-    },
-    ["frFR"] = {
-        [string_lower("Totem d'\195\169lementaire de terre")] = totemData[string_lower("Earth Elemental Totem")], -- Earth Elemental Totem
-        [string_lower("Totem d'\195\169lementaire de feu")] = totemData[string_lower("Fire Elemental Totem")], -- Fire Elemental Totem
-    },
-    ["ruRU"] = {
-        [string_lower("")] = totemData[string_lower("Sentry Totem")], -- Sentry Totem
-    }
-}
 
 local function GetTotemColorDefaultOptions()
     local defaultDB = {}
     local options = {}
     local indexedList = {}
     for k,v in pairs(totemData) do
-        tinsert(indexedList, {name = k, id = v.id, color = v.color, texture = v.texture, enabled = v.enabled})
+        tinsert(indexedList, {name = k, id = v.id, color = v.color, texture = v.texture})
     end
     table.sort(indexedList, function (a, b)
         return a.name < b.name
     end)
     for i=1,#indexedList do
-        defaultDB["totem" .. indexedList[i].id] = {color = indexedList[i].color, enabled = indexedList[i].enabled, alpha = 0.6, customText = ""}
+        defaultDB["totem" .. indexedList[i].id] = {color = indexedList[i].color, enabled = true, alpha = 0.6, customText = ""}
+        options["npTotemsHideDisabledTotems"] = {
+            order = 1,
+            name = L["Hide Disabled Totem Plates"],
+            desc = L["Hide Disabled Totem Plates"],
+            type = "toggle",
+            width = "full",
+            get = function() return Gladdy.dbi.profile.npTotemsHideDisabledTotems end,
+            set = function(_, value)
+                Gladdy.dbi.profile.npTotemsHideDisabledTotems = value
+                Gladdy:UpdateFrame()
+            end
+        }
         options["totem" .. indexedList[i].id] = {
             order = i+1,
             name = select(1, GetSpellInfo(indexedList[i].id)),
@@ -174,17 +112,13 @@ local function GetTotemColorDefaultOptions()
     return defaultDB, options, indexedList
 end
 
-function Gladdy:GetTotemColors()
-    return GetTotemColorDefaultOptions()
-end
-
 ---------------------------------------------------
 
 -- Core
 
 ---------------------------------------------------
 
-local TotemPlates = Gladdy:NewModule("Totem Plates", nil, {
+local TotemPlates = Gladdy:NewModule("Totem Plates", 2, {
     npTotems = true,
     npTotemsShowFriendly = true,
     npTotemsShowEnemy = true,
@@ -198,11 +132,9 @@ local TotemPlates = Gladdy:NewModule("Totem Plates", nil, {
     npTotemPlatesAlpha = 0.6,
     npTotemPlatesAlphaAlways = false,
     npTotemPlatesAlphaAlwaysTargeted = false,
-    npTotemColors = select(1, GetTotemColorDefaultOptions())
+    npTotemColors = select(1, GetTotemColorDefaultOptions()),
+    npTotemsHideDisabledTotems = false,
 })
-
-LibStub("AceHook-3.0"):Embed(TotemPlates)
-LibStub("AceTimer-3.0"):Embed(TotemPlates)
 
 function TotemPlates.OnEvent(self, event, ...)
     TotemPlates[event](self, ...)
@@ -212,19 +144,18 @@ function TotemPlates:Initialize()
     self.numChildren = 0
     self.activeTotemNameplates = {}
     self.totemPlateCache = {}
-    self:RegisterEvent("PLAYER_ENTERING_WORLD")
-    self:RegisterEvent("NAME_PLATE_UNIT_ADDED")
-    self:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
-    self:RegisterEvent("PLAYER_TARGET_CHANGED")
-    self:RegisterEvent("UNIT_NAME_UPDATE")
-    self:SetScript("OnEvent", TotemPlates.OnEvent)
+    if Gladdy.db.npTotems then
+        self:RegisterEvent("PLAYER_ENTERING_WORLD")
+        self:RegisterEvent("NAME_PLATE_UNIT_ADDED")
+        self:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
+        self:RegisterEvent("PLAYER_TARGET_CHANGED")
+        self:SetScript("OnEvent", TotemPlates.OnEvent)
+    end
     if Gladdy.db.npTotems and Gladdy.db.npTotemsShowEnemy then
-        --GetCVar("nameplateShowEnemyTotems")
-        --SetCVar("nameplateShowEnemyTotems", true);
+        SetCVar("nameplateShowEnemyTotems", true);
     end
     if Gladdy.db.npTotems and Gladdy.db.npTotemsShowFriendly then
-        --GetCVar("nameplateShowFriendlyTotems")
-        --SetCVar("nameplateShowFriendlyTotems", true);
+        SetCVar("nameplateShowFriendlyTotems", true);
     end
     self.addon = "Blizzard"
     if (IsAddOnLoaded("Plater")) then
@@ -248,17 +179,67 @@ function TotemPlates:Initialize()
     end
 end
 
+---------------------------------------------------
+
+-- Events
+
+---------------------------------------------------
+
 function TotemPlates:PLAYER_ENTERING_WORLD()
     self.numChildren = 0
     self.activeTotemNameplates = {}
 end
 
-function TotemPlates:Reset()
-    --self:CancelAllTimers()
-    --self:UnhookAll()
+function TotemPlates:PLAYER_TARGET_CHANGED()
+    for k,nameplate in pairs(self.activeTotemNameplates) do
+        TotemPlates:SetTotemAlpha(nameplate.gladdyTotemFrame, k)
+    end
 end
 
+function TotemPlates:NAME_PLATE_UNIT_ADDED(unitID)
+    self:OnUnitEvent(unitID)
+end
+
+function TotemPlates:NAME_PLATE_UNIT_REMOVED(unitID)
+    local nameplate = C_NamePlate.GetNamePlateForUnit(unitID)
+    self.activeTotemNameplates[unitID] = nil
+    --self:ToggleAddon(nameplate, true)
+    if nameplate.gladdyTotemFrame then
+        nameplate.gladdyTotemFrame:Hide()
+        nameplate.gladdyTotemFrame:SetParent(nil)
+        tinsert(self.totemPlateCache, nameplate.gladdyTotemFrame)
+        nameplate.gladdyTotemFrame = nil
+    end
+end
+
+---------------------------------------------------
+
+-- Gladdy Call
+
+---------------------------------------------------
+
 function TotemPlates:UpdateFrameOnce()
+    if Gladdy.db.npTotems then
+        self:RegisterEvent("PLAYER_ENTERING_WORLD")
+        self:RegisterEvent("NAME_PLATE_UNIT_ADDED")
+        self:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
+        self:RegisterEvent("PLAYER_TARGET_CHANGED")
+        self:SetScript("OnEvent", TotemPlates.OnEvent)
+    else
+        self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+        self:UnregisterEvent("NAME_PLATE_UNIT_ADDED")
+        self:UnregisterEvent("NAME_PLATE_UNIT_REMOVED")
+        self:UnregisterEvent("PLAYER_TARGET_CHANGED")
+        self:SetScript("OnEvent", nil)
+    end
+
+    if Gladdy.db.npTotems and Gladdy.db.npTotemsShowEnemy then
+        SetCVar("nameplateShowEnemyTotems", true);
+    end
+    if Gladdy.db.npTotems and Gladdy.db.npTotemsShowFriendly then
+        SetCVar("nameplateShowFriendlyTotems", true);
+    end
+
     for k,nameplate in pairs(self.activeTotemNameplates) do
         local totemDataEntry = nameplate.gladdyTotemFrame.totemDataEntry
         nameplate.gladdyTotemFrame:SetWidth(Gladdy.db.npTotemPlatesSize * Gladdy.db.npTotemPlatesWidthFactor)
@@ -295,6 +276,18 @@ function TotemPlates:UpdateFrameOnce()
             nameplate.gladdyTotemFrame:Hide()
             self:ToggleAddon(nameplate, true)
         end
+        if Gladdy.db.npTotems and Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enabled then
+            nameplate.gladdyTotemFrame:Show()
+            self:ToggleAddon(nameplate)
+        end
+        if Gladdy.db.npTotems and not Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enabled then
+            nameplate.gladdyTotemFrame:Hide()
+            self:ToggleAddon(nameplate, true)
+        end
+        if Gladdy.db.npTotems and not Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enabled and Gladdy.db.npTotemsHideDisabledTotems then
+            nameplate.gladdyTotemFrame:Hide()
+            self:ToggleAddon(nameplate)
+        end
     end
     for _,gladdyTotemFrame in ipairs(self.totemPlateCache) do
         gladdyTotemFrame:SetWidth(Gladdy.db.npTotemPlatesSize * Gladdy.db.npTotemPlatesWidthFactor)
@@ -313,6 +306,7 @@ end
 
 function TotemPlates:CreateTotemFrame(nameplate)
     nameplate.gladdyTotemFrame = CreateFrame("Frame")
+    nameplate.gladdyTotemFrame:SetFrameLevel(1)
     nameplate.gladdyTotemFrame:SetIgnoreParentAlpha(true)
     nameplate.gladdyTotemFrame:SetWidth(Gladdy.db.npTotemPlatesSize * Gladdy.db.npTotemPlatesWidthFactor)
     nameplate.gladdyTotemFrame:SetHeight(Gladdy.db.npTotemPlatesSize)
@@ -373,11 +367,7 @@ function TotemPlates:GetAddonFrame(nameplate)
     end
 end
 
-function TotemPlates:PLAYER_TARGET_CHANGED()
-    for k,nameplate in pairs(self.activeTotemNameplates) do
-        TotemPlates:SetTotemAlpha(nameplate.gladdyTotemFrame, k)
-    end
-end
+
 
 function TotemPlates:ToggleAddon(nameplate, show)
     local addonFrames = { self:GetAddonFrame(nameplate) }
@@ -395,7 +385,7 @@ function TotemPlates:ToggleAddon(nameplate, show)
 end
 
 function TotemPlates.OnUpdate(self)
-    if (UnitIsUnit("mouseover", self.unitID) or UnitIsUnit("target", self.unitID)) then
+    if (UnitIsUnit("mouseover", self.unitID) or UnitIsUnit("target", self.unitID)) and Gladdy.db.npTotemColors["totem" .. self.totemDataEntry.id].alpha > 0 then
         self.selectionHighlight:SetAlpha(.25)
     else
         self.selectionHighlight:SetAlpha(0)
@@ -423,12 +413,14 @@ function TotemPlates:OnUnitEvent(unitID)
         self:ToggleAddon(nameplate, true)
         return
     end
-    local nameplateName = UnitName(unitID)
-    local totemName = string_gsub(nameplateName, "^%s+", "") --trim
-    totemName = string_gsub(totemName, "%s+$", "") --trim
-    totemName = string_gsub(totemName, "%s+[I,V,X]+$", "") --trim rank
-    totemName = string_lower(totemName)
-    local totemDataEntry = localizedTotemData["default"][totemName] or localizedTotemData["frFR"][totemName] or localizedTotemData["ruRU"][totemName]
+    local npcType, _, _, _, _, npcId = strsplit("-", UnitGUID(unitID))
+    if npcType ~= "Creature" then
+        return
+    end
+    local totemDataEntry = npcIdToTotemData[tonumber(npcId)]
+    if not totemDataEntry then
+        return
+    end
     if totemDataEntry and Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enabled then-- modify this nameplates
         if #self.totemPlateCache > 0 then
             nameplate.gladdyTotemFrame = tremove(self.totemPlateCache, #self.totemPlateCache)
@@ -452,29 +444,16 @@ function TotemPlates:OnUnitEvent(unitID)
         TotemPlates:SetTotemAlpha(nameplate.gladdyTotemFrame, unitID)
         self:ToggleAddon(nameplate)
         self.activeTotemNameplates[unitID] = nameplate
+    elseif totemDataEntry and not Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enabled and Gladdy.db.npTotemsHideDisabledTotems then
+        if nameplate.gladdyTotemFrame then
+            nameplate.gladdyTotemFrame:Hide()
+            nameplate.gladdyTotemFrame:SetParent(nil)
+            tinsert(self.totemPlateCache, nameplate.gladdyTotemFrame)
+            nameplate.gladdyTotemFrame = nil
+        end
+        self:ToggleAddon(nameplate)
     else
         self:ToggleAddon(nameplate, true)
-    end
-end
-
-function TotemPlates:NAME_PLATE_UNIT_ADDED(...)
-    self:OnUnitEvent(...)
-end
-
-function TotemPlates:UNIT_NAME_UPDATE(...)
-    self:OnUnitEvent(...)
-end
-
-function TotemPlates:NAME_PLATE_UNIT_REMOVED(...)
-    local unitID = ...
-    local nameplate = C_NamePlate.GetNamePlateForUnit(unitID)
-    self.activeTotemNameplates[unitID] = nil
-    --self:ToggleAddon(nameplate, true)
-    if nameplate.gladdyTotemFrame then
-        nameplate.gladdyTotemFrame:Hide()
-        nameplate.gladdyTotemFrame:SetParent(nil)
-        tinsert(self.totemPlateCache, nameplate.gladdyTotemFrame)
-        nameplate.gladdyTotemFrame = nil
     end
 end
 
@@ -502,6 +481,65 @@ end
 
 ---------------------------------------------------
 
+-- Test
+
+---------------------------------------------------
+
+function TotemPlates:TestOnce()
+    if not self.testFrame then
+        self.testFrame = CreateFrame("Frame", nil, UIParent)
+        self.testFrame:SetWidth(1)
+        self.testFrame:SetHeight(32)
+        self.testFrame:SetPoint("CENTER", UIParent, "CENTER", 0, -140)
+        self.testFrame:SetIgnoreParentScale(true)
+    end
+    local totemDataEntry = npcIdToTotemData[5913]
+    self.testFrame:Show()
+    if not self.testFrame.gladdyTotemFrame then
+        if #self.totemPlateCache > 0 then
+            self.testFrame.gladdyTotemFrame = tremove(self.totemPlateCache, #self.totemPlateCache)
+        else
+            self:CreateTotemFrame(self.testFrame)
+            self.testFrame.gladdyTotemFrame:SetScript("OnHide", nil)
+            self.testFrame.gladdyTotemFrame:SetScript("OnUpdate", nil)
+        end
+    end
+    if Gladdy.db.npTotems then
+        self.testFrame.gladdyTotemFrame.unitID = "player"
+        self.testFrame.gladdyTotemFrame.totemDataEntry = totemDataEntry
+        self.testFrame.gladdyTotemFrame.parent = self.testFrame
+        self.testFrame.gladdyTotemFrame:SetParent(self.testFrame)
+        self.testFrame.gladdyTotemFrame:ClearAllPoints()
+        self.testFrame.gladdyTotemFrame:SetPoint("CENTER", self.testFrame, "CENTER", 0, 0)
+        self.testFrame.gladdyTotemFrame.totemIcon:SetTexture(totemDataEntry.texture)
+        self.testFrame.gladdyTotemFrame.totemBorder:SetVertexColor(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.r,
+                Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.g,
+                Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.b,
+                Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.a)
+        self.testFrame.gladdyTotemFrame.totemName:SetText(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].customText or "")
+        self.testFrame.gladdyTotemFrame.parent = self.testFrame
+        self.testFrame.gladdyTotemFrame:Show()
+        self.activeTotemNameplates["player"] = self.testFrame
+    else
+        self.testFrame.gladdyTotemFrame:Hide()
+    end
+end
+
+function TotemPlates:Reset()
+    if self.testFrame then
+        if self.testFrame.gladdyTotemFrame then
+            self.testFrame.gladdyTotemFrame:Hide()
+            self.testFrame.gladdyTotemFrame:SetParent(nil)
+            tinsert(self.totemPlateCache, self.testFrame.gladdyTotemFrame)
+            self.testFrame.gladdyTotemFrame = nil
+        end
+        self.testFrame:Hide()
+        self.activeTotemNameplates["player"] = nil
+    end
+end
+
+---------------------------------------------------
+
 -- Interface options
 
 ---------------------------------------------------
@@ -516,21 +554,23 @@ function TotemPlates:GetOptions()
         npTotems = Gladdy:option({
             type = "toggle",
             name = L["Enabled"],
-            desc = L["Turns totem icons instead of nameplates on or off. (Requires reload)"],
+            desc = L["Turns totem icons instead of nameplates on or off."],
             order = 3,
             width = 0.9,
         }),
         npTotemsShowFriendly = Gladdy:option({
             type = "toggle",
             name = L["Show friendly"],
-            desc = L["Turns totem icons instead of nameplates on or off. (Requires reload)"],
+            desc = L["Turns totem icons instead of nameplates on or off."],
+            disabled = function() return not Gladdy.db.npTotems end,
             order = 4,
             width = 0.65,
         }),
         npTotemsShowEnemy = Gladdy:option({
             type = "toggle",
             name = L["Show enemy"],
-            desc = L["Turns totem icons instead of nameplates on or off. (Requires reload)"],
+            desc = L["Turns totem icons instead of nameplates on or off."],
+            disabled = function() return not Gladdy.db.npTotems end,
             order = 5,
             width = 0.6,
         }),
@@ -538,6 +578,7 @@ function TotemPlates:GetOptions()
             type = "group",
             childGroups = "tree",
             name = L["Frame"],
+            disabled = function() return not Gladdy.db.npTotems end,
             order = 4,
             args = {
                 icon = {
@@ -732,7 +773,8 @@ function TotemPlates:GetOptions()
             name = L["Customize Totems"],
             type = "group",
             childGroups = "tree",
-            args = select(2, Gladdy:GetTotemColors())
+            disabled = function() return not Gladdy.db.npTotems end,
+            args = select(2, GetTotemColorDefaultOptions())
         },
     }
 end

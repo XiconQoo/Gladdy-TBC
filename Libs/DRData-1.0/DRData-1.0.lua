@@ -182,7 +182,13 @@ Data.spells = {
 	--[[ RANDOM ROOTS ]]--
 	-- Improved Hamstring
 	[23694] = "rndroot",
-	
+
+	-- Entrapment (Hunter Talent)
+	[19185] = "rndroot",
+
+	-- Improved Wingclip
+	[19229] = "rndroot",
+
 	-- Frostbite
 	[12494] = "rndroot",
 
@@ -244,7 +250,11 @@ Data.spells = {
 	[10912] = "charm",
 
 	-- Counterattack
-	[19306] = "counterattack"
+	[19306] = "counterattack",
+
+	-- Disarm
+	[676] = "disarm",
+	[14251] = "disarm",
 }
 
 -- DR Category names
@@ -267,7 +277,8 @@ Data.typeNames = {
 	["repentance"] = "Repentance",
 	["dragonsbreath"] = "Dragon's Breath",
 	["ua"] = "Unstable Affliction Silence",
-	["counterattack"] = "Counterattack Immobilize"
+	["counterattack"] = "Counterattack Immobilize",
+	["disarm"] = "Disarm"
 }
 
 -- Categories that have DR in PvE as well as PvP

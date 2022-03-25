@@ -34,8 +34,10 @@ end
 
 function ShadowsightTimer:Initialize()
     self.locale = Gladdy:GetArenaTimer()
-    self:RegisterMessage("JOINED_ARENA")
     self:CreateAnchor()
+    if Gladdy.db.shadowsightTimerEnabled then
+        self:RegisterMessage("JOINED_ARENA")
+    end
 end
 
 function ShadowsightTimer:Reset()
@@ -106,6 +108,12 @@ function ShadowsightTimer:CreateAnchor()
 end
 
 function ShadowsightTimer:UpdateFrameOnce()
+    if Gladdy.db.shadowsightTimerEnabled then
+        self:RegisterMessage("JOINED_ARENA")
+    else
+        self:UnregisterAllMessages()
+    end
+
     self.anchor:EnableMouse(not Gladdy.db.shadowsightTimerLocked)
 
     self.anchor:SetFrameStrata(Gladdy.db.shadowsightTimerFrameStrata)
@@ -148,13 +156,15 @@ end
 ---------------------------
 
 function ShadowsightTimer:JOINED_ARENA()
-    self:RegisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
-    self:SetScript("OnEvent", ShadowsightTimer.OnEvent)
-    for i=1,2 do
-        self["timerFrame" .. i].font:SetText("1:30")
-        self["timerFrame" .. i].font:SetTextColor(1, 0.8, 0)
+    if Gladdy.db.shadowsightTimerEnabled then
+        self:RegisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
+        self:SetScript("OnEvent", ShadowsightTimer.OnEvent)
+        for i=1,2 do
+            self["timerFrame" .. i].font:SetText("1:30")
+            self["timerFrame" .. i].font:SetTextColor(1, 0.8, 0)
+        end
+        self.anchor:Show()
     end
-    self.anchor:Show()
 end
 
 function ShadowsightTimer:AURA_GAIN(unit, auraType, spellID)
@@ -297,23 +307,27 @@ function ShadowsightTimer:GetOptions()
             name = L["Locked"],
             --desc = L["Turns countdown before the start of an arena match on/off."],
             order = 4,
+            disabled = function() return not Gladdy.db.shadowsightTimerEnabled end,
         }),
         shadowsightTimerShowTwoTimer = Gladdy:option({
             type = "toggle",
             name = L["Show two timers"],
             order = 5,
+            disabled = function() return not Gladdy.db.shadowsightTimerEnabled end,
         }),
         shadowsightAnnounce = Gladdy:option({
             type = "toggle",
             name = L["Announce"],
             --desc = L["Turns countdown before the start of an arena match on/off."],
             order = 6,
+            disabled = function() return not Gladdy.db.shadowsightTimerEnabled end,
         }),
         group = {
             type = "group",
             childGroups = "tree",
             name = L["Frame"],
             order = 7,
+            disabled = function() return not Gladdy.db.shadowsightTimerEnabled end,
             args = {
                 general = {
                     type = "group",

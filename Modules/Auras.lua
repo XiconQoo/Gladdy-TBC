@@ -1,5 +1,5 @@
 local pairs, ipairs, select, tinsert, tbl_sort, tostring, tonumber, rand = pairs, ipairs, select, tinsert, table.sort, tostring, tonumber, math.random
-
+local str_gsub = string.gsub
 local GetSpellInfo = GetSpellInfo
 local GetSpellDescription = GetSpellDescription
 local CreateFrame, GetTime = CreateFrame, GetTime
@@ -56,6 +56,10 @@ local Auras = Gladdy:NewModule("Auras", nil, {
     auraFrameLevel = 5,
     auraInterruptFrameStrata = "MEDIUM",
     auraInterruptFrameLevel = 5,
+    auraGroup = false,
+    auraGroupDirection = "DOWN",
+    auraInterruptGroup = false,
+    auraInterruptGroupDirection = "DOWN",
 })
 
 function Auras:Initialize()
@@ -239,6 +243,23 @@ function Auras:UpdateFrame(unit)
 
         auraFrame:ClearAllPoints()
         Gladdy:SetPosition(auraFrame, unit, "auraXOffset", "auraYOffset", true, Auras)
+
+        if (Gladdy.db.auraGroup) then
+            if (unit ~= "arena1") then
+                local previousUnit = "arena" .. str_gsub(unit, "arena", "") - 1
+                self.frames[unit]:ClearAllPoints()
+                if Gladdy.db.auraGroupDirection == "RIGHT" then
+                    self.frames[unit]:SetPoint("LEFT", self.frames[previousUnit], "RIGHT", 0, 0)
+                elseif Gladdy.db.auraGroupDirection == "LEFT" then
+                    self.frames[unit]:SetPoint("RIGHT", self.frames[previousUnit], "LEFT", 0, 0)
+                elseif Gladdy.db.auraGroupDirection == "UP" then
+                    self.frames[unit]:SetPoint("BOTTOM", self.frames[previousUnit], "TOP", 0, 0)
+                elseif Gladdy.db.auraGroupDirection == "DOWN" then
+                    self.frames[unit]:SetPoint("TOP", self.frames[previousUnit], "BOTTOM", 0, 0)
+                end
+            end
+        end
+
         if (unit == "arena1") then
             Gladdy:CreateMover(auraFrame, "auraXOffset", "auraYOffset", L["Auras"],
                     {"TOPLEFT", "TOPLEFT"},
@@ -321,6 +342,23 @@ function Auras:UpdateInterruptFrame(unit)
 
         interruptFrame:ClearAllPoints()
         Gladdy:SetPosition(interruptFrame, unit, "auraInterruptXOffset", "auraInterruptYOffset", true, Auras)
+
+        if (Gladdy.db.auraInterruptGroup) then
+            if (unit ~= "arena1") then
+                local previousUnit = "arena" .. str_gsub(unit, "arena", "") - 1
+                self.frames[unit].interruptFrame:ClearAllPoints()
+                if Gladdy.db.auraInterruptGroupDirection == "RIGHT" then
+                    self.frames[unit].interruptFrame:SetPoint("LEFT", self.frames[previousUnit].interruptFrame, "RIGHT", 0, 0)
+                elseif Gladdy.db.auraInterruptGroupDirection == "LEFT" then
+                    self.frames[unit].interruptFrame:SetPoint("RIGHT", self.frames[previousUnit].interruptFrame, "LEFT", 0, 0)
+                elseif Gladdy.db.auraInterruptGroupDirection == "UP" then
+                    self.frames[unit].interruptFrame:SetPoint("BOTTOM", self.frames[previousUnit].interruptFrame, "TOP", 0, 0)
+                elseif Gladdy.db.auraInterruptGroupDirection == "DOWN" then
+                    self.frames[unit].interruptFrame:SetPoint("TOP", self.frames[previousUnit].interruptFrame, "BOTTOM", 0, 0)
+                end
+            end
+        end
+
         if (unit == "arena1") then
             Gladdy:CreateMover(interruptFrame, "auraInterruptXOffset", "auraInterruptYOffset", L["Interrupts"],
                     {"TOPLEFT", "TOPLEFT"},
@@ -472,7 +510,7 @@ function Auras:Test(unit)
             local extraSpellSchool = spellSchools[rand(1, #spellSchools)]
             spellid = tonumber(enabledInterrupts[rand(1, #enabledInterrupts)])
             spellName = select(1, GetSpellInfo(spellid))
-            self:SPELL_INTERRUPT(unit,spellid, spellName, "physical", spellid, spellName, extraSpellSchool)
+            Gladdy:SendMessage("SPELL_INTERRUPT", unit,spellid, spellName, "physical", spellid, spellName, extraSpellSchool)
         end
     end
 end
@@ -682,10 +720,63 @@ function Auras:GetOptions()
             name = L["Frame"],
             order = 3,
             args = {
+                groupOptions = {
+                    type = "group",
+                    name = L["Group"],
+                    order = 4,
+                    args = {
+                        headerAuras = {
+                            type = "header",
+                            name = L["Auras"],
+                            order = 1,
+                        },
+                        auraGroup = Gladdy:option({
+                            type = "toggle",
+                            name = L["Group"] .. " " .. L["Auras"],
+                            order = 2,
+                            disabled = function() return not Gladdy.db.auraDetached end,
+                        }),
+                        auraGroupDirection = Gladdy:option({
+                            type = "select",
+                            name = L["Group direction"],
+                            order = 3,
+                            values = {
+                                ["RIGHT"] = L["Right"],
+                                ["LEFT"] = L["Left"],
+                                ["UP"] = L["Up"],
+                                ["DOWN"] = L["Down"],
+                            },
+                            disabled = function() return not Gladdy.db.auraGroup or not Gladdy.db.auraDetached end,
+                        }),
+                        headerInterrupts = {
+                            type = "header",
+                            name = L["Interrupts"],
+                            order = 4,
+                        },
+                        auraInterruptGroup = Gladdy:option({
+                            type = "toggle",
+                            name = L["Group"] .. " " .. L["Interrupts"],
+                            order = 5,
+                            disabled = function() return not Gladdy.db.auraInterruptDetached end,
+                        }),
+                        auraInterruptGroupDirection = Gladdy:option({
+                            type = "select",
+                            name = L["Group direction"],
+                            order = 6,
+                            values = {
+                                ["RIGHT"] = L["Right"],
+                                ["LEFT"] = L["Left"],
+                                ["UP"] = L["Up"],
+                                ["DOWN"] = L["Down"],
+                            },
+                            disabled = function() return not Gladdy.db.auraInterruptGroup or not Gladdy.db.auraInterruptDetached end,
+                        }),
+                    }
+                },
                 detachedAuraMode = {
                     type = "group",
                     name = L["Detached Aura"],
-                    order = 4,
+                    order = 5,
                     args = {
                         headerDetachedMode = {
                             type = "header",
@@ -789,7 +880,7 @@ function Auras:GetOptions()
                 detachedInterruptMode = {
                     type = "group",
                     name = L["Detached Interrupt"],
-                    order = 5,
+                    order = 6,
                     args = {
                         headerDetachedMode = {
                             type = "header",

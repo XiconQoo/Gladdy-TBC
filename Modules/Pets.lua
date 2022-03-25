@@ -31,11 +31,25 @@ local Pets = Gladdy:NewModule("Pets", nil, {
 
 function Pets:Initialize()
     self.frames = {}
-    self:RegisterMessage("JOINED_ARENA")
-    self:RegisterMessage("PET_SPOTTED")
-    self:RegisterMessage("PET_DESTROYED")
-    self:RegisterMessage("PET_STEALTH")
-    self:RegisterMessage("ENEMY_SPOTTED")
+    if Gladdy.db.petEnabled then
+        self:RegisterMessage("JOINED_ARENA")
+        self:RegisterMessage("PET_SPOTTED")
+        self:RegisterMessage("PET_DESTROYED")
+        self:RegisterMessage("PET_STEALTH")
+        self:RegisterMessage("ENEMY_SPOTTED")
+    end
+end
+
+function Pets:UpdateFrameOnce()
+    if Gladdy.db.petEnabled then
+        self:RegisterMessage("JOINED_ARENA")
+        self:RegisterMessage("PET_SPOTTED")
+        self:RegisterMessage("PET_DESTROYED")
+        self:RegisterMessage("PET_STEALTH")
+        self:RegisterMessage("ENEMY_SPOTTED")
+    else
+        self:UnregisterAllMessages()
+    end
 end
 
 function Pets:JOINED_ARENA()
@@ -219,7 +233,7 @@ function Pets:CreateFrame(unitId)
     healthBar.unit = unit
     button.healthBar = healthBar
 
-    healthBar:RegisterUnitEvent("UNIT_HEALTH", unit)
+    healthBar:RegisterUnitEvent("UNIT_HEALTH_FREQUENT", unit)
     healthBar:RegisterUnitEvent("UNIT_MAXHEALTH", unit)
     healthBar:RegisterUnitEvent("UNIT_PORTRAIT_UPDATE", unit)
     healthBar:RegisterUnitEvent("UNIT_NAME_UPDATE", unit)
@@ -375,11 +389,17 @@ function Pets:GetOptions()
             desc = L["Enables Pets module"],
             order = 3,
         }),
+        petGroup = option({
+            type = "toggle",
+            name = L["Group Pets"],
+            order = 4,
+        }),
         group = {
             type = "group",
             childGroups = "tree",
             name = L["Frame"],
             order = 3,
+            disabled = function() return not Gladdy.db.petEnabled end,
             args = {
                 general = {
                     type = "group",
@@ -410,11 +430,6 @@ function Pets:GetOptions()
                             max = 300,
                             step = 1,
                             width = "full",
-                        }),
-                        petGroup = option({
-                            type = "toggle",
-                            name = L["Group Pets"],
-                            order = 5,
                         }),
                         petMargin = option({
                             type = "range",

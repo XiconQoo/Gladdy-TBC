@@ -1,4 +1,4 @@
-local select = select
+local select, str_gsub = select, string.gsub
 
 local Gladdy = LibStub("Gladdy")
 local CreateFrame = CreateFrame
@@ -15,6 +15,8 @@ local Classicon = Gladdy:NewModule("Class Icon", 81, {
     classIconYOffset = 0,
     classIconFrameStrata = "MEDIUM",
     classIconFrameLevel = 5,
+    classIconGroup = false,
+    classIconGroupDirection = "DOWN"
 })
 
 local classIconPath = "Interface\\Addons\\Gladdy\\Images\\Classes\\"
@@ -82,9 +84,21 @@ local specIcons = {
 function Classicon:Initialize()
     self.frames = {}
 
-    self:RegisterMessage("ENEMY_SPOTTED")
-    self:RegisterMessage("UNIT_DEATH")
-    self:RegisterMessage("UNIT_SPEC")
+    if Gladdy.db.classIconEnabled then
+        self:RegisterMessage("ENEMY_SPOTTED")
+        self:RegisterMessage("UNIT_DEATH")
+        self:RegisterMessage("UNIT_SPEC")
+    end
+end
+
+function Classicon:UpdateFrameOnce()
+    if Gladdy.db.classIconEnabled then
+        self:RegisterMessage("ENEMY_SPOTTED")
+        self:RegisterMessage("UNIT_DEATH")
+        self:RegisterMessage("UNIT_SPEC")
+    else
+        self:UnregisterAllMessages()
+    end
 end
 
 function Classicon:CreateFrame(unit)
@@ -120,6 +134,22 @@ function Classicon:UpdateFrame(unit)
     classIcon:SetHeight(Gladdy.db.classIconSize)
 
     Gladdy:SetPosition(classIcon, unit, "classIconXOffset", "classIconYOffset", Classicon:LegacySetPosition(classIcon, unit), Classicon)
+
+    if (Gladdy.db.classIconGroup) then
+        if (unit ~= "arena1") then
+            local previousUnit = "arena" .. str_gsub(unit, "arena", "") - 1
+            self.frames[unit]:ClearAllPoints()
+            if Gladdy.db.classIconGroupDirection == "RIGHT" then
+                self.frames[unit]:SetPoint("LEFT", self.frames[previousUnit], "RIGHT", 0, 0)
+            elseif Gladdy.db.classIconGroupDirection == "LEFT" then
+                self.frames[unit]:SetPoint("RIGHT", self.frames[previousUnit], "LEFT", 0, 0)
+            elseif Gladdy.db.classIconGroupDirection == "UP" then
+                self.frames[unit]:SetPoint("BOTTOM", self.frames[previousUnit], "TOP", 0, 0)
+            elseif Gladdy.db.classIconGroupDirection == "DOWN" then
+                self.frames[unit]:SetPoint("TOP", self.frames[previousUnit], "BOTTOM", 0, 0)
+            end
+        end
+    end
 
     if (unit == "arena1") then
         Gladdy:CreateMover(classIcon, "classIconXOffset", "classIconYOffset", L["Class Icon"],
@@ -191,6 +221,7 @@ function Classicon:GetOptions()
             name = L["Show Spec Icon"],
             desc = L["Shows Spec Icon once spec is detected"],
             order = 4,
+            disabled = function() return not Gladdy.db.classIconEnabled end,
             get = function() return Gladdy.db.classIconSpecIcon end,
             set = function(_, value)
                 Gladdy.db.classIconSpecIcon = value
@@ -205,11 +236,32 @@ function Classicon:GetOptions()
                 end
             end
         },
+        classIconGroup = Gladdy:option({
+            type = "toggle",
+            name = L["Group"] .. " " .. L["Class Icon"],
+            order = 5,
+            disabled = function() return not Gladdy.db.classIconEnabled end,
+        }),
+        classIconGroupDirection = Gladdy:option({
+            type = "select",
+            name = L["Group direction"],
+            order = 6,
+            values = {
+                ["RIGHT"] = L["Right"],
+                ["LEFT"] = L["Left"],
+                ["UP"] = L["Up"],
+                ["DOWN"] = L["Down"],
+            },
+            disabled = function()
+                return not Gladdy.db.classIconGroup or not Gladdy.db.classIconEnabled
+            end,
+        }),
         group = {
             type = "group",
             childGroups = "tree",
             name = L["Frame"],
-            order = 4,
+            order = 7,
+            disabled = function() return not Gladdy.db.classIconEnabled end,
             args = {
                 size = {
                     type = "group",

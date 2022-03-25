@@ -25,6 +25,7 @@ local Castbar = Gladdy:NewModule("Cast Bar", 70, {
     castBarIconSize = 22,
     castBarBorderSize = 8,
     castBarFontSize = 12,
+    castBarFontOutline = false,
     castBarTexture = "Smooth",
     castBarIconStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     castBarBorderStyle = "Gladdy Tooltip round",
@@ -48,8 +49,10 @@ local Castbar = Gladdy:NewModule("Cast Bar", 70, {
 
 function Castbar:Initialize()
     self.frames = {}
-    self:RegisterMessage("UNIT_DEATH")
-    self:RegisterMessage("JOINED_ARENA")
+    if Gladdy.db.castBarEnabled then
+        self:RegisterMessage("UNIT_DEATH")
+        self:RegisterMessage("JOINED_ARENA")
+    end
 end
 
 ---------------------------
@@ -113,7 +116,7 @@ function Castbar:CreateFrame(unit)
     end
 
     castBar.spellText = castBar:CreateFontString(nil, "LOW")
-    castBar.spellText:SetFont(Gladdy:SMFetch("font", "auraFont"), Gladdy.db.castBarFontSize)
+    castBar.spellText:SetFont(Gladdy:SMFetch("font", "auraFont"), Gladdy.db.castBarFontSize, Gladdy.db.castBarFontOutline and "OUTLINE")
     castBar.spellText:SetTextColor(Gladdy:SetColor(Gladdy.db.castBarFontColor))
     castBar.spellText:SetShadowOffset(1, -1)
     castBar.spellText:SetShadowColor(0, 0, 0, 1)
@@ -121,7 +124,7 @@ function Castbar:CreateFrame(unit)
     castBar.spellText:SetPoint("LEFT", 7, 0) -- Text of the spell
 
     castBar.timeText = castBar:CreateFontString(nil, "LOW")
-    castBar.timeText:SetFont(Gladdy:SMFetch("font", "auraFont"), Gladdy.db.castBarFontSize)
+    castBar.timeText:SetFont(Gladdy:SMFetch("font", "auraFont"), Gladdy.db.castBarFontSize, Gladdy.db.castBarFontOutline and "OUTLINE")
     castBar.timeText:SetTextColor(Gladdy:SetColor(Gladdy.db.castBarFontColor))
     castBar.timeText:SetShadowOffset(1, -1)
     castBar.timeText:SetShadowColor(0, 0, 0, 1)
@@ -131,6 +134,15 @@ function Castbar:CreateFrame(unit)
     Gladdy.buttons[unit].castBar = castBar
     self.frames[unit] = castBar
     self:ResetUnit(unit)
+end
+
+function Castbar:UpdateFrameOnce()
+    if Gladdy.db.castBarEnabled then
+        self:RegisterMessage("UNIT_DEATH")
+        self:RegisterMessage("JOINED_ARENA")
+    else
+        self:UnregisterAllMessages()
+    end
 end
 
 function Castbar:UpdateFrame(unit)
@@ -192,10 +204,10 @@ function Castbar:UpdateFrame(unit)
 
     Gladdy:SetPosition(castBar, unit, "castBarXOffset", "castBarYOffset", Castbar:LegacySetPosition(castBar, unit, leftMargin, rightMargin), Castbar)
 
-    castBar.spellText:SetFont(Gladdy:SMFetch("font", "castBarFont"), Gladdy.db.castBarFontSize)
+    castBar.spellText:SetFont(Gladdy:SMFetch("font", "castBarFont"), Gladdy.db.castBarFontSize, Gladdy.db.castBarFontOutline and "OUTLINE")
     castBar.spellText:SetTextColor(Gladdy:SetColor(Gladdy.db.castBarFontColor))
 
-    castBar.timeText:SetFont(Gladdy:SMFetch("font", "castBarFont"), Gladdy.db.castBarFontSize)
+    castBar.timeText:SetFont(Gladdy:SMFetch("font", "castBarFont"), Gladdy.db.castBarFontSize, Gladdy.db.castBarFontOutline and "OUTLINE")
     castBar.timeText:SetTextColor(Gladdy:SetColor(Gladdy.db.castBarFontColor))
 
     castBar.icon.texture.overlay:SetTexture(Gladdy.db.castBarIconStyle)
@@ -584,6 +596,7 @@ function Castbar:GetOptions()
             childGroups = "tree",
             name = L["Frame"],
             order = 4,
+            disabled = function() return not Gladdy.db.castBarEnabled end,
             args = {
                 barFrame = {
                     type = "group",
@@ -773,6 +786,12 @@ function Castbar:GetOptions()
                             max = 20,
                             width = "full",
                         }),
+                        castBarFontOutline = option({
+                            type = "toggle",
+                            name = L["Outline"],
+                            order = 5,
+                            width = "full",
+                        }),
                         headerFormat = {
                             type = "header",
                             name = L["Format"],
@@ -879,6 +898,12 @@ function Castbar:LegacySetPosition(castBar, unit, leftMargin, rightMargin)
         return Gladdy.db.newLayout
     end
     castBar:ClearAllPoints()
+    if Gladdy.db.castBarWidth <= 0 then
+        castBar:SetWidth(0.1)
+    end
+    if Gladdy.db.castBarHeight <= 0 then
+        castBar:SetHeight(0.1)
+    end
     local horizontalMargin = (Gladdy.db.highlightInset and 0 or Gladdy.db.highlightBorderSize) + Gladdy.db.padding
     if (Gladdy.db.castBarPos == "LEFT") then
         local anchor = Gladdy:GetAnchor(unit, "LEFT")
