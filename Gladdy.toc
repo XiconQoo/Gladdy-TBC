@@ -5,7 +5,7 @@
 ## Author: XiconQoo, DnB_Junkee, Knall
 ## X-Email: contact me on discord Knall#1751
 ## SavedVariables: GladdyXZ
-## OptionalDeps: SharedMedia, Blizzard_CombatLog, Blizzard_ArenaUI, Blizzard_CombatText
+## OptionalDeps: SharedMedia, Blizzard_CombatLog, Blizzard_ArenaUI, Blizzard_CombatText, Plater, Kui_Nameplates, NeatPlates, TidyPlates_ThreatPlates, Tukui, ElvUI
 
 embeds.xml
 
