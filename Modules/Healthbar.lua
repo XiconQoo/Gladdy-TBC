@@ -210,7 +210,7 @@ function Healthbar:UpdateFrame(unit)
         healthBar.nameText:Hide()
     else
         healthBar.nameText:SetFont(Gladdy:SMFetch("font", "healthBarFont"), Gladdy.db.healthBarNameFontSize, Gladdy.db.healthTextLeftOutline and "OUTLINE")
-        if Gladdy.db.healthName then
+        if Gladdy.db.healthName or Gladdy.db.healthCustomTagsEnabled then
             healthBar.nameText:Show()
         else
             healthBar.nameText:Hide()
