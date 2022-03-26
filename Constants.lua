@@ -995,7 +995,7 @@ local cooldownList = {
         [18499] = 30, -- Berserker Rage
         --[2565] 	= 60,    -- Shield Block
         [12292] = { cd = 180, spec = L["Arms"], }, -- Death Wish
-        [20252] = { cd = 30, [L["Arms"]] = 20 }, -- Intercept
+        [20252] = { cd = 25, [L["Arms"]] = 15 }, -- Intercept
         [12975] = { cd = 180, spec = L["Protection"], }, -- Last Stand
         [12809] = { cd = 30, spec = L["Protection"], }, -- Concussion Blow
 
