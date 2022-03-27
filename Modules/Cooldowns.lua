@@ -91,7 +91,7 @@ function Cooldowns:Initialize()
         end
     end
     self:RegisterMessage("ENEMY_SPOTTED")
-    self:RegisterMessage("SPEC_DETECTED")
+    self:RegisterMessage("UNIT_SPEC")
     self:RegisterMessage("UNIT_DEATH")
     self:RegisterMessage("UNIT_DESTROYED")
 end
@@ -299,21 +299,14 @@ end
 
 function Cooldowns:Test(unit)
     if Gladdy.frame.testing then
-        local button = Gladdy.buttons[unit]
-        if Gladdy.db.cooldown then
-            button.spellCooldownFrame:Show()
-        else
-            button.spellCooldownFrame:Hide()
-        end
         self:UpdateTestCooldowns(unit)
     end
 end
 
 function Cooldowns:UpdateTestCooldowns(unit)
     local button = Gladdy.buttons[unit]
-    self:UpdateCooldowns(button)
-
     local orderedIcons = {}
+
     for _,icon in pairs(button.spellCooldownFrame.icons) do
         tinsert(orderedIcons, icon)
     end
@@ -337,7 +330,7 @@ function Cooldowns:ENEMY_SPOTTED(unit)
     self:UpdateCooldowns(Gladdy.buttons[unit])
 end
 
-function Cooldowns:SPEC_DETECTED(unit)
+function Cooldowns:UNIT_SPEC(unit)
     if (not Gladdy.buttons[unit]) then
         return
     end
@@ -854,6 +847,7 @@ function Cooldowns:GetCooldownOptions()
                             Gladdy.db.cooldownCooldowns[tostring(spellId)] = value
                             for unit in pairs(Gladdy.buttons) do
                                 Cooldowns:ResetUnit(unit)
+                                Cooldowns:UpdateCooldowns(Gladdy.buttons[unit])
                                 Cooldowns:Test(unit)
                             end
                             Gladdy:UpdateFrame()

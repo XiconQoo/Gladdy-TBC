@@ -57,13 +57,15 @@ function Gladdy:SpotEnemy(unit, auraScan)
     if not unit or not button then
         return
     end
-    button.raceLoc = UnitRace(unit)
-    button.race = select(2, UnitRace(unit))
-    button.classLoc = select(1, UnitClass(unit))
-    button.class = select(2, UnitClass(unit))
-    button.name = UnitName(unit)
     button.stealthed = false
-    Gladdy.guids[UnitGUID(unit)] = unit
+    if UnitExists(unit) then
+        button.raceLoc = UnitRace(unit)
+        button.race = select(2, UnitRace(unit))
+        button.classLoc = select(1, UnitClass(unit))
+        button.class = select(2, UnitClass(unit))
+        button.name = UnitName(unit)
+        Gladdy.guids[UnitGUID(unit)] = unit
+    end
     if button.class and button.race then
         Gladdy:SendMessage("ENEMY_SPOTTED", unit)
     end
@@ -138,20 +140,28 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
             if Gladdy.db.cooldown and Cooldowns.cooldownSpellIds[spellName] then
                 local unitClass
                 local spellId = Cooldowns.cooldownSpellIds[spellName] -- don't use spellId from combatlog, in case of different spellrank
+                if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
+                    spellId = spellID
+                end
                 if Gladdy.db.cooldownCooldowns[tostring(spellId)] then
                     if (Gladdy:GetCooldownList()[Gladdy.buttons[srcUnit].class][spellId]) then
                         unitClass = Gladdy.buttons[srcUnit].class
                     else
                         unitClass = Gladdy.buttons[srcUnit].race
                     end
-                    Cooldowns:CooldownUsed(srcUnit, unitClass, spellId)
                     self:DetectSpec(srcUnit, Gladdy.specSpells[spellName])
+                    if spellID ~= 16188 and spellID ~= 17116 then -- Nature's Swiftness CD starts when buff fades
+                        Cooldowns:CooldownUsed(srcUnit, unitClass, spellId)
+                    end
                 end
             end
 
             if Gladdy.db.racialEnabled and Gladdy:Racials()[unitRace].spellName == spellName and Gladdy:Racials()[unitRace][spellID] then
                 Gladdy:SendMessage("RACIAL_USED", srcUnit)
             end
+        end
+        if (eventType == "SPELL_AURA_REMOVED" and (spellID ~= 16188 or spellID ~= 17116) and Gladdy.buttons[srcUnit].class) then
+            Cooldowns:CooldownUsed(srcUnit, Gladdy.buttons[srcUnit].class, spellID)
         end
     end
 end
@@ -333,8 +343,9 @@ end
 
 function EventListener:Test(unit)
     local button = Gladdy.buttons[unit]
-    if (Gladdy.testData[unit].testSpec) then
+    if (button and Gladdy.testData[unit].testSpec) then
         button.spec = nil
+        Gladdy:SpotEnemy(unit, false)
         self:DetectSpec(unit, button.testSpec)
     end
 end

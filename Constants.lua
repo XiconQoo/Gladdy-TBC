@@ -107,6 +107,7 @@ local specBuffs = {
     -- WARLOCK
     [GetSpellInfo(19028)] = L["Demonology"], -- Soul Link
     [GetSpellInfo(23759)] = L["Demonology"], -- Master Demonologist
+    [GetSpellInfo(35696)] = L["Demonology"], -- Demonic Knowledge
     [GetSpellInfo(30302)] = L["Destruction"], -- Nether Protection
     [GetSpellInfo(34935)] = L["Destruction"], -- Backlash
 
@@ -125,7 +126,7 @@ local specSpells = {
     [GetSpellInfo(33983)] = L["Feral"], -- Mangle (Cat)
     [GetSpellInfo(33987)] = L["Feral"], -- Mangle (Bear)
     [GetSpellInfo(18562)] = L["Restoration"], -- Swiftmend
-    [GetSpellInfo(16188)] = L["Restoration"], -- Nature's Swiftness
+    [GetSpellInfo(17116)] = L["Restoration"], -- Nature's Swiftness
     [GetSpellInfo(33891)] = L["Restoration"], -- Tree of Life
 
     -- HUNTER
@@ -182,7 +183,7 @@ local specSpells = {
     [GetSpellInfo(17364)] = L["Enhancement"], -- Stormstrike
     [GetSpellInfo(16190)] = L["Restoration"], -- Mana Tide Totem
     [GetSpellInfo(32594)] = L["Restoration"], -- Earth Shield
-    --[GetSpellInfo(16188)] = L["Restoration"], -- Nature's Swiftness
+    [GetSpellInfo(16188)] = L["Restoration"], -- Nature's Swiftness
 
     -- WARLOCK
     [GetSpellInfo(30405)] = L["Affliction"], -- Unstable Affliction
@@ -190,6 +191,7 @@ local specSpells = {
     --[GetSpellInfo(30911)] = L["Affliction"], -- Siphon Life
     [GetSpellInfo(30414)] = L["Destruction"], -- Shadowfury
     [GetSpellInfo(30912)] = L["Destruction"], -- Conflagrate
+    [GetSpellInfo(18708)] = L["Demonology"], -- Fel Domination
 
     -- WARRIOR
     [GetSpellInfo(30330)] = L["Arms"], -- Mortal Strike
