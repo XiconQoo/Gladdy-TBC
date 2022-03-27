@@ -160,7 +160,7 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
                 Gladdy:SendMessage("RACIAL_USED", srcUnit)
             end
         end
-        if (eventType == "SPELL_AURA_REMOVED" and (spellID ~= 16188 or spellID ~= 17116) and Gladdy.buttons[srcUnit].class) then
+        if (eventType == "SPELL_AURA_REMOVED" and (spellID == 16188 or spellID == 17116) and Gladdy.buttons[srcUnit].class) then
             Cooldowns:CooldownUsed(srcUnit, Gladdy.buttons[srcUnit].class, spellID)
         end
     end
@@ -226,11 +226,14 @@ Gladdy.cooldownBuffs = {
         return expTime
     end, spellId = 6346 }, -- Fear Ward
     [GetSpellInfo(11305)] = { cd = function(expTime) -- 15s uptime
-        return 180 - (15 - expTime)
+        return 300 - (15 - expTime)
     end, spellId = 11305 }, -- Sprint
-    [GetSpellInfo(36554)] = { cd = function(expTime) -- 3s uptime
+    [36554] = { cd = function(expTime) -- 3s uptime
         return 30 - (3 - expTime)
-    end, spellId = 36554 }, -- Shadowstep
+    end, spellId = 36554 }, -- Shadowstep speed buff
+    [36563] = { cd = function(expTime) -- 10s uptime
+        return 30 - (10 - expTime)
+    end, spellId = 36554 }, -- Shadowstep dmg buff
     [GetSpellInfo(26889)] = { cd = function(expTime) -- 3s uptime
         return 180 - (10 - expTime)
     end, spellId = 26889 }, -- Vanish
@@ -265,10 +268,11 @@ function EventListener:UNIT_AURA(unit)
                     self:DetectSpec(unit, Gladdy.specBuffs[spellName])
                 end
             end
-            if Gladdy.cooldownBuffs[spellName] and unitCaster then -- Check for auras that hint used CDs (like Fear Ward)
+            if (Gladdy.cooldownBuffs[spellName] or Gladdy.cooldownBuffs[spellID]) and unitCaster then -- Check for auras that hint used CDs (like Fear Ward)
+                local cooldownBuff = Gladdy.cooldownBuffs[spellID] or Gladdy.cooldownBuffs[spellName]
                 for arenaUnit,v in pairs(Gladdy.buttons) do
                     if (UnitIsUnit(arenaUnit, unitCaster)) then
-                        Cooldowns:CooldownUsed(arenaUnit, v.class, Gladdy.cooldownBuffs[spellName].spellId, Gladdy.cooldownBuffs[spellName].cd(expirationTime - GetTime()))
+                        Cooldowns:CooldownUsed(arenaUnit, v.class, cooldownBuff.spellId, cooldownBuff.cd(expirationTime - GetTime()))
                     end
                 end
             end
