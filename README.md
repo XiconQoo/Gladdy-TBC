@@ -4,7 +4,7 @@
 
 ---
 
-## [v2.10-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.10-Release/Gladdy_TBC-Classic_v2.10-Release.zip)
+## [v2.11-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.11-Release/Gladdy_TBC-Classic_v2.11-Release.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -78,6 +78,19 @@ Thank you!
 ---
 
 ### Changes
+
+### v2.11-Release
+- **Cooldowns**
+  - fixed cooldowns not showing properly for detected spec
+  - Nature's Swiftness (Druid/Shaman) now properly tracked
+  - improved cd out of stealth detection
+- **HealthBar**
+  - added options class colored or custom colors
+  - custom colors for 100%, 50% 0% hp values added
+  - custom stealth color added
+- add group option for DRs
+- intercept cd adjusted (-5s for 4pc set bonus)
+- totempulse minor adjustments
 
 ### v2.10-Release
 
