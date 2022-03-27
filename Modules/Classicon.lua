@@ -191,10 +191,6 @@ function Classicon:UNIT_SPEC(unit, spec)
     classIcon.texture:SetTexture(specIcons[Gladdy.buttons[unit].class][spec])
 end
 
-function Classicon:Test(unit)
-    self:ENEMY_SPOTTED(unit)
-end
-
 function Classicon:ResetUnit(unit)
     local classIcon = self.frames[unit]
     if (not classIcon) then
