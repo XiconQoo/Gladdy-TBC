@@ -105,8 +105,11 @@ function Gladdy:option(params)
     return defaults
 end
 
-function Gladdy:SetColor(option)
-    return option.r, option.g, option.b, option.a
+function Gladdy:SetColor(option, factor, altAlpha)
+    if not factor then
+        factor = 1
+    end
+    return option.r / factor, option.g / factor, option.b / factor, altAlpha or option.a
 end
 
 function Gladdy:colorOption(params)

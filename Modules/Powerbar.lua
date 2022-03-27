@@ -161,13 +161,9 @@ function Powerbar:UpdateFrame(unit)
 end
 
 function Powerbar.OnEvent(powerBar, event, unit)
-    if event == "UNIT_POWER_UPDATE" then
-        Powerbar:SetPower(powerBar, unit, UnitPower(unit, UnitPowerType(unit), true), UnitPowerMax(unit, UnitPowerType(unit), true), UnitPowerType(unit))
-    elseif event == "UNIT_MAXPOWER" then
-        Powerbar:SetPower(powerBar, unit, UnitPower(unit, UnitPowerType(unit), true), UnitPowerMax(unit, UnitPowerType(unit), true), UnitPowerType(unit))
-    elseif event == "UNIT_DISPLAYPOWER" then
-        Powerbar:SetPower(powerBar, unit, UnitPower(unit, UnitPowerType(unit), true), UnitPowerMax(unit, UnitPowerType(unit), true), UnitPowerType(unit))
-    end
+    powerBar.energy.powerType = select(1, UnitPowerType(unit))
+    powerBar.energy.current, powerBar.energy.max = UnitPower(unit, powerBar.energy.powerType, true), UnitPowerMax(unit, powerBar.energy.powerType, true)
+    Powerbar:SetPower(powerBar, unit, powerBar.energy.current, powerBar.energy.max, powerBar.energy.powerType)
 end
 
 function Powerbar:SetText(unit, power, powerMax, status)
@@ -276,7 +272,9 @@ function Powerbar:ENEMY_SPOTTED(unit)
     end
 
     if UnitExists(unit) then
-        Powerbar:SetPower(powerBar, UnitPower(unit, UnitPowerType(unit), true), UnitPowerMax(unit, UnitPowerType(unit), true), UnitPowerType(unit))
+        powerBar.energy.powerType = select(1, UnitPowerType(unit))
+        powerBar.energy.current, powerBar.energy.max = UnitPower(unit, powerBar.energy.powerType, true), UnitPowerMax(unit, powerBar.energy.powerType, true)
+        Powerbar:SetPower(powerBar, unit, powerBar.energy.current, powerBar.energy.max, powerBar.energy.powerType)
     end
 end
 

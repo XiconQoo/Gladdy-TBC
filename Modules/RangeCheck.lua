@@ -17,6 +17,7 @@ local LibStub = LibStub
 local Gladdy = LibStub("Gladdy")
 local LSR = LibStub("SpellRange-1.0")
 local L = Gladdy.L
+local HealthBar = Gladdy.modules["Health Bar"]
 
 local classSpells = {
     ["MAGE"] =  118,
@@ -54,8 +55,6 @@ local RangeCheck = Gladdy:NewModule("Range Check", nil, {
 function RangeCheck:Initialize()
     if Gladdy.db.rangeCheckEnabled then
         self:RegisterMessage("JOINED_ARENA")
-        self:RegisterMessage("ENEMY_STEALTH")
-        self:RegisterMessage("ENEMY_SPOTTED")
     end
     self.playerClass = select(2, UnitClass("player"))
 end
@@ -63,8 +62,6 @@ end
 function RangeCheck:UpdateFrameOnce()
     if Gladdy.db.rangeCheckEnabled then
         self:RegisterMessage("JOINED_ARENA")
-        self:RegisterMessage("ENEMY_STEALTH")
-        self:RegisterMessage("ENEMY_SPOTTED")
     else
         self:UnregisterAllMessages()
     end
@@ -78,7 +75,6 @@ function RangeCheck:ResetUnit(unit)
     local button = Gladdy.buttons[unit]
     self:CancelTimer(button)
     self:SetColor(button, 1)
-    button.classColors = {}
 end
 
 function RangeCheck:Test(unit)
@@ -86,11 +82,10 @@ function RangeCheck:Test(unit)
     if not button then
         return
     end
-    self:ENEMY_SPOTTED(unit)
     self.test = true
     button.lastState = 0
     if Gladdy.db.rangeCheckEnabled then
-        if unit == "arena1" then
+        if unit == "arena2" or unit == "arena4" then
             --button.unit = "target"
             --self:CreateTimer(button)
             self:SetRangeAlpha(button, nil)
@@ -113,18 +108,12 @@ function RangeCheck:SetColor(button, oorFac)
         return
     end
 
-    if not button.classColors.r then
-        if button.class then
-            button.classColors = { r = RAID_CLASS_COLORS[button.class].r, g = RAID_CLASS_COLORS[button.class].g, b = RAID_CLASS_COLORS[button.class].b }
-        else
-            button.classColors = { r = 0.66, g = 0.66, b = 0.66 }
-        end
-    end
-
     if Gladdy.db.rangeCheckHealthBar then
-        button.healthBar.hp:SetStatusBarColor(button.classColors.r/oorFac, button.classColors.g/oorFac, button.classColors.b/oorFac, 1)
+        button.healthBar.hp.oorFactor = oorFac
+        HealthBar:SetHealthStatusBarColor(button.unit, button.healthBar.hp.current, button.healthBar.hp.max)
     else
-        button.healthBar.hp:SetStatusBarColor(button.classColors.r, button.classColors.g, button.classColors.b, 1)
+        button.healthBar.hp.oorFactor = 1
+        HealthBar:SetHealthStatusBarColor(button.unit, button.healthBar.hp.current, button.healthBar.hp.max)
     end
 
     if Gladdy.db.rangeCheckHealthBarText then
@@ -187,35 +176,6 @@ function RangeCheck:JOINED_ARENA()
             self:CreateTimer(button)
         end
     end
-end
-
-function RangeCheck:ENEMY_STEALTH(unit, stealth)
-    local button = Gladdy.buttons[unit]
-    if not button then
-        return
-    end
-    button.lastState = 0
-    if stealth then
-        button.classColors = { r = 0.66, g = 0.66, b = 0.66 }
-        if not Gladdy.db.rangeCheckEnabled then
-            button.healthBar.hp:SetStatusBarColor(0.66, 0.66, 0.66, 1)
-        end
-    else
-        if button.class then
-            button.classColors = { r = RAID_CLASS_COLORS[button.class].r, g = RAID_CLASS_COLORS[button.class].g, b = RAID_CLASS_COLORS[button.class].b }
-            if not Gladdy.db.rangeCheckEnabled then
-                button.healthBar.hp:SetStatusBarColor(RAID_CLASS_COLORS[button.class].r, RAID_CLASS_COLORS[button.class].g, RAID_CLASS_COLORS[button.class].b, 1)
-            end
-        end
-    end
-end
-
-function RangeCheck:ENEMY_SPOTTED(unit)
-    local button = Gladdy.buttons[unit]
-    if (not button) then
-        return
-    end
-    button.classColors = { r = RAID_CLASS_COLORS[button.class].r, g = RAID_CLASS_COLORS[button.class].g, b = RAID_CLASS_COLORS[button.class].b }
 end
 
 function RangeCheck.CheckRange(self)
