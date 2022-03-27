@@ -1,5 +1,6 @@
 local select = select
 local pairs,ipairs,tbl_sort,tinsert,format,rand = pairs,ipairs,table.sort,tinsert,format,math.random
+local str_gsub = string.gsub
 
 local GetSpellInfo = GetSpellInfo
 local CreateFrame = CreateFrame
@@ -55,6 +56,8 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drDuration = 18,
     drFrameStrata = "MEDIUM",
     drFrameLevel = 3,
+    drGroup = false,
+    drGroupDirection = "DOWN"
 })
 
 local function getDiminishColor(dr)
@@ -186,6 +189,22 @@ function Diminishings:UpdateFrame(unit)
     drFrame:SetFrameLevel(Gladdy.db.drFrameLevel)
 
     Gladdy:SetPosition(drFrame, unit, "drXOffset", "drYOffset", Diminishings:LegacySetPosition(drFrame, unit), Diminishings)
+
+    if (Gladdy.db.drGroup) then
+        if (unit ~= "arena1") then
+            local previousUnit = "arena" .. str_gsub(unit, "arena", "") - 1
+            self.frames[unit]:ClearAllPoints()
+            if Gladdy.db.classIconGroupDirection == "RIGHT" then
+                self.frames[unit]:SetPoint("LEFT", self.frames[previousUnit], "RIGHT", 0, 0)
+            elseif Gladdy.db.classIconGroupDirection == "LEFT" then
+                self.frames[unit]:SetPoint("RIGHT", self.frames[previousUnit], "LEFT", 0, 0)
+            elseif Gladdy.db.classIconGroupDirection == "UP" then
+                self.frames[unit]:SetPoint("BOTTOM", self.frames[previousUnit], "TOP", 0, 0)
+            elseif Gladdy.db.classIconGroupDirection == "DOWN" then
+                self.frames[unit]:SetPoint("TOP", self.frames[previousUnit], "BOTTOM", 0, 0)
+            end
+        end
+    end
 
     if (unit == "arena1") then
         Gladdy:CreateMover(drFrame,"drXOffset", "drYOffset", L["Diminishings"],
@@ -438,6 +457,26 @@ function Diminishings:GetOptions()
             min = 15,
             max = 20,
             step = .1,
+        }),
+        drGroup = Gladdy:option({
+            type = "toggle",
+            name = L["Group"] .. " " .. L["Class Icon"],
+            order = 5,
+            disabled = function() return not Gladdy.db.drEnabled end,
+        }),
+        drGroupDirection = Gladdy:option({
+            type = "select",
+            name = L["Group direction"],
+            order = 6,
+            values = {
+                ["RIGHT"] = L["Right"],
+                ["LEFT"] = L["Left"],
+                ["UP"] = L["Up"],
+                ["DOWN"] = L["Down"],
+            },
+            disabled = function()
+                return not Gladdy.db.drGroup or not Gladdy.db.drEnabled
+            end,
         }),
         group = {
             type = "group",
