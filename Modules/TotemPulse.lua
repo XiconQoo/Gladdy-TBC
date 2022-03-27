@@ -313,7 +313,7 @@ function TotemPulse:CreateCooldownFrame(style)
             totemTick.spark.position = 0
             totemTick.spark:SetRotation(style == "Vertical" and ninetyDegreeInRad or 0)
 
-            totemTick.bg = totemTick.bar:CreateTexture(nil, "BACKGROUND")
+            totemTick.bg = totemTick:CreateTexture(nil, "ARTWORK")
             totemTick.bg:SetTexture(Gladdy:SMFetch("statusbar", "totemPulseBarTexture"))
             totemTick.bg:SetAllPoints(totemTick.bar)
             totemTick.bg:SetVertexColor(Gladdy:SetColor(Gladdy.db.totemPulseBarBgColor))
@@ -461,7 +461,6 @@ function TotemPulse:UpdateBar(bar)
 
     bar.bar:SetStatusBarTexture(Gladdy:SMFetch("statusbar", "totemPulseBarTexture"))
     bar.bar:SetStatusBarColor(Gladdy:SetColor(Gladdy.db.totemPulseBarColor))
-    bar.bar:SetAllPoints(bar)
 
     bar.bg:SetTexture(Gladdy:SMFetch("statusbar", "totemPulseBarTexture"))
     bar.bg:SetVertexColor(Gladdy:SetColor(Gladdy.db.totemPulseBarBgColor))
