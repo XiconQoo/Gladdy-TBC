@@ -107,6 +107,7 @@ local specBuffs = {
     -- WARLOCK
     [GetSpellInfo(19028)] = L["Demonology"], -- Soul Link
     [GetSpellInfo(23759)] = L["Demonology"], -- Master Demonologist
+    [GetSpellInfo(35696)] = L["Demonology"], -- Demonic Knowledge
     [GetSpellInfo(30302)] = L["Destruction"], -- Nether Protection
     [GetSpellInfo(34935)] = L["Destruction"], -- Backlash
 
@@ -125,7 +126,7 @@ local specSpells = {
     [GetSpellInfo(33983)] = L["Feral"], -- Mangle (Cat)
     [GetSpellInfo(33987)] = L["Feral"], -- Mangle (Bear)
     [GetSpellInfo(18562)] = L["Restoration"], -- Swiftmend
-    [GetSpellInfo(16188)] = L["Restoration"], -- Nature's Swiftness
+    [GetSpellInfo(17116)] = L["Restoration"], -- Nature's Swiftness
     [GetSpellInfo(33891)] = L["Restoration"], -- Tree of Life
 
     -- HUNTER
@@ -182,7 +183,7 @@ local specSpells = {
     [GetSpellInfo(17364)] = L["Enhancement"], -- Stormstrike
     [GetSpellInfo(16190)] = L["Restoration"], -- Mana Tide Totem
     [GetSpellInfo(32594)] = L["Restoration"], -- Earth Shield
-    --[GetSpellInfo(16188)] = L["Restoration"], -- Nature's Swiftness
+    [GetSpellInfo(16188)] = L["Restoration"], -- Nature's Swiftness
 
     -- WARLOCK
     [GetSpellInfo(30405)] = L["Affliction"], -- Unstable Affliction
@@ -190,6 +191,7 @@ local specSpells = {
     --[GetSpellInfo(30911)] = L["Affliction"], -- Siphon Life
     [GetSpellInfo(30414)] = L["Destruction"], -- Shadowfury
     [GetSpellInfo(30912)] = L["Destruction"], -- Conflagrate
+    [GetSpellInfo(18708)] = L["Demonology"], -- Fel Domination
 
     -- WARRIOR
     [GetSpellInfo(30330)] = L["Arms"], -- Mortal Strike
@@ -995,7 +997,7 @@ local cooldownList = {
         [18499] = 30, -- Berserker Rage
         --[2565] 	= 60,    -- Shield Block
         [12292] = { cd = 180, spec = L["Arms"], }, -- Death Wish
-        [20252] = { cd = 30, [L["Arms"]] = 20 }, -- Intercept
+        [20252] = { cd = 25, [L["Arms"]] = 15 }, -- Intercept
         [12975] = { cd = 180, spec = L["Protection"], }, -- Last Stand
         [12809] = { cd = 30, spec = L["Protection"], }, -- Concussion Blow
 
@@ -1330,8 +1332,8 @@ local totemData = {
     [string_lower("Frost Resistance Totem")] = {id = 8181,texture = select(3, GetSpellInfo(8181)), color = {r = 0, g = 0, b = 0, a = 1}},
     -- Water
     [string_lower("Fire Resistance Totem")] = {id = 8184,texture = select(3, GetSpellInfo(8184)), color = {r = 0, g = 0, b = 0, a = 1}},
-    [string_lower("Poison Cleansing Totem")] = {id = 8166,texture = select(3, GetSpellInfo(8166)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 4},
-    [string_lower("Disease Cleansing Totem")] = {id = 8170,texture = select(3, GetSpellInfo(8170)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 4},
+    [string_lower("Poison Cleansing Totem")] = {id = 8166,texture = select(3, GetSpellInfo(8166)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 5},
+    [string_lower("Disease Cleansing Totem")] = {id = 8170,texture = select(3, GetSpellInfo(8170)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 5},
     [string_lower("Healing Stream Totem")] = {id = 5394,texture = select(3, GetSpellInfo(5394)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 2},
     [string_lower("Mana Tide Totem")] = {id = 16190,texture = select(3, GetSpellInfo(16190)), color = {r = 0.078, g = 0.9, b = 0.16, a = 1}},
     [string_lower("Mana Spring Totem")] = {id = 5675,texture = select(3, GetSpellInfo(5675)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 2},
