@@ -7,7 +7,8 @@ local CreateFrame = CreateFrame
 local GetTime = GetTime
 
 local Gladdy = LibStub("Gladdy")
-local DRData = LibStub("DRData-1.0-BCC")
+--local DRData = LibStub("DRData-1.0-BCC")
+local DRData = LibStub("DRList-1.0")
 local L = Gladdy.L
 local function defaultCategories()
     local categories = {}

@@ -1,0 +1,23 @@
+## Interface: 90205
+## Interface-Classic: 11402
+## Interface-BCC: 20504
+## Interface-Wrath: 30400
+## Title: Lib: DRList-1.0
+## Version: @project-version@
+## X-Category: Library
+## X-License: MIT
+## X-Curse-Project-ID: 315757
+## X-Wago-ID: 9rN4BxKD
+
+#@no-lib-strip@
+libs\LibStub\LibStub.lua
+#@end-no-lib-strip@
+
+DRList-1.0.xml
+#@do-not-package@
+tests\engine.lua
+tests\test-retail.lua
+tests\test-classic.lua
+tests\test-tbc.lua
+tests\test-wotlk.lua
+#@end-do-not-package@
