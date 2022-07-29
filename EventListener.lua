@@ -112,7 +112,9 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
         end
         -- death detection
         if (Gladdy.buttons[destUnit] and eventType == "UNIT_DIED" or eventType == "PARTY_KILL" or eventType == "SPELL_INSTAKILL") then
-            Gladdy:SendMessage("UNIT_DEATH", destUnit)
+            if not Gladdy:isFeignDeath(destUnit) then
+                Gladdy:SendMessage("UNIT_DEATH", destUnit)
+            end
         end
         -- spec detection
         if Gladdy.buttons[destUnit] and (not Gladdy.buttons[destUnit].class or not Gladdy.buttons[destUnit].race) then

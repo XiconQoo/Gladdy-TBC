@@ -3,6 +3,8 @@ local floor = math.floor
 local str_find, str_gsub, str_sub, tinsert = string.find, string.gsub, string.sub, table.insert
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
+local AuraUtil = AuraUtil
+local GetSpellInfo = GetSpellInfo
 
 ---------------------------
 
@@ -150,4 +152,9 @@ function Gladdy:contains(entry, list)
         end
     end
     return false
+end
+
+local feignDeath = GetSpellInfo(5384)
+function Gladdy:isFeignDeath(unit)
+    return AuraUtil.FindAuraByName(feignDeath, unit)
 end
