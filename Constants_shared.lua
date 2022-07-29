@@ -183,30 +183,51 @@ Gladdy.frameStrataSorting = {
     [8] = "TOOLTIP",
 }
 
-local auraTypeColor = {}
-auraTypeColor["none"] = { r = 0.80, g = 0, b = 0, a = 1 }
-auraTypeColor["magic"] = { r = 0.20, g = 0.60, b = 1.00, a = 1 }
-auraTypeColor["curse"] = { r = 0.60, g = 0.00, b = 1.00, a = 1 }
-auraTypeColor["disease"] = { r = 0.60, g = 0.40, b = 0, a = 1 }
-auraTypeColor["poison"] = { r = 0.00, g = 0.60, b = 0, a = 1 }
-auraTypeColor["immune"] = { r = 1.00, g = 0.02, b = 0.99, a = 1 }
-auraTypeColor["form"] = auraTypeColor["none"]
-auraTypeColor["aura"] = auraTypeColor["none"]
-auraTypeColor[""] = auraTypeColor["none"]
+local dispelTypeColors = {}
+dispelTypeColors["none"] = { r = 0.80, g = 0, b = 0, a = 1 }
+dispelTypeColors["magic"] = { r = 0.20, g = 0.60, b = 1.00, a = 1 }
+dispelTypeColors["curse"] = { r = 0.60, g = 0.00, b = 1.00, a = 1 }
+dispelTypeColors["disease"] = { r = 0.60, g = 0.40, b = 0, a = 1 }
+dispelTypeColors["poison"] = { r = 0.00, g = 0.60, b = 0, a = 1 }
+dispelTypeColors["immune"] = { r = 1.00, g = 0.02, b = 0.99, a = 1 }
+dispelTypeColors["enrage"] = dispelTypeColors["none"]
+dispelTypeColors["form"] = dispelTypeColors["none"]
+dispelTypeColors["aura"] = dispelTypeColors["none"]
+dispelTypeColors[""] = dispelTypeColors["none"]
 
-function Gladdy:GetAuraTypeColor()
-    return auraTypeColor
+function Gladdy:GetDispelTypeColors()
+    return dispelTypeColors
 end
 
+
+--[[schoolColoring = {
+    [SCHOOL_MASK_NONE]	= {a=1.0,r=1.00,g=1.00,b=1.00};
+    [SCHOOL_MASK_PHYSICAL]	= {a=1.0,r=1.00,g=1.00,b=0.00};
+    [SCHOOL_MASK_HOLY] 	= {a=1.0,r=1.00,g=0.90,b=0.50};
+    [SCHOOL_MASK_FIRE] 	= {a=1.0,r=1.00,g=0.50,b=0.00};
+    [SCHOOL_MASK_NATURE] 	= {a=1.0,r=0.30,g=1.00,b=0.30};
+    [SCHOOL_MASK_FROST] 	= {a=1.0,r=0.50,g=1.00,b=1.00};
+    [SCHOOL_MASK_SHADOW] 	= {a=1.0,r=0.50,g=0.50,b=1.00};
+    [SCHOOL_MASK_ARCANE] 	= {a=1.0,r=1.00,g=0.50,b=1.00};
+
+SCHOOL_MASK_NONE		= 0x00;
+SCHOOL_MASK_PHYSICAL	= 0x01;
+SCHOOL_MASK_HOLY		= 0x02;
+SCHOOL_MASK_FIRE		= 0x04;
+SCHOOL_MASK_NATURE		= 0x08;
+SCHOOL_MASK_FROST		= 0x10;
+SCHOOL_MASK_SHADOW		= 0x20;
+SCHOOL_MASK_ARCANE		= 0x40;
+--]]
 local spellSchoolColors = {}
-spellSchoolColors[1] = { r = 1, g = 1, b = 0, a = 1, type = "Physical" } --- "physical" 255, 255, 0
-spellSchoolColors[2] = { r = 1, g = 0.901, b = 0.501, a = 1, type = "Holy" } ---"holy" -- 255, 230, 128
-spellSchoolColors[4] = { r = 1, g = 0.501, b = 0, a = 1, type = "Fire" } ---"fire" --  255, 128, 0
-spellSchoolColors[8] = { r = 0.302, g = 1, b = 0.302, a = 1, type = "Nature" } ---"nature" --  77, 255, 77
-spellSchoolColors[16] = { r = 0.501, g = 1, b = 1, a = 1, type = "Frost" } ---"frost" -- 128, 255, 255
-spellSchoolColors[32] = { r = 0.501, g = 0.501, b = 1, a = 1, type = "Shadow" } ---"shadow" --128, 128, 255
-spellSchoolColors[64] = { r = 1, g = 0.501, b = 1, a = 1, type = "Arcane" } ---"arcane" -- 255, 128, 255
-spellSchoolColors["unknown"] = { r = 0, g = 0, b = 0, a = 1, type = "Unknown" } ---"unknown spell school"
+spellSchoolColors[1] = { r = 1, g = 1, b = 0, a = 1, type = "Physical" } -- "physical" 255, 255, 0
+spellSchoolColors[2] = { r = 1, g = 0.901, b = 0.501, a = 1, type = "Holy" } --"holy" -- 255, 230, 128
+spellSchoolColors[4] = { r = 1, g = 0.501, b = 0, a = 1, type = "Fire" } --"fire" --  255, 128, 0
+spellSchoolColors[8] = { r = 0.302, g = 1, b = 0.302, a = 1, type = "Nature" } --"nature" --  77, 255, 77
+spellSchoolColors[16] = { r = 0.501, g = 1, b = 1, a = 1, type = "Frost" } --"frost" -- 128, 255, 255
+spellSchoolColors[32] = { r = 0.501, g = 0.501, b = 1, a = 1, type = "Shadow" } --"shadow" --128, 128, 255
+spellSchoolColors[64] = { r = 1, g = 0.501, b = 1, a = 1, type = "Arcane" } --"arcane" -- 255, 128, 255
+spellSchoolColors["unknown"] = { r = 0, g = 0, b = 0, a = 1, type = "Unknown" } --"unknown spell school"
 
 function Gladdy:GetSpellSchoolColors()
     return spellSchoolColors

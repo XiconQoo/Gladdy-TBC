@@ -42,25 +42,26 @@ local BuffsDebuffs = Gladdy:NewModule("Buffs and Debuffs", nil, {
     buffsBorderColorsEnabled = true,
     trackedDebuffs = defaultTrackedDebuffs,
     trackedBuffs = defaultTrackedBuffs,
-    buffsBorderColorCurse = Gladdy:GetAuraTypeColor()["curse"],
-    buffsBorderColorMagic = Gladdy:GetAuraTypeColor()["magic"],
-    buffsBorderColorPoison = Gladdy:GetAuraTypeColor()["poison"],
-    buffsBorderColorPhysical = Gladdy:GetAuraTypeColor()["none"],
-    buffsBorderColorImmune = Gladdy:GetAuraTypeColor()["immune"],
-    buffsBorderColorDisease = Gladdy:GetAuraTypeColor()["disease"],
-    buffsBorderColorForm = Gladdy:GetAuraTypeColor()["form"],
-    buffsBorderColorAura = Gladdy:GetAuraTypeColor()["aura"],
+    buffsBorderColorEnrage = Gladdy:GetDispelTypeColors()["enrage"],
+    buffsBorderColorCurse = Gladdy:GetDispelTypeColors()["curse"],
+    buffsBorderColorMagic = Gladdy:GetDispelTypeColors()["magic"],
+    buffsBorderColorPoison = Gladdy:GetDispelTypeColors()["poison"],
+    buffsBorderColorPhysical = Gladdy:GetDispelTypeColors()["none"],
+    buffsBorderColorImmune = Gladdy:GetDispelTypeColors()["immune"],
+    buffsBorderColorDisease = Gladdy:GetDispelTypeColors()["disease"],
+    buffsBorderColorForm = Gladdy:GetDispelTypeColors()["form"],
+    buffsBorderColorAura = Gladdy:GetDispelTypeColors()["aura"],
     buffFrameStrata = "MEDIUM",
     buffsFrameLevel = 9,
 })
 
-local spellSchoolToOptionValueTable
-local function spellSchoolToOptionValue(spellSchool)
-    if Gladdy.db.buffsBorderColorsEnabled and spellSchool then
-        return spellSchoolToOptionValueTable[spellSchool].r,
-        spellSchoolToOptionValueTable[spellSchool].g,
-        spellSchoolToOptionValueTable[spellSchool].b,
-        spellSchoolToOptionValueTable[spellSchool].a
+local dispelTypeToOptionValueTable
+local function dispelTypeToOptionValue(dispelType)
+    if Gladdy.db.buffsBorderColorsEnabled and dispelType then
+        return dispelTypeToOptionValueTable[dispelType].r,
+        dispelTypeToOptionValueTable[dispelType].g,
+        dispelTypeToOptionValueTable[dispelType].b,
+        dispelTypeToOptionValueTable[dispelType].a
     else
         return Gladdy:SetColor(Gladdy.db.buffsBorderColor)
     end
@@ -86,7 +87,8 @@ function BuffsDebuffs:Initialize()
                 "AURA_GAIN_LIMIT")
         self:SetScript("OnEvent", BuffsDebuffs.OnEvent)
     end
-    spellSchoolToOptionValueTable = {
+    dispelTypeToOptionValueTable = {
+        enrage = Gladdy.db.buffsBorderColorEnrage,
         curse = Gladdy.db.buffsBorderColorCurse,
         magic = Gladdy.db.buffsBorderColorMagic,
         poison = Gladdy.db.buffsBorderColorPoison,
@@ -137,7 +139,7 @@ end
 
 function BuffsDebuffs:Test(unit)
     if Gladdy.db.buffsEnabled then
-        local spellSchools = { "physical", "magic", "curse", "poison", "disease", "immune" }
+        local dispelTypes = { "physical", "magic", "curse", "poison", "disease", "immune", "enrage"}
 
         BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_DEBUFF)
         BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_BUFF)
@@ -149,7 +151,7 @@ function BuffsDebuffs:Test(unit)
                 break
             end
             if enabled then
-                BuffsDebuffs:AddOrRefreshAura(unit, spellID, AURA_TYPE_DEBUFF, 15, 15, random(1,5), spellSchools[random(1,6)], select(3, GetSpellInfo(spellID)), i)
+                BuffsDebuffs:AddOrRefreshAura(unit, spellID, AURA_TYPE_DEBUFF, 15, 15, random(1,5), dispelTypes[random(1,#dispelTypes)], select(3, GetSpellInfo(spellID)), i)
                 i = i + 1
             end
         end
@@ -159,7 +161,7 @@ function BuffsDebuffs:Test(unit)
                 break
             end
             if enabled then
-                BuffsDebuffs:AddOrRefreshAura(unit, spellID, AURA_TYPE_BUFF, 15, 15, random(1,5), spellSchools[random(1,6)], select(3, GetSpellInfo(spellID)), i)
+                BuffsDebuffs:AddOrRefreshAura(unit, spellID, AURA_TYPE_BUFF, 15, 15, random(1,5), dispelTypes[random(1,#dispelTypes)], select(3, GetSpellInfo(spellID)), i)
                 i = i + 1
             end
         end
@@ -196,7 +198,7 @@ function BuffsDebuffs:AURA_GAIN_LIMIT(unit, auraType, limit)
     end
 end
 
-function BuffsDebuffs:AURA_GAIN(unit, auraType, spellID, spellName, texture, duration, expirationTime, count, spellSchool)
+function BuffsDebuffs:AURA_GAIN(unit, auraType, spellID, spellName, texture, duration, expirationTime, count, dispelType)
     if (not self.frames[unit] or not Gladdy.db.buffsEnabled) then
         return
     end
@@ -227,7 +229,7 @@ function BuffsDebuffs:AURA_GAIN(unit, auraType, spellID, spellName, texture, dur
             auraFrame.numBuffs = auraFrame.numBuffs + 1
             index = auraFrame.numBuffs
         end
-        BuffsDebuffs:AddOrRefreshAura(unit,spellID, auraType, duration, expirationTime - GetTime(), count, spellSchool and lower(spellSchool) or "physical", texture, index)
+        BuffsDebuffs:AddOrRefreshAura(unit,spellID, auraType, duration, expirationTime - GetTime(), count, dispelType and lower(dispelType) or "physical", texture, index)
     end
 end
 
@@ -286,7 +288,7 @@ local function styleIcon(aura, auraType)
     aura.overlay:SetFrameLevel(Gladdy.db.buffsFrameLevel + 2)
 
     aura.border:SetTexture(Gladdy.db.buffsBorderStyle)
-    aura.border:SetVertexColor(spellSchoolToOptionValue(aura.spellSchool))
+    aura.border:SetVertexColor(dispelTypeToOptionValue(aura.dispelType))
     aura.cooldown:SetFont(Gladdy:SMFetch("font", "buffsFont"), (Gladdy.db.buffsIconSize/2 - 1) * Gladdy.db.buffsFontScale, "OUTLINE")
     aura.cooldown:SetTextColor(Gladdy.db.buffsFontColor.r, Gladdy.db.buffsFontColor.g, Gladdy.db.buffsFontColor.b, Gladdy.db.buffsFontColor.a)
     aura.stacks:SetFont(Gladdy:SMFetch("font", "buffsFont"), (Gladdy.db.buffsIconSize/3 - 1) * Gladdy.db.buffsFontScale, "OUTLINE")
@@ -404,7 +406,7 @@ local function iconTimer(auraFrame, elapsed)
     end
 end
 
-function BuffsDebuffs:AddAura(unit, spellID, auraType, duration, timeLeft, stacks, spellSchool, icon, index)
+function BuffsDebuffs:AddAura(unit, spellID, auraType, duration, timeLeft, stacks, dispelType, icon, index)
     local aura
     if not self.frames[unit].auras[auraType][index] then
         if #self.framePool > 0 then
@@ -457,12 +459,12 @@ function BuffsDebuffs:AddAura(unit, spellID, auraType, duration, timeLeft, stack
     aura.spellID = spellID
     aura.type = auraType
     aura.unit = unit
-    aura.spellSchool = spellSchool
-    aura.border:SetVertexColor(spellSchoolToOptionValue(spellSchool))
+    aura.dispelType = dispelType
+    aura.border:SetVertexColor(dispelTypeToOptionValue(dispelType))
     aura:Show()
 end
 
-function BuffsDebuffs:AddOrRefreshAura(unit, spellID, auraType, duration, timeLeft, stacks, spellSchool, icon, index)
+function BuffsDebuffs:AddOrRefreshAura(unit, spellID, auraType, duration, timeLeft, stacks, dispelType, icon, index)
     if self.frames[unit].auras[auraType][index] and self.frames[unit].auras[auraType][index].spellID == spellID then -- refresh
         if duration == 0 then
             self.frames[unit].auras[auraType][index].endtime = "undefined"
@@ -478,7 +480,7 @@ function BuffsDebuffs:AddOrRefreshAura(unit, spellID, auraType, duration, timeLe
         return
     end
     --add
-    self:AddAura(unit, spellID, auraType, duration, timeLeft, stacks, spellSchool, icon, index)
+    self:AddAura(unit, spellID, auraType, duration, timeLeft, stacks, dispelType, icon, index)
     self:UpdateAurasOnUnit(unit)
 end
 
@@ -901,6 +903,13 @@ function BuffsDebuffs:GetOptions()
                             name = L["Form"],
                             desc = L["Color of the border"],
                             order = 49,
+                            hasAlpha = true,
+                        }),
+                        buffsBorderColorEnrage = Gladdy:colorOption({
+                            type = "color",
+                            name = L["Enrage"],
+                            desc = L["Color of the border"],
+                            order = 50,
                             hasAlpha = true,
                         }),
                     },
