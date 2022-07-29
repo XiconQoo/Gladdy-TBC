@@ -259,7 +259,7 @@ function EventListener:UNIT_AURA(unit)
         local auraType = i == 1 and AURA_TYPE_BUFF or AURA_TYPE_DEBUFF
         Gladdy:SendMessage("AURA_FADE", unit, auraType)
         for n = 1, 30 do
-            local spellName, texture, count, debuffType, duration, expirationTime, unitCaster, _, shouldConsolidate, spellID = UnitAura(unit, n, filter)
+            local spellName, texture, count, dispelType, duration, expirationTime, unitCaster, _, shouldConsolidate, spellID = UnitAura(unit, n, filter)
             if ( not spellID ) then
                 Gladdy:SendMessage("AURA_GAIN_LIMIT", unit, auraType, n - 1)
                 break
@@ -284,7 +284,7 @@ function EventListener:UNIT_AURA(unit)
             if Gladdy.exceptionNames[spellID] then
                 spellName = Gladdy.exceptionNames[spellID]
             end
-            Gladdy:SendMessage("AURA_GAIN", unit, auraType, spellID, spellName, texture, duration, expirationTime, count, debuffType, i)
+            Gladdy:SendMessage("AURA_GAIN", unit, auraType, spellID, spellName, texture, duration, expirationTime, count, dispelType, i)
         end
     end
 end
