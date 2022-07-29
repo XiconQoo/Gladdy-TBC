@@ -142,3 +142,12 @@ function Gladdy:GetTagOption(name, order, enabledOption, func, toggle)
         })
     end
 end
+
+function Gladdy:contains(entry, list)
+    for _,v in pairs(list) do
+        if entry == v then
+            return true
+        end
+    end
+    return false
+end
