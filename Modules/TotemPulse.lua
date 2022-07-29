@@ -330,7 +330,7 @@ function TotemPulse:CreateCooldownFrame(style)
 end
 
 function TotemPulse:AddTimerFrame(nameplate, timestamp, test)
-    if (nameplate:IsShown() or test) and timestamp then
+    if (nameplate:IsShown() or test) and timestamp and timestamp.id then
         if not nameplate.totemTick then
             nameplate.totemTick = TotemPulse:CreateCooldownFrame(Gladdy.db.totemPulseTotems["totem" .. timestamp.id].style)
         end
