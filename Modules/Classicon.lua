@@ -22,6 +22,7 @@ local Classicon = Gladdy:NewModule("Class Icon", 81, {
 local classIconPath = "Interface\\Addons\\Gladdy\\Images\\Classes\\"
 local classIcons = {
     ["DRUID"] = classIconPath .. "inv_misc_monsterclaw_04",
+    ["DEATHKNIGHT"] = select(3, GetSpellInfo(49023)), --Might of Mograine
     ["HUNTER"] = classIconPath .. "inv_weapon_bow_07",
     ["MAGE"] = classIconPath .. "inv_staff_13",
     ["PALADIN"] = classIconPath .. "inv_hammer_01",
@@ -38,6 +39,11 @@ local specIcons = {
         [L["Balance"]] = select(3, GetSpellInfo(8921)), -- Moonfire
         [L["Feral"]] = select(3, GetSpellInfo(27545)), -- Cat Form
         [L["Restoration"]] = select(3, GetSpellInfo(5185)), -- Healing Touch
+    },
+    ["DEATHKNIGHT"] = {
+        [L["Unholy"]] = select(3, GetSpellInfo(48265)), -- Unholy Presence
+        [L["Blood"]] = select(3, GetSpellInfo(48266)), -- Blood Presence
+        [L["Frost"]] = select(3, GetSpellInfo(48263)), -- Frost Presence
     },
     ["HUNTER"] = {
         [L["Beast Mastery"]] = select(3, GetSpellInfo(1515)), -- Tame Beast

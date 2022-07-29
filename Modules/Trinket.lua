@@ -33,12 +33,18 @@ function Trinket:Initialize()
     self.frames = {}
     if Gladdy.db.trinketEnabled then
         self:RegisterMessage("JOINED_ARENA")
+        if Gladdy.expansion == "Wrath" then
+            self:RegisterMessage("RACIAL_USED")
+        end
     end
 end
 
 function Trinket:UpdateFrameOnce()
     if Gladdy.db.trinketEnabled then
         self:RegisterMessage("JOINED_ARENA")
+        if Gladdy.expansion == "Wrath" then
+            self:RegisterMessage("RACIAL_USED")
+        end
     else
         self:UnregisterAllMessages()
     end
@@ -228,6 +234,7 @@ function Trinket:ResetUnit(unit)
         return
     end
 
+    trinket.itemID = nil
     trinket.timeLeft = nil
     trinket.active = false
     trinket.cooldown:Clear()
@@ -239,13 +246,15 @@ function Trinket:Test(unit)
     if (not trinket) then
         return
     end
-    if (unit == "arena2" or unit == "arena3") then
+    if (unit == "arena1" or unit == "arena2") then
         self:Used(unit, GetTime() * 1000, 120000)
     end
 end
 
 function Trinket:JOINED_ARENA()
     self:RegisterEvent("ARENA_COOLDOWNS_UPDATE")
+    self:RegisterEvent("ARENA_CROWD_CONTROL_SPELL_UPDATE")
+    self:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "arena1", "arena2", "arena3", "arena4", "arena5")
     self:SetScript("OnEvent", function(self, event, ...)
         if self[event] then
             self[event](self, ...)
@@ -253,19 +262,64 @@ function Trinket:JOINED_ARENA()
     end)
 end
 
+function Trinket:ARENA_CROWD_CONTROL_SPELL_UPDATE(...)
+    local unitID, spellID, itemID = ...
+    Gladdy:Debug("INFO", "Trinket:ARENA_CROWD_CONTROL_SPELL_UPDATE", unitID, spellID, itemID)
+    if Gladdy.buttons[unitID] and Gladdy:GetPvpTrinkets()[itemID] then
+        Gladdy.buttons[unitID].trinket.itemID = itemID
+        if not Gladdy.db.trinketColored then
+            self.frames[unitID].texture:SetTexture(GetItemIcon(itemID))
+        end
+    end
+end
+
+function Trinket:UNIT_SPELLCAST_SUCCEEDED(...)
+    local unitID, castGUID, spellID = ...
+    if Gladdy.buttons[unitID] then
+        if spellID == 42292 or spellID == 59752 then
+            Gladdy:Debug("INFO", "Trinket:UNIT_SPELLCAST_SUCCEEDED", unitID, spellID)
+            self:Used(unitID, GetTime() * 1000,
+                    Gladdy.buttons[unitID].trinket.itemID and Gladdy:GetPvpTrinkets()[Gladdy.buttons[unitID].trinket.itemID]
+                            or 120000)
+        end
+    end
+end
+
+function Trinket:RACIAL_USED(unit) -- Wrath only
+    local trinket = self.frames[unit]
+    if (not trinket) then
+        return
+    end
+    if Gladdy.buttons[unit].race == "Scourge" then
+        if trinket.active and trinket.timeLeft >= 44 then
+            -- do nothing
+        else
+            trinket.active = false
+            self:Used(unit, GetTime() * 1000, 45000, true)
+        end
+    elseif Gladdy.buttons[unit].race == "Human" then
+        trinket.active = false
+        self:Used(unit, GetTime() * 1000, 120000)
+    end
+end
+
 function Trinket:ARENA_COOLDOWNS_UPDATE()
     for i=1, Gladdy.curBracket do
-        local unit = "arena" .. i
-        local spellID, itemID, startTime, duration = C_PvP.GetArenaCrowdControlInfo(unit);
+        local unitID = "arena" .. i
+        local spellID, itemID, startTime, duration = C_PvP.GetArenaCrowdControlInfo(unitID)
+        Gladdy:Debug("INFO", "Trinket:ARENA_COOLDOWNS_UPDATE", spellID, itemID, startTime, duration)
         if (spellID) then
+            if not Gladdy.db.trinketColored and Gladdy:GetPvpTrinkets()[itemID] then
+                self.frames[unitID].texture:SetTexture(GetItemIcon(itemID))
+            end
             if (startTime ~= 0 and duration ~= 0) then
-                self:Used(unit, startTime, duration)
+                self:Used(unitID, startTime, duration)
             end
         end
     end
 end
 
-function Trinket:Used(unit, startTime, duration)
+function Trinket:Used(unit, startTime, duration, passive)
     local trinket = self.frames[unit]
     if (not trinket) then
         return
@@ -277,7 +331,9 @@ function Trinket:Used(unit, startTime, duration)
         if Gladdy.db.trinketColored then
             trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredCd))
         end
-        Gladdy:SendMessage("TRINKET_USED", unit)
+        if not passive then
+            Gladdy:SendMessage("TRINKET_USED", unit)
+        end
     end
 end
 

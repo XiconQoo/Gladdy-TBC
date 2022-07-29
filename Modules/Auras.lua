@@ -483,12 +483,13 @@ function Auras:Test(unit)
         if Gladdy.exceptionNames[spellid] then
             spellName = Gladdy.exceptionNames[spellid]
         end
+        local duration = math.random(2,10)
         if (unit == "arena2") then
             if (v.value.track == AURA_TYPE_BUFF) then
-                self:AURA_GAIN(unit,v.value.track, spellid, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
+                self:AURA_GAIN(unit,v.value.track, spellid, spellName, icon, duration, GetTime() + duration)
             end
         else
-            self:AURA_GAIN(unit,v.value.track, spellid, spellName, icon, self.auras[spellName].duration, GetTime() + self.auras[spellName].duration)
+            self:AURA_GAIN(unit,v.value.track, spellid, spellName, icon, duration, GetTime() + duration)
         end
     end
     -- /run LibStub("Gladdy").modules["Auras"]:Test("arena1")

@@ -935,6 +935,17 @@ function Gladdy:GetAuras(auraType)
         end
         return args
     end
+    if Gladdy.expansion == "Wrath" then
+        spells.deathknight = {
+            order = 3,
+            type = "group",
+            name = LOCALIZED_CLASS_NAMES_MALE["DEATHKNIGHT"],
+            icon = "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes",
+            iconCoords = CLASS_ICON_TCOORDS["DEATHKNIGHT"],
+            args = {},
+        }
+        spells.deathknight.args = assignForClass("DEATHKNIGHT")
+    end
     spells.druid.args = assignForClass("DRUID")
     spells.hunter.args = assignForClass("HUNTER")
     spells.mage.args = assignForClass("MAGE")

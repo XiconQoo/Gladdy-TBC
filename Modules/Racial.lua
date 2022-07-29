@@ -32,6 +32,9 @@ function Racial:Initialize()
         self:RegisterMessage("JOINED_ARENA")
         self:RegisterMessage("ENEMY_SPOTTED")
         self:RegisterMessage("RACIAL_USED")
+        if Gladdy.expansion == "Wrath" then
+            self:RegisterMessage("TRINKET_USED")
+        end
     end
 end
 
@@ -40,6 +43,9 @@ function Racial:UpdateFrameOnce()
         self:RegisterMessage("JOINED_ARENA")
         self:RegisterMessage("ENEMY_SPOTTED")
         self:RegisterMessage("RACIAL_USED")
+        if Gladdy.expansion == "Wrath" then
+            self:RegisterMessage("TRINKET_USED")
+        end
     else
         self:UnregisterAllMessages()
     end
@@ -207,6 +213,25 @@ function Racial:RACIAL_USED(unit, expirationTime, spellName)
     Racial:Used(unit, startTime, Gladdy:Racials()[button.race].duration)
 end
 
+function Racial:TRINKET_USED(unit) -- Wrath only
+    local racial = self.frames[unit]
+    local button = Gladdy.buttons[unit]
+    if (not racial or not button or not button.race) then
+        return
+    end
+    if button.race == "Scourge" then
+        if racial.active and racial.timeLeft >= 45 then
+            -- do nothing
+        else
+            racial.active = false
+            self:Used(unit, GetTime(), 45)
+        end
+    elseif button.race == "Human" then
+        racial.active = false
+        self:Used(unit, GetTime(), 120)
+    end
+end
+
 function Racial:Used(unit, startTime, duration)
     local racial = self.frames[unit]
     if (not racial) then
@@ -241,8 +266,8 @@ end
 
 function Racial:Test(unit)
     Racial:ENEMY_SPOTTED(unit)
-    if (unit == "arena1" or unit == "arena3") then
-        Racial:Used(unit, GetTime(), Gladdy:Racials()[Gladdy.buttons[unit].race].duration)
+    if (unit == "arena2" or unit == "arena3") then
+        Gladdy:SendMessage("RACIAL_USED", unit)
     end
 end
 

@@ -195,3 +195,12 @@ Buff({ 6143 }, { buffType = "magic"}, "MAGE") -- Frost Ward
 --talents
 Buff({ 11426 }, { buffType = "magic"}, "MAGE") -- Ice Barrier
 Buff({ 12472 }, { buffType = "magic"}, "MAGE") -- Icy Veins
+
+-------------
+-- DEATHKNIGHT
+-------------
+
+Buff({ 48707 }, { buffType = "physical"}, "DEATHKNIGHT") -- Anti-Magic Shell
+Buff({ 48792 }, { buffType = "physical"}, "DEATHKNIGHT") -- Icebound Fortitude
+Buff({ 49039 }, { buffType = "physical"}, "DEATHKNIGHT") -- Lichborne
+Buff({ 50461 }, { buffType = "physical"}, "DEATHKNIGHT") -- Anti-Magic Zone

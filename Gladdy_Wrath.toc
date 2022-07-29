@@ -1,7 +1,7 @@
-## Interface: 20504
-## Title: Gladdy - TBC
-## Version: 2.11-Release
-## Notes: The most powerful arena AddOn for WoW 2.5.4
+## Interface: 30400
+## Title: Gladdy - WotLK
+## Version: 2.2-Beta
+## Notes: The most powerful arena AddOn for WoW 3.4.0
 ## Author: XiconQoo, DnB_Junkee, Knall
 ## X-Email: contact me on discord Knall#1751
 ## SavedVariables: GladdyXZ
@@ -13,7 +13,8 @@ Gladdy.lua
 Lang.lua
 Frame.lua
 Options.lua
-Constants.lua
+Constants_shared.lua
+Constants_Wrath.lua
 ImportStrings.lua
 Util.lua
 
