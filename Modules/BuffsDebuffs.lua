@@ -57,7 +57,11 @@ local BuffsDebuffs = Gladdy:NewModule("Buffs and Debuffs", nil, {
 
 local dispelTypeToOptionValueTable
 local function dispelTypeToOptionValue(dispelType)
-    if Gladdy.db.buffsBorderColorsEnabled and dispelType then
+    if Gladdy.db.buffsBorderColorsEnabled then
+        dispelType = dispelType and lower(dispelType) or "physical"
+        if not dispelTypeToOptionValueTable[dispelType] then
+            dispelType = "physical"
+        end
         return dispelTypeToOptionValueTable[dispelType].r,
         dispelTypeToOptionValueTable[dispelType].g,
         dispelTypeToOptionValueTable[dispelType].b,
@@ -88,14 +92,17 @@ function BuffsDebuffs:Initialize()
         self:SetScript("OnEvent", BuffsDebuffs.OnEvent)
     end
     dispelTypeToOptionValueTable = {
-        enrage = Gladdy.db.buffsBorderColorEnrage,
-        curse = Gladdy.db.buffsBorderColorCurse,
+        none = Gladdy.db.buffsBorderColorPhysical,
         magic = Gladdy.db.buffsBorderColorMagic,
+        curse = Gladdy.db.buffsBorderColorCurse,
+        disease = Gladdy.db.buffsBorderColorDisease,
         poison = Gladdy.db.buffsBorderColorPoison,
+        stealth = Gladdy.db.buffsBorderColorPhysical,
+        invisibility = Gladdy.db.buffsBorderColorPhysical,
         physical = Gladdy.db.buffsBorderColorPhysical,
         immune = Gladdy.db.buffsBorderColorImmune,
-        disease = Gladdy.db.buffsBorderColorDisease,
         form = Gladdy.db.buffsBorderColorForm,
+        enrage = Gladdy.db.buffsBorderColorEnrage,
     }
 
 end
@@ -229,7 +236,7 @@ function BuffsDebuffs:AURA_GAIN(unit, auraType, spellID, spellName, texture, dur
             auraFrame.numBuffs = auraFrame.numBuffs + 1
             index = auraFrame.numBuffs
         end
-        BuffsDebuffs:AddOrRefreshAura(unit,spellID, auraType, duration, expirationTime - GetTime(), count, dispelType and lower(dispelType) or "physical", texture, index)
+        BuffsDebuffs:AddOrRefreshAura(unit,spellID, auraType, duration, expirationTime - GetTime(), count, dispelType, texture, index)
     end
 end
 
