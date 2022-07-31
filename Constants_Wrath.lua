@@ -635,6 +635,11 @@ local importantAuras = {
         priority = 30,
         spellID = 642,
     },
+    [GetSpellInfo(18499)] = { -- Berserker Rage
+        track = AURA_TYPE_BUFF,
+        priority = 30,
+        spellID = 18499,
+    },
 
     --- Alt Stuff
     [GetSpellInfo(34709)] = { -- Shadowsight Buff
@@ -821,8 +826,10 @@ local cooldownList = {
                      [6552] = true,
                  },
         },
+        [18499] = 30, -- Berserker Rage
         [23920] = 10, -- Spell Reflection
         [3411] = 30, -- Intervene
+        [20252] = 30, -- Intercept
         [676] = 60, -- Disarm
         [5246] = 120, -- Intimidating Shout
         [2565] = 60, -- Shield Block
@@ -830,6 +837,7 @@ local cooldownList = {
         [20230] = 300, -- Retaliation
         [1719] = 300, -- Recklessness
         [871] = 300, -- Shield Wall
+        [64382] = 300, -- Shattering Throw
         [12292] = { cd = 180, spec = L["Fury"], }, -- Death Wish
         [46924] = { cd = 90, spec = L["Arms"], }, -- Bladestorm
         [46968] = { cd = 20, spec = L["Protection"], }, -- Shockwave
