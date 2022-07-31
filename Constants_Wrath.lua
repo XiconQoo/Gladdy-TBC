@@ -36,7 +36,7 @@ local specBuffs = {
     [GetSpellInfo(44373)] = L["Subtlety"], -- Shadowstep Speed
     [GetSpellInfo(36563)] = L["Subtlety"], -- Shadowstep DMG
     [GetSpellInfo(51713)] = L["Subtlety"], -- Shadow Dance
-    [GetSpellInfo(31223)] = L["Subtlety"], -- Master of Subtlety
+    [GetSpellInfo(31665)] = L["Subtlety"], -- Master of Subtlety
     [GetSpellInfo(14278)] = L["Subtlety"], -- Ghostly Strike
     [GetSpellInfo(51690)] = L["Combat"], -- Killing Spree
     [GetSpellInfo(13877)] = L["Combat"], -- Blade Flurry
@@ -85,6 +85,7 @@ local specBuffs = {
     -- HUNTER
     [GetSpellInfo(20895)] = L["Beast Mastery"], -- Spirit Bond
     [GetSpellInfo(19506)] = L["Marksmanship"], -- Trueshot Aura
+    [GetSpellInfo(64420)] = L["Survival"], -- Sniper Training
     -- DRUID
     [GetSpellInfo(24932)] = L["Feral"], -- Leader of the Pack
     [GetSpellInfo(34123)] = L["Restoration"], -- Tree of Life
@@ -282,6 +283,11 @@ local importantAuras = {
         track = AURA_TYPE_DEBUFF,
         priority = 30,
         spellID = 33395,
+    },
+    [GetSpellInfo(55080)] = { -- Shattered Barrier
+        track = AURA_TYPE_DEBUFF,
+        priority = 30,
+        spellID = 55080,
     },
     [GetSpellInfo(16979)] = { -- Feral Charge
         track = AURA_TYPE_DEBUFF,
@@ -790,7 +796,6 @@ local cooldownList = {
         [17928] = 40, -- Howl of Terror
         [47860] = 120, -- Death Coil
         [18708] = 180, -- Feldom
-        [47996] = { cd = 30, pet = true, }, -- Intercept
         [48020] = 30, -- Demonic Circle: Port
         [19647] = { cd = 24, pet = true, }, -- Spell Lock
         [27277] = { cd = 8, pet = true, },  -- Devour Magic
@@ -800,6 +805,7 @@ local cooldownList = {
         [17962] = { cd = 10, spec = L["Destruction"], }, -- Conflagrate
         [59172] = { cd = 12, spec = L["Destruction"], }, -- Chaos Bolt
         [47241] = { cd = 180, spec = L["Demonology"], }, -- Metamorphosis
+        [47996] = { cd = 30, spec = L["Demonology"], pet = true, }, -- Intercept
         [1122] = { cd = 600, spec = L["Demonology"], }, -- Inferno
     },
 
