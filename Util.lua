@@ -160,13 +160,22 @@ function Gladdy:isFeignDeath(unit)
     return AuraUtil.FindAuraByName(feignDeath, unit)
 end
 
-function Gladdy:GetArenaUnit(unitCaster)
+function Gladdy:GetArenaUnit(unitCaster, unify)
     if unitCaster then
         for i=1,5 do
             local arenaUnit = "arena" .. i
             local arenaUnitPet = "arenapet" .. i
-            if unitCaster and (UnitIsUnit(arenaUnit, unitCaster) or UnitIsUnit(arenaUnitPet, unitCaster)) then
-                return arenaUnit
+            if unify then
+                if unitCaster and (UnitIsUnit(arenaUnit, unitCaster) or UnitIsUnit(arenaUnitPet, unitCaster)) then
+                    return arenaUnit
+                end
+            else
+                if unitCaster and UnitIsUnit(arenaUnit, unitCaster) then
+                    return arenaUnit
+                end
+                if unitCaster and UnitIsUnit(arenaUnitPet, unitCaster) then
+                    return arenaUnitPet
+                end
             end
         end
     end
