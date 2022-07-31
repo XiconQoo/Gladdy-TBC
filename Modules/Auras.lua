@@ -542,7 +542,9 @@ function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, exp
         return
     end
     -- don't use spellId from combatlog, in case of different spellrank
-    if not Gladdy.db.auraListDefault[tostring(self.auras[spellName].spellID)] or not Gladdy.db.auraListDefault[tostring(self.auras[spellName].spellID)].enabled then
+    if not Gladdy.db.auraListDefault[tostring(self.auras[spellName].spellID)]
+            or not Gladdy.db.auraListDefault[tostring(self.auras[spellName].spellID)].enabled
+            or Gladdy.db.auraListDefault[tostring(self.auras[spellName].spellID)].track ~= auraType then
         return
     end
 
