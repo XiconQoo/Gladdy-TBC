@@ -829,7 +829,7 @@ local cooldownList = {
         [18499] = 30, -- Berserker Rage
         [23920] = 10, -- Spell Reflection
         [3411] = 30, -- Intervene
-        [20252] = 30, -- Intercept
+        [20252] = { cd = 30, [L["Arms"]] = 20, }, -- Intercept
         [676] = 60, -- Disarm
         [5246] = 120, -- Intimidating Shout
         [2565] = 60, -- Shield Block
