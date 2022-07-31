@@ -247,14 +247,13 @@ function Trinket:Test(unit)
         return
     end
     if (unit == "arena1" or unit == "arena2") then
-        self:Used(unit, GetTime() * 1000, 120000)
+        Gladdy:SendMessage("TRINKET_USED", unit)
     end
 end
 
 function Trinket:JOINED_ARENA()
     self:RegisterEvent("ARENA_COOLDOWNS_UPDATE")
     self:RegisterEvent("ARENA_CROWD_CONTROL_SPELL_UPDATE")
-    self:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "arena1", "arena2", "arena3", "arena4", "arena5")
     self:SetScript("OnEvent", function(self, event, ...)
         if self[event] then
             self[event](self, ...)
@@ -273,15 +272,11 @@ function Trinket:ARENA_CROWD_CONTROL_SPELL_UPDATE(...)
     end
 end
 
-function Trinket:UNIT_SPELLCAST_SUCCEEDED(...)
-    local unitID, castGUID, spellID = ...
-    if Gladdy.buttons[unitID] then
-        if spellID == 42292 or spellID == 59752 then
-            Gladdy:Debug("INFO", "Trinket:UNIT_SPELLCAST_SUCCEEDED", unitID, spellID)
-            self:Used(unitID, GetTime() * 1000,
-                    Gladdy.buttons[unitID].trinket.itemID and Gladdy:GetPvpTrinkets()[Gladdy.buttons[unitID].trinket.itemID]
-                            or 120000)
-        end
+function Trinket:TRINKET_USED(unit)
+    if Gladdy.buttons[unit] then
+        self:Used(unit, GetTime() * 1000,
+                Gladdy.buttons[unit].trinket.itemID and Gladdy:GetPvpTrinkets()[Gladdy.buttons[unit].trinket.itemID]
+                        or 120000)
     end
 end
 
@@ -291,11 +286,11 @@ function Trinket:RACIAL_USED(unit) -- Wrath only
         return
     end
     if Gladdy.buttons[unit].race == "Scourge" then
-        if trinket.active and trinket.timeLeft >= 44 then
+        if trinket.active and trinket.timeLeft >= 45 then
             -- do nothing
         else
             trinket.active = false
-            self:Used(unit, GetTime() * 1000, 45000, true)
+            self:Used(unit, GetTime() * 1000, 45000)
         end
     elseif Gladdy.buttons[unit].race == "Human" then
         trinket.active = false
@@ -307,8 +302,8 @@ function Trinket:ARENA_COOLDOWNS_UPDATE()
     for i=1, Gladdy.curBracket do
         local unitID = "arena" .. i
         local spellID, itemID, startTime, duration = C_PvP.GetArenaCrowdControlInfo(unitID)
-        Gladdy:Debug("INFO", "Trinket:ARENA_COOLDOWNS_UPDATE", spellID, itemID, startTime, duration)
         if (spellID) then
+            Gladdy:Debug("INFO", "Trinket:ARENA_COOLDOWNS_UPDATE", spellID, itemID, startTime, duration)
             if not Gladdy.db.trinketColored and Gladdy:GetPvpTrinkets()[itemID] then
                 self.frames[unitID].texture:SetTexture(GetItemIcon(itemID))
             end
@@ -319,9 +314,9 @@ function Trinket:ARENA_COOLDOWNS_UPDATE()
     end
 end
 
-function Trinket:Used(unit, startTime, duration, passive)
+function Trinket:Used(unit, startTime, duration)
     local trinket = self.frames[unit]
-    if (not trinket) then
+    if (not trinket or not Gladdy.db.trinketEnabled) then
         return
     end
     if not trinket.active then
@@ -330,9 +325,6 @@ function Trinket:Used(unit, startTime, duration, passive)
         trinket.active = true
         if Gladdy.db.trinketColored then
             trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredCd))
-        end
-        if not passive then
-            Gladdy:SendMessage("TRINKET_USED", unit)
         end
     end
 end

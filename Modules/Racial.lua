@@ -203,7 +203,7 @@ end
 function Racial:RACIAL_USED(unit, expirationTime, spellName)
     local racial = self.frames[unit]
     local button = Gladdy.buttons[unit]
-    if (not racial or not button or not button.race) then
+    if (not racial or not button or not button.race or not Gladdy.db.racialEnabled) then
         return
     end
     if expirationTime and Gladdy:Racials()[button.race].spellName ~= spellName then

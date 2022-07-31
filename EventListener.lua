@@ -157,7 +157,6 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
             self:DetectSpec(srcUnit, Gladdy.specSpells[spellName])
         end
         if (eventType == "SPELL_CAST_SUCCESS" or eventType == "SPELL_AURA_APPLIED" or eventType == "SPELL_MISSED") then
-            local unitRace = Gladdy.buttons[srcUnit].race
             self:DetectSpec(srcUnit, Gladdy.specSpells[spellName])
             -- cooldown tracker
             if Gladdy.db.cooldown and Cooldowns.cooldownSpellIds[spellName] then
@@ -177,10 +176,6 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
                     end
                 end
             end
-
-            if Gladdy.db.racialEnabled and Gladdy:Racials()[unitRace].spellName == spellName and Gladdy:Racials()[unitRace][spellID] then
-                Gladdy:SendMessage("RACIAL_USED", srcUnit)
-            end
         end
         if (eventType == "SPELL_AURA_REMOVED" and (spellID == 16188 or spellID == 17116) and Gladdy.buttons[srcUnit].class) then
             Cooldowns:CooldownUsed(srcUnit, Gladdy.buttons[srcUnit].class, spellID)
@@ -191,6 +186,7 @@ end
 function EventListener:ARENA_OPPONENT_UPDATE(unit, updateReason)
     --[[ updateReason: seen, unseen, destroyed, cleared ]]
 
+    unit = Gladdy:GetArenaUnit(unit)
     local button = Gladdy.buttons[unit]
     local pet = Gladdy.modules["Pets"].frames[unit]
     if button or pet then
@@ -332,11 +328,28 @@ function EventListener:UNIT_SPELLCAST_CHANNEL_START(unit)
     end
 end
 
-function EventListener:UNIT_SPELLCAST_SUCCEEDED(unit)
+function EventListener:UNIT_SPELLCAST_SUCCEEDED(...)
+    local unit, castGUID, spellID = ...
+    unit = Gladdy:GetArenaUnit(unit, true)
     if Gladdy.buttons[unit] then
-        local spellName = UnitCastingInfo(unit)
+        local unitRace = Gladdy.buttons[unit].race
+        local spellName = GetSpellInfo(spellID)
+
+        -- spec detection
         if Gladdy.specSpells[spellName] and not Gladdy.buttons[unit].spec then
             self:DetectSpec(unit, Gladdy.specSpells[spellName])
+        end
+
+        -- trinket
+        if spellID == 42292 or spellID == 59752 then
+            Gladdy:Debug("INFO", "UNIT_SPELLCAST_SUCCEEDED - TRINKET_USED", unit, spellID)
+            Gladdy:SendMessage("TRINKET_USED", unit)
+        end
+
+        -- racial
+        if Gladdy:Racials()[unitRace].spellName == spellName and Gladdy:Racials()[unitRace][spellID] then
+            Gladdy:Debug("INFO", "UNIT_SPELLCAST_SUCCEEDED - RACIAL_USED", unit, spellID)
+            Gladdy:SendMessage("RACIAL_USED", unit)
         end
     end
 end
