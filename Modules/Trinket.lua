@@ -33,6 +33,7 @@ function Trinket:Initialize()
     self.frames = {}
     if Gladdy.db.trinketEnabled then
         self:RegisterMessage("JOINED_ARENA")
+        self:RegisterMessage("TRINKET_USED")
         if Gladdy.expansion == "Wrath" then
             self:RegisterMessage("RACIAL_USED")
         end
@@ -289,11 +290,9 @@ function Trinket:RACIAL_USED(unit) -- Wrath only
         if trinket.active and trinket.timeLeft >= 45 then
             -- do nothing
         else
-            trinket.active = false
             self:Used(unit, GetTime() * 1000, 45000)
         end
     elseif Gladdy.buttons[unit].race == "Human" then
-        trinket.active = false
         self:Used(unit, GetTime() * 1000, 120000)
     end
 end
@@ -319,14 +318,14 @@ function Trinket:Used(unit, startTime, duration)
     if (not trinket or not Gladdy.db.trinketEnabled) then
         return
     end
-    if not trinket.active then
+    --if not trinket.active then
         trinket.timeLeft = (startTime/1000.0 + duration/1000.0) - GetTime()
         if not Gladdy.db.trinketDisableCircle then trinket.cooldown:SetCooldown(startTime/1000.0, duration/1000.0) end
         trinket.active = true
         if Gladdy.db.trinketColored then
             trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredCd))
         end
-    end
+    --end
 end
 
 function Trinket:GetOptions()

@@ -223,11 +223,9 @@ function Racial:TRINKET_USED(unit) -- Wrath only
         if racial.active and racial.timeLeft >= 45 then
             -- do nothing
         else
-            racial.active = false
             self:Used(unit, GetTime(), 45)
         end
     elseif button.race == "Human" then
-        racial.active = false
         self:Used(unit, GetTime(), 120)
     end
 end
