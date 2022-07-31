@@ -305,7 +305,7 @@ function Cooldowns:Test(unit)
     if Gladdy.frame.testing then
         self:UpdateTestCooldowns(unit)
     end
-    Cooldowns:AURA_GAIN(_, AURA_TYPE_BUFF, "22812", "Barkskin", _, 10, _, _, _, _, unit, true) -- unit, auraType, spellID, spellName, texture, duration, expirationTime
+    Cooldowns:AURA_GAIN(_, AURA_TYPE_BUFF, "22812", "Barkskin", _, 20, _, _, _, _, unit, true) -- unit, auraType, spellID, spellName, texture, duration, expirationTime
 end
 
 function Cooldowns:UpdateTestCooldowns(unit)
@@ -351,7 +351,7 @@ end
     /run local a=LibStub("Gladdy").modules["Cooldowns"] a:AURA_FADE("arena1",22812)
 --]]
 function Cooldowns:AURA_GAIN(_, auraType, spellID, spellName, _, duration, _, _, _, _, unitCaster, test)
-    local arenaUnit = test and unitCaster or Gladdy:GetArenaUnit(unitCaster)
+    local arenaUnit = test and unitCaster or Gladdy:GetArenaUnit(unitCaster, true)
     if not Gladdy.db.cooldownIconGlow or not arenaUnit or not Gladdy.buttons[arenaUnit] or auraType ~= AURA_TYPE_BUFF then
         return
     end
@@ -538,7 +538,7 @@ function Cooldowns:AddCooldown(spellID, value, button)
         icon.texture:SetTexture(self.spellTextures[spellID])
         tinsert(button.spellCooldownFrame.icons, icon)
         self:IconsSetPoint(button)
-        Gladdy:Debug("Cooldowns:AddCooldown", button.unit, GetSpellInfo(spellID))
+        Gladdy:Debug("INFO", "Cooldowns:AddCooldown", button.unit, GetSpellInfo(spellID))
     end
 end
 
