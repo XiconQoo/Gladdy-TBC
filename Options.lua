@@ -3,7 +3,6 @@ local tostring, str_match, tonumber, str_format = tostring, string.match, tonumb
 local ceil, floor = ceil, floor
 local ReloadUI = ReloadUI
 
-local InterfaceOptionsFrame_OpenToFrame = InterfaceOptionsFrame_OpenToFrame
 local GetSpellInfo = GetSpellInfo
 local LOCALIZED_CLASS_NAMES_MALE = LOCALIZED_CLASS_NAMES_MALE
 local CLASS_ICON_TCOORDS = CLASS_ICON_TCOORDS
@@ -799,7 +798,7 @@ function Gladdy:SetupOptions()
 end
 
 function Gladdy:ShowOptions()
-    InterfaceOptionsFrame_OpenToFrame("Gladdy")
+    LibStub("AceConfigDialog-3.0"):Open("Gladdy")
 end
 
 function Gladdy:GetAuras(auraType)
