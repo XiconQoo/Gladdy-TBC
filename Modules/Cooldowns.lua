@@ -3,8 +3,10 @@ local tbl_sort = table.sort
 local GetTime = GetTime
 local CreateFrame = CreateFrame
 local GetSpellInfo = GetSpellInfo
+local AURA_TYPE_BUFF = AURA_TYPE_BUFF
 
 local Gladdy = LibStub("Gladdy")
+local LCG = LibStub("LibCustomGlow-1.0")
 local L = Gladdy.L
 
 local function tableLength(tbl)
@@ -94,6 +96,7 @@ function Cooldowns:Initialize()
     self:RegisterMessage("UNIT_SPEC")
     self:RegisterMessage("UNIT_DEATH")
     self:RegisterMessage("UNIT_DESTROYED")
+    self:RegisterMessage("AURA_GAIN")
 end
 
 ---------------------
@@ -290,6 +293,7 @@ function Cooldowns:ClearIcon(button, index, spellId, icon)
     icon.cooldown:Hide()
     icon.cooldownFont:SetText("")
     icon:SetScript("OnUpdate", nil)
+    LCG:ButtonGlow_Stop(icon)
     tinsert(self.iconCache, icon)
 end
 
@@ -301,6 +305,7 @@ function Cooldowns:Test(unit)
     if Gladdy.frame.testing then
         self:UpdateTestCooldowns(unit)
     end
+    Cooldowns:AURA_GAIN(_, AURA_TYPE_BUFF, "22812", "Barkskin", _, 10, _, _, _, _, unit, true) -- unit, auraType, spellID, spellName, texture, duration, expirationTime
 end
 
 function Cooldowns:UpdateTestCooldowns(unit)
@@ -338,7 +343,45 @@ function Cooldowns:UNIT_SPEC(unit)
 end
 
 function Cooldowns:UNIT_DESTROYED(unit)
+    self:ResetUnit(unit)
+end
 
+--[[
+    /run local a=LibStub("Gladdy").modules["Cooldowns"] a:AURA_GAIN("arena1",22812)
+    /run local a=LibStub("Gladdy").modules["Cooldowns"] a:AURA_FADE("arena1",22812)
+--]]
+function Cooldowns:AURA_GAIN(_, auraType, spellID, spellName, _, duration, _, _, _, _, unitCaster, test)
+    local arenaUnit = test and unitCaster or Gladdy:GetArenaUnit(unitCaster)
+    if not Gladdy.db.cooldownIconGlow or not arenaUnit or not Gladdy.buttons[arenaUnit] or auraType ~= AURA_TYPE_BUFF then
+        return
+    end
+    local cooldownFrame = Gladdy.buttons[arenaUnit].spellCooldownFrame
+
+    local spellId = Cooldowns.cooldownSpellIds[spellName] -- don't use spellId from combatlog, in case of different spellrank
+    if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
+        spellId = spellID
+    end
+
+    for _,icon in pairs(cooldownFrame.icons) do
+        if (icon.spellId == spellId) then
+            if icon._ButtonGlow and not icon._ButtonGlow.animIn:IsPlaying() or not icon._ButtonGlow then
+                LCG.ButtonGlow_Start(icon, nil, 0.15)
+                C_Timer.NewTimer(duration, function() LCG.ButtonGlow_Stop(icon) end)
+            end
+        end
+    end
+end
+
+function Cooldowns:AURA_FADE(unit, spellID)
+    if not Gladdy.buttons[unit] then
+        return
+    end
+    local cooldownFrame = Gladdy.buttons[unit].spellCooldownFrame
+    for _,icon in pairs(cooldownFrame.icons) do
+        if (icon.spellId == spellID) then
+            LCG.ButtonGlow_Stop(icon)
+        end
+    end
 end
 
 ---------------------
@@ -573,7 +616,7 @@ function Cooldowns:GetOptions()
                             type = "range",
                             name = L["Cooldown size"],
                             desc = L["Size of each cd icon"],
-                            order = 4,
+                            order = 5,
                             min = 5,
                             max = 50,
                             width = "full",
@@ -582,7 +625,7 @@ function Cooldowns:GetOptions()
                             type = "range",
                             name = L["Icon Width Factor"],
                             desc = L["Stretches the icon"],
-                            order = 5,
+                            order = 6,
                             min = 0.5,
                             max = 2,
                             step = 0.05,
@@ -592,7 +635,7 @@ function Cooldowns:GetOptions()
                             type = "range",
                             name = L["Icon Padding"],
                             desc = L["Space between Icons"],
-                            order = 6,
+                            order = 7,
                             min = 0,
                             max = 10,
                             step = 0.1,

@@ -16,4 +16,5 @@
     <Include file="libs\DRList-1.0\DRList-1.0.xml"/>
     <Include file="libs\LibClassAuras-1.0\lib.xml"/>
     <Include file="libs\LibSpellRange-1.0\lib.xml"/>
+    <Include file="libs\LibCustomGlow-1.0\LibCustomGlow-1.0.lua"/>
 </Ui>

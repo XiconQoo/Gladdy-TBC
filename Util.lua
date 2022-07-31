@@ -5,6 +5,7 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local AuraUtil = AuraUtil
 local GetSpellInfo = GetSpellInfo
+local UnitIsUnit = UnitIsUnit
 
 ---------------------------
 
@@ -157,4 +158,16 @@ end
 local feignDeath = GetSpellInfo(5384)
 function Gladdy:isFeignDeath(unit)
     return AuraUtil.FindAuraByName(feignDeath, unit)
+end
+
+function Gladdy:GetArenaUnit(unitCaster)
+    if unitCaster then
+        for i=1,5 do
+            local arenaUnit = "arena" .. i
+            local arenaUnitPet = "arenapet" .. i
+            if unitCaster and (UnitIsUnit(arenaUnit, unitCaster) or UnitIsUnit(arenaUnitPet, unitCaster)) then
+                return arenaUnit
+            end
+        end
+    end
 end
