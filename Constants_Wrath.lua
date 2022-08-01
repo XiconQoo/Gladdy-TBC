@@ -309,6 +309,11 @@ local importantAuras = {
         priority = 30,
         spellID = 4167,
     },
+    [GetSpellInfo(47168)] = { -- Improved Wingclip
+        track = AURA_TYPE_DEBUFF,
+        priority = 30,
+        spellID = 47168,
+    },
 
     --- Stuns and incapacitates
     [GetSpellInfo(8983)] = { -- Bash
@@ -543,7 +548,7 @@ local importantAuras = {
     },
     [GetSpellInfo(2825)] = { -- Bloodlust
         track = AURA_TYPE_BUFF,
-        priority = 20,
+        priority = 9,
         spellID = 2825,
     },
     [GetSpellInfo(32182)] = { -- Heroism
@@ -573,18 +578,13 @@ local importantAuras = {
     },
     [GetSpellInfo(31821)] = { -- Aura mastery
         track = AURA_TYPE_BUFF,
-        priority = 20,
+        priority = 21,
         spellID = 31821,
     },
     [GetSpellInfo(51713)] = { -- Shadow Dance
         track = AURA_TYPE_BUFF,
         priority = 20,
         spellID = 51713,
-    },
-    [GetSpellInfo(7744)] = { -- Will of the Forsaken
-        track = AURA_TYPE_BUFF,
-        priority = 20,
-        spellID = 7744,
     },
     [GetSpellInfo(12292)] = { -- Death Wish
         track = AURA_TYPE_BUFF,
@@ -593,7 +593,7 @@ local importantAuras = {
     },
     [GetSpellInfo(23920)] = { -- Spell Reflection
         track = AURA_TYPE_BUFF,
-        priority = 50,
+        priority = 40,
         spellID = 23920,
     },
     [GetSpellInfo(6346)] = {-- Fear Ward
@@ -601,26 +601,31 @@ local importantAuras = {
         priority = 9,
         spellID = 6346,
     },
+    [GetSpellInfo(50334)] = {-- Berserk
+        track = AURA_TYPE_BUFF,
+        priority = 20,
+        spellID = 50334,
+    },
 
     --- Turtling abilities
     [GetSpellInfo(871)] = { -- Shield Wall
         track = AURA_TYPE_BUFF,
-        priority = 20,
+        priority = 25,
         spellID = 871,
     },
     [GetSpellInfo(48707)] = { -- Anti-Magic Shell
         track = AURA_TYPE_BUFF,
-        priority = 20,
+        priority = 25,
         spellID = 48707,
     },
     [GetSpellInfo(31224)] = { -- Cloak of Shadows
         track = AURA_TYPE_BUFF,
-        priority = 20,
+        priority = 25,
         spellID = 31224,
     },
     [GetSpellInfo(19263)] = { -- Deterrence
         track = AURA_TYPE_BUFF,
-        priority = 20,
+        priority = 25,
         spellID = 19263,
     },
     [GetSpellInfo(26669)] = { -- Evasion
@@ -630,7 +635,7 @@ local importantAuras = {
     },
 
     --- Immunities
-    [GetSpellInfo(34471)] = { -- The Beast Within
+    [GetSpellInfo(34471)] = { -- The Beast Within (CC Immune)
         track = AURA_TYPE_BUFF,
         priority = 20,
         spellID = 34471,
@@ -640,15 +645,25 @@ local importantAuras = {
         priority = 30,
         spellID = 45438,
     },
+    [GetSpellInfo(41425)] = { -- Hypothermia (Ice Block Immune
+        track = AURA_TYPE_DEBUFF,
+        priority = 8,
+        spellID = 41425,
+    },
     [GetSpellInfo(642)] = { -- Divine Shield
         track = AURA_TYPE_BUFF,
         priority = 30,
         spellID = 642,
     },
-    [GetSpellInfo(18499)] = { -- Berserker Rage
+    [GetSpellInfo(18499)] = { -- Berserker Rage (Flee Immune)
         track = AURA_TYPE_BUFF,
         priority = 30,
         spellID = 18499,
+    },
+    [GetSpellInfo(1719)] = { -- Recklessness (Flee Immune)
+        track = AURA_TYPE_BUFF,
+        priority = 30,
+        spellID = 1719,
     },
 
     --- Alt Stuff
