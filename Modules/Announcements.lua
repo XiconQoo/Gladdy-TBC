@@ -91,7 +91,7 @@ function Announcements:CAST_START(unit, spell)
     end
 
     if (self.RES_SPELLS[spell]) then
-        self:Send(L["RESURRECTING: %s (%s)"]:format(button.name, button.classLoc), 3, RAID_CLASS_COLORS[button.class])
+        self:Send(L["RESURRECTING: %s (%s)"]:format(button.name, button.classLoc), 3, RAID_CLASS_COLORS[button.class], unit)
     end
 end
 
@@ -105,7 +105,7 @@ function Announcements:ENEMY_SPOTTED(unit)
         if button.name == "Unknown" then
             button.name = UnitName(unit)
         end
-        self:Send("ENEMY SPOTTED:" .. ("%s (%s)"):format(button.name, button.classLoc), 0, RAID_CLASS_COLORS[button.class])
+        self:Send("ENEMY SPOTTED:" .. ("%s (%s)"):format(button.name, button.classLoc), 0, RAID_CLASS_COLORS[button.class], unit)
         self.enemy[unit] = true
     end
 end
@@ -118,7 +118,7 @@ function Announcements:UNIT_SPEC(unit, spec)
     if button.name == "Unknown" then
         button.name = UnitName(unit)
     end
-    self:Send(L["SPEC DETECTED: %s - %s (%s)"]:format(button.name, spec, button.classLoc), 0, RAID_CLASS_COLORS[button.class])
+    self:Send(L["SPEC DETECTED: %s - %s (%s)"]:format(button.name, spec, button.classLoc), 1, RAID_CLASS_COLORS[button.class], unit)
 end
 
 function Announcements:UNIT_HEALTH(unit, health, healthMax)
@@ -129,7 +129,7 @@ function Announcements:UNIT_HEALTH(unit, health, healthMax)
 
     local healthPercent = floor(health * 100 / healthMax)
     if (healthPercent < Gladdy.db.announcements.healthThreshold) then
-        self:Send(L["LOW HEALTH: %s (%s)"]:format(button.name, button.classLoc), 10, RAID_CLASS_COLORS[button.class])
+        self:Send(L["LOW HEALTH: %s (%s)"]:format(button.name, button.classLoc), 10, RAID_CLASS_COLORS[button.class], unit)
     end
 end
 
@@ -139,7 +139,7 @@ function Announcements:TRINKET_USED(unit)
         return
     end
 
-    self:Send(L["TRINKET USED: %s (%s)"]:format(button.name, button.classLoc), 0, RAID_CLASS_COLORS[button.class])
+    self:Send(L["TRINKET USED: %s (%s)"]:format(button.name, button.classLoc), 1, RAID_CLASS_COLORS[button.class], unit)
 end
 
 function Announcements:TRINKET_READY(unit)
@@ -148,15 +148,15 @@ function Announcements:TRINKET_READY(unit)
         return
     end
 
-    self:Send(L["TRINKET READY: %s (%s)"]:format(button.name, button.classLoc), 3, RAID_CLASS_COLORS[button.class])
+    self:Send(L["TRINKET READY: %s (%s)"]:format(button.name, button.classLoc), 1, RAID_CLASS_COLORS[button.class], unit)
 end
 
-function Announcements:SPELL_INTERRUPT(destUnit,spellID,spellName,spellSchool,extraSpellId,extraSpellName,extraSpellSchool)
-    local button = Gladdy.buttons[destUnit]
+function Announcements:SPELL_INTERRUPT(unit,spellID,spellName,spellSchool,extraSpellId,extraSpellName,extraSpellSchool)
+    local button = Gladdy.buttons[unit]
     if (not button or not Gladdy.db.announcements.spellInterrupt) then
         return
     end
-    self:Send(L["INTERRUPTED: %s (%s)"]:format(extraSpellName, button.name or ""), nil, RAID_CLASS_COLORS[button.class])
+    self:Send(L["INTERRUPTED: %s (%s)"]:format(extraSpellName, button.name or ""), nil, RAID_CLASS_COLORS[button.class], unit)
 end
 
 function Announcements:AURA_GAIN(unit, auraType, spellID, spellName)
@@ -166,7 +166,7 @@ function Announcements:AURA_GAIN(unit, auraType, spellID, spellName)
     end
 
     if (spellName == self.DRINK_AURA) then
-        self:Send(L["DRINKING: %s (%s)"]:format(button.name, button.classLoc), 3, RAID_CLASS_COLORS[button.class])
+        self:Send(L["DRINKING: %s (%s)"]:format(button.name, button.classLoc), 3, RAID_CLASS_COLORS[button.class], unit)
     end
 end
 
@@ -174,16 +174,17 @@ function Announcements:SHADOWSIGHT(msg)
     self:Send(msg, 2)
 end
 
-function Announcements:Send(msg, throttle, color)
+function Announcements:Send(msg, throttle, color, unit)
     if (throttle and throttle > 0) then
-        if (not self.throttled[msg]) then
-            self.throttled[msg] = GetTime() + throttle
-            Gladdy:Debug("INFO", msg, "- NOT THROTTLED -", self.throttled[msg])
-        elseif (self.throttled[msg] < GetTime()) then
-            Gladdy:Debug("INFO", msg, "- THROTTLED OVER -", self.throttled[msg])
-            self.throttled[msg] = GetTime() + throttle
+        local throttledMsg = unit and msg .. unit or msg
+        if (not self.throttled[throttledMsg]) then
+            self.throttled[throttledMsg] = GetTime() + throttle
+            Gladdy:Debug("INFO", throttledMsg, "- NOT THROTTLED -", self.throttled[throttledMsg])
+        elseif (self.throttled[throttledMsg] < GetTime()) then
+            Gladdy:Debug("INFO", throttledMsg, "- THROTTLED OVER -", self.throttled[throttledMsg])
+            self.throttled[throttledMsg] = GetTime() + throttle
         else
-            Gladdy:Debug("INFO", msg, "- THROTTLED -", self.throttled[msg])
+            Gladdy:Debug("INFO", throttledMsg, "- THROTTLED -", self.throttled[throttledMsg])
             return
         end
     end
