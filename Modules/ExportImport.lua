@@ -24,6 +24,7 @@ local function table_copy(t, str)
 end
 
 local ExportImport = Gladdy:NewModule("Export Import", nil, {
+    expansion = Gladdy.expansion,
 })
 
 local export = AceGUI:Create("Frame")
@@ -112,6 +113,18 @@ local deletedOptions = { -- backwards compatibility
     padding = true,
     growUp = true,
     powerBarFontSize = true,
+    ["38373"] = true, -- The Beast Within (Auras)
+    ["34692"] = true, -- The Beast Within (Cooldowns)
+}
+
+local expansionSpecific = {
+    "drCategories",
+    "auraListDefault",
+    "auraListInterrupts",
+    "trackedDebuffs",
+    "trackedBuffs",
+    "cooldownCooldowns",
+    "cooldownCooldownsOrder",
 }
 
 local function checkIsDeletedOption(k, str, msg, errorFound, errorMsg)
@@ -162,7 +175,7 @@ function ExportImport:CheckDeserializedOptions(tbl, refTbl, str)
     end
 
     if errorFound then
-        return false, errorMsg
+        --return false, errorMsg
     end
     return true
 end
@@ -227,17 +240,29 @@ function ExportImport:ApplyImport(t, table, str)
         if (not t.newLayout) then
             table.newLayout = false
         end
+        if not t.expansion then
+            t.expansion = "BCC"
+        end
     end
     for k,v in pairs(t) do
-        if type(v) == "table" then
-            if (table[k] ~= nil) then
-                ExportImport:ApplyImport(v, table[k], str .. "." .. k)
-            else
-                Gladdy:Debug("ERROR", "ApplyImport failed for", str .. "." .. k)
+        local skip = k == "expansion"
+        if t.expansion and t.expansion ~= table.expansion then
+            if Gladdy:contains(k, expansionSpecific) then
+                Gladdy:Debug("WARN", "ExportImport:ApplyImport", "skipped", k, "- import string expansion is", t.expansion, "- current expansion is", table.expansion)
+                skip = true
             end
+        end
+        if not skip then
+            if type(v) == "table" then
+                if (table[k] ~= nil) then
+                    ExportImport:ApplyImport(v, table[k], str .. "." .. k)
+                else
+                    Gladdy:Debug("ERROR", "ExportImport:ApplyImport", "failed for", str .. "." .. k)
+                end
 
-        else
-            table[k] = v
+            else
+                table[k] = v
+            end
         end
     end
 end

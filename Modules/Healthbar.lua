@@ -118,7 +118,7 @@ function Healthbar:CreateFrame(unit)
 end
 
 function Healthbar.OnEvent(self, event, unit)
-    local isDead = UnitExists(unit) and UnitIsDeadOrGhost(unit)
+    local isDead = UnitExists(unit) and UnitIsDeadOrGhost(unit) and not Gladdy:isFeignDeath(unit)
     if event == "UNIT_HEALTH_FREQUENT" or event == "UNIT_MAXHEALTH" then
         if isDead then
             Gladdy:SendMessage("UNIT_DEATH", unit)
@@ -207,7 +207,7 @@ function Healthbar:SetHealthText(healthBar, health, healthMax)
     local healthText = ""
     local healthPercentage = health and healthMax and floor(health * 100 / healthMax)
 
-    if health == 0 and UnitExists(healthBar.unit) and UnitIsDeadOrGhost(healthBar.unit) then
+    if health == 0 and UnitExists(healthBar.unit) and UnitIsDeadOrGhost(healthBar.unit) and not Gladdy:isFeignDeath(healthBar.unit) then
         self:UNIT_DEATH(healthBar.unit)
         return
     end

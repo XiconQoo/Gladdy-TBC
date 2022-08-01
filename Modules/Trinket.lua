@@ -13,6 +13,7 @@ local Trinket = Gladdy:NewModule("Trinket", 80, {
     trinketEnabled = true,
     trinketSize = 60 + 20 + 1,
     trinketWidthFactor = 0.9,
+    trinketIconZoomed = false,
     trinketBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     trinketBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     trinketDisableCircle = false,
@@ -33,12 +34,19 @@ function Trinket:Initialize()
     self.frames = {}
     if Gladdy.db.trinketEnabled then
         self:RegisterMessage("JOINED_ARENA")
+        self:RegisterMessage("TRINKET_USED")
+        if Gladdy.expansion == "Wrath" then
+            self:RegisterMessage("RACIAL_USED")
+        end
     end
 end
 
 function Trinket:UpdateFrameOnce()
     if Gladdy.db.trinketEnabled then
         self:RegisterMessage("JOINED_ARENA")
+        if Gladdy.expansion == "Wrath" then
+            self:RegisterMessage("RACIAL_USED")
+        end
     else
         self:UnregisterAllMessages()
     end
@@ -94,6 +102,7 @@ function Trinket:CreateFrame(unit)
     trinket.texture:SetAllPoints(trinket)
     trinket.texture:SetTexture("Interface\\Icons\\INV_Jewelry_TrinketPVP_02")
     trinket.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
+    trinket.texture.masked = true
 
     trinket.cooldown = CreateFrame("Cooldown", nil, trinket, "CooldownFrameTemplate")
     trinket.cooldown.noCooldownCount = true --Gladdy.db.trinketDisableOmniCC
@@ -137,17 +146,7 @@ function Trinket:UpdateFrame(unit)
         return
     end
 
-    if Gladdy.db.trinketColored then
-        if trinket.active then
-            trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredCd))
-        else
-            trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredNoCd))
-        end
-        trinket.texture:SetTexture()
-    else
-        trinket:SetBackdropColor(0,0,0,0)
-        trinket.texture:SetTexture("Interface\\Icons\\INV_Jewelry_TrinketPVP_02")
-    end
+    local testAgain = false
 
     local width, height = Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor, Gladdy.db.trinketSize
 
@@ -162,8 +161,14 @@ function Trinket:UpdateFrame(unit)
 
     trinket:SetWidth(width)
     trinket:SetHeight(height)
-    trinket.cooldown:SetWidth(width - width/16)
-    trinket.cooldown:SetHeight(height - height/16)
+    if Gladdy.db.trinketIconZoomed then
+        trinket.cooldown:SetWidth(width)
+        trinket.cooldown:SetHeight(height)
+
+    else
+        trinket.cooldown:SetWidth(width - width/16)
+        trinket.cooldown:SetHeight(height - height/16)
+    end
     trinket.cooldown:ClearAllPoints()
     trinket.cooldown:SetPoint("CENTER", trinket, "CENTER")
     trinket.cooldown.noCooldownCount = true -- Gladdy.db.trinketDisableOmniCC
@@ -174,6 +179,36 @@ function Trinket:UpdateFrame(unit)
 
     trinket.texture.overlay:SetTexture(Gladdy.db.trinketBorderStyle)
     trinket.texture.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.trinketBorderColor))
+
+    if Gladdy.db.trinketIconZoomed then
+        if trinket.texture.masked then
+            trinket.texture:SetMask(nil)
+            trinket.texture:SetTexCoord(0.1,0.9,0.1,0.9)
+            trinket.texture.masked = nil
+        end
+    else
+        if not trinket.texture.masked then
+            trinket.texture:SetMask(nil)
+            trinket.texture:SetTexCoord(0,1,0,1)
+            trinket.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
+            trinket.texture.masked = true
+            if Gladdy.frame.testing then
+                testAgain = true
+            end
+        end
+    end
+
+    if Gladdy.db.trinketColored then
+        if trinket.active then
+            trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredCd))
+        else
+            trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredNoCd))
+        end
+        trinket.texture:SetTexture()
+    else
+        trinket:SetBackdropColor(0,0,0,0)
+        trinket.texture:SetTexture("Interface\\Icons\\INV_Jewelry_TrinketPVP_02")
+    end
 
     Gladdy:SetPosition(trinket, unit, "trinketXOffset", "trinketYOffset", Trinket:LegacySetPosition(trinket, unit), Trinket)
 
@@ -214,6 +249,10 @@ function Trinket:UpdateFrame(unit)
         trinket:Hide()
     else
         trinket:Show()
+        if testAgain then
+            Trinket:ResetUnit(unit)
+            Trinket:Test(unit)
+        end
     end
 end
 
@@ -228,6 +267,7 @@ function Trinket:ResetUnit(unit)
         return
     end
 
+    trinket.itemID = nil
     trinket.timeLeft = nil
     trinket.active = false
     trinket.cooldown:Clear()
@@ -239,13 +279,14 @@ function Trinket:Test(unit)
     if (not trinket) then
         return
     end
-    if (unit == "arena2" or unit == "arena3") then
-        self:Used(unit, GetTime() * 1000, 120000)
+    if (unit == "arena1" or unit == "arena2") then
+        Gladdy:SendMessage("TRINKET_USED", unit)
     end
 end
 
 function Trinket:JOINED_ARENA()
     self:RegisterEvent("ARENA_COOLDOWNS_UPDATE")
+    self:RegisterEvent("ARENA_CROWD_CONTROL_SPELL_UPDATE")
     self:SetScript("OnEvent", function(self, event, ...)
         if self[event] then
             self[event](self, ...)
@@ -253,13 +294,52 @@ function Trinket:JOINED_ARENA()
     end)
 end
 
+function Trinket:ARENA_CROWD_CONTROL_SPELL_UPDATE(...)
+    local unitID, spellID, itemID = ...
+    Gladdy:Debug("INFO", "Trinket:ARENA_CROWD_CONTROL_SPELL_UPDATE", unitID, spellID, itemID)
+    if Gladdy.buttons[unitID] and Gladdy:GetPvpTrinkets()[itemID] then
+        Gladdy.buttons[unitID].trinket.itemID = itemID
+        if not Gladdy.db.trinketColored then
+            self.frames[unitID].texture:SetTexture(GetItemIcon(itemID))
+        end
+    end
+end
+
+function Trinket:TRINKET_USED(unit)
+    if Gladdy.buttons[unit] then
+        self:Used(unit, GetTime() * 1000,
+                Gladdy.buttons[unit].trinket.itemID and Gladdy:GetPvpTrinkets()[Gladdy.buttons[unit].trinket.itemID]
+                        or 120000)
+    end
+end
+
+function Trinket:RACIAL_USED(unit) -- Wrath only
+    local trinket = self.frames[unit]
+    if (not trinket) then
+        return
+    end
+    if Gladdy.buttons[unit].race == "Scourge" then
+        if trinket.active and trinket.timeLeft >= 45 then
+            -- do nothing
+        else
+            self:Used(unit, GetTime() * 1000, 45000)
+        end
+    elseif Gladdy.buttons[unit].race == "Human" then
+        self:Used(unit, GetTime() * 1000, 120000)
+    end
+end
+
 function Trinket:ARENA_COOLDOWNS_UPDATE()
     for i=1, Gladdy.curBracket do
-        local unit = "arena" .. i
-        local spellID, itemID, startTime, duration = C_PvP.GetArenaCrowdControlInfo(unit);
+        local unitID = "arena" .. i
+        local spellID, itemID, startTime, duration = C_PvP.GetArenaCrowdControlInfo(unitID)
         if (spellID) then
+            Gladdy:Debug("INFO", "Trinket:ARENA_COOLDOWNS_UPDATE", spellID, itemID, startTime, duration)
+            if not Gladdy.db.trinketColored and Gladdy:GetPvpTrinkets()[itemID] then
+                self.frames[unitID].texture:SetTexture(GetItemIcon(itemID))
+            end
             if (startTime ~= 0 and duration ~= 0) then
-                self:Used(unit, startTime, duration)
+                self:Used(unitID, startTime, duration)
             end
         end
     end
@@ -267,18 +347,17 @@ end
 
 function Trinket:Used(unit, startTime, duration)
     local trinket = self.frames[unit]
-    if (not trinket) then
+    if (not trinket or not Gladdy.db.trinketEnabled) then
         return
     end
-    if not trinket.active then
+    --if not trinket.active then
         trinket.timeLeft = (startTime/1000.0 + duration/1000.0) - GetTime()
         if not Gladdy.db.trinketDisableCircle then trinket.cooldown:SetCooldown(startTime/1000.0, duration/1000.0) end
         trinket.active = true
         if Gladdy.db.trinketColored then
             trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredCd))
         end
-        Gladdy:SendMessage("TRINKET_USED", unit)
-    end
+    --end
 end
 
 function Trinket:GetOptions()
@@ -346,14 +425,21 @@ function Trinket:GetOptions()
             args = {
                 general = {
                     type = "group",
-                    name = L["Size"],
+                    name = L["Icon"],
                     order = 1,
                     args = {
                         header = {
                             type = "header",
-                            name = L["Size"],
+                            name = L["Icon"],
                             order = 1,
                         },
+                        trinketIconZoomed = Gladdy:option({
+                            type = "toggle",
+                            name = L["Zoomed Icon"],
+                            desc = L["Zoomes the icon to remove borders"],
+                            order = 2,
+                            width = "full",
+                        }),
                         trinketSize = Gladdy:option({
                             type = "range",
                             name = L["Size"],

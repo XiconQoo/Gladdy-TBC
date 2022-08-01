@@ -3,7 +3,6 @@ local tostring, str_match, tonumber, str_format = tostring, string.match, tonumb
 local ceil, floor = ceil, floor
 local ReloadUI = ReloadUI
 
-local InterfaceOptionsFrame_OpenToFrame = InterfaceOptionsFrame_OpenToFrame
 local GetSpellInfo = GetSpellInfo
 local LOCALIZED_CLASS_NAMES_MALE = LOCALIZED_CLASS_NAMES_MALE
 local CLASS_ICON_TCOORDS = CLASS_ICON_TCOORDS
@@ -799,7 +798,7 @@ function Gladdy:SetupOptions()
 end
 
 function Gladdy:ShowOptions()
-    InterfaceOptionsFrame_OpenToFrame("Gladdy")
+    LibStub("AceConfigDialog-3.0"):Open("Gladdy")
 end
 
 function Gladdy:GetAuras(auraType)
@@ -934,6 +933,17 @@ function Gladdy:GetAuras(auraType)
             defaultDebuffs[tostring(classSpells[i].id[1])] = true
         end
         return args
+    end
+    if Gladdy.expansion == "Wrath" then
+        spells.deathknight = {
+            order = 3,
+            type = "group",
+            name = LOCALIZED_CLASS_NAMES_MALE["DEATHKNIGHT"],
+            icon = "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes",
+            iconCoords = CLASS_ICON_TCOORDS["DEATHKNIGHT"],
+            args = {},
+        }
+        spells.deathknight.args = assignForClass("DEATHKNIGHT")
     end
     spells.druid.args = assignForClass("DRUID")
     spells.hunter.args = assignForClass("HUNTER")

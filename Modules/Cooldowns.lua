@@ -3,8 +3,10 @@ local tbl_sort = table.sort
 local GetTime = GetTime
 local CreateFrame = CreateFrame
 local GetSpellInfo = GetSpellInfo
+local AURA_TYPE_BUFF = AURA_TYPE_BUFF
 
 local Gladdy = LibStub("Gladdy")
+local LCG = LibStub("LibCustomGlow-1.0")
 local L = Gladdy.L
 
 local function tableLength(tbl)
@@ -56,6 +58,10 @@ local Cooldowns = Gladdy:NewModule("Cooldowns", nil, {
     cooldownYOffset = 0,
     cooldownXOffset = 0,
     cooldownSize = 30,
+    cooldownIconGlow = true,
+    cooldownIconZoomed = false,
+    cooldownIconDesaturateOnCooldown = false,
+    cooldownIconAlphaOnCooldown = 1,
     cooldownWidthFactor = 1,
     cooldownIconPadding = 1,
     cooldownMaxIconsPerLine = 10,
@@ -94,6 +100,7 @@ function Cooldowns:Initialize()
     self:RegisterMessage("UNIT_SPEC")
     self:RegisterMessage("UNIT_DEATH")
     self:RegisterMessage("UNIT_DESTROYED")
+    self:RegisterMessage("AURA_GAIN")
 end
 
 ---------------------
@@ -123,6 +130,7 @@ function Cooldowns:CreateIcon() -- returns iconFrame
 
         icon.texture = icon:CreateTexture(nil, "BACKGROUND")
         icon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
+        icon.texture.masked = true
         icon.texture:SetAllPoints(icon)
 
         icon.cooldown = CreateFrame("Cooldown", nil, icon, "CooldownFrameTemplate")
@@ -158,8 +166,13 @@ function Cooldowns:UpdateIcon(icon)
     icon.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), Gladdy.db.cooldownSize / 2 * Gladdy.db.cooldownFontScale, "OUTLINE")
     icon.cooldownFont:SetTextColor(Gladdy:SetColor(Gladdy.db.cooldownFontColor))
 
-    icon.cooldown:SetWidth(icon:GetWidth() - icon:GetWidth()/16)
-    icon.cooldown:SetHeight(icon:GetHeight() - icon:GetHeight()/16)
+    if Gladdy.db.cooldownIconZoomed then
+        icon.cooldown:SetWidth(icon:GetWidth())
+        icon.cooldown:SetHeight(icon:GetHeight())
+    else
+        icon.cooldown:SetWidth(icon:GetWidth() - icon:GetWidth()/16)
+        icon.cooldown:SetHeight(icon:GetHeight() - icon:GetHeight()/16)
+    end
     icon.cooldown:ClearAllPoints()
     icon.cooldown:SetPoint("CENTER", icon, "CENTER")
     icon.cooldown:SetAlpha(Gladdy.db.cooldownCooldownAlpha)
@@ -169,6 +182,31 @@ function Cooldowns:UpdateIcon(icon)
 
     icon.border:SetTexture(Gladdy.db.cooldownBorderStyle)
     icon.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.cooldownBorderColor))
+
+    if Gladdy.db.cooldownIconZoomed then
+        if icon.texture.masked then
+            icon.texture:SetMask(nil)
+            icon.texture:SetTexCoord(0.1,0.9,0.1,0.9)
+            icon.texture.masked = nil
+        end
+    else
+        if not icon.texture.masked then
+            icon.texture:SetMask(nil)
+            icon.texture:SetTexCoord(0,1,0,1)
+            icon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
+            icon.texture.masked = true
+        end
+    end
+    if Gladdy.db.cooldownIconDesaturateOnCooldown and icon.active then
+        icon.texture:SetDesaturated(true)
+    else
+        icon.texture:SetDesaturated(false)
+    end
+    if Gladdy.db.cooldownIconAlphaOnCooldown < 1 and icon.active then
+        icon.texture:SetAlpha(Gladdy.db.cooldownIconAlphaOnCooldown)
+    else
+        icon.texture:SetAlpha(1)
+    end
 end
 
 function Cooldowns:IconsSetPoint(button)
@@ -221,6 +259,7 @@ end
 function Cooldowns:UpdateFrame(unit)
     local button = Gladdy.buttons[unit]
     -- Cooldown frame
+    local testAgain = false
     if (Gladdy.db.cooldown) then
         button.spellCooldownFrame:SetHeight(Gladdy.db.cooldownSize)
         button.spellCooldownFrame:SetWidth(1)
@@ -246,12 +285,24 @@ function Cooldowns:UpdateFrame(unit)
 
         -- Update each cooldown icon
         for _,icon in pairs(button.spellCooldownFrame.icons) do
+            testAgain = icon.texture.masked
             self:UpdateIcon(icon)
+            if icon.texture.masked ~= testAgain then
+                testAgain = true
+            else
+                testAgain = false
+            end
         end
         self:IconsSetPoint(button)
         button.spellCooldownFrame:Show()
     else
         button.spellCooldownFrame:Hide()
+    end
+    if testAgain and Gladdy.frame.testing then
+        Cooldowns:ResetUnit(unit)
+        Cooldowns:ENEMY_SPOTTED(unit)
+        Cooldowns:UNIT_SPEC(unit)
+        Cooldowns:Test(unit)
     end
 end
 
@@ -290,6 +341,7 @@ function Cooldowns:ClearIcon(button, index, spellId, icon)
     icon.cooldown:Hide()
     icon.cooldownFont:SetText("")
     icon:SetScript("OnUpdate", nil)
+    LCG:ButtonGlow_Stop(icon)
     tinsert(self.iconCache, icon)
 end
 
@@ -301,6 +353,7 @@ function Cooldowns:Test(unit)
     if Gladdy.frame.testing then
         self:UpdateTestCooldowns(unit)
     end
+    Cooldowns:AURA_GAIN(_, AURA_TYPE_BUFF, "22812", "Barkskin", _, 20, _, _, _, _, unit, true) -- unit, auraType, spellID, spellName, texture, duration, expirationTime
 end
 
 function Cooldowns:UpdateTestCooldowns(unit)
@@ -338,7 +391,45 @@ function Cooldowns:UNIT_SPEC(unit)
 end
 
 function Cooldowns:UNIT_DESTROYED(unit)
+    self:ResetUnit(unit)
+end
 
+--[[
+    /run local a=LibStub("Gladdy").modules["Cooldowns"] a:AURA_GAIN("arena1",22812)
+    /run local a=LibStub("Gladdy").modules["Cooldowns"] a:AURA_FADE("arena1",22812)
+--]]
+function Cooldowns:AURA_GAIN(_, auraType, spellID, spellName, _, duration, _, _, _, _, unitCaster, test)
+    local arenaUnit = test and unitCaster or Gladdy:GetArenaUnit(unitCaster, true)
+    if not Gladdy.db.cooldownIconGlow or not arenaUnit or not Gladdy.buttons[arenaUnit] or auraType ~= AURA_TYPE_BUFF then
+        return
+    end
+    local cooldownFrame = Gladdy.buttons[arenaUnit].spellCooldownFrame
+
+    local spellId = Cooldowns.cooldownSpellIds[spellName] -- don't use spellId from combatlog, in case of different spellrank
+    if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
+        spellId = spellID
+    end
+
+    for _,icon in pairs(cooldownFrame.icons) do
+        if (icon.spellId == spellId) then
+            if icon._ButtonGlow and not icon._ButtonGlow.animIn:IsPlaying() or not icon._ButtonGlow then
+                LCG.ButtonGlow_Start(icon, nil, 0.15)
+                C_Timer.NewTimer(duration, function() LCG.ButtonGlow_Stop(icon) end)
+            end
+        end
+    end
+end
+
+function Cooldowns:AURA_FADE(unit, spellID)
+    if not Gladdy.buttons[unit] then
+        return
+    end
+    local cooldownFrame = Gladdy.buttons[unit].spellCooldownFrame
+    for _,icon in pairs(cooldownFrame.icons) do
+        if (icon.spellId == spellID) then
+            LCG.ButtonGlow_Stop(icon)
+        end
+    end
 end
 
 ---------------------
@@ -355,6 +446,13 @@ function Cooldowns:CooldownStart(button, spellId, duration, start)
             icon.active = true
             icon.timeLeft = start and start - GetTime() + duration or duration
             if (not Gladdy.db.cooldownDisableCircle) then icon.cooldown:SetCooldown(start or GetTime(), duration) end
+            if Gladdy.db.cooldownIconDesaturateOnCooldown then
+                icon.texture:SetDesaturated(true)
+            end
+            if Gladdy.db.cooldownIconAlphaOnCooldown < 1 then
+                icon.texture:SetAlpha(Gladdy.db.cooldownIconAlphaOnCooldown)
+            end
+            --if math.random(1, 30 ) > 10 then LCG.ButtonGlow_Start(icon, nil, 0.15) end
             icon:SetScript("OnUpdate", function(self, elapsed)
                 self.timeLeft = self.timeLeft - elapsed
                 local timeLeft = ceil(self.timeLeft)
@@ -378,21 +476,29 @@ function Cooldowns:CooldownStart(button, spellId, duration, start)
     end
 end
 
+local function resetIcon(icon)
+    if Gladdy.db.cooldownIconDesaturateOnCooldown then
+        icon.texture:SetDesaturated(false)
+    end
+    if Gladdy.db.cooldownIconAlphaOnCooldown < 1 then
+        icon.texture:SetAlpha(1)
+    end
+    icon.active = false
+    icon.cooldown:Hide()
+    icon.cooldownFont:SetText("")
+    icon:SetScript("OnUpdate", nil)
+    --LCG.ButtonGlow_Stop(icon)
+end
+
 function Cooldowns:CooldownReady(button, spellId, frame)
     if (frame == false) then
         for _,icon in pairs(button.spellCooldownFrame.icons) do
             if (icon.spellId == spellId) then
-                icon.active = false
-                icon.cooldown:Hide()
-                icon.cooldownFont:SetText("")
-                icon:SetScript("OnUpdate", nil)
+                resetIcon(icon)
             end
         end
     else
-        frame.active = false
-        frame.cooldown:Hide()
-        frame.cooldownFont:SetText("")
-        frame:SetScript("OnUpdate", nil)
+        resetIcon(frame)
     end
 end
 
@@ -495,7 +601,7 @@ function Cooldowns:AddCooldown(spellID, value, button)
         icon.texture:SetTexture(self.spellTextures[spellID])
         tinsert(button.spellCooldownFrame.icons, icon)
         self:IconsSetPoint(button)
-        Gladdy:Debug("Cooldowns:AddCooldown", button.unit, GetSpellInfo(spellID))
+        Gladdy:Debug("INFO", "Cooldowns:AddCooldown", button.unit, GetSpellInfo(spellID))
     end
 end
 
@@ -569,11 +675,18 @@ function Cooldowns:GetOptions()
                             name = L["Icon"],
                             order = 2,
                         },
+                        cooldownIconZoomed = Gladdy:option({
+                            type = "toggle",
+                            name = L["Zoomed Icon"],
+                            desc = L["Zoomes the icon to remove borders"],
+                            order = 4,
+                            width = "full",
+                        }),
                         cooldownSize = Gladdy:option({
                             type = "range",
                             name = L["Cooldown size"],
                             desc = L["Size of each cd icon"],
-                            order = 4,
+                            order = 5,
                             min = 5,
                             max = 50,
                             width = "full",
@@ -582,7 +695,7 @@ function Cooldowns:GetOptions()
                             type = "range",
                             name = L["Icon Width Factor"],
                             desc = L["Stretches the icon"],
-                            order = 5,
+                            order = 6,
                             min = 0.5,
                             max = 2,
                             step = 0.05,
@@ -592,7 +705,7 @@ function Cooldowns:GetOptions()
                             type = "range",
                             name = L["Icon Padding"],
                             desc = L["Space between Icons"],
-                            order = 6,
+                            order = 7,
                             min = 0,
                             max = 10,
                             step = 0.1,
@@ -609,6 +722,35 @@ function Cooldowns:GetOptions()
                             type = "header",
                             name = L["Cooldown"],
                             order = 2,
+                        },
+                        cooldownIconGlow = Gladdy:option({
+                            type = "toggle",
+                            name = L["Glow Icon"],
+                            desc = L["Glow the icon when cooldown active"],
+                            order = 3,
+                            width = "full",
+                        }),
+                        cooldownIconDesaturateOnCooldown = Gladdy:option({
+                            type = "toggle",
+                            name = L["Desaturate Icon"],
+                            order = 4,
+                            width = "full",
+                        }),
+                        cooldownIconAlphaOnCooldown = Gladdy:option({
+                            type = "range",
+                            name = L["Cooldown alpha on CD"],
+                            desc = L["Alpha of the icon when cooldown active"],
+                            desc = L["changes "],
+                            order = 5,
+                            min = 0,
+                            max = 1,
+                            step = 0.1,
+                            width = "full",
+                        }),
+                        headerCircle = {
+                            type = "header",
+                            name = L["Cooldowncircle"],
+                            order = 6,
                         },
                         cooldownDisableCircle = Gladdy:option({
                             type = "toggle",

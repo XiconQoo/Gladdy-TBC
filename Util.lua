@@ -3,6 +3,9 @@ local floor = math.floor
 local str_find, str_gsub, str_sub, tinsert = string.find, string.gsub, string.sub, table.insert
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
+local AuraUtil = AuraUtil
+local GetSpellInfo = GetSpellInfo
+local UnitIsUnit = UnitIsUnit
 
 ---------------------------
 
@@ -140,5 +143,40 @@ function Gladdy:GetTagOption(name, order, enabledOption, func, toggle)
                     "\n|cff1ac742[spec]|r - Shows spec\n\n" ..
                     "Can be combined with OR operator like |cff1ac742[percent|status]|r. The last valid option will be used.\n"],
         })
+    end
+end
+
+function Gladdy:contains(entry, list)
+    for _,v in pairs(list) do
+        if entry == v then
+            return true
+        end
+    end
+    return false
+end
+
+local feignDeath = GetSpellInfo(5384)
+function Gladdy:isFeignDeath(unit)
+    return AuraUtil.FindAuraByName(feignDeath, unit)
+end
+
+function Gladdy:GetArenaUnit(unitCaster, unify)
+    if unitCaster then
+        for i=1,5 do
+            local arenaUnit = "arena" .. i
+            local arenaUnitPet = "arenapet" .. i
+            if unify then
+                if unitCaster and (UnitIsUnit(arenaUnit, unitCaster) or UnitIsUnit(arenaUnitPet, unitCaster)) then
+                    return arenaUnit
+                end
+            else
+                if unitCaster and UnitIsUnit(arenaUnit, unitCaster) then
+                    return arenaUnit
+                end
+                if unitCaster and UnitIsUnit(arenaUnitPet, unitCaster) then
+                    return arenaUnitPet
+                end
+            end
+        end
     end
 end

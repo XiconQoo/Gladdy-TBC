@@ -20,10 +20,12 @@ local BuffsDebuffs = Gladdy:NewModule("Buffs and Debuffs", nil, {
     buffsAlpha = 1,
     buffsIconSize = 30,
     buffsWidthFactor = 1,
+    buffsIconZoomed = false,
     buffsIconPadding = 1,
     buffsBuffsAlpha = 1,
     buffsBuffsIconSize = 30,
     buffsBuffsWidthFactor = 1,
+    buffsBuffsIconZoomed = false,
     buffsBuffsIconPadding = 1,
     buffsDisableCircle = false,
     buffsCooldownAlpha = 1,
@@ -42,25 +44,30 @@ local BuffsDebuffs = Gladdy:NewModule("Buffs and Debuffs", nil, {
     buffsBorderColorsEnabled = true,
     trackedDebuffs = defaultTrackedDebuffs,
     trackedBuffs = defaultTrackedBuffs,
-    buffsBorderColorCurse = Gladdy:GetAuraTypeColor()["curse"],
-    buffsBorderColorMagic = Gladdy:GetAuraTypeColor()["magic"],
-    buffsBorderColorPoison = Gladdy:GetAuraTypeColor()["poison"],
-    buffsBorderColorPhysical = Gladdy:GetAuraTypeColor()["none"],
-    buffsBorderColorImmune = Gladdy:GetAuraTypeColor()["immune"],
-    buffsBorderColorDisease = Gladdy:GetAuraTypeColor()["disease"],
-    buffsBorderColorForm = Gladdy:GetAuraTypeColor()["form"],
-    buffsBorderColorAura = Gladdy:GetAuraTypeColor()["aura"],
+    buffsBorderColorEnrage = Gladdy:GetDispelTypeColors()["enrage"],
+    buffsBorderColorCurse = Gladdy:GetDispelTypeColors()["curse"],
+    buffsBorderColorMagic = Gladdy:GetDispelTypeColors()["magic"],
+    buffsBorderColorPoison = Gladdy:GetDispelTypeColors()["poison"],
+    buffsBorderColorPhysical = Gladdy:GetDispelTypeColors()["none"],
+    buffsBorderColorImmune = Gladdy:GetDispelTypeColors()["immune"],
+    buffsBorderColorDisease = Gladdy:GetDispelTypeColors()["disease"],
+    buffsBorderColorForm = Gladdy:GetDispelTypeColors()["form"],
+    buffsBorderColorAura = Gladdy:GetDispelTypeColors()["aura"],
     buffFrameStrata = "MEDIUM",
     buffsFrameLevel = 9,
 })
 
-local spellSchoolToOptionValueTable
-local function spellSchoolToOptionValue(spellSchool)
-    if Gladdy.db.buffsBorderColorsEnabled and spellSchool then
-        return spellSchoolToOptionValueTable[spellSchool].r,
-        spellSchoolToOptionValueTable[spellSchool].g,
-        spellSchoolToOptionValueTable[spellSchool].b,
-        spellSchoolToOptionValueTable[spellSchool].a
+local dispelTypeToOptionValueTable
+local function dispelTypeToOptionValue(dispelType)
+    if Gladdy.db.buffsBorderColorsEnabled then
+        dispelType = dispelType and lower(dispelType) or "physical"
+        if not dispelTypeToOptionValueTable[dispelType] then
+            dispelType = "physical"
+        end
+        return dispelTypeToOptionValueTable[dispelType].r,
+        dispelTypeToOptionValueTable[dispelType].g,
+        dispelTypeToOptionValueTable[dispelType].b,
+        dispelTypeToOptionValueTable[dispelType].a
     else
         return Gladdy:SetColor(Gladdy.db.buffsBorderColor)
     end
@@ -86,14 +93,18 @@ function BuffsDebuffs:Initialize()
                 "AURA_GAIN_LIMIT")
         self:SetScript("OnEvent", BuffsDebuffs.OnEvent)
     end
-    spellSchoolToOptionValueTable = {
-        curse = Gladdy.db.buffsBorderColorCurse,
+    dispelTypeToOptionValueTable = {
+        none = Gladdy.db.buffsBorderColorPhysical,
         magic = Gladdy.db.buffsBorderColorMagic,
+        curse = Gladdy.db.buffsBorderColorCurse,
+        disease = Gladdy.db.buffsBorderColorDisease,
         poison = Gladdy.db.buffsBorderColorPoison,
+        stealth = Gladdy.db.buffsBorderColorPhysical,
+        invisibility = Gladdy.db.buffsBorderColorPhysical,
         physical = Gladdy.db.buffsBorderColorPhysical,
         immune = Gladdy.db.buffsBorderColorImmune,
-        disease = Gladdy.db.buffsBorderColorDisease,
         form = Gladdy.db.buffsBorderColorForm,
+        enrage = Gladdy.db.buffsBorderColorEnrage,
     }
 
 end
@@ -137,7 +148,7 @@ end
 
 function BuffsDebuffs:Test(unit)
     if Gladdy.db.buffsEnabled then
-        local spellSchools = { "physical", "magic", "curse", "poison", "disease", "immune" }
+        local dispelTypes = { "physical", "magic", "curse", "poison", "disease", "immune", "enrage"}
 
         BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_DEBUFF)
         BuffsDebuffs:AURA_FADE(unit, AURA_TYPE_BUFF)
@@ -149,7 +160,7 @@ function BuffsDebuffs:Test(unit)
                 break
             end
             if enabled then
-                BuffsDebuffs:AddOrRefreshAura(unit, spellID, AURA_TYPE_DEBUFF, 15, 15, random(1,5), spellSchools[random(1,6)], select(3, GetSpellInfo(spellID)), i)
+                BuffsDebuffs:AddOrRefreshAura(unit, spellID, AURA_TYPE_DEBUFF, 15, 15, random(1,5), dispelTypes[random(1,#dispelTypes)], select(3, GetSpellInfo(spellID)), i)
                 i = i + 1
             end
         end
@@ -159,7 +170,7 @@ function BuffsDebuffs:Test(unit)
                 break
             end
             if enabled then
-                BuffsDebuffs:AddOrRefreshAura(unit, spellID, AURA_TYPE_BUFF, 15, 15, random(1,5), spellSchools[random(1,6)], select(3, GetSpellInfo(spellID)), i)
+                BuffsDebuffs:AddOrRefreshAura(unit, spellID, AURA_TYPE_BUFF, 15, 15, random(1,5), dispelTypes[random(1,#dispelTypes)], select(3, GetSpellInfo(spellID)), i)
                 i = i + 1
             end
         end
@@ -196,7 +207,7 @@ function BuffsDebuffs:AURA_GAIN_LIMIT(unit, auraType, limit)
     end
 end
 
-function BuffsDebuffs:AURA_GAIN(unit, auraType, spellID, spellName, texture, duration, expirationTime, count, spellSchool)
+function BuffsDebuffs:AURA_GAIN(unit, auraType, spellID, spellName, texture, duration, expirationTime, count, dispelType)
     if (not self.frames[unit] or not Gladdy.db.buffsEnabled) then
         return
     end
@@ -227,7 +238,7 @@ function BuffsDebuffs:AURA_GAIN(unit, auraType, spellID, spellName, texture, dur
             auraFrame.numBuffs = auraFrame.numBuffs + 1
             index = auraFrame.numBuffs
         end
-        BuffsDebuffs:AddOrRefreshAura(unit,spellID, auraType, duration, expirationTime - GetTime(), count, spellSchool and lower(spellSchool) or "physical", texture, index)
+        BuffsDebuffs:AddOrRefreshAura(unit,spellID, auraType, duration, expirationTime - GetTime(), count, dispelType, texture, index)
     end
 end
 
@@ -280,17 +291,44 @@ local function styleIcon(aura, auraType)
         aura.cooldowncircle:SetAlpha(Gladdy.db.buffsCooldownAlpha)
     end
 
+    local zoomedOption, testAgain
+    if auraType == AURA_TYPE_BUFF then
+        zoomedOption = Gladdy.db.buffsBuffsIconZoomed
+    else
+        zoomedOption = Gladdy.db.buffsIconZoomed
+    end
+
+    if zoomedOption then
+        if aura.texture.masked then
+            aura.texture:SetMask(nil)
+            aura.texture:SetTexCoord(0.1,0.9,0.1,0.9)
+            aura.texture.masked = nil
+        end
+    else
+        if not aura.texture.masked then
+            aura.texture:SetMask(nil)
+            aura.texture:SetTexCoord(0,1,0,1)
+            aura.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
+            aura.texture.masked = true
+            if Gladdy.frame.testing then
+                testAgain = true
+            end
+        end
+    end
+
     aura:SetFrameStrata(Gladdy.db.buffFrameStrata)
     aura:SetFrameLevel(Gladdy.db.buffsFrameLevel)
     aura.cooldowncircle:SetFrameLevel(Gladdy.db.buffsFrameLevel + 1)
     aura.overlay:SetFrameLevel(Gladdy.db.buffsFrameLevel + 2)
 
     aura.border:SetTexture(Gladdy.db.buffsBorderStyle)
-    aura.border:SetVertexColor(spellSchoolToOptionValue(aura.spellSchool))
+    aura.border:SetVertexColor(dispelTypeToOptionValue(aura.dispelType))
     aura.cooldown:SetFont(Gladdy:SMFetch("font", "buffsFont"), (Gladdy.db.buffsIconSize/2 - 1) * Gladdy.db.buffsFontScale, "OUTLINE")
     aura.cooldown:SetTextColor(Gladdy.db.buffsFontColor.r, Gladdy.db.buffsFontColor.g, Gladdy.db.buffsFontColor.b, Gladdy.db.buffsFontColor.a)
     aura.stacks:SetFont(Gladdy:SMFetch("font", "buffsFont"), (Gladdy.db.buffsIconSize/3 - 1) * Gladdy.db.buffsFontScale, "OUTLINE")
     aura.stacks:SetTextColor(Gladdy.db.buffsFontColor.r, Gladdy.db.buffsFontColor.g, Gladdy.db.buffsFontColor.b, 1)
+
+    return testAgain
 end
 
 function BuffsDebuffs:UpdateFrameOnce()
@@ -330,16 +368,23 @@ function BuffsDebuffs:UpdateFrame(unit)
                 0, 0, "buffsEnabled")
     end
 
+    local testBuffsAgain, testDebuffsAgain
+
     for i=1, #self.frames[unit].auras[AURA_TYPE_BUFF] do
-        styleIcon(self.frames[unit].auras[AURA_TYPE_BUFF][i], AURA_TYPE_BUFF)
+        testBuffsAgain = styleIcon(self.frames[unit].auras[AURA_TYPE_BUFF][i], AURA_TYPE_BUFF)
     end
     for i=1, #self.frames[unit].auras[AURA_TYPE_DEBUFF] do
-        styleIcon(self.frames[unit].auras[AURA_TYPE_DEBUFF][i], AURA_TYPE_DEBUFF)
+        testDebuffsAgain = styleIcon(self.frames[unit].auras[AURA_TYPE_DEBUFF][i], AURA_TYPE_DEBUFF)
     end
     for i=1, #self.framePool do
         styleIcon(self.framePool[i])
     end
     self:UpdateAurasOnUnit(unit)
+
+    if Gladdy.frame.testing and (testBuffsAgain or testDebuffsAgain) then
+        self:ResetUnit(unit)
+        self:Test(unit)
+    end
 end
 
 ---------------------------
@@ -404,11 +449,12 @@ local function iconTimer(auraFrame, elapsed)
     end
 end
 
-function BuffsDebuffs:AddAura(unit, spellID, auraType, duration, timeLeft, stacks, spellSchool, icon, index)
+function BuffsDebuffs:AddAura(unit, spellID, auraType, duration, timeLeft, stacks, dispelType, icon, index)
     local aura
     if not self.frames[unit].auras[auraType][index] then
         if #self.framePool > 0 then
             aura = tremove(self.framePool, #self.framePool)
+            styleIcon(aura)
         else
             aura = CreateFrame("Frame")
             aura:EnableMouse(false)
@@ -416,6 +462,7 @@ function BuffsDebuffs:AddAura(unit, spellID, auraType, duration, timeLeft, stack
             aura:SetFrameLevel(Gladdy.db.buffsFrameLevel)
             aura.texture = aura:CreateTexture(nil, "BACKGROUND")
             aura.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
+            aura.texture.masked = true
             aura.texture:SetAllPoints(aura)
             aura.cooldowncircle = CreateFrame("Cooldown", nil, aura, "CooldownFrameTemplate")
             aura.cooldowncircle:SetFrameLevel(Gladdy.db.buffsFrameLevel + 1)
@@ -457,12 +504,12 @@ function BuffsDebuffs:AddAura(unit, spellID, auraType, duration, timeLeft, stack
     aura.spellID = spellID
     aura.type = auraType
     aura.unit = unit
-    aura.spellSchool = spellSchool
-    aura.border:SetVertexColor(spellSchoolToOptionValue(spellSchool))
+    aura.dispelType = dispelType
+    aura.border:SetVertexColor(dispelTypeToOptionValue(dispelType))
     aura:Show()
 end
 
-function BuffsDebuffs:AddOrRefreshAura(unit, spellID, auraType, duration, timeLeft, stacks, spellSchool, icon, index)
+function BuffsDebuffs:AddOrRefreshAura(unit, spellID, auraType, duration, timeLeft, stacks, dispelType, icon, index)
     if self.frames[unit].auras[auraType][index] and self.frames[unit].auras[auraType][index].spellID == spellID then -- refresh
         if duration == 0 then
             self.frames[unit].auras[auraType][index].endtime = "undefined"
@@ -478,7 +525,7 @@ function BuffsDebuffs:AddOrRefreshAura(unit, spellID, auraType, duration, timeLe
         return
     end
     --add
-    self:AddAura(unit, spellID, auraType, duration, timeLeft, stacks, spellSchool, icon, index)
+    self:AddAura(unit, spellID, auraType, duration, timeLeft, stacks, dispelType, icon, index)
     self:UpdateAurasOnUnit(unit)
 end
 
@@ -520,14 +567,21 @@ function BuffsDebuffs:GetOptions()
                     args = {
                         size = {
                             type = "group",
-                            name = L["Size & Padding"],
+                            name = L["Icon"],
                             order = 1,
                             args = {
                                 header = {
                                     type = "header",
-                                    name = L["Size & Padding"],
-                                    order = 5,
+                                    name = L["Icon"],
+                                    order = 1,
                                 },
+                                buffsBuffsIconZoomed = Gladdy:option({
+                                    type = "toggle",
+                                    name = L["Zoomed Icon"],
+                                    desc = L["Zoomes the icon to remove borders"],
+                                    order = 2,
+                                    width = "full",
+                                }),
                                 buffsBuffsIconSize = Gladdy:option({
                                     type = "range",
                                     name = L["Icon Size"],
@@ -630,14 +684,21 @@ function BuffsDebuffs:GetOptions()
                     args = {
                         size = {
                             type = "group",
-                            name = L["Size & Padding"],
+                            name = L["Icon"],
                             order = 1,
                             args = {
                                 header = {
                                     type = "header",
-                                    name = L["Size & Padding"],
-                                    order = 5,
+                                    name = L["Icon"],
+                                    order = 1,
                                 },
+                                buffsIconZoomed = Gladdy:option({
+                                    type = "toggle",
+                                    name = L["Zoomed Icon"],
+                                    desc = L["Zoomes the icon to remove borders"],
+                                    order = 2,
+                                    width = "full",
+                                }),
                                 buffsIconSize = Gladdy:option({
                                     type = "range",
                                     name = L["Icon Size"],
@@ -901,6 +962,13 @@ function BuffsDebuffs:GetOptions()
                             name = L["Form"],
                             desc = L["Color of the border"],
                             order = 49,
+                            hasAlpha = true,
+                        }),
+                        buffsBorderColorEnrage = Gladdy:colorOption({
+                            type = "color",
+                            name = L["Enrage"],
+                            desc = L["Color of the border"],
+                            order = 50,
                             hasAlpha = true,
                         }),
                     },

@@ -1,43 +1,8 @@
-## Interface: 20504
-## Title: Gladdy - TBC
-## Version: 2.11-Release
-## Notes: The most powerful arena AddOn for WoW 2.5.4
+## Title: Gladdy |cFFFF0000 game client not supported|r
+## Version: 2.2-Beta
+## Notes: The most powerful arena AddOn for WoW Classic TBC/WotLK
 ## Author: XiconQoo, DnB_Junkee, Knall
 ## X-Email: contact me on discord Knall#1751
-## SavedVariables: GladdyXZ
-## OptionalDeps: SharedMedia, Blizzard_CombatLog, Blizzard_ArenaUI, Blizzard_CombatText, Plater, Kui_Nameplates, NeatPlates, TidyPlates_ThreatPlates, Tukui, ElvUI
-
-embeds.xml
-
-Gladdy.lua
-Lang.lua
-Frame.lua
-Options.lua
-Constants.lua
-ImportStrings.lua
-Util.lua
-
-Modules\Announcements.lua
-Modules\Healthbar.lua
-Modules\Powerbar.lua
-Modules\Auras.lua
-Modules\Castbar.lua
-Modules\Classicon.lua
-Modules\Clicks.lua
-Modules\Diminishings.lua
-Modules\Highlight.lua
-Modules\TotemPlates.lua
-Modules\TotemPulse.lua
-Modules\Trinket.lua
-Modules\Racial.lua
-Modules\Cooldowns.lua
-Modules\ArenaCountDown.lua
-Modules\BuffsDebuffs.lua
-Modules\VersionCheck.lua
-Modules\XiconProfiles.lua
-Modules\Pets.lua
-Modules\ExportImport.lua
-Modules\CombatIndicator.lua
-Modules\RangeCheck.lua
-Modules\ShadowsightTimer.lua
-EventListener.lua
+## X-Curse-Project-ID: 482332
+## X-WoWI-ID: 26350
+## Notes: Gladdy only supports Classic TBC and Classic WotLK.

@@ -1,10 +1,10 @@
-# Gladdy - TBC
+# Gladdy - Classic
 
-### The most powerful arena addon for WoW TBC 2.5.4
+### The most powerful arena addon for WoW TBC 2.5.4 & WotLK 3.4.0
 
 ---
 
-## [v2.11-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.11-Release/Gladdy_TBC-Classic_v2.11-Release.zip)
+## [v2.20-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.20-Release/Gladdy_Classic_v2.20-Beta.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -73,11 +73,36 @@ Thank you!
 - **Klimp** (thanks for all the suggestions and active feedback)
 - **the whole TBC addons 2.4.3 discord** (thanks for the support and great community, especially the MVPs)
 - **Hydra** (thanks for constructive feedback and suggestions)
-- **Xyz** (thanks for suggestions)
+- **Xyz** (thanks for suggestions and extensive testing <3)
 
 ---
 
 ### Changes
+
+### v2.20-Beta
+- **Wrath** & **BCC** support
+  - different auras/DRs/Cooldowns/Buffs per expansion
+- **Zoomed Icon** options added for all modules
+- **Cooldowns**
+  - desaturate icon on cd added
+  - alpha on cd added
+  - glow on CD active added
+- **Diminishing**
+  - replaced DRData with DRList (your dr-categories options will be reset like "force icon" and what is enabled)
+  - zoomed icons
+  - changed DR-tracking behaviour (DR will show once aura is applied and start CD once aura fades)
+- **Trinket & Racial**
+  - in Wrath racials like wotf share CD with Trinket and vice versa
+  - fixed some potential API bug in Trinket use detection
+- **ArenaCountdown**
+  - uses C_Timer now
+- **Import/Export of Profiles**
+  - profiles should now be able to import/export between BCC and Wrath
+  - auras, cooldowns, DRs and buffs/debuffs are ignored
+  - positioning, style etc will be transferred between expansions
+- proper Feign Death detection
+- fix detect pet abilities CD like Spell Lock
+- minor bugfixes
 
 ### v2.11-Release
 - **Cooldowns**

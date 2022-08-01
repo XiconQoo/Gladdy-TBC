@@ -7,6 +7,7 @@ local L = {}
 
 -- Classes
 L["Druid"] = C_CreatureInfo.GetClassInfo(11).className
+L["Deathknight"] = C_CreatureInfo.GetClassInfo(6) and C_CreatureInfo.GetClassInfo(6).className
 L["Hunter"] = C_CreatureInfo.GetClassInfo(3).className
 L["Mage"] = C_CreatureInfo.GetClassInfo(8).className
 L["Paladin"] = C_CreatureInfo.GetClassInfo(2).className

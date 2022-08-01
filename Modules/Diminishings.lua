@@ -7,7 +7,8 @@ local CreateFrame = CreateFrame
 local GetTime = GetTime
 
 local Gladdy = LibStub("Gladdy")
-local DRData = LibStub("DRData-1.0-BCC")
+--local DRData = LibStub("DRData-1.0-BCC")
+local DRData = LibStub("DRList-1.0")
 local L = Gladdy.L
 local function defaultCategories()
     local categories = {}
@@ -36,6 +37,7 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drXOffset = 0,
     drYOffset = 0,
     drIconSize = 36,
+    drIconZoomed = false,
     drEnabled = true,
     drBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_Gloss",
     drBorderColor = { r = 1, g = 1, b = 1, a = 1 },
@@ -94,21 +96,21 @@ function Diminishings:CreateFrame(unit)
 
     for i = 1, 16 do
         local icon = CreateFrame("Frame", "GladdyDr" .. unit .. "Icon" .. i, drFrame)
+        icon.drFrame = drFrame
         icon:Hide()
         icon:EnableMouse(false)
         icon:SetFrameStrata(Gladdy.db.drFrameStrata)
         icon:SetFrameLevel(Gladdy.db.drFrameLevel)
         icon.texture = icon:CreateTexture(nil, "BACKGROUND")
         icon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
+        icon.texture.masked = true
         icon.texture:SetAllPoints(icon)
         icon:SetScript("OnUpdate", function(self, elapsed)
-            if (self.active) then
+            if (self.running) then
                 if (self.timeLeft <= 0) then
-                    if (self.factor == drFrame.tracked[self.dr]) then
-                        drFrame.tracked[self.dr] = 0
-                    end
-
+                    self.drFrame.tracked[self.dr] = nil
                     self.active = false
+                    self.running = false
                     self.dr = nil
                     self.diminishing = 1.0
                     self.texture:SetTexture("")
@@ -215,6 +217,7 @@ function Diminishings:UpdateFrame(unit)
                 0, "drEnabled")
     end
 
+    local testAgain = false
     for i = 1, 16 do
         local icon = drFrame["icon" .. i]
 
@@ -242,8 +245,13 @@ function Diminishings:UpdateFrame(unit)
             icon.drLevelText:SetTextColor(Gladdy:SetColor(Gladdy.db.drLevelTextColor))
         end
 
-        icon.cooldown:SetWidth(icon:GetWidth() - icon:GetWidth()/16)
-        icon.cooldown:SetHeight(icon:GetHeight() - icon:GetHeight()/16)
+        if Gladdy.db.drIconZoomed then
+            icon.cooldown:SetWidth(icon:GetWidth())
+            icon.cooldown:SetHeight(icon:GetHeight())
+        else
+            icon.cooldown:SetWidth(icon:GetWidth() - icon:GetWidth()/16)
+            icon.cooldown:SetHeight(icon:GetHeight() - icon:GetHeight()/16)
+        end
         icon.cooldown:ClearAllPoints()
         icon.cooldown:SetPoint("CENTER", icon, "CENTER")
         if Gladdy.db.drDisableCircle then
@@ -285,9 +293,27 @@ function Diminishings:UpdateFrame(unit)
             icon.border:SetTexture(Gladdy.db.drBorderStyle)
         end
 
-        --icon.texture:SetTexCoord(.1, .9, .1, .9)
-        --icon.texture:SetPoint("TOPLEFT", icon, "TOPLEFT", 2, -2)
-        --icon.texture:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", -2, 2)
+        if Gladdy.db.drIconZoomed then
+            if icon.texture.masked then
+                icon.texture:SetMask(nil)
+                icon.texture:SetTexCoord(0.1,0.9,0.1,0.9)
+                icon.texture.masked = nil
+            end
+        else
+            if not icon.texture.masked then
+                icon.texture:SetMask(nil)
+                icon.texture:SetTexCoord(0,1,0,1)
+                icon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
+                icon.texture.masked = true
+                if Gladdy.frame.testing then
+                    testAgain = true
+                end
+            end
+        end
+    end
+    if testAgain then
+        Diminishings:ResetUnit(unit)
+        Diminishings:Test(unit)
     end
 end
 
@@ -302,6 +328,7 @@ function Diminishings:ResetUnit(unit)
     for i = 1, 16 do
         local icon = drFrame["icon" .. i]
         icon.active = false
+        icon.running = false
         icon.timeLeft = 0
         icon.texture:SetTexture("")
         icon.timeText:SetText("")
@@ -340,10 +367,121 @@ function Diminishings:Test(unit)
             amount = rand(1,3)
             index = rand(1, #enabledCategories[i].spellIDs)
             for _=1, amount do
+                self:AuraGain(unit, enabledCategories[i].spellIDs[index])
                 self:AuraFade(unit, enabledCategories[i].spellIDs[index])
             end
         end
     end
+end
+
+--[[ testcases for show icon with icon.active = true and icon.running = false and no cooldown. Only when AuraFade start set icon.running = true and start cooldown
+    SPELL_AURA_APPLIED
+        Script:     /run local a=LibStub("Gladdy").modules["Diminishings"] a:AuraGain("arena1", 10890)
+        Script:     /run local a=LibStub("Gladdy").modules["Diminishings"] a:AuraGain("arena1", 2637)
+        Script:     /run local a=LibStub("Gladdy").modules["Diminishings"] a:AuraGain("arena1", 10890) a:AuraGain("arena1", 2637)
+        expected:   stale icon AND 1/2 dr
+    SPELL_AURA_REMOVED
+        Script:     /run local a=LibStub("Gladdy").modules["Diminishings"] a:AuraFade("arena1", 10890)
+        Script:     /run local a=LibStub("Gladdy").modules["Diminishings"] a:AuraFade("arena1", 2637)
+        Script:     /run local a=LibStub("Gladdy").modules["Diminishings"] a:AuraFade("arena1", 2637) a:AuraFade("arena1", 10890)
+        expected:   icon 1/2 AND 1/2 dr
+    SPELL_AURA_REFRESH
+        Script:     /run local a=LibStub("Gladdy").modules["Diminishings"] a:AuraGain("arena1", 10890) a:AuraGain("arena1", 10890)
+        expected:   icon 1/4 AND 1/4 dr
+    two different spells with same DR applied and one fades
+        Script:     /run local a=LibStub("Gladdy").modules["Diminishings"] a:AuraGain("arena1", 10890) a:AuraGain("arena1", 2094) a:AuraFade("arena1", 10890)
+        expected:   icon 1/4 AND 1/4 dr
+    two different spells with same DR applied and both fade
+        Script:     /run local a=LibStub("Gladdy").modules["Diminishings"] a:AuraGain("arena1", 10890) a:AuraGain("arena1", 2094) a:AuraFade("arena1", 10890) a:AuraFade("arena1", 2094)
+        expected:   icon 1/4 AND 1/4 dr
+    three different spells with same DR applied and two fade
+        Script:     /run local a=LibStub("Gladdy").modules["Diminishings"] a:AuraGain("arena1", 10890) a:AuraGain("arena1", 2094) a:AuraGain("arena1", 5484) a:AuraFade("arena1", 10890) a:AuraFade("arena1", 2094)
+        expected:   icon 0 AND 0 dr
+--]]
+
+function Diminishings:FindLastIcon(unit, drCat)
+    local drFrame = self.frames[unit]
+    if (not drFrame or not drCat) then
+        return
+    end
+    if not Gladdy.db.drCategories[drCat].enabled then
+        return
+    end
+    local lastIcon
+    for i = 1, 16 do
+        local icon = drFrame["icon" .. i]
+        if ((icon.active) and icon.dr and icon.dr == drCat) then
+            lastIcon = icon
+            break
+        elseif not icon.active and not lastIcon then
+            lastIcon = icon
+        end
+    end
+    return lastIcon
+end
+
+function Diminishings:PrepareIcon(unit, lastIcon, drCat, spellID)
+    local drFrame = self.frames[unit]
+
+    lastIcon.dr = drCat
+    lastIcon.diminishing = drFrame.tracked[drCat]
+    if Gladdy.db.drBorderColorsEnabled then
+        lastIcon.border:SetVertexColor(getDiminishColor(lastIcon.diminishing))
+    else
+        lastIcon.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.drBorderColor))
+    end
+
+    if Gladdy.db.drCategories[drCat].forceIcon then
+        lastIcon.texture:SetTexture(Gladdy.db.drCategories[drCat].icon)
+    else
+        lastIcon.texture:SetTexture(select(3, GetSpellInfo(spellID)))
+    end
+
+    if Gladdy.db.drFontColorsEnabled then
+        lastIcon.timeText:SetTextColor(getDiminishColor(lastIcon.diminishing))
+    else
+        lastIcon.timeText:SetTextColor(Gladdy:SetColor(Gladdy.db.drFontColor))
+    end
+    lastIcon.drLevelText:SetText("")
+    if Gladdy.db.drLevelTextColorsEnabled then
+        lastIcon.drLevelText:SetTextColor(getDiminishColor(lastIcon.diminishing))
+    else
+        lastIcon.drLevelText:SetTextColor(Gladdy:SetColor(Gladdy.db.drLevelTextColor))
+    end
+    lastIcon.drLevelText:SetText(getDiminishText(lastIcon.diminishing))
+    lastIcon.active = true
+    self:Positionate(unit)
+    lastIcon:Show()
+end
+
+function Diminishings:AuraGain(unit, spellID)
+    local drFrame = self.frames[unit]
+    local drCat = DRData:GetSpellCategory(spellID)
+    if (not drFrame or not drCat) then
+        return
+    end
+    if not Gladdy.db.drCategories[drCat].enabled then
+        return
+    end
+
+    -- due to dynamic DR we reset the DR here if dr == 0
+    if not drFrame.tracked[drCat] or drFrame.tracked[drCat] == 0 then
+        drFrame.tracked[drCat] = DRData:NextDR(1)
+    else
+        drFrame.tracked[drCat] = DRData:NextDR(drFrame.tracked[drCat] == 1.0 and 1 or drFrame.tracked[drCat] == 0.5 and 2 or 3)
+    end
+
+    -- add icon with no timer
+    local lastIcon = Diminishings:FindLastIcon(unit, drCat)
+    if not lastIcon then return end
+
+    Diminishings:PrepareIcon(unit, lastIcon, drCat, spellID)
+
+
+    lastIcon.running = false
+    lastIcon.cooldown:Hide()
+    lastIcon.cooldown:SetCooldown(0, 0)
+    lastIcon.timeText:SetText("")
 end
 
 function Diminishings:AuraFade(unit, spellID)
@@ -356,49 +494,16 @@ function Diminishings:AuraFade(unit, spellID)
         return
     end
 
-    local lastIcon
-    for i = 1, 16 do
-        local icon = drFrame["icon" .. i]
-        if (icon.active and icon.dr and icon.dr == drCat) then
-            lastIcon = icon
-            break
-        elseif not icon.active and not lastIcon then
-            lastIcon = icon
-            lastIcon.diminishing = 1.0
-        end
-    end
+    -- find icon and start timer
+    local lastIcon = Diminishings:FindLastIcon(unit, drCat)
     if not lastIcon then return end
-    lastIcon.dr = drCat
+
+    Diminishings:PrepareIcon(unit, lastIcon, drCat, spellID)
+
     lastIcon.timeLeft = Gladdy.db.drDuration
-    lastIcon.diminishing = DRData:NextDR(lastIcon.diminishing)
-    if Gladdy.db.drBorderColorsEnabled then
-        lastIcon.border:SetVertexColor(getDiminishColor(lastIcon.diminishing))
-    else
-        lastIcon.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.drBorderColor))
-    end
+    lastIcon.cooldown:Show()
     lastIcon.cooldown:SetCooldown(GetTime(), Gladdy.db.drDuration)
-    if Gladdy.db.drCategories[drCat].forceIcon then
-        lastIcon.texture:SetTexture(Gladdy.db.drCategories[drCat].icon)
-    else
-        lastIcon.texture:SetTexture(select(3, GetSpellInfo(spellID)))
-    end
-
-    if Gladdy.db.drFontColorsEnabled then
-        lastIcon.timeText:SetTextColor(getDiminishColor(lastIcon.diminishing))
-    else
-        lastIcon.timeText:SetTextColor(Gladdy:SetColor(Gladdy.db.drFontColor))
-    end
-
-    lastIcon.drLevelText:SetText(getDiminishText(lastIcon.diminishing))
-    if Gladdy.db.drLevelTextColorsEnabled then
-        lastIcon.drLevelText:SetTextColor(getDiminishColor(lastIcon.diminishing))
-    else
-        lastIcon.drLevelText:SetTextColor(Gladdy:SetColor(Gladdy.db.drLevelTextColor))
-    end
-
-    lastIcon.active = true
-    self:Positionate(unit)
-    lastIcon:Show()
+    lastIcon.running = true
 end
 
 function Diminishings:Positionate(unit)
@@ -495,11 +600,18 @@ function Diminishings:GetOptions()
                             name = L["Icon"],
                             order = 4,
                         },
+                        drIconZoomed = Gladdy:option({
+                            type = "toggle",
+                            name = L["Zoomed Icon"],
+                            desc = L["Zoomes the icon to remove borders"],
+                            order = 5,
+                            width = "full",
+                        }),
                         drIconSize = Gladdy:option({
                             type = "range",
                             name = L["Icon Size"],
                             desc = L["Size of the DR Icons"],
-                            order = 5,
+                            order = 6,
                             min = 5,
                             max = 80,
                             step = 1,
@@ -509,7 +621,7 @@ function Diminishings:GetOptions()
                             type = "range",
                             name = L["Icon Width Factor"],
                             desc = L["Stretches the icon"],
-                            order = 6,
+                            order = 7,
                             min = 0.5,
                             max = 2,
                             step = 0.05,
@@ -519,7 +631,7 @@ function Diminishings:GetOptions()
                             type = "range",
                             name = L["Icon Padding"],
                             desc = L["Space between Icons"],
-                            order = 7,
+                            order = 8,
                             min = 0,
                             max = 10,
                             step = 0.1,

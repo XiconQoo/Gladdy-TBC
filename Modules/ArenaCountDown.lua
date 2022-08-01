@@ -1,6 +1,5 @@
-local floor, str_len, tostring, str_sub, str_find, pairs = math.floor, string.len, tostring, string.sub, string.find, pairs
+local str_find, pairs = string.find, pairs
 local CreateFrame = CreateFrame
-local GetTime = GetTime
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
@@ -17,7 +16,6 @@ end
 
 function ACDFrame:Initialize()
     self.locale = Gladdy:GetArenaTimer()
-    self.hidden = false
     self.countdown = -1
     self.texturePath = "Interface\\AddOns\\Gladdy\\Images\\Countdown\\";
 
@@ -53,6 +51,7 @@ function ACDFrame:Initialize()
         self:RegisterMessage("UNIT_SPEC")
     end
     self.faction = UnitFactionGroup("player")
+    self:SetScript("OnEvent", ACDFrame.OnEvent)
 end
 
 function ACDFrame:UpdateFrameOnce()
@@ -83,53 +82,70 @@ function ACDFrame:UpdateFrameOnce()
     self.ACDNumOne:SetPoint("CENTER", self.ACDNumFrame, "CENTER", 0, 0)
 end
 
-function ACDFrame.OnUpdate(self, elapse)
-    if (self.countdown > 0 and Gladdy.db.countdown) then
-        self.hidden = false;
+function ACDFrame:HideAll()
+    self.ACDNumFrame:Hide()
+    self.ACDNumTens:Hide()
+    self.ACDNumOnes:Hide()
+    self.ACDNumOne:Hide()
+end
+
+function ACDFrame:CreateTicker(countdown)
+    self.countdown = countdown
+    if self.ticker and not self.ticker:IsCancelled() then
+        self.ticker:Cancel()
+    end
+    self.ticker = C_Timer.NewTicker(1, ACDFrame.Ticker)
+end
+
+function ACDFrame.Ticker()
+    local self = ACDFrame
+    if (Gladdy.db.countdown) then
         self.ACDNumFrame:Show()
-        if ((floor(self.countdown) ~= floor(self.countdown - elapse)) and (floor(self.countdown - elapse) >= 0)) then
-            local str = tostring(floor(self.countdown - elapse));
+        if (self.countdown and self.countdown >= 10 and self.countdown <= 60) then
+            -- Display has 2 digits
+            local ones = self.countdown % 10
+            local tens = (self.countdown / 10) % 10
+            self.ACDNumOne:Hide()
+            self.ACDNumTens:Show()
+            self.ACDNumOnes:Show()
 
-            if (str_len(str) == 2) then
-                -- Display has 2 digits
-                self.ACDNumOne:Hide();
-                self.ACDNumTens:Show();
-                self.ACDNumOnes:Show();
-
-                self.ACDNumTens:SetTexture(self.texturePath .. str_sub(str, 0, 1));
-                self.ACDNumOnes:SetTexture(self.texturePath .. str_sub(str, 2, 2));
-                self.ACDNumFrame:SetScale(0.7)
-            elseif (str_len(str) == 1) then
-                -- Display has 1 digit
-                local numStr = str_sub(str, 0, 1)
-                local path = numStr == "0" and self.faction or numStr
-                self.ACDNumOne:Show();
-                self.ACDNumOne:SetTexture(self.texturePath .. path);
-                self.ACDNumOnes:Hide();
-                self.ACDNumTens:Hide();
-                self.ACDNumFrame:SetScale(1.0)
+            self.ACDNumTens:SetTexture(self.texturePath .. tens)
+            self.ACDNumOnes:SetTexture(self.texturePath .. ones)
+            self.ACDNumFrame:SetScale(0.7)
+        elseif (self.countdown and self.countdown < 10 and self.countdown > -1) then
+            -- Display has 1 digit
+            local path = self.countdown <= 0 and self.faction or self.countdown
+            self.ACDNumOne:Show()
+            self.ACDNumOne:SetTexture(self.texturePath .. path)
+            self.ACDNumOnes:Hide()
+            self.ACDNumTens:Hide()
+            self.ACDNumFrame:SetScale(1.0)
+        else
+            ACDFrame:HideAll()
+            if (self.countdown and self.countdown < -1) then
+                self.ticker:Cancel()
             end
         end
-        self.countdown = self.countdown - elapse;
+        self.countdown = self.countdown and self.countdown - 1
     else
-        self.hidden = true;
-        self.ACDNumFrame:Hide()
-        self.ACDNumTens:Hide();
-        self.ACDNumOnes:Hide();
-        self.ACDNumOne:Hide();
-    end
-    if (GetTime() > self.endTime) then
-        self:SetScript("OnUpdate", nil)
+        ACDFrame:HideAll()
     end
 end
 
 function ACDFrame:JOINED_ARENA()
     if Gladdy.db.countdown then
+        self:CreateTicker(nil)
         self:RegisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
-        self:SetScript("OnEvent", ACDFrame.OnEvent)
-        self.endTime = GetTime() + 70
-        self:SetScript("OnUpdate", ACDFrame.OnUpdate)
     end
+end
+
+function ACDFrame:Reset()
+    if self.ticker and not self.ticker:IsCancelled() then
+        self.ticker:Cancel()
+    end
+    self.countdown = nil
+    self:UnregisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
+    ACDFrame:HideAll()
 end
 
 function ACDFrame:ENEMY_SPOTTED()
@@ -147,30 +163,16 @@ end
 function ACDFrame:CHAT_MSG_BG_SYSTEM_NEUTRAL(msg)
     for k,v in pairs(self.locale) do
         if str_find(msg, v) then
-            if k == 0 then
-                ACDFrame:Reset()
-            else
-                self.countdown = k
+            if self.countdown and self.countdown == 0 then
+                return
             end
+            self.countdown = k
         end
     end
 end
 
 function ACDFrame:TestOnce()
-    self.countdown = 30
-    self:JOINED_ARENA()
-end
-
-function ACDFrame:Reset()
-    self.endTime = 0
-    self.countdown = 0
-    self:UnregisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
-    self:SetScript("OnUpdate", nil)
-    self.hidden = true;
-    self.ACDNumFrame:Hide()
-    self.ACDNumTens:Hide();
-    self.ACDNumOnes:Hide();
-    self.ACDNumOne:Hide();
+    self:CreateTicker(30)
 end
 
 function ACDFrame:GetOptions()
