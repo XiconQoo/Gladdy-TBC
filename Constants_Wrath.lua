@@ -84,13 +84,18 @@ local specBuffs = {
     [GetSpellInfo(63685)] = L["Enhancement"], -- Freeze (Frozen Power)
     -- HUNTER
     [GetSpellInfo(20895)] = L["Beast Mastery"], -- Spirit Bond
+    [GetSpellInfo(34471)] = L["Beast Mastery"], -- The Beast Within
     [GetSpellInfo(19506)] = L["Marksmanship"], -- Trueshot Aura
     [GetSpellInfo(64420)] = L["Survival"], -- Sniper Training
     -- DRUID
     [GetSpellInfo(24932)] = L["Feral"], -- Leader of the Pack
-    [GetSpellInfo(34123)] = L["Restoration"], -- Tree of Life
+    [GetSpellInfo(16975)] = L["Feral"], -- Predatory Strikes
+    [GetSpellInfo(50334)] = L["Feral"], -- Berserk
     [GetSpellInfo(24907)] = L["Balance"], -- Moonkin Aura
+    [GetSpellInfo(24858)] = L["Balance"], -- Moonkin Form
     [GetSpellInfo(53251)] = L["Restoration"], -- Wild Growth
+    [GetSpellInfo(16188)] = L["Restoration"], -- Nature's Swiftness
+    [GetSpellInfo(33891)] = L["Restoration"], -- Tree of Life
 }
 function Gladdy:GetSpecBuffs()
     return specBuffs
@@ -164,9 +169,14 @@ local specSpells = {
     -- DRUID
     [GetSpellInfo(53201)] = L["Balance"], -- Starfall
     [GetSpellInfo(61384)] = L["Balance"], -- Typhoon
+    [GetSpellInfo(24858)] = L["Balance"], -- Moonkin Form
     [GetSpellInfo(48566)] = L["Feral"], -- Mangle (Cat)
     [GetSpellInfo(48564)] = L["Feral"], -- Mangle (Bear)
+    [GetSpellInfo(50334)] = L["Feral"], -- Berserk
     [GetSpellInfo(18562)] = L["Restoration"], -- Swiftmend
+    [GetSpellInfo(17116)] = L["Restoration"], -- Nature's Swiftness
+    [GetSpellInfo(33891)] = L["Restoration"], -- Tree of Life
+    [GetSpellInfo(53251)] = L["Restoration"], -- Wild Growth
 }
 function Gladdy:GetSpecSpells()
     return specSpells
