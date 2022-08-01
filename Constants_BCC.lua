@@ -369,6 +369,11 @@ local importantAuras = {
         priority = 20,
         spellID = 45438,
     },
+    [GetSpellInfo(41425)] = { -- Hypothermia (Ice Block Immune
+        track = AURA_TYPE_DEBUFF,
+        priority = 8,
+        spellID = 41425,
+    },
     -- Impact
     [GetSpellInfo(12355)] = {
         track = AURA_TYPE_DEBUFF,
