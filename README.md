@@ -1,10 +1,10 @@
-# Gladdy - TBC
+# Gladdy - Classic
 
-### The most powerful arena addon for WoW TBC 2.5.4
+### The most powerful arena addon for WoW TBC 2.5.4 & WotLK 3.4.0
 
 ---
 
-## [v2.11-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.11-Release/Gladdy_TBC-Classic_v2.11-Release.zip)
+## [v2.20-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.20-Release/Gladdy_Classic_v2.20-Beta.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
