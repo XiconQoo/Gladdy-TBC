@@ -37,6 +37,7 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drXOffset = 0,
     drYOffset = 0,
     drIconSize = 36,
+    drIconZoomed = false,
     drEnabled = true,
     drBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_Gloss",
     drBorderColor = { r = 1, g = 1, b = 1, a = 1 },
@@ -102,6 +103,7 @@ function Diminishings:CreateFrame(unit)
         icon:SetFrameLevel(Gladdy.db.drFrameLevel)
         icon.texture = icon:CreateTexture(nil, "BACKGROUND")
         icon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
+        icon.texture.masked = true
         icon.texture:SetAllPoints(icon)
         icon:SetScript("OnUpdate", function(self, elapsed)
             if (self.running) then
@@ -215,6 +217,7 @@ function Diminishings:UpdateFrame(unit)
                 0, "drEnabled")
     end
 
+    local testAgain = false
     for i = 1, 16 do
         local icon = drFrame["icon" .. i]
 
@@ -242,8 +245,13 @@ function Diminishings:UpdateFrame(unit)
             icon.drLevelText:SetTextColor(Gladdy:SetColor(Gladdy.db.drLevelTextColor))
         end
 
-        icon.cooldown:SetWidth(icon:GetWidth() - icon:GetWidth()/16)
-        icon.cooldown:SetHeight(icon:GetHeight() - icon:GetHeight()/16)
+        if Gladdy.db.drIconZoomed then
+            icon.cooldown:SetWidth(icon:GetWidth())
+            icon.cooldown:SetHeight(icon:GetHeight())
+        else
+            icon.cooldown:SetWidth(icon:GetWidth() - icon:GetWidth()/16)
+            icon.cooldown:SetHeight(icon:GetHeight() - icon:GetHeight()/16)
+        end
         icon.cooldown:ClearAllPoints()
         icon.cooldown:SetPoint("CENTER", icon, "CENTER")
         if Gladdy.db.drDisableCircle then
@@ -285,9 +293,27 @@ function Diminishings:UpdateFrame(unit)
             icon.border:SetTexture(Gladdy.db.drBorderStyle)
         end
 
-        --icon.texture:SetTexCoord(.1, .9, .1, .9)
-        --icon.texture:SetPoint("TOPLEFT", icon, "TOPLEFT", 2, -2)
-        --icon.texture:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", -2, 2)
+        if Gladdy.db.drIconZoomed then
+            if icon.texture.masked then
+                icon.texture:SetMask(nil)
+                icon.texture:SetTexCoord(0.1,0.9,0.1,0.9)
+                icon.texture.masked = nil
+            end
+        else
+            if not icon.texture.masked then
+                icon.texture:SetMask(nil)
+                icon.texture:SetTexCoord(0,1,0,1)
+                icon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
+                icon.texture.masked = true
+                if Gladdy.frame.testing then
+                    testAgain = true
+                end
+            end
+        end
+    end
+    if testAgain then
+        Diminishings:ResetUnit(unit)
+        Diminishings:Test(unit)
     end
 end
 
@@ -574,11 +600,18 @@ function Diminishings:GetOptions()
                             name = L["Icon"],
                             order = 4,
                         },
+                        drIconZoomed = Gladdy:option({
+                            type = "toggle",
+                            name = L["Zoomed Icon"],
+                            desc = L["Zoomes the icon to remove borders"],
+                            order = 5,
+                            width = "full",
+                        }),
                         drIconSize = Gladdy:option({
                             type = "range",
                             name = L["Icon Size"],
                             desc = L["Size of the DR Icons"],
-                            order = 5,
+                            order = 6,
                             min = 5,
                             max = 80,
                             step = 1,
@@ -588,7 +621,7 @@ function Diminishings:GetOptions()
                             type = "range",
                             name = L["Icon Width Factor"],
                             desc = L["Stretches the icon"],
-                            order = 6,
+                            order = 7,
                             min = 0.5,
                             max = 2,
                             step = 0.05,
@@ -598,7 +631,7 @@ function Diminishings:GetOptions()
                             type = "range",
                             name = L["Icon Padding"],
                             desc = L["Space between Icons"],
-                            order = 7,
+                            order = 8,
                             min = 0,
                             max = 10,
                             step = 0.1,

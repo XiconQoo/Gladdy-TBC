@@ -13,6 +13,7 @@ local Trinket = Gladdy:NewModule("Trinket", 80, {
     trinketEnabled = true,
     trinketSize = 60 + 20 + 1,
     trinketWidthFactor = 0.9,
+    trinketIconZoomed = false,
     trinketBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     trinketBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     trinketDisableCircle = false,
@@ -101,6 +102,7 @@ function Trinket:CreateFrame(unit)
     trinket.texture:SetAllPoints(trinket)
     trinket.texture:SetTexture("Interface\\Icons\\INV_Jewelry_TrinketPVP_02")
     trinket.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
+    trinket.texture.masked = true
 
     trinket.cooldown = CreateFrame("Cooldown", nil, trinket, "CooldownFrameTemplate")
     trinket.cooldown.noCooldownCount = true --Gladdy.db.trinketDisableOmniCC
@@ -144,17 +146,7 @@ function Trinket:UpdateFrame(unit)
         return
     end
 
-    if Gladdy.db.trinketColored then
-        if trinket.active then
-            trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredCd))
-        else
-            trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredNoCd))
-        end
-        trinket.texture:SetTexture()
-    else
-        trinket:SetBackdropColor(0,0,0,0)
-        trinket.texture:SetTexture("Interface\\Icons\\INV_Jewelry_TrinketPVP_02")
-    end
+    local testAgain = false
 
     local width, height = Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor, Gladdy.db.trinketSize
 
@@ -169,8 +161,14 @@ function Trinket:UpdateFrame(unit)
 
     trinket:SetWidth(width)
     trinket:SetHeight(height)
-    trinket.cooldown:SetWidth(width - width/16)
-    trinket.cooldown:SetHeight(height - height/16)
+    if Gladdy.db.trinketIconZoomed then
+        trinket.cooldown:SetWidth(width)
+        trinket.cooldown:SetHeight(height)
+
+    else
+        trinket.cooldown:SetWidth(width - width/16)
+        trinket.cooldown:SetHeight(height - height/16)
+    end
     trinket.cooldown:ClearAllPoints()
     trinket.cooldown:SetPoint("CENTER", trinket, "CENTER")
     trinket.cooldown.noCooldownCount = true -- Gladdy.db.trinketDisableOmniCC
@@ -181,6 +179,36 @@ function Trinket:UpdateFrame(unit)
 
     trinket.texture.overlay:SetTexture(Gladdy.db.trinketBorderStyle)
     trinket.texture.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.trinketBorderColor))
+
+    if Gladdy.db.trinketIconZoomed then
+        if trinket.texture.masked then
+            trinket.texture:SetMask(nil)
+            trinket.texture:SetTexCoord(0.1,0.9,0.1,0.9)
+            trinket.texture.masked = nil
+        end
+    else
+        if not trinket.texture.masked then
+            trinket.texture:SetMask(nil)
+            trinket.texture:SetTexCoord(0,1,0,1)
+            trinket.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
+            trinket.texture.masked = true
+            if Gladdy.frame.testing then
+                testAgain = true
+            end
+        end
+    end
+
+    if Gladdy.db.trinketColored then
+        if trinket.active then
+            trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredCd))
+        else
+            trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredNoCd))
+        end
+        trinket.texture:SetTexture()
+    else
+        trinket:SetBackdropColor(0,0,0,0)
+        trinket.texture:SetTexture("Interface\\Icons\\INV_Jewelry_TrinketPVP_02")
+    end
 
     Gladdy:SetPosition(trinket, unit, "trinketXOffset", "trinketYOffset", Trinket:LegacySetPosition(trinket, unit), Trinket)
 
@@ -221,6 +249,10 @@ function Trinket:UpdateFrame(unit)
         trinket:Hide()
     else
         trinket:Show()
+        if testAgain then
+            Trinket:ResetUnit(unit)
+            Trinket:Test(unit)
+        end
     end
 end
 
@@ -393,14 +425,21 @@ function Trinket:GetOptions()
             args = {
                 general = {
                     type = "group",
-                    name = L["Size"],
+                    name = L["Icon"],
                     order = 1,
                     args = {
                         header = {
                             type = "header",
-                            name = L["Size"],
+                            name = L["Icon"],
                             order = 1,
                         },
+                        trinketIconZoomed = Gladdy:option({
+                            type = "toggle",
+                            name = L["Zoomed Icon"],
+                            desc = L["Zoomes the icon to remove borders"],
+                            order = 2,
+                            width = "full",
+                        }),
                         trinketSize = Gladdy:option({
                             type = "range",
                             name = L["Size"],

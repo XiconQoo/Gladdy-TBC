@@ -8,6 +8,7 @@ local Classicon = Gladdy:NewModule("Class Icon", 81, {
     classIconEnabled = true,
     classIconSize = 60 + 20 + 1,
     classIconWidthFactor = 0.9,
+    classIconZoomed = false,
     classIconBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     classIconBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     classIconSpecIcon = false,
@@ -115,6 +116,7 @@ function Classicon:CreateFrame(unit)
     classIcon.texture = classIcon:CreateTexture(nil, "BACKGROUND")
     classIcon.texture:SetAllPoints(classIcon)
     classIcon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
+    classIcon.texture.masked = true
 
     classIcon.texture.overlay = classIcon:CreateTexture(nil, "BORDER")
     classIcon.texture.overlay:SetAllPoints(classIcon)
@@ -133,11 +135,31 @@ function Classicon:UpdateFrame(unit)
         return
     end
 
+    local testAgain = false
+
     classIcon:SetFrameStrata(Gladdy.db.classIconFrameStrata)
     classIcon:SetFrameLevel(Gladdy.db.classIconFrameLevel)
 
     classIcon:SetWidth(Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor)
     classIcon:SetHeight(Gladdy.db.classIconSize)
+
+    if Gladdy.db.classIconZoomed then
+        if classIcon.texture.masked then
+            classIcon.texture:SetMask(nil)
+            classIcon.texture:SetTexCoord(0.1,0.9,0.1,0.9)
+            classIcon.texture.masked = nil
+        end
+    else
+        if not classIcon.texture.masked then
+            classIcon.texture:SetMask(nil)
+            classIcon.texture:SetTexCoord(0,1,0,1)
+            classIcon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
+            classIcon.texture.masked = true
+            if Gladdy.frame.testing then
+                testAgain = true
+            end
+        end
+    end
 
     Gladdy:SetPosition(classIcon, unit, "classIconXOffset", "classIconYOffset", Classicon:LegacySetPosition(classIcon, unit), Classicon)
 
@@ -173,6 +195,10 @@ function Classicon:UpdateFrame(unit)
     classIcon.texture.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.classIconBorderColor))
     if Gladdy.db.classIconEnabled then
         classIcon:Show()
+        if testAgain then
+            Classicon:ResetUnit(unit)
+            Classicon:ENEMY_SPOTTED(unit)
+        end
     else
         classIcon:Hide()
     end
@@ -267,17 +293,24 @@ function Classicon:GetOptions()
             args = {
                 size = {
                     type = "group",
-                    name = L["Icon size"],
+                    name = L["Icon"],
                     order = 1,
                     args = {
                         header = {
                             type = "header",
-                            name = L["Icon size"],
+                            name = L["Icon"],
                             order = 1,
                         },
+                        classIconZoomed = Gladdy:option({
+                            type = "toggle",
+                            name = L["Zoomed Icon"],
+                            desc = L["Zoomes the icon to remove borders"],
+                            order = 2,
+                            width = "full",
+                        }),
                         classIconSize = Gladdy:option({
                             type = "range",
-                            name = L["Icon size"],
+                            name = L["Size"],
                             min = 3,
                             max = 100,
                             step = .1,

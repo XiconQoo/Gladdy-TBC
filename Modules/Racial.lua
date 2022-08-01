@@ -11,6 +11,7 @@ local Racial = Gladdy:NewModule("Racial", 79, {
     racialEnabled = true,
     racialSize = 60 + 20 + 1,
     racialWidthFactor = 0.9,
+    racialIconZoomed = false,
     racialXOffset = 0,
     racialYOffset = 0,
     racialBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
@@ -91,6 +92,7 @@ function Racial:CreateFrame(unit)
     racial.texture = racial:CreateTexture(nil, "BACKGROUND")
     racial.texture:SetAllPoints(racial)
     racial.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
+    racial.texture.masked = true
     --racial.texture:SetTexture("Interface\\Icons\\INV_Jewelry_TrinketPVP_02")
 
     racial.cooldown = CreateFrame("Cooldown", nil, racial, "CooldownFrameTemplate")
@@ -133,6 +135,7 @@ function Racial:UpdateFrame(unit)
         return
     end
 
+    local testAgain = false
     local width, height = Gladdy.db.racialSize * Gladdy.db.racialWidthFactor, Gladdy.db.racialSize
 
     racial:SetFrameStrata(Gladdy.db.racialFrameStrata)
@@ -146,8 +149,13 @@ function Racial:UpdateFrame(unit)
 
     racial:SetWidth(width)
     racial:SetHeight(height)
-    racial.cooldown:SetWidth(width - width/16)
-    racial.cooldown:SetHeight(height - height/16)
+    if Gladdy.db.racialIconZoomed then
+        racial.cooldown:SetWidth(width)
+        racial.cooldown:SetHeight(height)
+    else
+        racial.cooldown:SetWidth(width - width/16)
+        racial.cooldown:SetHeight(height - height/16)
+    end
     racial.cooldown:ClearAllPoints()
     racial.cooldown:SetPoint("CENTER", racial, "CENTER")
     racial.cooldown.noCooldownCount = true -- Gladdy.db.racialDisableOmniCC
@@ -158,6 +166,24 @@ function Racial:UpdateFrame(unit)
 
     racial.texture.overlay:SetTexture(Gladdy.db.racialBorderStyle)
     racial.texture.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.racialBorderColor))
+
+    if Gladdy.db.racialIconZoomed then
+        if racial.texture.masked then
+            racial.texture:SetMask(nil)
+            racial.texture:SetTexCoord(0.1,0.9,0.1,0.9)
+            racial.texture.masked = nil
+        end
+    else
+        if not racial.texture.masked then
+            racial.texture:SetMask(nil)
+            racial.texture:SetTexCoord(0,1,0,1)
+            racial.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
+            racial.texture.masked = true
+            if Gladdy.frame.testing then
+                testAgain = true
+            end
+        end
+    end
 
     Gladdy:SetPosition(racial, unit, "racialXOffset", "racialYOffset", Racial:LegacySetPosition(racial, unit), Racial)
 
@@ -189,6 +215,10 @@ function Racial:UpdateFrame(unit)
         racial:Hide()
     else
         racial:Show()
+        if testAgain then
+            Racial:ResetUnit(unit)
+            Racial:Test(unit)
+        end
     end
 end
 
@@ -311,21 +341,28 @@ function Racial:GetOptions()
             args = {
                 general = {
                     type = "group",
-                    name = L["Size"],
+                    name = L["Icon"],
                     order = 1,
                     args = {
                         header = {
                             type = "header",
-                            name = L["Size"],
+                            name = L["Icon"],
                             order = 1,
                         },
+                        racialIconZoomed = Gladdy:option({
+                            type = "toggle",
+                            name = L["Zoomed Icon"],
+                            desc = L["Zoomes the icon to remove borders"],
+                            order = 2,
+                            width = "full",
+                        }),
                         racialSize = Gladdy:option({
                             type = "range",
                             name = L["Icon size"],
                             min = 5,
                             max = 100,
                             step = 1,
-                            order = 2,
+                            order = 3,
                             width = "full",
                         }),
                         racialWidthFactor = Gladdy:option({
@@ -334,7 +371,7 @@ function Racial:GetOptions()
                             min = 0.5,
                             max = 2,
                             step = 0.05,
-                            order = 3,
+                            order = 4,
                             width = "full",
                         }),
                     },

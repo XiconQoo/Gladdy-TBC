@@ -47,11 +47,13 @@ local Auras = Gladdy:NewModule("Auras", nil, {
     auraYOffset = 0,
     auraSize = 60 + 20 + 1,
     auraWidthFactor = 0.9,
+    auraIconZoomed = false,
     auraInterruptDetached = false,
     auraInterruptXOffset = 0,
     auraInterruptYOffset = 0,
     auraInterruptSize = 60 + 20 + 1,
     auraInterruptWidthFactor = 0.9,
+    auraInterruptIconZoomed = false,
     auraFrameStrata = "MEDIUM",
     auraFrameLevel = 5,
     auraInterruptFrameStrata = "MEDIUM",
@@ -101,6 +103,7 @@ function Auras:CreateFrame(unit)
     auraFrame.icon = auraFrame.frame:CreateTexture(nil, "BACKGROUND")
     auraFrame.icon:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
     auraFrame.icon:SetAllPoints(auraFrame)
+    auraFrame.icon.masked = true
 
     auraFrame.icon.overlay = auraFrame.cooldownFrame:CreateTexture(nil, "OVERLAY")
     auraFrame.icon.overlay:SetAllPoints(auraFrame)
@@ -174,6 +177,7 @@ function Auras:CreateInterrupt(unit)
     interruptFrame.icon = interruptFrame.frame:CreateTexture(nil, "BACKGROUND")
     interruptFrame.icon:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
     interruptFrame.icon:SetAllPoints(interruptFrame.frame)
+    interruptFrame.icon.masked = true
 
     interruptFrame.icon.overlay = interruptFrame.cooldownFrame:CreateTexture(nil, "OVERLAY")
     interruptFrame.icon.overlay:SetAllPoints(interruptFrame.frame)
@@ -287,6 +291,8 @@ function Auras:UpdateFrame(unit)
         end
     end
 
+    local testAgain = false
+
     auraFrame:SetWidth(width)
     auraFrame:SetHeight(height)
     auraFrame.frame:SetWidth(height)
@@ -296,8 +302,13 @@ function Auras:UpdateFrame(unit)
 
     auraFrame.cooldown:ClearAllPoints()
     auraFrame.cooldown:SetPoint("CENTER", auraFrame, "CENTER")
-    auraFrame.cooldown:SetWidth(width - width/16)
-    auraFrame.cooldown:SetHeight(height - height/16)
+    if Gladdy.db.auraIconZoomed then
+        auraFrame.cooldown:SetWidth(width)
+        auraFrame.cooldown:SetHeight(height)
+    else
+        auraFrame.cooldown:SetWidth(width - width/16)
+        auraFrame.cooldown:SetHeight(height - height/16)
+    end
     auraFrame.cooldown:SetAlpha(Gladdy.db.auraCooldownAlpha)
 
     auraFrame.text:SetFont(Gladdy:SMFetch("font", "auraFont"), (width/2 - 1) * Gladdy.db.auraFontSizeScale, "OUTLINE")
@@ -317,7 +328,31 @@ function Auras:UpdateFrame(unit)
     if Gladdy.db.auraDisableCircle then
         auraFrame.cooldown:SetAlpha(0)
     end
-    self:UpdateInterruptFrame(unit)
+
+    if Gladdy.db.auraIconZoomed then
+        if auraFrame.icon.masked then
+            auraFrame.icon:SetMask(nil)
+            auraFrame.icon:SetTexCoord(0.1,0.9,0.1,0.9)
+            auraFrame.icon.masked = nil
+        end
+    else
+        if not auraFrame.icon.masked then
+            auraFrame.icon:SetMask(nil)
+            auraFrame.icon:SetTexCoord(0,1,0,1)
+            auraFrame.icon:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
+            auraFrame.icon.masked = true
+            if Gladdy.frame.testing then
+                testAgain = true
+            end
+        end
+    end
+
+    testAgain = testAgain or self:UpdateInterruptFrame(unit)
+
+    if testAgain then
+        Auras:ResetUnit(unit)
+        Auras:Test(unit)
+    end
 end
 
 function Auras:UpdateInterruptFrame(unit)
@@ -405,6 +440,8 @@ function Auras:UpdateInterruptFrame(unit)
         end
     end
 
+    local testAgain = false
+
     interruptFrame:SetWidth(width)
     interruptFrame:SetHeight(height)
     interruptFrame.frame:SetWidth(width)
@@ -414,8 +451,14 @@ function Auras:UpdateInterruptFrame(unit)
 
     interruptFrame.cooldown:ClearAllPoints()
     interruptFrame.cooldown:SetPoint("CENTER", interruptFrame, "CENTER")
-    interruptFrame.cooldown:SetWidth(width - width/16)
-    interruptFrame.cooldown:SetHeight(height - height/16)
+    if Gladdy.db.auraInterruptIconZoomed then
+        interruptFrame.cooldown:SetWidth(width)
+        interruptFrame.cooldown:SetHeight(height)
+
+    else
+        interruptFrame.cooldown:SetWidth(width - width/16)
+        interruptFrame.cooldown:SetHeight(height - height/16)
+    end
     interruptFrame.cooldown:SetAlpha(Gladdy.db.auraCooldownAlpha)
 
     interruptFrame.text:SetFont(Gladdy:SMFetch("font", "auraFont"), (width/2 - 1) * Gladdy.db.auraFontSizeScale, "OUTLINE")
@@ -433,6 +476,25 @@ function Auras:UpdateInterruptFrame(unit)
     if Gladdy.db.auraDisableCircle then
         interruptFrame.cooldown:SetAlpha(0)
     end
+
+    if Gladdy.db.auraInterruptIconZoomed then
+        if interruptFrame.icon.masked then
+            interruptFrame.icon:SetMask(nil)
+            interruptFrame.icon:SetTexCoord(0.1,0.9,0.1,0.9)
+            interruptFrame.icon.masked = nil
+        end
+    else
+        if not interruptFrame.icon.masked then
+            interruptFrame.icon:SetMask(nil)
+            interruptFrame.icon:SetTexCoord(0,1,0,1)
+            interruptFrame.icon:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
+            interruptFrame.icon.masked = true
+            if Gladdy.frame.testing then
+                testAgain = true
+            end
+        end
+    end
+    return testAgain
 end
 
 function Auras:ResetUnit(unit)
@@ -792,6 +854,21 @@ function Auras:GetOptions()
                             order = 2,
                             width = "full"
                         }),
+                        headerIcon = {
+                            type = "header",
+                            name = L["Icon"],
+                            order = 5,
+                        },
+                        auraIconZoomed = Gladdy:option({
+                            type = "toggle",
+                            name = L["Zoomed Icon"],
+                            desc = L["Zoomes the icon to remove borders"],
+                            disabled = function()
+                                return not Gladdy.db.auraDetached
+                            end,
+                            order = 6,
+                            width = "full",
+                        }),
                         headerAuraSize = {
                             type = "header",
                             name = L["Size"],
@@ -896,6 +973,21 @@ function Auras:GetOptions()
                             order = 2,
                             width = "full"
                         }),
+                        headerIcon = {
+                            type = "header",
+                            name = L["Icon"],
+                            order = 5,
+                        },
+                        auraInterruptIconZoomed = Gladdy:option({
+                            type = "toggle",
+                            name = L["Zoomed Icon"],
+                            desc = L["Zoomes the icon to remove borders"],
+                            disabled = function()
+                                return not Gladdy.db.auraInterruptDetached
+                            end,
+                            order = 6,
+                            width = "full",
+                        }),
                         headerAuraSize = {
                             type = "header",
                             name = L["Size"],
@@ -984,10 +1076,29 @@ function Auras:GetOptions()
                         }),
                     }
                 },
+                icon = {
+                    type = "group",
+                    name = L["Icon"],
+                    order = 1,
+                    args = {
+                        headerIcon = {
+                            type = "header",
+                            name = L["Icon"],
+                            order = 1,
+                        },
+                        auraIconZoomed = Gladdy:option({
+                            type = "toggle",
+                            name = L["Zoomed Icon"],
+                            desc = L["Zoomes the icon to remove borders"],
+                            order = 2,
+                            width = "full",
+                        }),
+                    },
+                },
                 cooldown = {
                     type = "group",
                     name = L["Cooldown"],
-                    order = 1,
+                    order = 2,
                     args = {
                         headerAuras = {
                             type = "header",
@@ -1030,7 +1141,7 @@ function Auras:GetOptions()
                 font = {
                     type = "group",
                     name = L["Font"],
-                    order = 2,
+                    order = 3,
                     args = {
                         headerAuras = {
                             type = "header",
@@ -1067,7 +1178,7 @@ function Auras:GetOptions()
                 border = {
                     type = "group",
                     name = L["Border"],
-                    order = 3,
+                    order = 4,
                     args = borderArgs
                 }
             }

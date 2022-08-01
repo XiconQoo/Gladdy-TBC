@@ -23,6 +23,7 @@ local Castbar = Gladdy:NewModule("Cast Bar", 70, {
     castBarHeight = 20,
     castBarWidth = 160,
     castBarIconSize = 22,
+    castBarIconZoomed = false,
     castBarBorderSize = 8,
     castBarFontSize = 12,
     castBarFontOutline = false,
@@ -104,6 +105,7 @@ function Castbar:CreateFrame(unit)
     castBar.icon.texture = castBar.icon:CreateTexture(nil, "BACKGROUND")
     castBar.icon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
     castBar.icon.texture:SetAllPoints(castBar.icon)
+    castBar.icon.texture.masked = true
     castBar.icon.texture.overlay = castBar.icon:CreateTexture(nil, "BORDER")
     castBar.icon.texture.overlay:SetAllPoints(castBar.icon.texture)
     castBar.icon.texture.overlay:SetTexture(Gladdy.db.castBarIconStyle)
@@ -157,6 +159,8 @@ function Castbar:UpdateFrame(unit)
         return
     end
 
+    local testAgain = false
+
     castBar:SetFrameStrata(Gladdy.db.castBarFrameStrata)
     castBar:SetFrameLevel(Gladdy.db.castBarFrameLevel)
     castBar.backdrop:SetFrameStrata(Gladdy.db.castBarFrameStrata)
@@ -191,12 +195,24 @@ function Castbar:UpdateFrame(unit)
     castBar.icon:SetWidth(Gladdy.db.castBarIconSize)
     castBar.icon:SetHeight(Gladdy.db.castBarIconSize)
     castBar.icon.texture:SetAllPoints(castBar.icon)
-    castBar.icon:ClearAllPoints()
-    if Gladdy.db.castBarIconEnabled then
-        castBar.icon:Show()
+    if Gladdy.db.castBarIconZoomed then
+        if castBar.icon.texture.masked then
+            castBar.icon.texture:SetMask(nil)
+            castBar.icon.texture:SetTexCoord(0.1,0.9,0.1,0.9)
+            castBar.icon.texture.masked = nil
+        end
     else
-        castBar.icon:Hide()
+        if not castBar.icon.texture.masked then
+            castBar.icon.texture:SetMask(nil)
+            castBar.icon.texture:SetTexCoord(0,1,0,1)
+            castBar.icon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
+            castBar.icon.texture.masked = true
+            if Gladdy.frame.testing then
+                testAgain = true
+            end
+        end
     end
+    castBar.icon:ClearAllPoints()
 
     castBar.shield:SetWidth(Gladdy.db.castBarIconSize * 3.2)
     castBar.shield:SetHeight(Gladdy.db.castBarIconSize * 3.2)
@@ -229,6 +245,16 @@ function Castbar:UpdateFrame(unit)
     end
     if not Gladdy.db.castBarEnabled then
         self:CAST_STOP(unit)
+    end
+
+    if Gladdy.db.castBarIconEnabled then
+        castBar.icon:Show()
+        if testAgain then
+            self:ResetUnit(unit)
+            self:Test(unit)
+        end
+    else
+        castBar.icon:Hide()
     end
 end
 
@@ -712,13 +738,20 @@ function Castbar:GetOptions()
                     args = {
                         headerSize = {
                             type = "header",
-                            name = L["Icon Size"],
+                            name = L["Icon"],
                             order = 1,
                         },
                         castBarIconEnabled = option({
                             type = "toggle",
                             name = L["Icon Enabled"],
                             order = 2,
+                            width = "full",
+                        }),
+                        castBarIconZoomed = Gladdy:option({
+                            type = "toggle",
+                            name = L["Zoomed Icon"],
+                            desc = L["Zoomes the icon to remove borders"],
+                            order = 3,
                             width = "full",
                         }),
                         castBarIconSize = option({
