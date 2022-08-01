@@ -234,6 +234,11 @@ local importantAuras = {
         priority = 40,
         spellID = 8122,
     },
+    [GetSpellInfo(64044)] = { -- Psychic Horror
+        track = AURA_TYPE_DEBUFF,
+        priority = 40,
+        spellID = 64044,
+    },
     [GetSpellInfo(12826)] = { -- Polymorph
         track = AURA_TYPE_DEBUFF,
         priority = 40,
@@ -503,6 +508,11 @@ local importantAuras = {
         track = AURA_TYPE_DEBUFF,
         priority = 20,
         spellID = 53359,
+    },
+    [GetSpellInfo(64058)] = { -- Psychic Horror Disarm
+        track = AURA_TYPE_DEBUFF,
+        priority = 20,
+        spellID = 64058,
     },
 
     --- Buffs
