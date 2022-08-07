@@ -1,4 +1,6 @@
 local select, string_gsub, tostring, pairs, ipairs = select, string.gsub, tostring, pairs, ipairs
+local wipe = wipe
+local unpack = unpack
 
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local AURA_TYPE_DEBUFF = AURA_TYPE_DEBUFF
@@ -34,10 +36,11 @@ function EventListener:JOINED_ARENA()
     self:RegisterEvent("UNIT_SPELLCAST_START")
     self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
     self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
-    self:SetScript("OnEvent", EventListener.OnEvent)
-
     -- in case arena has started already we check for units
     for i=1,Gladdy.curBracket do
+        if Gladdy.buttons["arena"..i].lastAuras then
+            wipe(Gladdy.buttons["arena"..i].lastAuras)
+        end
         if UnitExists("arena" .. i) then
             Gladdy:SpotEnemy("arena" .. i, true)
         end
@@ -45,6 +48,7 @@ function EventListener:JOINED_ARENA()
             Gladdy:SendMessage("PET_SPOTTED", "arenapet" .. i)
         end
     end
+    self:SetScript("OnEvent", EventListener.OnEvent)
 end
 
 function EventListener:Reset()
@@ -281,6 +285,13 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
     if not button then
         return
     end
+    if not button.auras then
+        button.auras = {}
+    end
+    wipe(button.auras)
+    if not button.lastAuras then
+        button.lastAuras = {}
+    end
     for i = 1, 2 do
         if not Gladdy.buttons[unit].class or not Gladdy.buttons[unit].race then
             Gladdy:SpotEnemy(unit, false)
@@ -317,6 +328,31 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
             end
             Gladdy:SendMessage("AURA_GAIN", unit, auraType, spellID, spellName, texture, duration, expirationTime, count, dispelType, i, unitCaster)
         end
+    end
+    -- check auras
+    for spellID,v in pairs(button.lastAuras) do
+        if not button.auras[spellID] then
+            if Gladdy.db.cooldown and Cooldowns.cooldownSpellIds[v[3]] then
+                local spellId = Cooldowns.cooldownSpellIds[v[3]] -- don't use spellId from combatlog, in case of different spellrank
+                if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
+                    spellId = spellID
+                end
+                Gladdy:Debug("INFO", "EL:UNIT_AURA Cooldowns:AURA_FADE", unit, spellId)
+                Cooldowns:AURA_FADE(unit, spellId)
+            end
+        end
+    end
+    wipe(button.lastAuras)
+    button.lastAuras = Gladdy:DeepCopy(button.auras)
+end
+
+function EventListener:UpdateAuras(unit)
+    local button = Gladdy.buttons[unit]
+    if not button or button.lastAuras then
+        return
+    end
+    for i=1, #button.lastAuras do
+        Gladdy.modules["Auras"]:AURA_GAIN(unit, unpack(button.lastAuras[i]))
     end
 end
 
