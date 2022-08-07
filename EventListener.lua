@@ -118,12 +118,16 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
     end
     if destUnit then
         -- cooldown
-        if (Gladdy.db.cooldown and Cooldowns.cooldownSpellIds[spellName]) then
+        if (srcUnit and eventType == "SPELL_AURA_REMOVED" and Gladdy.db.cooldown and Cooldowns.cooldownSpellIds[spellName]) then
+            local unit = Gladdy:GetArenaUnit(srcUnit, true)
             local spellId = Cooldowns.cooldownSpellIds[spellName] -- don't use spellId from combatlog, in case of different spellrank
             if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
                 spellId = spellID
             end
-            Cooldowns:AURA_FADE(destUnit, spellID)
+            if unit then
+                Gladdy:Debug("INFO", "EL:CL:SPELL_AURA_REMOVED (destUnit)", "Cooldowns:AURA_FADE", unit, spellId)
+                Cooldowns:AURA_FADE(unit, spellId)
+            end
         end
         -- diminish tracker
         if Gladdy.buttons[destUnit] and Gladdy.db.drEnabled and extraSpellId == AURA_TYPE_DEBUFF then
@@ -189,6 +193,17 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
         if (eventType == "SPELL_AURA_REMOVED" and (spellID == 16188 or spellID == 17116) and Gladdy.buttons[srcUnit].class) then
             Gladdy:Debug("INFO", "SPELL_AURA_REMOVED - CooldownUsed", srcUnit, "spellID:", spellID)
             Cooldowns:CooldownUsed(srcUnit, Gladdy.buttons[srcUnit].class, spellID)
+        end
+        if (eventType == "SPELL_AURA_REMOVED" and Gladdy.db.cooldown and Cooldowns.cooldownSpellIds[spellName]) then
+            local unit = Gladdy:GetArenaUnit(srcUnit, true)
+            local spellId = Cooldowns.cooldownSpellIds[spellName] -- don't use spellId from combatlog, in case of different spellrank
+            if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
+                spellId = spellID
+            end
+            if unit then
+                Gladdy:Debug("INFO", "EL:CL:SPELL_AURA_REMOVED (srcUnit)", "Cooldowns:AURA_FADE", unit, spellId)
+                Cooldowns:AURA_FADE(unit, spellId)
+            end
         end
     end
 end

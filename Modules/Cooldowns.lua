@@ -1,5 +1,6 @@
 local type, pairs, ipairs, ceil, tonumber, mod, tostring, upper, select, tinsert, tremove = type, pairs, ipairs, ceil, tonumber, mod, tostring, string.upper, select, tinsert, tremove
 local tbl_sort = table.sort
+local C_Timer = C_Timer
 local GetTime = GetTime
 local CreateFrame = CreateFrame
 local GetSpellInfo = GetSpellInfo
@@ -373,6 +374,9 @@ function Cooldowns:UpdateTestCooldowns(unit)
     end)
 
     for _,icon in ipairs(orderedIcons) do
+        if icon.timer then
+            icon.timer:Cancel()
+        end
         self:CooldownUsed(unit, button.class, icon.spellId)
     end
 end
@@ -419,7 +423,7 @@ function Cooldowns:AURA_GAIN(_, auraType, spellID, spellName, _, duration, _, _,
         if (icon.spellId == spellId) then
             if icon._ButtonGlow and not icon._ButtonGlow.animIn:IsPlaying() or not icon._ButtonGlow then
                 LCG.ButtonGlow_Start(icon, nil, 0.15)
-                C_Timer.NewTimer(duration, function() LCG.ButtonGlow_Stop(icon) end)
+                icon.timer = C_Timer.NewTimer(duration, function() LCG.ButtonGlow_Stop(icon) end)
             end
         end
     end
@@ -432,6 +436,10 @@ function Cooldowns:AURA_FADE(unit, spellID)
     local cooldownFrame = Gladdy.buttons[unit].spellCooldownFrame
     for _,icon in pairs(cooldownFrame.icons) do
         if (icon.spellId == spellID) then
+            Gladdy:Debug("INFO", "Cooldowns:AURA_FADE", "LCG.ButtonGlow_Stop")
+            if icon.timer then
+                icon.timer:Cancel()
+            end
             LCG.ButtonGlow_Stop(icon)
         end
     end
@@ -492,6 +500,9 @@ local function resetIcon(icon)
     icon.cooldown:Hide()
     icon.cooldownFont:SetText("")
     icon:SetScript("OnUpdate", nil)
+    if icon.timer then
+        icon.timer:Cancel()
+    end
     --LCG.ButtonGlow_Stop(icon)
 end
 
