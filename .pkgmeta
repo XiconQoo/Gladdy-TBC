@@ -1,0 +1,10 @@
+package-as: Gladdy
+
+enable-nolib-creation: no
+
+embedded-libraries:
+  - drlist-1-0
+
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
