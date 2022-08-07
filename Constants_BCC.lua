@@ -1133,6 +1133,15 @@ local totemData = {
 local totemSpellIdToPulse = {
     [GetSpellInfo(totemData[string_lower("Poison Cleansing Totem")].id)] = totemData[string_lower("Poison Cleansing Totem")].pulse,
     [8166] = totemData[string_lower("Poison Cleansing Totem")].pulse,
+    [GetSpellInfo(totemData[string_lower("Mana Spring Totem")].id)] = totemData[string_lower("Mana Spring Totem")].pulse,
+    [5675] = totemData[string_lower("Mana Spring Totem")].pulse, -- Rank 1
+    [10495] = totemData[string_lower("Mana Spring Totem")].pulse, -- Rank 2
+    [10496] = totemData[string_lower("Mana Spring Totem")].pulse, -- Rank 3
+    [10497] = totemData[string_lower("Mana Spring Totem")].pulse, -- Rank 4
+    [25570] = totemData[string_lower("Mana Spring Totem")].pulse, -- Rank 5
+    [58771] = totemData[string_lower("Mana Spring Totem")].pulse, -- Rank 6
+    [58773] = totemData[string_lower("Mana Spring Totem")].pulse, -- Rank 7
+    [58774] = totemData[string_lower("Mana Spring Totem")].pulse, -- Rank 8
 }
 
 local totemNpcIdsToTotemData = {
