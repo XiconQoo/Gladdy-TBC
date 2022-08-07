@@ -490,7 +490,7 @@ local importantAuras = {
         priority = 20,
         spellID = 63529,
     },
-    ["Unstable Affliction Silence"] = { -- Unstable Affliction Silence (GetSpellInfo returns "Unstable Affliction")
+    [select(1, GetSpellInfo(31117)) .. " Silence"] = { -- Unstable Affliction Silence (GetSpellInfo returns "Unstable Affliction")
         track = AURA_TYPE_DEBUFF,
         altName = select(1, GetSpellInfo(31117)) .. " Silence",
         priority = 20,
@@ -615,7 +615,7 @@ local importantAuras = {
         priority = 9,
         spellID = 6346,
     },
-    [GetSpellInfo(50334)] = {-- Berserk
+    [GetSpellInfo(50334) .. "Feral"] = {-- Berserk
         track = AURA_TYPE_BUFF,
         priority = 20,
         spellID = 50334,
@@ -678,6 +678,16 @@ local importantAuras = {
         track = AURA_TYPE_BUFF,
         priority = 30,
         spellID = 1719,
+    },
+    [GetSpellInfo(48792)] = { -- Icebound Fortitude
+        track = AURA_TYPE_BUFF,
+        priority = 15,
+        spellID = 48792,
+    },
+    [GetSpellInfo(49039)] = { -- Lichborne
+        track = AURA_TYPE_BUFF,
+        priority = 15,
+        spellID = 49039,
     },
 
     --- Alt Stuff
