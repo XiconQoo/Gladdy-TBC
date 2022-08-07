@@ -77,6 +77,7 @@ function Pets:ResetUnit(unitId)
     end
     petFrame.healthBar:SetAlpha(0)
     petFrame.healthBar:SetScript("OnUpdate", nil)
+    petFrame.healthBar.portrait:SetTexture(nil)
     self:UnregisterEvent("UNIT_PET")
 end
 
@@ -346,7 +347,7 @@ function Pets:SetHealthText(healthBar, health, healthMax)
             healthText = ("%d%%"):format(healthPercentage)
         end
     else
-        healthText = "DEAD"
+        healthText = ""
     end
 
     healthBar.healthText:SetText(healthText)
