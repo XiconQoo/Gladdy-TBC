@@ -978,7 +978,7 @@ local cooldownList = {
                     icon = select(3, GetSpellInfo(14311)),
         },
         [34490] = { cd = 20, spec = L["Marksmanship"], }, -- Silencing Shot
-        [19386] = { cd = 60, spec = L["Survival"], }, -- Wyvern Sting
+        [19386] = { cd = 120, spec = L["Survival"], }, -- Wyvern Sting
         [19577] = { cd = 60, spec = L["Beast Mastery"], }, -- Intimidation
         [34471] = { cd = 120, spec = L["Beast Mastery"], }, -- The Beast Within
         [5384] = 30, -- Feign Death
