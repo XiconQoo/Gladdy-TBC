@@ -189,14 +189,14 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
                     else
                         unitClass = Gladdy.buttons[srcUnit].race
                     end
-                    if spellID ~= 16188 and spellID ~= 17116 then -- Nature's Swiftness CD starts when buff fades
+                    if spellID ~= 16188 and spellID ~= 17116 and spellID ~= 16166 and spellID ~= 12043 then -- Nature's Swiftness CD starts when buff fades
                         Gladdy:Debug("INFO", eventType, "- CooldownUsed", srcUnit, "spellID:", spellID)
                         Cooldowns:CooldownUsed(srcUnit, unitClass, spellId)
                     end
                 end
             end
         end
-        if (eventType == "SPELL_AURA_REMOVED" and (spellID == 16188 or spellID == 17116) and Gladdy.buttons[srcUnit].class) then
+        if (eventType == "SPELL_AURA_REMOVED" and (spellID == 16188 or spellID == 17116 or spellID == 16166 or spellID == 12043) and Gladdy.buttons[srcUnit].class) then
             Gladdy:Debug("INFO", "SPELL_AURA_REMOVED - CooldownUsed", srcUnit, "spellID:", spellID)
             Cooldowns:CooldownUsed(srcUnit, Gladdy.buttons[srcUnit].class, spellID)
         end
