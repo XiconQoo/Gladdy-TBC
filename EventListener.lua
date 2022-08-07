@@ -77,6 +77,11 @@ function Gladdy:SpotEnemy(unit, auraScan)
                 Gladdy:SendMessage("AURA_GAIN_LIMIT", unit, AURA_TYPE_BUFF, n - 1)
                 break
             end
+
+            if Gladdy.exceptionNames[spellID] then
+                spellName = Gladdy.exceptionNames[spellID]
+            end
+
             if Gladdy.specBuffs[spellName] and unitCaster then -- Check for auras that detect a spec
                 local unitPet = string_gsub(unit, "%d$", "pet%1")
                 if UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster) then
@@ -108,6 +113,9 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
         Gladdy.modules["Shadowsight Timer"]:AURA_GAIN(nil, nil, 34709)
     end
 
+    if Gladdy.exceptionNames[spellID] then
+        spellName = Gladdy.exceptionNames[spellID]
+    end
     if destUnit then
         -- cooldown
         if (Gladdy.db.cooldown and Cooldowns.cooldownSpellIds[spellName]) then
@@ -226,25 +234,6 @@ function EventListener:ARENA_OPPONENT_UPDATE(unit, updateReason)
     end
 end
 
-Gladdy.exceptionNames = { -- TODO MOVE ME TO CLASSBUFFS LIB
-    [31117] = GetSpellInfo(30405) .. " Silence", -- Unstable Affliction Silence
-    [43523] = GetSpellInfo(30405) .. " Silence",
-    [24131] = select(1, GetSpellInfo(19386)) .. " Dot", -- Wyvern Sting Dot
-    [24134] = select(1, GetSpellInfo(19386)) .. " Dot",
-    [24135] = select(1, GetSpellInfo(19386)) .. " Dot",
-    [27069] = select(1, GetSpellInfo(19386)) .. " Dot",
-    [49009] = select(1, GetSpellInfo(19386)) .. " Dot",
-    [49010] = select(1, GetSpellInfo(19386)) .. " Dot",
-    [19975] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)), -- Entangling Roots Nature's Grasp
-    [19974] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
-    [19973] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
-    [19972] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
-    [19971] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
-    [19971] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
-    [27010] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
-    [53312] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
-}
-
 Gladdy.cooldownBuffs = {
     [GetSpellInfo(6346)] = { cd = function(expTime) -- 180s uptime == cd
         return expTime
@@ -288,6 +277,10 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
                 Gladdy:SendMessage("AURA_GAIN_LIMIT", unit, auraType, n - 1)
                 break
             end
+            if Gladdy.exceptionNames[spellID] then
+                spellName = Gladdy.exceptionNames[spellID]
+            end
+            button.auras[spellID] = { auraType, spellID, spellName, texture, duration, expirationTime, count, dispelType }
             if not button.spec and Gladdy.specBuffs[spellName] and unitCaster then
                 local unitPet = string_gsub(unit, "%d$", "pet%1")
                 if unitCaster and (UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster)) then
@@ -304,9 +297,6 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
             end
             if Gladdy.cooldownBuffs.racials[spellName] then
                 Gladdy:SendMessage("RACIAL_USED", unit, spellName, Gladdy.cooldownBuffs.racials[spellName].cd(expirationTime - GetTime()), spellName)
-            end
-            if Gladdy.exceptionNames[spellID] then
-                spellName = Gladdy.exceptionNames[spellID]
             end
             Gladdy:SendMessage("AURA_GAIN", unit, auraType, spellID, spellName, texture, duration, expirationTime, count, dispelType, i, unitCaster)
         end
@@ -337,6 +327,10 @@ function EventListener:UNIT_SPELLCAST_SUCCEEDED(...)
     if Gladdy.buttons[unit] then
         local unitRace = Gladdy.buttons[unit].race
         local spellName = GetSpellInfo(spellID)
+
+        if Gladdy.exceptionNames[spellID] then
+            spellName = Gladdy.exceptionNames[spellID]
+        end
 
         -- spec detection
         if Gladdy.specSpells[spellName] and not Gladdy.buttons[unit].spec then

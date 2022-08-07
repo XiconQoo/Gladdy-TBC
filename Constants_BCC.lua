@@ -626,7 +626,7 @@ local importantAuras = {
         spellID = 24259,
     },
     -- Unstable Affliction Silence
-    ["Unstable Affliction Silence"] = { -- GetSpellInfo returns "Unstable Affliction"
+    [select(1, GetSpellInfo(31117)) .. " Silence"] = { -- GetSpellInfo returns "Unstable Affliction"
         track = AURA_TYPE_DEBUFF,
         altName = select(1, GetSpellInfo(31117)) .. " Silence",
         duration = 5,

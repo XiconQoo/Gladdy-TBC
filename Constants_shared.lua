@@ -1,5 +1,6 @@
 local tbl_sort, select, string_lower = table.sort, select, string.lower
 local GetLocale = GetLocale
+local GetSpellInfo = GetSpellInfo
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
@@ -181,6 +182,30 @@ Gladdy.frameStrataSorting = {
     [6] = "FULLSCREEN",
     [7] = "FULLSCREEN_DIALOG",
     [8] = "TOOLTIP",
+}
+
+Gladdy.exceptionNames = {
+    [50334] = (GetSpellInfo(50334) or "...") .. " Feral", -- Berserk
+    [30151] = select(1, GetSpellInfo(30151)) .. " Felguard", -- Intercept
+    [30194] = select(1, GetSpellInfo(30151)) .. " Felguard", -- Intercept
+    [30198] = select(1, GetSpellInfo(30151)) .. " Felguard", -- Intercept
+    [47996] = select(1, GetSpellInfo(30151)) .. " Felguard", -- Intercept
+    [31117] = select(1, GetSpellInfo(30405)) .. " Silence", -- Unstable Affliction Silence
+    [43523] = select(1, GetSpellInfo(30405)) .. " Silence",
+    [24131] = select(1, GetSpellInfo(19386)) .. " Dot", -- Wyvern Sting Dot
+    [24134] = select(1, GetSpellInfo(19386)) .. " Dot",
+    [24135] = select(1, GetSpellInfo(19386)) .. " Dot",
+    [27069] = select(1, GetSpellInfo(19386)) .. " Dot",
+    [49009] = select(1, GetSpellInfo(19386)) .. " Dot",
+    [49010] = select(1, GetSpellInfo(19386)) .. " Dot",
+    [19975] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)), -- Entangling Roots Nature's Grasp
+    [19974] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
+    [19973] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
+    [19972] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
+    [19971] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
+    [19971] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
+    [27010] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
+    [53312] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
 }
 
 local dispelTypeColors = {}

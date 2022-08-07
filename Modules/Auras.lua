@@ -596,10 +596,6 @@ function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, exp
         return
     end
 
-    if spellID == 31117 then
-        spellName = "Unstable Affliction Silence"
-    end
-
     if not self.auras[spellName] then
         return
     end
@@ -1242,14 +1238,7 @@ function Auras:GetAuraOptions(auraType)
     for i,k in ipairs(auras) do
         options[tostring(k)] = {
             type = "group",
-            name = (Gladdy:GetImportantAuras()["Unstable Affliction Silence"]
-                    and Gladdy:GetImportantAuras()["Unstable Affliction Silence"].spellID == k
-                    and Gladdy:GetImportantAuras()["Unstable Affliction Silence"].altName)
-                    or (Gladdy:GetImportantAuras()[select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689))]
-                    and Gladdy:GetImportantAuras()[select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689))].spellID == k
-                    and Gladdy:GetImportantAuras()[select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689))].altName)
-                    or Gladdy:GetImportantAuras()[GetSpellInfo(k)].altName
-                    or GetSpellInfo(k),
+            name = Gladdy:GetExceptionSpellName(k),
             order = i+2,
             icon = Gladdy:GetImportantAuras()[GetSpellInfo(k)] and Gladdy:GetImportantAuras()[GetSpellInfo(k)].texture or select(3, GetSpellInfo(k)),
             args = {
@@ -1322,10 +1311,7 @@ function Auras:GetInterruptOptions()
     for i,k in ipairs(auras) do
         options[tostring(k)] = {
             type = "group",
-            name = Gladdy:GetInterrupts()["Unstable Affliction Silence"]
-                    and Gladdy:GetInterrupts()["Unstable Affliction Silence"].spellID == k
-                    and Gladdy:GetInterrupts()["Unstable Affliction Silence"].altName
-                    or GetSpellInfo(k),
+            name = GetSpellInfo(k),
             order = i+2,
             icon = Gladdy:GetInterrupts()[GetSpellInfo(k)] and Gladdy:GetInterrupts()[GetSpellInfo(k)].texture or select(3, GetSpellInfo(k)),
             args = {
