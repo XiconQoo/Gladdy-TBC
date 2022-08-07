@@ -362,7 +362,7 @@ function EventListener:DetectSpec(unit, spec)
     if (not button or not spec or button.spec) then
         return
     end
-    if button.class == "PALADIN" and Gladdy:contains(spec, {L["Holy"], L["Retribution"], L["Protection"]})
+    if button.class == "PALADIN" and not Gladdy:contains(spec, {L["Holy"], L["Retribution"], L["Protection"]})
             or button.class == "SHAMAN" and not Gladdy:contains(spec, {L["Restoration"], L["Enhancement"], L["Elemental"]})
             or button.class == "ROGUE" and not Gladdy:contains(spec, {L["Subtlety"], L["Assassination"], L["Combat"]})
             or button.class == "WARLOCK" and not Gladdy:contains(spec, {L["Demonology"], L["Destruction"], L["Affliction"]})
