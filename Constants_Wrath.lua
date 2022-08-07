@@ -788,7 +788,7 @@ local cooldownList = {
         [8983] = 60, -- Bash
         [53312] = 60, -- Natures Grasp
         [48505] = { cd = 90, spec = L["Balance"], }, -- Starfall
-        [50334] = { cd = 180, spec = L["Feral"], }, -- Berserk
+        [50334] = { cd = 180, spec = L["Feral"], altName = GetSpellInfo(50334) .. " Feral" }, -- Berserk
         [17116] = { cd = 120, spec = L["Restoration"], }, -- Natures Swiftness
         [18562] = { cd = 15, spec = L["Restoration"], }, -- Swiftmend
         [33831] = { cd = 180, spec = L["Balance"], }, -- Force of Nature
@@ -849,7 +849,7 @@ local cooldownList = {
         [17962] = { cd = 10, spec = L["Destruction"], }, -- Conflagrate
         [59172] = { cd = 12, spec = L["Destruction"], }, -- Chaos Bolt
         [47241] = { cd = 180, spec = L["Demonology"], }, -- Metamorphosis
-        [47996] = { cd = 30, spec = L["Demonology"], pet = true, }, -- Intercept
+        [47996] = { cd = 30, spec = L["Demonology"], pet = true, altName = GetSpellInfo(47996) .. " Felguard" }, -- Intercept
         [1122] = { cd = 600, spec = L["Demonology"], }, -- Inferno
     },
 
@@ -893,7 +893,7 @@ local cooldownList = {
         [19503] = 30, -- Scatter Shot
         [19263] = 90, -- Deterrence
         [781] = 15, -- Disengage
-        [5384] = 20, -- Feign Death
+        [5384] = 30, -- Feign Death
         [3045] = 20, -- Rapid Fire
         [60192] = { cd = 28, -- Freezing Arrow
                     sharedCD = {

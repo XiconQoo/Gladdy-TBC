@@ -85,8 +85,13 @@ function Cooldowns:Initialize()
     for _,spellTable in pairs(Gladdy:GetCooldownList()) do
         for spellId,val in pairs(spellTable) do
             local spellName, _, texture = GetSpellInfo(spellId)
-            if type(val) == "table" and val.icon then
-                texture = val.icon
+            if type(val) == "table" then
+                if val.icon then
+                    texture = val.icon
+                end
+                if val.altName then
+                    spellName = val.altName
+                end
             end
             if spellName then
                 self.cooldownSpellIds[spellName] = spellId
