@@ -447,9 +447,17 @@ function Cooldowns:CooldownStart(button, spellId, duration, start)
     if not duration or duration == nil or type(duration) ~= "number" then
         return
     end
+    local cooldown = Gladdy:GetCooldownList()[button.class][spellId]
+    if type(cooldown) == "table" then
+        if (button.spec ~= nil and cooldown[button.spec] ~= nil) then
+            cooldown = cooldown[button.spec]
+        else
+            cooldown = cooldown.cd
+        end
+    end
     for _,icon in pairs(button.spellCooldownFrame.icons) do
         if (icon.spellId == spellId) then
-            if not start and icon.active and icon.timeLeft > Gladdy:GetCooldownList()[button.class][spellId].cd/2 then
+            if not start and icon.active and icon.timeLeft > cooldown/2 then
                 return -- do not trigger cooldown again
             end
             icon.active = true
