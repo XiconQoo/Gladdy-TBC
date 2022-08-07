@@ -456,6 +456,9 @@ function Cooldowns:CooldownStart(button, spellId, duration, start)
     end
     for _,icon in pairs(button.spellCooldownFrame.icons) do
         if (icon.spellId == spellId) then
+            if not start and icon.active and icon.timeLeft > Gladdy:GetCooldownList()[button.class][spellId].cd/2 then
+                return -- do not trigger cooldown again
+            end
             icon.active = true
             icon.timeLeft = start and start - GetTime() + duration or duration
             if (not Gladdy.db.cooldownDisableCircle) then icon.cooldown:SetCooldown(start or GetTime(), duration) end
@@ -465,7 +468,6 @@ function Cooldowns:CooldownStart(button, spellId, duration, start)
             if Gladdy.db.cooldownIconAlphaOnCooldown < 1 then
                 icon.texture:SetAlpha(Gladdy.db.cooldownIconAlphaOnCooldown)
             end
-            --if math.random(1, 30 ) > 10 then LCG.ButtonGlow_Start(icon, nil, 0.15) end
             icon:SetScript("OnUpdate", function(self, elapsed)
                 self.timeLeft = self.timeLeft - elapsed
                 local timeLeft = ceil(self.timeLeft)
@@ -484,6 +486,7 @@ function Cooldowns:CooldownStart(button, spellId, duration, start)
                     Cooldowns:CooldownReady(button, spellId, icon)
                 end
             end)
+            break
             --C_VoiceChat.SpeakText(2, GetSpellInfo(spellId), 3, 4, 100)
         end
     end
@@ -617,7 +620,6 @@ function Cooldowns:AddCooldown(spellID, value, button)
         icon.texture:SetTexture(self.spellTextures[spellID])
         tinsert(button.spellCooldownFrame.icons, icon)
         self:IconsSetPoint(button)
-        Gladdy:Debug("INFO", "Cooldowns:AddCooldown", button.unit, GetSpellInfo(spellID))
     end
 end
 
