@@ -1,4 +1,6 @@
 local pairs, ipairs = pairs, ipairs
+local select = select
+local type = type
 local floor = math.floor
 local str_find, str_gsub, str_sub, tinsert = string.find, string.gsub, string.sub, table.insert
 local Gladdy = LibStub("Gladdy")
@@ -179,4 +181,51 @@ function Gladdy:GetArenaUnit(unitCaster, unify)
             end
         end
     end
+end
+
+function Gladdy:ShallowCopy(table)
+    local copy
+    if type(table) == 'table' then
+        copy = {}
+        for k,v in pairs(table) do
+            copy[k] = v
+        end
+    else -- number, string, boolean, etc
+        copy = table
+    end
+    return copy
+end
+
+function Gladdy:DeepCopy(table)
+    local copy
+    if type(table) == 'table' then
+        copy = {}
+        for k,v in pairs(table) do
+            if type(v) == 'table' then
+                copy[k] = self:DeepCopy(v)
+            else -- number, string, boolean, etc
+                copy[k] = v
+            end
+        end
+    else -- number, string, boolean, etc
+        copy = table
+    end
+    return copy
+end
+
+function Gladdy:AddEntriesToTable(table, entries)
+    for k,v in pairs(entries) do
+        if not table[k] then
+            table[k] = v
+        end
+    end
+end
+
+function Gladdy:GetExceptionSpellName(spellID)
+    for k,v in pairs(Gladdy.exceptionNames) do
+        if k == spellID and Gladdy:GetImportantAuras()[v] and Gladdy:GetImportantAuras()[v].altName then
+            return Gladdy:GetImportantAuras()[v].altName
+        end
+    end
+    return select(1, GetSpellInfo(spellID))
 end

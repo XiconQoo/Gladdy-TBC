@@ -13,12 +13,12 @@ embeds.xml
 
 Gladdy.lua
 Lang.lua
+Util.lua
 Frame.lua
 Options.lua
 Constants_shared.lua
 Constants_BCC.lua
 ImportStrings.lua
-Util.lua
 
 Modules\Announcements.lua
 Modules\Healthbar.lua
