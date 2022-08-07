@@ -386,7 +386,7 @@ function EventListener:UNIT_SPELLCAST_SUCCEEDED(...)
         end
 
         -- spec detection
-        if Gladdy.specSpells[spellName] and not Gladdy.buttons[unit].spec then
+        if spellName and  Gladdy.specSpells[spellName] and not Gladdy.buttons[unit].spec then
             self:DetectSpec(unit, Gladdy.specSpells[spellName])
         end
 
@@ -397,7 +397,7 @@ function EventListener:UNIT_SPELLCAST_SUCCEEDED(...)
         end
 
         -- racial
-        if Gladdy:Racials()[unitRace].spellName == spellName and Gladdy:Racials()[unitRace][spellID] then
+        if unitRace and  Gladdy:Racials()[unitRace].spellName == spellName and Gladdy:Racials()[unitRace][spellID] then
             Gladdy:Debug("INFO", "UNIT_SPELLCAST_SUCCEEDED - RACIAL_USED", unit, spellID)
             Gladdy:SendMessage("RACIAL_USED", unit)
         end
