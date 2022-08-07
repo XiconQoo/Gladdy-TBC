@@ -146,6 +146,8 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
         if (Gladdy.buttons[destUnit] and eventType == "UNIT_DIED" or eventType == "PARTY_KILL" or eventType == "SPELL_INSTAKILL") then
             if not Gladdy:isFeignDeath(destUnit) then
                 Gladdy:SendMessage("UNIT_DEATH", destUnit)
+            else
+                Cooldowns:CooldownUsed(destUnit, Gladdy.buttons[destUnit].class, 5384)
             end
         end
         -- spec detection
@@ -177,14 +179,14 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
                 if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
                     spellId = spellID
                 end
-                if Gladdy.db.cooldownCooldowns[tostring(spellId)] then
+                if Gladdy.db.cooldownCooldowns[tostring(spellId)] and (eventType == "SPELL_CAST_SUCCESS" or eventType == "SPELL_MISSED") then
                     if (Gladdy:GetCooldownList()[Gladdy.buttons[srcUnit].class][spellId]) then
                         unitClass = Gladdy.buttons[srcUnit].class
                     else
                         unitClass = Gladdy.buttons[srcUnit].race
                     end
                     if spellID ~= 16188 and spellID ~= 17116 then -- Nature's Swiftness CD starts when buff fades
-                        Gladdy:Debug("INFO", "SPELL_CAST_SUCCESS - CooldownUsed", srcUnit, "spellID:", spellID)
+                        Gladdy:Debug("INFO", eventType, "- CooldownUsed", srcUnit, "spellID:", spellID)
                         Cooldowns:CooldownUsed(srcUnit, unitClass, spellId)
                     end
                 end
