@@ -759,9 +759,9 @@ local importantAuras = {
     },
     -- Shadowsight Buff
     [GetSpellInfo(34709)] = {
-        track = AURA_TYPE_BUFF,
+        track = AURA_TYPE_DEBUFF,
         duration = 15,
-        priority = 15,
+        priority = 9,
         magic = true,
         spellID = 34709,
     },
