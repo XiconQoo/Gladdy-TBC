@@ -146,7 +146,6 @@ local function getGradient(start, ending, percentage, factor)
     return start * abs(-2 * percentage + 1) + ending * factor
 end
 
--- /run LibStub("Gladdy").modules["Health Bar"]:SetHealthStatusBarColor("arena1", 51, 100)
 local rMax, gMax, bMax, rMid, gMid, bMid, rMin, gMin, bMin, rNow, gNow, bNow, percentage, factor, stealthAlpha
 function Healthbar:SetHealthStatusBarColor(unit, health, healthMax)
     local button = Gladdy.buttons[unit]

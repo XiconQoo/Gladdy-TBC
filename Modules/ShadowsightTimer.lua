@@ -25,9 +25,6 @@ local ShadowsightTimer = Gladdy:NewModule("Shadowsight Timer", nil, {
     shadowsightTimerFrameLevel = 20,
 })
 
--- /run LibStub("Gladdy").modules["Shadowsight Timer"]:AURA_GAIN(nil, nil, 34709)
--- /run LibStub("Gladdy").modules["Shadowsight Timer"].timerFrame1:SetAlpha(0)
-
 function ShadowsightTimer:OnEvent(event, ...)
     self[event](self, ...)
 end

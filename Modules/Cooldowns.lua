@@ -115,7 +115,6 @@ end
 
 function Cooldowns:CreateFrame(unit)
     local button = Gladdy.buttons[unit]
-    -- Cooldown frame
     local spellCooldownFrame = CreateFrame("Frame", nil, button)
     spellCooldownFrame:EnableMouse(false)
     spellCooldownFrame:SetMovable(true)
@@ -126,7 +125,7 @@ function Cooldowns:CreateFrame(unit)
     self.frames[unit] = spellCooldownFrame
 end
 
-function Cooldowns:CreateIcon() -- returns iconFrame
+function Cooldowns:CreateIcon()
     local icon
     if (#self.iconCache > 0) then
         icon = tremove(self.iconCache, #self.iconCache)
@@ -264,7 +263,6 @@ end
 
 function Cooldowns:UpdateFrame(unit)
     local button = Gladdy.buttons[unit]
-    -- Cooldown frame
     local testAgain = false
     if (Gladdy.db.cooldown) then
         button.spellCooldownFrame:SetHeight(Gladdy.db.cooldownSize)
@@ -359,7 +357,7 @@ function Cooldowns:Test(unit)
     if Gladdy.frame.testing then
         self:UpdateTestCooldowns(unit)
     end
-    Cooldowns:AURA_GAIN(_, AURA_TYPE_BUFF, "22812", "Barkskin", _, 20, _, _, _, _, unit, true) -- unit, auraType, spellID, spellName, texture, duration, expirationTime
+    Cooldowns:AURA_GAIN(_, AURA_TYPE_BUFF, "22812", "Barkskin", _, 20, _, _, _, _, unit, true)
 end
 
 function Cooldowns:UpdateTestCooldowns(unit)
@@ -403,10 +401,6 @@ function Cooldowns:UNIT_DESTROYED(unit)
     self:ResetUnit(unit)
 end
 
---[[
-    /run local a=LibStub("Gladdy").modules["Cooldowns"] a:AURA_GAIN("arena1",22812)
-    /run local a=LibStub("Gladdy").modules["Cooldowns"] a:AURA_FADE("arena1",22812)
---]]
 function Cooldowns:AURA_GAIN(_, auraType, spellID, spellName, _, duration, _, _, _, _, unitCaster, test)
     local arenaUnit = test and unitCaster or Gladdy:GetArenaUnit(unitCaster, true)
     if not Gladdy.db.cooldownIconGlow or not arenaUnit or not Gladdy.buttons[arenaUnit] or auraType ~= AURA_TYPE_BUFF then
@@ -450,7 +444,6 @@ end
 ---------------------
 
 function Cooldowns:CooldownStart(button, spellId, duration, start)
-    -- starts timer frame
     if not duration or duration == nil or type(duration) ~= "number" then
         return
     end
@@ -526,13 +519,11 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId, expirationTimeInSecond
     if not button then
         return
     end
-    -- if (self.db.cooldownList[spellId] == false) then return end
 
     local cooldown = Gladdy:GetCooldownList()[unitClass][spellId]
     local cd = cooldown
     if (type(cooldown) == "table") then
         -- return if the spec doesn't have a cooldown for this spell
-        --if (arenaSpecs[unit] ~= nil and cooldown.notSpec ~= nil and arenaSpecs[unit] == cooldown.notSpec) then return end
         if (button.spec ~= nil and cooldown.notSpec ~= nil and button.spec == cooldown.notSpec) then
             return
         end
@@ -545,7 +536,6 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId, expirationTimeInSecond
         end
 
         -- check if there is a special cooldown for the units spec
-        --if (arenaSpecs[unit] ~= nil and cooldown[arenaSpecs[unit]] ~= nil) then
         if (button.spec ~= nil and cooldown[button.spec] ~= nil) then
             cd = cooldown[button.spec]
         else

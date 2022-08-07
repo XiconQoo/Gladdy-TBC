@@ -554,8 +554,6 @@ function Auras:Test(unit)
             self:AURA_GAIN(unit,v.value.track, spellid, spellName, icon, duration, GetTime() + duration)
         end
     end
-    -- /run LibStub("Gladdy").modules["Auras"]:Test("arena1")
-    -- /run LibStub("Gladdy"):JoinedArena()
 
     --Interrupts
     if (unit == "arena1" or unit == "arena3") then
