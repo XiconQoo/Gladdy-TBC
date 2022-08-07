@@ -587,7 +587,7 @@ local importantAuras = {
     },
     [GetSpellInfo(54428)] = { -- Divine Plea
         track = AURA_TYPE_BUFF,
-        priority = 20,
+        priority = 15,
         spellID = 54428,
     },
     [GetSpellInfo(31821)] = { -- Aura mastery
@@ -802,6 +802,7 @@ local cooldownList = {
         [17116] = { cd = 120, spec = L["Restoration"], }, -- Natures Swiftness
         [18562] = { cd = 15, spec = L["Restoration"], }, -- Swiftmend
         [33831] = { cd = 180, spec = L["Balance"], }, -- Force of Nature
+        [61384] = { cd = 20, spec = L["Balance"], }, -- Typhoon
     },
 
     -- Shaman
