@@ -91,7 +91,7 @@ local specBuffs = {
     -- DRUID
     [GetSpellInfo(24932)] = L["Feral"], -- Leader of the Pack
     [GetSpellInfo(16975)] = L["Feral"], -- Predatory Strikes
-    [GetSpellInfo(50334) .. "Feral"] = L["Feral"], -- Berserk
+    [GetSpellInfo(50334) .. " Feral"] = L["Feral"], -- Berserk
     [GetSpellInfo(24907)] = L["Balance"], -- Moonkin Aura
     [GetSpellInfo(24858)] = L["Balance"], -- Moonkin Form
     [GetSpellInfo(48504)] = L["Restoration"], -- Living Seed
@@ -176,7 +176,7 @@ local specSpells = {
     [GetSpellInfo(24858)] = L["Balance"], -- Moonkin Form
     [GetSpellInfo(48566)] = L["Feral"], -- Mangle (Cat)
     [GetSpellInfo(48564)] = L["Feral"], -- Mangle (Bear)
-    [GetSpellInfo(50334) .. "Feral"] = L["Feral"], -- Berserk
+    [GetSpellInfo(50334) .. " Feral"] = L["Feral"], -- Berserk
     [GetSpellInfo(18562)] = L["Restoration"], -- Swiftmend
     [GetSpellInfo(17116)] = L["Restoration"], -- Nature's Swiftness
     [GetSpellInfo(33891)] = L["Restoration"], -- Tree of Life
@@ -615,10 +615,15 @@ local importantAuras = {
         priority = 9,
         spellID = 6346,
     },
-    [GetSpellInfo(50334) .. "Feral"] = {-- Berserk
+    [GetSpellInfo(50334) .. " Feral"] = {-- Berserk
         track = AURA_TYPE_BUFF,
         priority = 20,
         spellID = 50334,
+    },
+    [GetSpellInfo(46924)] = { -- Bladestorm
+        track = AURA_TYPE_BUFF,
+        priority = 20,
+        spellID = 46924,
     },
 
     --- Turtling abilities
