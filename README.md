@@ -4,7 +4,7 @@
 
 ---
 
-## [v2.20-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.20-Release/Gladdy_Classic_v2.20-Beta.zip)
+## [v2.20-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.20-Release/Gladdy_Classic_v2.20-Release.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -78,6 +78,24 @@ Thank you!
 ---
 
 ### Changes
+
+### v2.20-Release
+- **Cooldowns**
+  - glow changed to PixelGlow
+  - glow color configurable
+  - improved tracking
+  - feign death cd tracking
+  - fixed Elemental Mastery and Presence of Mind tracking
+- **Auras**
+  - improved **Aura** tracking
+  - stealthed unit **Aura** tracking improved
+  - fixed Berserking Wrath
+- **Totemplates**
+  - ElvUI fix
+  - fix ManaSpringTotem
+- fix Paladin **SpecDetection**
+- fix DRList conflict with Diminish
+- minor bugfixes/improvements
 
 ### v2.20-Beta
 - **Wrath** & **BCC** support
