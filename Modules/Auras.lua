@@ -130,7 +130,7 @@ function Auras:CreateFrame(unit)
                 self.frame:SetAlpha(1)
             end
             if (self.timeLeft <= 0) then
-                Auras:AURA_FADE(self.unit, self.track)
+                Auras:AURA_FADE(self.unit, self.track, true)
             else
                 if self.spellID == 8178 then
                     self.text:SetText("")
@@ -554,8 +554,6 @@ function Auras:Test(unit)
             self:AURA_GAIN(unit,v.value.track, spellid, spellName, icon, duration, GetTime() + duration)
         end
     end
-    -- /run LibStub("Gladdy").modules["Auras"]:Test("arena1")
-    -- /run LibStub("Gladdy"):JoinedArena()
 
     --Interrupts
     if (unit == "arena1" or unit == "arena3") then
@@ -594,10 +592,6 @@ function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, exp
     local auraFrame = self.frames[unit]
     if (not auraFrame) then
         return
-    end
-
-    if spellID == 31117 then
-        spellName = "Unstable Affliction Silence"
     end
 
     if not self.auras[spellName] then
@@ -639,9 +633,9 @@ function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, exp
     end
 end
 
-function Auras:AURA_FADE(unit, auraType)
+function Auras:AURA_FADE(unit, auraType, force)
     local auraFrame = self.frames[unit]
-    if (not auraFrame or auraFrame.track ~= auraType) then
+    if (not auraFrame or auraFrame.track ~= auraType or not Gladdy.buttons[unit] or (not force and Gladdy.buttons[unit].stealthed)) then
         return
     end
     if auraFrame.active then
@@ -1242,14 +1236,7 @@ function Auras:GetAuraOptions(auraType)
     for i,k in ipairs(auras) do
         options[tostring(k)] = {
             type = "group",
-            name = (Gladdy:GetImportantAuras()["Unstable Affliction Silence"]
-                    and Gladdy:GetImportantAuras()["Unstable Affliction Silence"].spellID == k
-                    and Gladdy:GetImportantAuras()["Unstable Affliction Silence"].altName)
-                    or (Gladdy:GetImportantAuras()[select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689))]
-                    and Gladdy:GetImportantAuras()[select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689))].spellID == k
-                    and Gladdy:GetImportantAuras()[select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689))].altName)
-                    or Gladdy:GetImportantAuras()[GetSpellInfo(k)].altName
-                    or GetSpellInfo(k),
+            name = Gladdy:GetExceptionSpellName(k),
             order = i+2,
             icon = Gladdy:GetImportantAuras()[GetSpellInfo(k)] and Gladdy:GetImportantAuras()[GetSpellInfo(k)].texture or select(3, GetSpellInfo(k)),
             args = {
@@ -1322,10 +1309,7 @@ function Auras:GetInterruptOptions()
     for i,k in ipairs(auras) do
         options[tostring(k)] = {
             type = "group",
-            name = Gladdy:GetInterrupts()["Unstable Affliction Silence"]
-                    and Gladdy:GetInterrupts()["Unstable Affliction Silence"].spellID == k
-                    and Gladdy:GetInterrupts()["Unstable Affliction Silence"].altName
-                    or GetSpellInfo(k),
+            name = GetSpellInfo(k),
             order = i+2,
             icon = Gladdy:GetInterrupts()[GetSpellInfo(k)] and Gladdy:GetInterrupts()[GetSpellInfo(k)].texture or select(3, GetSpellInfo(k)),
             args = {

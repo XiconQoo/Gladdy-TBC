@@ -31,6 +31,8 @@ Gladdy.BUTTON_DEFAULTS = {
     stealthed = false,
     classColors = {},
     lastState = 0,
+    auras = {},
+    lastAuras = {}
 }
 
 function Gladdy:CreateFrame()

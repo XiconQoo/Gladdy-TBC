@@ -1,6 +1,9 @@
 local pairs, ipairs = pairs, ipairs
+local select = select
+local type = type
 local floor = math.floor
-local str_find, str_gsub, str_sub, tinsert = string.find, string.gsub, string.sub, table.insert
+local str_find, str_gsub, str_sub, str_format = string.find, string.gsub, string.sub, string.format
+local tinsert = table.insert
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local AuraUtil = AuraUtil
@@ -177,6 +180,82 @@ function Gladdy:GetArenaUnit(unitCaster, unify)
                     return arenaUnitPet
                 end
             end
+        end
+    end
+end
+
+function Gladdy:ShallowCopy(table)
+    local copy
+    if type(table) == 'table' then
+        copy = {}
+        for k,v in pairs(table) do
+            copy[k] = v
+        end
+    else -- number, string, boolean, etc
+        copy = table
+    end
+    return copy
+end
+
+function Gladdy:DeepCopy(table)
+    local copy
+    if type(table) == 'table' then
+        copy = {}
+        for k,v in pairs(table) do
+            if type(v) == 'table' then
+                copy[k] = self:DeepCopy(v)
+            else -- number, string, boolean, etc
+                copy[k] = v
+            end
+        end
+    else -- number, string, boolean, etc
+        copy = table
+    end
+    return copy
+end
+
+function Gladdy:AddEntriesToTable(table, entries)
+    for k,v in pairs(entries) do
+        if not table[k] then
+            table[k] = v
+        end
+    end
+end
+
+function Gladdy:GetExceptionSpellName(spellID)
+    for k,v in pairs(Gladdy.exceptionNames) do
+        if k == spellID and Gladdy:GetImportantAuras()[v] and Gladdy:GetImportantAuras()[v].altName then
+            return Gladdy:GetImportantAuras()[v].altName
+        end
+    end
+    return select(1, GetSpellInfo(spellID))
+end
+
+local function toHex(color)
+    if not color or not color.r or not color.g or not color.b then
+        return "000000"
+    end
+    return str_format("%.2x%.2x%.2x", floor(color.r * 255), floor(color.g * 255), floor(color.b * 255))
+end
+function Gladdy:SetTextColor(text, color)
+    return "|cff" .. toHex(color) .. text or "" .. "|r"
+end
+
+function Gladdy:ColorAsArray(color)
+    return {color.r, color.g, color.b, color.a}
+end
+
+function Gladdy:Dump(table, space)
+    if type(table) ~= "table" then
+        return
+    end
+    if not space then
+        space = ""
+    end
+    for k,v in pairs(table) do
+        Gladdy:Print(space .. k .. " - ", v)
+        if type(v) == "table" then
+            Gladdy:Dump(v, space .. " ")
         end
     end
 end

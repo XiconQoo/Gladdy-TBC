@@ -1,6 +1,6 @@
 ## Interface: 20504
 ## Title: Gladdy - TBC
-## Version: 2.2-Beta
+## Version: 2.20-Release
 ## Notes: The most powerful arena AddOn for WoW 2.5.4
 ## Author: XiconQoo, DnB_Junkee, Knall
 ## X-Email: contact me on discord Knall#1751
@@ -13,12 +13,12 @@ embeds.xml
 
 Gladdy.lua
 Lang.lua
+Util.lua
 Frame.lua
 Options.lua
 Constants_shared.lua
 Constants_BCC.lua
 ImportStrings.lua
-Util.lua
 
 Modules\Announcements.lua
 Modules\Healthbar.lua

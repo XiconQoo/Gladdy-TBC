@@ -1,4 +1,6 @@
 local select, string_gsub, tostring, pairs, ipairs = select, string.gsub, tostring, pairs, ipairs
+local wipe = wipe
+local unpack = unpack
 
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local AURA_TYPE_DEBUFF = AURA_TYPE_DEBUFF
@@ -34,10 +36,11 @@ function EventListener:JOINED_ARENA()
     self:RegisterEvent("UNIT_SPELLCAST_START")
     self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
     self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
-    self:SetScript("OnEvent", EventListener.OnEvent)
-
     -- in case arena has started already we check for units
     for i=1,Gladdy.curBracket do
+        if Gladdy.buttons["arena"..i].lastAuras then
+            wipe(Gladdy.buttons["arena"..i].lastAuras)
+        end
         if UnitExists("arena" .. i) then
             Gladdy:SpotEnemy("arena" .. i, true)
         end
@@ -45,6 +48,7 @@ function EventListener:JOINED_ARENA()
             Gladdy:SendMessage("PET_SPOTTED", "arenapet" .. i)
         end
     end
+    self:SetScript("OnEvent", EventListener.OnEvent)
 end
 
 function EventListener:Reset()
@@ -57,7 +61,6 @@ function Gladdy:SpotEnemy(unit, auraScan)
     if not unit or not button then
         return
     end
-    button.stealthed = false
     if UnitExists(unit) then
         button.raceLoc = UnitRace(unit)
         button.race = select(2, UnitRace(unit))
@@ -77,6 +80,11 @@ function Gladdy:SpotEnemy(unit, auraScan)
                 Gladdy:SendMessage("AURA_GAIN_LIMIT", unit, AURA_TYPE_BUFF, n - 1)
                 break
             end
+
+            if Gladdy.exceptionNames[spellID] then
+                spellName = Gladdy.exceptionNames[spellID]
+            end
+
             if Gladdy.specBuffs[spellName] and unitCaster then -- Check for auras that detect a spec
                 local unitPet = string_gsub(unit, "%d$", "pet%1")
                 if UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster) then
@@ -108,15 +116,10 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
         Gladdy.modules["Shadowsight Timer"]:AURA_GAIN(nil, nil, 34709)
     end
 
+    if Gladdy.exceptionNames[spellID] then
+        spellName = Gladdy.exceptionNames[spellID]
+    end
     if destUnit then
-        -- cooldown
-        if (Gladdy.db.cooldown and Cooldowns.cooldownSpellIds[spellName]) then
-            local spellId = Cooldowns.cooldownSpellIds[spellName] -- don't use spellId from combatlog, in case of different spellrank
-            if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
-                spellId = spellID
-            end
-            Cooldowns:AURA_FADE(destUnit, spellID)
-        end
         -- diminish tracker
         if Gladdy.buttons[destUnit] and Gladdy.db.drEnabled and extraSpellId == AURA_TYPE_DEBUFF then
             if (eventType == "SPELL_AURA_REMOVED") then
@@ -156,8 +159,7 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
         if not Gladdy.buttons[srcUnit].spec then
             self:DetectSpec(srcUnit, Gladdy.specSpells[spellName])
         end
-        if (eventType == "SPELL_CAST_SUCCESS" or eventType == "SPELL_AURA_APPLIED" or eventType == "SPELL_MISSED") then
-            self:DetectSpec(srcUnit, Gladdy.specSpells[spellName])
+        if (eventType == "SPELL_CAST_SUCCESS" or eventType == "SPELL_MISSED") then
             -- cooldown tracker
             if Gladdy.db.cooldown and Cooldowns.cooldownSpellIds[spellName] then
                 local unitClass
@@ -165,22 +167,33 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
                 if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
                     spellId = spellID
                 end
-                if Gladdy.db.cooldownCooldowns[tostring(spellId)] then
+                if Gladdy.db.cooldownCooldowns[tostring(spellId)] and (eventType == "SPELL_CAST_SUCCESS" or eventType == "SPELL_MISSED") then
                     if (Gladdy:GetCooldownList()[Gladdy.buttons[srcUnit].class][spellId]) then
                         unitClass = Gladdy.buttons[srcUnit].class
                     else
                         unitClass = Gladdy.buttons[srcUnit].race
                     end
-                    if spellID ~= 16188 and spellID ~= 17116 then -- Nature's Swiftness CD starts when buff fades
-                        Gladdy:Debug("INFO", "SPELL_CAST_SUCCESS - CooldownUsed", srcUnit, "spellID:", spellID)
+                    if spellID ~= 16188 and spellID ~= 17116 and spellID ~= 16166 and spellID ~= 12043 and spellID ~= 5384 then -- Nature's Swiftness CD starts when buff fades
+                        Gladdy:Debug("INFO", eventType, "- CooldownUsed", srcUnit, "spellID:", spellID)
                         Cooldowns:CooldownUsed(srcUnit, unitClass, spellId)
                     end
                 end
             end
         end
-        if (eventType == "SPELL_AURA_REMOVED" and (spellID == 16188 or spellID == 17116) and Gladdy.buttons[srcUnit].class) then
+        if (eventType == "SPELL_AURA_REMOVED" and (spellID == 16188 or spellID == 17116 or spellID == 16166 or spellID == 12043) and Gladdy.buttons[srcUnit].class) then
             Gladdy:Debug("INFO", "SPELL_AURA_REMOVED - CooldownUsed", srcUnit, "spellID:", spellID)
             Cooldowns:CooldownUsed(srcUnit, Gladdy.buttons[srcUnit].class, spellID)
+        end
+        if (eventType == "SPELL_AURA_REMOVED" and Gladdy.db.cooldown and Cooldowns.cooldownSpellIds[spellName]) then
+            local unit = Gladdy:GetArenaUnit(srcUnit, true)
+            local spellId = Cooldowns.cooldownSpellIds[spellName] -- don't use spellId from combatlog, in case of different spellrank
+            if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
+                spellId = spellID
+            end
+            if unit then
+                --Gladdy:Debug("INFO", "EL:CL:SPELL_AURA_REMOVED (srcUnit)", "Cooldowns:AURA_FADE", unit, spellId)
+                Cooldowns:AURA_FADE(unit, spellId)
+            end
         end
     end
 end
@@ -196,6 +209,7 @@ function EventListener:ARENA_OPPONENT_UPDATE(unit, updateReason)
         if updateReason == "seen" then
             -- ENEMY_SPOTTED
             if button then
+                button.stealthed = false
                 Gladdy:SendMessage("ENEMY_STEALTH", unit, false)
                 if not button.class or not button.race then
                     Gladdy:SpotEnemy(unit, true)
@@ -207,6 +221,7 @@ function EventListener:ARENA_OPPONENT_UPDATE(unit, updateReason)
         elseif updateReason == "unseen" then
             -- STEALTH
             if button then
+                button.stealthed = true
                 Gladdy:SendMessage("ENEMY_STEALTH", unit, true)
             end
             if pet then
@@ -225,25 +240,6 @@ function EventListener:ARENA_OPPONENT_UPDATE(unit, updateReason)
         end
     end
 end
-
-Gladdy.exceptionNames = { -- TODO MOVE ME TO CLASSBUFFS LIB
-    [31117] = GetSpellInfo(30405) .. " Silence", -- Unstable Affliction Silence
-    [43523] = GetSpellInfo(30405) .. " Silence",
-    [24131] = select(1, GetSpellInfo(19386)) .. " Dot", -- Wyvern Sting Dot
-    [24134] = select(1, GetSpellInfo(19386)) .. " Dot",
-    [24135] = select(1, GetSpellInfo(19386)) .. " Dot",
-    [27069] = select(1, GetSpellInfo(19386)) .. " Dot",
-    [49009] = select(1, GetSpellInfo(19386)) .. " Dot",
-    [49010] = select(1, GetSpellInfo(19386)) .. " Dot",
-    [19975] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)), -- Entangling Roots Nature's Grasp
-    [19974] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
-    [19973] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
-    [19972] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
-    [19971] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
-    [19971] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
-    [27010] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
-    [53312] = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
-}
 
 Gladdy.cooldownBuffs = {
     [GetSpellInfo(6346)] = { cd = function(expTime) -- 180s uptime == cd
@@ -275,19 +271,32 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
     if not button then
         return
     end
+    if not button.auras then
+        button.auras = {}
+    end
+    wipe(button.auras)
+    if not button.lastAuras then
+        button.lastAuras = {}
+    end
+    Gladdy:Debug("INFO", "AURA_FADE", unit, AURA_TYPE_BUFF, AURA_TYPE_DEBUFF)
+    Gladdy:SendMessage("AURA_FADE", unit, AURA_TYPE_BUFF)
+    Gladdy:SendMessage("AURA_FADE", unit, AURA_TYPE_DEBUFF)
     for i = 1, 2 do
         if not Gladdy.buttons[unit].class or not Gladdy.buttons[unit].race then
             Gladdy:SpotEnemy(unit, false)
         end
         local filter = (i == 1 and "HELPFUL" or "HARMFUL")
         local auraType = i == 1 and AURA_TYPE_BUFF or AURA_TYPE_DEBUFF
-        Gladdy:SendMessage("AURA_FADE", unit, auraType)
         for n = 1, 30 do
             local spellName, texture, count, dispelType, duration, expirationTime, unitCaster, _, shouldConsolidate, spellID = UnitAura(unit, n, filter)
             if ( not spellID ) then
                 Gladdy:SendMessage("AURA_GAIN_LIMIT", unit, auraType, n - 1)
                 break
             end
+            if Gladdy.exceptionNames[spellID] then
+                spellName = Gladdy.exceptionNames[spellID]
+            end
+            button.auras[spellID] = { auraType, spellID, spellName, texture, duration, expirationTime, count, dispelType }
             if not button.spec and Gladdy.specBuffs[spellName] and unitCaster then
                 local unitPet = string_gsub(unit, "%d$", "pet%1")
                 if unitCaster and (UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster)) then
@@ -305,11 +314,37 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
             if Gladdy.cooldownBuffs.racials[spellName] then
                 Gladdy:SendMessage("RACIAL_USED", unit, spellName, Gladdy.cooldownBuffs.racials[spellName].cd(expirationTime - GetTime()), spellName)
             end
-            if Gladdy.exceptionNames[spellID] then
-                spellName = Gladdy.exceptionNames[spellID]
-            end
+            Gladdy:Debug("INFO", "AURA_GAIN", unit, auraType, spellName)
             Gladdy:SendMessage("AURA_GAIN", unit, auraType, spellID, spellName, texture, duration, expirationTime, count, dispelType, i, unitCaster)
         end
+    end
+    -- check auras
+    for spellID,v in pairs(button.lastAuras) do
+        if not button.auras[spellID] then
+            if Gladdy.db.cooldown and Cooldowns.cooldownSpellIds[v[3]] then
+                local spellId = Cooldowns.cooldownSpellIds[v[3]] -- don't use spellId from combatlog, in case of different spellrank
+                if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
+                    spellId = spellID
+                end
+                --Gladdy:Debug("INFO", "EL:UNIT_AURA Cooldowns:AURA_FADE", unit, spellId)
+                Cooldowns:AURA_FADE(unit, spellId)
+                if spellID == 5384 then -- Feign Death CD Detection needs this
+                    Cooldowns:CooldownUsed(unit, Gladdy.buttons[unit].class, 5384)
+                end
+            end
+        end
+    end
+    wipe(button.lastAuras)
+    button.lastAuras = Gladdy:DeepCopy(button.auras)
+end
+
+function EventListener:UpdateAuras(unit)
+    local button = Gladdy.buttons[unit]
+    if not button or button.lastAuras then
+        return
+    end
+    for i=1, #button.lastAuras do
+        Gladdy.modules["Auras"]:AURA_GAIN(unit, unpack(button.lastAuras[i]))
     end
 end
 
@@ -338,8 +373,12 @@ function EventListener:UNIT_SPELLCAST_SUCCEEDED(...)
         local unitRace = Gladdy.buttons[unit].race
         local spellName = GetSpellInfo(spellID)
 
+        if Gladdy.exceptionNames[spellID] then
+            spellName = Gladdy.exceptionNames[spellID]
+        end
+
         -- spec detection
-        if Gladdy.specSpells[spellName] and not Gladdy.buttons[unit].spec then
+        if spellName and  Gladdy.specSpells[spellName] and not Gladdy.buttons[unit].spec then
             self:DetectSpec(unit, Gladdy.specSpells[spellName])
         end
 
@@ -350,7 +389,7 @@ function EventListener:UNIT_SPELLCAST_SUCCEEDED(...)
         end
 
         -- racial
-        if Gladdy:Racials()[unitRace].spellName == spellName and Gladdy:Racials()[unitRace][spellID] then
+        if unitRace and  Gladdy:Racials()[unitRace].spellName == spellName and Gladdy:Racials()[unitRace][spellID] then
             Gladdy:Debug("INFO", "UNIT_SPELLCAST_SUCCEEDED - RACIAL_USED", unit, spellID)
             Gladdy:SendMessage("RACIAL_USED", unit)
         end
@@ -362,7 +401,7 @@ function EventListener:DetectSpec(unit, spec)
     if (not button or not spec or button.spec) then
         return
     end
-    if button.class == "PALADIN" and Gladdy:contains(spec, {L["Holy"], L["Retribution"], L["Protection"]})
+    if button.class == "PALADIN" and not Gladdy:contains(spec, {L["Holy"], L["Retribution"], L["Protection"]})
             or button.class == "SHAMAN" and not Gladdy:contains(spec, {L["Restoration"], L["Enhancement"], L["Elemental"]})
             or button.class == "ROGUE" and not Gladdy:contains(spec, {L["Subtlety"], L["Assassination"], L["Combat"]})
             or button.class == "WARLOCK" and not Gladdy:contains(spec, {L["Demonology"], L["Destruction"], L["Affliction"]})
