@@ -130,7 +130,7 @@ function Auras:CreateFrame(unit)
                 self.frame:SetAlpha(1)
             end
             if (self.timeLeft <= 0) then
-                Auras:AURA_FADE(self.unit, self.track)
+                Auras:AURA_FADE(self.unit, self.track, true)
             else
                 if self.spellID == 8178 then
                     self.text:SetText("")
@@ -633,9 +633,9 @@ function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, exp
     end
 end
 
-function Auras:AURA_FADE(unit, auraType)
+function Auras:AURA_FADE(unit, auraType, force)
     local auraFrame = self.frames[unit]
-    if (not auraFrame or auraFrame.track ~= auraType) then
+    if (not auraFrame or auraFrame.track ~= auraType or not Gladdy.buttons[unit] or (not force and Gladdy.buttons[unit].stealthed)) then
         return
     end
     if auraFrame.active then
