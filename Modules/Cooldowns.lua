@@ -347,7 +347,7 @@ function Cooldowns:ClearIcon(button, index, spellId, icon)
         end
     end
     icon:Show()
-    LCG:PixelGlow_Stop(icon.glow)
+    LCG.PixelGlow_Stop(icon.glow)
     if icon.timer then
         icon.timer:Cancel()
     end
@@ -366,6 +366,8 @@ end
 -- Test
 ---------------------
 
+-- /run LibStub("Gladdy").modules["Cooldowns"]:AURA_GAIN(_, AURA_TYPE_BUFF, 22812, "Barkskin", _, 20, _, _, _, _, "arena1", true)
+-- /run LibStub("Gladdy").modules["Cooldowns"]:AURA_FADE("arena1", 22812)
 function Cooldowns:Test(unit)
     if Gladdy.frame.testing then
         self:UpdateTestCooldowns(unit)

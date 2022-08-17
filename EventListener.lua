@@ -134,7 +134,7 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
             end
         end
         -- death detection
-        if (Gladdy.buttons[destUnit] and eventType == "UNIT_DIED" or eventType == "PARTY_KILL" or eventType == "SPELL_INSTAKILL") then
+        if (eventType == "UNIT_DIED" or eventType == "PARTY_KILL" or eventType == "SPELL_INSTAKILL") then
             if not Gladdy:isFeignDeath(destUnit) then
                 Gladdy:SendMessage("UNIT_DEATH", destUnit)
             end
@@ -167,7 +167,7 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
                 if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
                     spellId = spellID
                 end
-                if Gladdy.db.cooldownCooldowns[tostring(spellId)] and (eventType == "SPELL_CAST_SUCCESS" or eventType == "SPELL_MISSED") then
+                if Gladdy.db.cooldownCooldowns[tostring(spellId)] and (eventType == "SPELL_CAST_SUCCESS" or eventType == "SPELL_MISSED" or eventType == "SPELL_DODGED") then
                     if (Gladdy:GetCooldownList()[Gladdy.buttons[srcUnit].class][spellId]) then
                         unitClass = Gladdy.buttons[srcUnit].class
                     else
@@ -392,6 +392,18 @@ function EventListener:UNIT_SPELLCAST_SUCCEEDED(...)
         if unitRace and  Gladdy:Racials()[unitRace].spellName == spellName and Gladdy:Racials()[unitRace][spellID] then
             Gladdy:Debug("INFO", "UNIT_SPELLCAST_SUCCEEDED - RACIAL_USED", unit, spellID)
             Gladdy:SendMessage("RACIAL_USED", unit)
+        end
+
+        --cooldown
+        local unitClass
+        if (Gladdy:GetCooldownList()[Gladdy.buttons[unit].class][unit]) then
+            unitClass = Gladdy.buttons[unit].class
+        else
+            unitClass = Gladdy.buttons[unit].race
+        end
+        if spellID ~= 16188 and spellID ~= 17116 and spellID ~= 16166 and spellID ~= 12043 and spellID ~= 5384 then -- Nature's Swiftness CD starts when buff fades
+            Gladdy:Debug("INFO", "UNIT_SPELLCAST_SUCCEEDED", "- CooldownUsed", unit, "spellID:", spellID)
+            Cooldowns:CooldownUsed(unit, unitClass, spellID)
         end
     end
 end
