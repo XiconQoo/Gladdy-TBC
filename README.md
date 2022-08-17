@@ -4,7 +4,7 @@
 
 ---
 
-## [v2.20-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.20-Release/Gladdy_Classic_v2.20-Release.zip)
+## [v2.21-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.21-Release/Gladdy_Classic_v2.21-Release.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -78,6 +78,14 @@ Thank you!
 ---
 
 ### Changes
+
+### v2.21-Release
+- **Cooldowns**
+  - glows minor fix again...
+  - more tracking
+- **Pets**
+  - death detection improved
+  - detection improved
 
 ### v2.20-Release
 - **Cooldowns**
