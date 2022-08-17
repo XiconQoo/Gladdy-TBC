@@ -1,6 +1,6 @@
 local string_gsub, floor, pairs = string.gsub, math.floor, pairs
 local CreateFrame, SetPortraitTexture = CreateFrame, SetPortraitTexture
-local UnitHealthMax, UnitHealth, UnitGUID = UnitHealthMax, UnitHealth, UnitGUID
+local UnitHealthMax, UnitHealth, UnitGUID, UnitExists = UnitHealthMax, UnitHealth, UnitGUID, UnitExists
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
@@ -47,6 +47,7 @@ function Pets:UpdateFrameOnce()
         self:RegisterMessage("PET_DESTROYED")
         self:RegisterMessage("PET_STEALTH")
         self:RegisterMessage("ENEMY_SPOTTED")
+        self:RegisterMessage("UNIT_DEATH")
     else
         self:UnregisterAllMessages()
     end
@@ -55,6 +56,11 @@ end
 function Pets:JOINED_ARENA()
     for _,v in pairs(self.frames) do
         v.healthBar:SetAlpha(0)
+    end
+    for i=1,Gladdy.curBracket do
+        if UnitExists("arenapet" .. i) then
+            Gladdy:SendMessage("PET_SPOTTED", "arenapet" .. i)
+        end
     end
     if Gladdy.db.petEnabled then
         self:RegisterEvent("UNIT_PET")
@@ -91,13 +97,18 @@ function Pets:PET_SPOTTED(unit)
             Pets:SetHealthText(self, UnitHealth(unit), UnitHealthMax(unit))
         end)
     end
+    Gladdy:Print(self.frames[unit].healthBar:GetAlpha())
 end
 
 function Pets:PET_DESTROYED(unit)
-    if Gladdy.db.petEnabled then
+    if Gladdy.db.petEnabled and self.frames[unit] then
         self.frames[unit].healthBar:SetAlpha(0)
         self.frames[unit].healthBar:SetScript("OnUpdate", nil)
     end
+end
+
+function Pets:UNIT_DEATH(unit)
+    self:PET_DESTROYED(unit)
 end
 
 function Pets:PET_STEALTH(unit)
@@ -123,6 +134,7 @@ function Pets:CheckUnitPet(unitId)
         petFrame.healthBar.hp:SetMinMaxValues(0, UnitHealthMax(unit))
         petFrame.healthBar.hp:SetValue(UnitHealth(unit))
         Pets:SetHealthText(petFrame.healthBar, UnitHealth(unit), UnitHealthMax(unit))
+        SetPortraitTexture(petFrame.healthBar.portrait, unit)
         petFrame.healthBar:SetScript("OnUpdate", function(self)
             self.hp:SetValue(UnitHealth(self.unit))
             Pets:SetHealthText(self, UnitHealth(unit), UnitHealthMax(unit))
