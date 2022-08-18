@@ -6,7 +6,7 @@ https://www.wowace.com/projects/libbuttonglow-1-0
 -- luacheck: globals CreateFromMixins ObjectPoolMixin CreateTexturePool CreateFramePool
 
 local MAJOR_VERSION = "LibCustomGlow-1.0"
-local MINOR_VERSION = 17
+local MINOR_VERSION = 16
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub.") end
 local lib, oldversion = LibStub:NewLibrary(MAJOR_VERSION, MINOR_VERSION)
 if not lib then return end
@@ -313,9 +313,6 @@ function lib.PixelGlow_Stop(r,key)
     if not r then
         return
     end
-    if type(key) ~= "string" or type(key) ~= "number" then
-        key = nil
-    end
     key = key or ""
     if not r["_PixelGlow"..key] then
         return false
@@ -410,9 +407,6 @@ end
 function lib.AutoCastGlow_Stop(r,key)
     if not r then
         return
-    end
-    if type(key) ~= "string" or type(key) ~= "number" then
-        key = nil
     end
 
     key = key or ""
