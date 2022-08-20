@@ -369,16 +369,21 @@ end
 function EventListener:UNIT_SPELLCAST_SUCCEEDED(...)
     local unit, castGUID, spellID = ...
     unit = Gladdy:GetArenaUnit(unit, true)
-    if Gladdy.buttons[unit] then
-        local unitRace = Gladdy.buttons[unit].race
+    local button = Gladdy.buttons[unit]
+    if button then
+        if not button.class or not button.race then
+            self:SpotEnemy()
+        end
         local spellName = GetSpellInfo(spellID)
+        local unitRace = button.race
+        local unitClass = button.class
 
         if Gladdy.exceptionNames[spellID] then
             spellName = Gladdy.exceptionNames[spellID]
         end
 
         -- spec detection
-        if spellName and  Gladdy.specSpells[spellName] and not Gladdy.buttons[unit].spec then
+        if spellName and Gladdy.specSpells[spellName] and not button.spec then
             self:DetectSpec(unit, Gladdy.specSpells[spellName])
         end
 
@@ -394,16 +399,22 @@ function EventListener:UNIT_SPELLCAST_SUCCEEDED(...)
             Gladdy:SendMessage("RACIAL_USED", unit)
         end
 
-        --cooldown
-        local unitClass
-        if (Gladdy:GetCooldownList()[Gladdy.buttons[unit].class][unit]) then
-            unitClass = Gladdy.buttons[unit].class
-        else
-            unitClass = Gladdy.buttons[unit].race
-        end
-        if spellID ~= 16188 and spellID ~= 17116 and spellID ~= 16166 and spellID ~= 12043 and spellID ~= 5384 then -- Nature's Swiftness CD starts when buff fades
-            Gladdy:Debug("INFO", "UNIT_SPELLCAST_SUCCEEDED", "- CooldownUsed", unit, "spellID:", spellID)
-            Cooldowns:CooldownUsed(unit, unitClass, spellID)
+        -- cooldown tracker
+        if Gladdy.db.cooldown and Cooldowns.cooldownSpellIds[spellName] then
+            local spellId = Cooldowns.cooldownSpellIds[spellName] -- don't use spellId from combatlog, in case of different spellrank
+            if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
+                spellId = spellID
+            end
+            if Gladdy.db.cooldownCooldowns[tostring(spellId)] then
+                if (Gladdy:GetCooldownList()[button.class][spellId]) then
+                    unitClass = button.class
+                else
+                    unitClass = button.race
+                end
+                if spellID ~= 16188 and spellID ~= 17116 and spellID ~= 16166 and spellID ~= 12043 and spellID ~= 5384 then -- Nature's Swiftness CD starts when buff fades
+                    Cooldowns:CooldownUsed(unit, unitClass, spellId)
+                end
+            end
         end
     end
 end
