@@ -22,6 +22,7 @@ local Targets = Gladdy:NewModule("Targets", nil, {
     targetHealthBarBgColor = { r = 0, g = 0, b = 0, a = 0.4 },
     targetHealthBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
     targetHealthBarFontSize = 12,
+    targetHealthUnitName = true,
     targetHealthPercentage = true,
     targetHealthBarClassColored = true,
     targetXOffset = 286,
@@ -141,6 +142,7 @@ function Targets:CheckUnitTarget(unitId)
             end
         end)
 
+        Targets:SetText(unit)
         Targets:SetHealthStatusBarColor(unit)
     else
         targetsHealth[unit] = nil
@@ -164,6 +166,7 @@ function Targets:Test(unitId)
         targetsFrame.healthBar.hp:SetValue(7000)
         Targets:SetHealthText(targetsFrame.healthBar, 7000, 12000)
         SetPortraitTexture(targetsFrame.healthBar.portrait, "player")
+        Targets:SetText(unit)
         Targets:SetHealthStatusBarColor(unit)
 
         self:RegisterEvent("UNIT_TARGET")
@@ -208,7 +211,7 @@ function Targets:CreateFrame(unitId)
     healthBar.portrait = healthBar:CreateTexture(nil, "BACKGROUND")
     healthBar.portrait:SetPoint("LEFT", healthBar, "RIGHT")
     healthBar.portrait:SetTexCoord(0.1, 0.9, 0.1, 0.9)
-    SetPortraitTexture(healthBar.portrait, "player")
+    -- SetPortraitTexture(healthBar.portrait, "player")
     healthBar.portrait.border = healthBar:CreateTexture(nil, "OVERLAY")
     healthBar.portrait.border:SetAllPoints(healthBar.portrait)
     healthBar.portrait.border:SetTexture(Gladdy.db.classIconBorderStyle)
@@ -406,6 +409,23 @@ function Targets:SetHealthText(healthBar, health, healthMax)
     end
 
     healthBar.healthText:SetText(healthText)
+end
+
+function Targets:SetText(unit)
+    local targetsFrame = self.frames[unit]
+    if not targetsFrame then
+        return
+    end
+
+    local nameText = ""
+    local unitName = UnitName(unit)
+    if unitName and Gladdy.db.targetHealthUnitName then
+        nameText = unitName
+    else
+        nameText = ""
+    end
+    
+    targetsFrame.healthBar.nameText:SetText(nameText)
 end
 
 local function option(params)
@@ -680,14 +700,21 @@ function Targets:GetOptions()
                 },
                 healthValues = {
                     type = "group",
-                    name = L["Health Values"],
+                    name = L["Health Bar Text"],
                     order = 7,
                     args = {
                         header = {
                             type = "header",
-                            name = L["Health Values"],
+                            name = L["Health Bar Text"],
                             order = 1,
                         },
+                        targetHealthUnitName = option({
+                            type = "toggle",
+                            name = L["Show name text"],
+                            desc = L["Show the units name"],
+                            order = 2,
+                            width = "full",
+                        }),
                         targetHealthPercentage = option({
                             type = "toggle",
                             name = L["Show health percentage"],
