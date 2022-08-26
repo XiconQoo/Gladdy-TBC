@@ -1298,6 +1298,10 @@ elseif GetLocale() == "zhCN" then
     L["Portrait"] = "头像"
     L["Health Values"] = "生命值"
 
+    -- Targets.lua
+    L["Targets"] = "敌方目标"
+    L["Enables Targets module"] = "启用敌方目标显示模块"
+
     -- Powerbar.lua
     L["Power Bar"] = "法力/能量条"
     L["Power Bar Text"] = "法力/能量条文字"
