@@ -32,6 +32,9 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drFontColorsEnabled = false,
     drFontColor = { r = 1, g = 1, b = 0, a = 1 },
     drFontScale = 1,
+    drFontOutline = "OUTLINE",
+    drFontXOffset = 0,
+    drFontYOffset = 1,
     drGrowDirection = "RIGHT",
     drXOffset = 0,
     drYOffset = 0,
@@ -47,6 +50,10 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drHalfColor = {r = 1, g = 1, b = 0, a = 1 },
     drQuarterColor = {r = 1, g = 0.7, b = 0, a = 1 },
     drNullColor = {r = 1, g = 0, b = 0, a = 1 },
+    drLevelOutline = "OUTLINE",
+    drHalfText = "½", --"\u{00BD}", --½
+    drQuarterText = "¼", --"\u{00BC}", --¼
+    drNullText = "ø", --"\u{00F8}", --ø
     drLevelTextEnabled = true,
     drLevelTextFont = "DorisPP",
     drLevelTextScale = 0.8,
@@ -58,7 +65,9 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drFrameStrata = "MEDIUM",
     drFrameLevel = 3,
     drGroup = false,
-    drGroupDirection = "DOWN"
+    drGroupDirection = "DOWN",
+    drLevelTextXOffset = 0,
+    drLevelTextYOffset = 0,
 })
 
 local function getDiminishColor(dr)
@@ -73,11 +82,11 @@ end
 
 local function getDiminishText(dr)
     if dr == 0.5 then
-        return "½"
+        return Gladdy.db.drHalfText
     elseif dr == 0.25 then
-        return "¼"
+        return Gladdy.db.drQuarterText
     else
-        return "ø"
+        return Gladdy.db.drNullText
     end
 end
 
@@ -118,7 +127,11 @@ function Diminishings:CreateFrame(unit)
                     Diminishings:Positionate(unit)
                 else
                     self.timeLeft = self.timeLeft - elapsed
-                    Gladdy:FormatTimer(self.timeText, self.timeLeft, self.timeLeft < 5)
+                    if not Gladdy.db.useOmnicc then
+                        Gladdy:FormatTimer(self.timeText, self.timeLeft, self.timeLeft < 5)
+                    else
+                        self.timeText:SetText("")
+                    end
                 end
             end
         end)
@@ -230,19 +243,21 @@ function Diminishings:UpdateFrame(unit)
         icon.cooldownFrame:SetFrameStrata(Gladdy.db.drFrameStrata)
         icon.cooldownFrame:SetFrameLevel(Gladdy.db.drFrameLevel + 2)
 
-        icon.timeText:SetFont(Gladdy:SMFetch("font", "drFont"), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, "OUTLINE")
+        icon.timeText:SetFont(Gladdy:SMFetch("font", "drFont"), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, Gladdy.db.drFontOutline)
         if Gladdy.db.drFontColorsEnabled then
             icon.timeText:SetTextColor(getDiminishColor(icon.diminishing))
         else
             icon.timeText:SetTextColor(Gladdy:SetColor(Gladdy.db.drFontColor))
         end
+        icon.timeText:SetPoint("CENTER", icon, "CENTER", Gladdy.db.drFontXOffset, Gladdy.db.drFontYOffset)
 
-        icon.drLevelText:SetFont(Gladdy:SMFetch("font", "drLevelTextFont"), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drLevelTextScale, "OUTLINE")
+        icon.drLevelText:SetFont(Gladdy:SMFetch("font", "drLevelTextFont"), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drLevelTextScale, Gladdy.db.drLevelOutline)
         if Gladdy.db.drLevelTextColorsEnabled then
             icon.drLevelText:SetTextColor(getDiminishColor(icon.diminishing))
         else
             icon.drLevelText:SetTextColor(Gladdy:SetColor(Gladdy.db.drLevelTextColor))
         end
+        icon.drLevelText:SetPoint("BOTTOM", icon, "BOTTOM", Gladdy.db.drLevelTextXOffset, Gladdy.db.drLevelTextYOffset)
 
         if Gladdy.db.drIconZoomed then
             icon.cooldown:SetWidth(icon:GetWidth())
@@ -308,6 +323,12 @@ function Diminishings:UpdateFrame(unit)
                     testAgain = true
                 end
             end
+        end
+        icon.cooldown.noCooldownCount = not Gladdy.db.useOmnicc
+        if Gladdy.db.useOmnicc then
+            icon.timeText:Hide()
+        else
+            icon.timeText:Show()
         end
     end
     if testAgain then
@@ -685,6 +706,9 @@ function Diminishings:GetOptions()
                     type = "group",
                     name = L["Cooldown Font"],
                     order = 3,
+                    disabled = function()
+                        return Gladdy.db.useOmnicc
+                    end,
                     args = {
                         headerFont = {
                             type = "header",
@@ -724,9 +748,34 @@ function Diminishings:GetOptions()
                             step = 0.1,
                             width = "full",
                         }),
+                        drFontOutline = Gladdy:option({
+                            type = "select",
+                            name = L["Font Outline"],
+                            order = 7,
+                            values = Gladdy.fontOutline,
+                            width = "full",
+                        }),
+                        drFontXOffset = Gladdy:option({
+                            type = "range",
+                            name = L["X Offset"],
+                            order = 8,
+                            min = -100,
+                            max = 100,
+                            step = 0.01,
+                            width = "full",
+                        }),
+                        drFontYOffset = Gladdy:option({
+                            type = "range",
+                            name = L["Y Offset"],
+                            order = 9,
+                            min = -100,
+                            max = 100,
+                            step = 0.01,
+                            width = "full",
+                        }),
                     }
                 },
-                levelText = {
+                levelFont = {
                     type = "group",
                     name = L["DR Font"],
                     order = 4,
@@ -760,7 +809,7 @@ function Diminishings:GetOptions()
                             order = 4,
                             hasAlpha = true,
                             disabled = function()
-                                return not Gladdy.db.drLevelTextEnabled
+                                return not Gladdy.db.drLevelTextEnabled or Gladdy.db.drLevelTextColorsEnabled
                             end,
                         }),
                         drLevelTextFont = Gladdy:option({
@@ -788,12 +837,109 @@ function Diminishings:GetOptions()
                                 return not Gladdy.db.drLevelTextEnabled
                             end,
                         }),
+                        drLevelOutline = Gladdy:option({
+                            type = "select",
+                            name = L["Font Outline"],
+                            order = 7,
+                            values = Gladdy.fontOutline,
+                            width = "full",
+                            disabled = function()
+                                return not Gladdy.db.drLevelTextEnabled
+                            end,
+                        }),
+                        drLevelTextXOffset = Gladdy:option({
+                            type = "range",
+                            name = L["X Offset"],
+                            order = 8,
+                            min = -100,
+                            max = 100,
+                            step = 0.01,
+                            width = "full",
+                            disabled = function()
+                                return not Gladdy.db.drLevelTextEnabled
+                            end,
+                        }),
+                        drLevelTextYOffset = Gladdy:option({
+                            type = "range",
+                            name = L["Y Offset"],
+                            order = 9,
+                            min = -100,
+                            max = 100,
+                            step = 0.01,
+                            width = "full",
+                            disabled = function()
+                                return not Gladdy.db.drLevelTextEnabled
+                            end,
+                        }),
                     },
+                },
+                levelColors = {
+                    type = "group",
+                    name = L["DR Colors"],
+                    order = 5,
+                    args = {
+                        headerColors = {
+                            type = "header",
+                            name = L["DR Colors"],
+                            order = 10,
+                        },
+                        drHalfColor = Gladdy:colorOption({
+                            type = "color",
+                            name = L["Half"],
+                            desc = L["Color of the border"],
+                            order = 42,
+                            hasAlpha = true,
+                        }),
+                        drQuarterColor = Gladdy:colorOption({
+                            type = "color",
+                            name = L["Quarter"],
+                            desc = L["Color of the border"],
+                            order = 43,
+                            hasAlpha = true,
+                        }),
+                        drNullColor = Gladdy:colorOption({
+                            type = "color",
+                            name = L["Immune"],
+                            desc = L["Color of the border"],
+                            order = 44,
+                            hasAlpha = true,
+                        }),
+                    },
+                },
+                levelTexts = {
+                    type = "group",
+                    name = L["DR Texts"],
+                    order = 6,
+                    args = {
+                        headerColors = {
+                            type = "header",
+                            name = L["DR Texts"],
+                            order = 10,
+                        },
+                        drHalfText = Gladdy:option({
+                            type = "input",
+                            name = L["Half"],
+                            desc = L["Text on half DR"],
+                            order = 42,
+                        }),
+                        drQuarterText = Gladdy:option({
+                            type = "input",
+                            name = L["Quarter"],
+                            desc = L["Text on quarter DR"],
+                            order = 43,
+                        }),
+                        drNullText = Gladdy:option({
+                            type = "input",
+                            name = L["Immune"],
+                            desc = L["Text on immune DR"],
+                            order = 44,
+                        }),
+                    }
                 },
                 border = {
                     type = "group",
                     name = L["Border"],
-                    order = 5,
+                    order = 7,
                     args = {
                         headerBorder = {
                             type = "header",
@@ -825,43 +971,10 @@ function Diminishings:GetOptions()
                         }),
                     }
                 },
-                levelColors = {
-                    type = "group",
-                    name = L["DR Colors"],
-                    order = 6,
-                    args = {
-                        headerColors = {
-                            type = "header",
-                            name = L["DR Colors"],
-                            order = 10,
-                        },
-                        drHalfColor = Gladdy:colorOption({
-                            type = "color",
-                            name = L["Half"],
-                            desc = L["Color of the border"],
-                            order = 42,
-                            hasAlpha = true,
-                        }),
-                        drQuarterColor = Gladdy:colorOption({
-                            type = "color",
-                            name = L["Quarter"],
-                            desc = L["Color of the border"],
-                            order = 43,
-                            hasAlpha = true,
-                        }),
-                        drNullColor = Gladdy:colorOption({
-                            type = "color",
-                            name = L["Immune"],
-                            desc = L["Color of the border"],
-                            order = 44,
-                            hasAlpha = true,
-                        }),
-                    },
-                },
                 position = {
                     type = "group",
                     name = L["Position"],
-                    order = 7,
+                    order = 8,
                     args = {
                         headerPosition = {
                             type = "header",
@@ -901,7 +1014,7 @@ function Diminishings:GetOptions()
                 frameStrata = {
                     type = "group",
                     name = L["Frame Strata and Level"],
-                    order = 8,
+                    order = 9,
                     args = {
                         headerAuraLevel = {
                             type = "header",

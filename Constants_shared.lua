@@ -173,6 +173,11 @@ Gladdy.frameStrata = {
     TOOLTIP = L["Tooltip"] .. "(7)",
 }
 
+Gladdy.fontOutline = {
+    OUTLINE = L["Thin Outline"],
+    THICKOUTLINE = L["Thick Outline"]
+}
+
 Gladdy.frameStrataSorting = {
     [1] = "BACKGROUND",
     [2] = "LOW",
