@@ -9,6 +9,8 @@ local L = Gladdy.L
 local AuraUtil = AuraUtil
 local GetSpellInfo = GetSpellInfo
 local UnitIsUnit = UnitIsUnit
+local GetSpellPowerCost = GetSpellPowerCost
+local GetSpellDescription = GetSpellDescription
 
 ---------------------------
 
@@ -258,4 +260,18 @@ function Gladdy:Dump(table, space)
             Gladdy:Dump(v, space .. " ")
         end
     end
+end
+
+function Gladdy:GetSpellDescription(spellID, cooldown) -- GetSpellPowerCost(51052) GetSpellDescription(2983)
+    local cost = (GetSpellPowerCost(spellID) and GetSpellPowerCost(spellID)[1] and (GetSpellPowerCost(spellID)[1].cost .. " " .. _G[GetSpellPowerCost(spellID)[1].name])) or ""
+    cost = cost .. (cost ~= "" and "\n\n" or "")
+    local castTime = select(4, GetSpellInfo(spellID))
+    castTime = (castTime <= 0 and "Instant" or castTime / 1000 .. "s") .. "\n\n"
+    local str = ""
+    if cooldown then
+        str = str .. (type(cooldown) == "table" and cooldown.cd or cooldown) .. "s" .. " cooldown" .. "\n\n"
+    end
+    str = str .. castTime
+    str = str .. Gladdy:SetTextColor(GetSpellDescription(spellID), {r = 1, g=0.82, b=0})
+    return str
 end

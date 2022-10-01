@@ -1020,7 +1020,9 @@ function Cooldowns:GetOptions()
     }
 end
 
-
+local function getName(spellID, cooldown)
+    return select(1, GetSpellInfo(spellID)) .. (type(cooldown) == "table" and cooldown.spec and (" - " .. cooldown.spec) or "")
+end
 
 function Cooldowns:GetCooldownOptions()
     local group = {}
@@ -1045,7 +1047,9 @@ function Cooldowns:GetCooldownOptions()
                 args = {
                     toggle = {
                         type = "toggle",
-                        name = select(1, GetSpellInfo(spellId)) .. (type(cooldown) == "table" and cooldown.spec and (" - " .. cooldown.spec) or ""),
+                        name = getName(spellId, cooldown),
+                        desc = Gladdy:GetSpellDescription(spellId, cooldown),
+                        --desc = getSpellText(spellId),
                         order = 1,
                         width = 1.1,
                         image = select(3, GetSpellInfo(spellId)),
@@ -1129,7 +1133,8 @@ function Cooldowns:GetCooldownOptions()
                 args = {
                     toggle = {
                         type = "toggle",
-                        name = select(1, GetSpellInfo(spellId)) .. (type(cooldown) == "table" and cooldown.spec and (" - " .. cooldown.spec) or ""),
+                        name = getName(spellId, cooldown),
+                        desc = Gladdy:GetSpellDescription(spellId, cooldown),
                         order = 1,
                         width = 1.1,
                         image = select(3, GetSpellInfo(spellId)),

@@ -925,6 +925,7 @@ function Gladdy:GetAuras(auraType)
             args[tostring(classSpells[i].id[1])] = {
                 order = i,
                 name = classSpells[i].name,
+                desc = Gladdy:GetSpellDescription(classSpells[i].id[#classSpells[i].id]),
                 type = "toggle",
                 image = texture,
                 width = "full",

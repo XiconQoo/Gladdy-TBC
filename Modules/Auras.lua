@@ -1237,6 +1237,7 @@ function Auras:GetAuraOptions(auraType)
         options[tostring(k)] = {
             type = "group",
             name = Gladdy:GetExceptionSpellName(k),
+            desc = GetSpellDescription(k),
             order = i+2,
             icon = Gladdy:GetImportantAuras()[GetSpellInfo(k)] and Gladdy:GetImportantAuras()[GetSpellInfo(k)].texture or select(3, GetSpellInfo(k)),
             args = {
