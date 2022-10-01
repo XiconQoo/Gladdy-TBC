@@ -211,7 +211,9 @@ function Auras:CreateInterrupt(unit)
                 self.frame:SetAlpha(0.001)
             else
                 self.timeLeft = self.timeLeft - elapsed
-                Gladdy:FormatTimer(self.text, self.timeLeft, self.timeLeft < 10)
+                if not Gladdy.db.useOmnicc then
+                    Gladdy:FormatTimer(self.text, self.timeLeft, self.timeLeft < 10)
+                end
             end
         else
             self.priority = nil
@@ -347,6 +349,13 @@ function Auras:UpdateFrame(unit)
         end
     end
 
+    auraFrame.cooldown.noCooldownCount = not Gladdy.db.useOmnicc
+    if Gladdy.db.useOmnicc then
+        auraFrame.text:Hide()
+    else
+        auraFrame.text:Show()
+    end
+
     testAgain = testAgain or self:UpdateInterruptFrame(unit)
 
     if testAgain then
@@ -475,6 +484,13 @@ function Auras:UpdateInterruptFrame(unit)
     end
     if Gladdy.db.auraDisableCircle then
         interruptFrame.cooldown:SetAlpha(0)
+    end
+
+    interruptFrame.cooldown.noCooldownCount = not Gladdy.db.useOmnicc
+    if Gladdy.db.useOmnicc then
+        interruptFrame.text:Hide()
+    else
+        interruptFrame.text:Show()
     end
 
     if Gladdy.db.auraInterruptIconZoomed then
@@ -625,11 +641,10 @@ function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, exp
     else
         auraFrame.icon.overlay:SetVertexColor(Gladdy.db.frameBorderColor.r, Gladdy.db.frameBorderColor.g, Gladdy.db.frameBorderColor.b, Gladdy.db.frameBorderColor.a)
     end
-    if not Gladdy.db.auraDisableCircle and spellID ~= 8178 then
-        auraFrame.cooldown:Show()
+    if spellID ~= 8178 then --grounding totem effect
         auraFrame.cooldown:SetCooldown(auraFrame.startTime, duration)
     else
-        auraFrame.cooldown:Hide()
+        auraFrame.cooldown:Clear()
     end
 end
 
@@ -693,11 +708,7 @@ function Auras:SPELL_INTERRUPT(unit,spellID,spellName,spellSchool,extraSpellId,e
 
     interruptFrame.icon.overlay:SetVertexColor(self:GetInterruptColor(extraSpellSchool))
 
-    if not Gladdy.db.auraDisableCircle then
-        interruptFrame.cooldown:Show()
-        interruptFrame.cooldown:SetCooldown(interruptFrame.startTime, duration)
-    end
-    --interruptFrame:SetAlpha(1)
+    interruptFrame.cooldown:SetCooldown(interruptFrame.startTime, duration)
 end
 
 function Auras:GetOptions()
@@ -1136,6 +1147,9 @@ function Auras:GetOptions()
                     type = "group",
                     name = L["Font"],
                     order = 3,
+                    disabled = function()
+                        return Gladdy.db.useOmnicc
+                    end,
                     args = {
                         headerAuras = {
                             type = "header",
