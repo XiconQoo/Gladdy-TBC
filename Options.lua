@@ -57,6 +57,7 @@ Gladdy.defaults = {
         backgroundColor = {r = 0, g = 0, b = 0, a = 0},
         newLayout = false,
         showMover = true,
+        useOmnicc =false,
     },
 }
 
@@ -388,10 +389,18 @@ function Gladdy:SetupOptions()
                                         name = L["Cooldown General"],
                                         order = 8,
                                     },
+                                    useOmnicc = {
+                                        type = "toggle",
+                                        name = L["OmniCC Enabled"],
+                                        order = 9,
+                                    },
                                     disableCooldownCircle = {
                                         type = "toggle",
                                         name = L["No Cooldown Circle"],
-                                        order = 9,
+                                        order = 10,
+                                        disabled = function()
+                                            return Gladdy.db.useOmnicc
+                                        end,
                                         get = function(info)
                                             local a = Gladdy.db.auraDisableCircle
                                             local b = Gladdy.db.cooldownDisableCircle
@@ -419,10 +428,13 @@ function Gladdy:SetupOptions()
                                     cooldownCircleAlpha = {
                                         type = "range",
                                         name = L["Cooldown circle alpha"],
-                                        order = 10,
+                                        order = 11,
                                         min = 0,
                                         max = 1,
                                         step = 0.1,
+                                        disabled = function()
+                                            return Gladdy.db.useOmnicc
+                                        end,
                                         get = function(info)
                                             local a = Gladdy.db.cooldownCooldownAlpha
                                             local b = Gladdy.db.drCooldownAlpha
@@ -449,8 +461,11 @@ function Gladdy:SetupOptions()
                                     timerFormat = Gladdy:option({
                                         type = "select",
                                         name = L["Timer Format"],
-                                        order = 11,
-                                        values = Gladdy.TIMER_FORMAT.values
+                                        order = 12,
+                                        values = Gladdy.TIMER_FORMAT.values,
+                                        disabled = function()
+                                            return Gladdy.db.useOmnicc
+                                        end,
                                     })
                                 },
                             },

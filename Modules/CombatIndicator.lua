@@ -28,8 +28,24 @@ function CombatIndicator:Initialize()
 end
 
 function CombatIndicator:JOINED_ARENA()
-    self:SetScript("OnUpdate", CombatIndicator.OnEvent)
+    self:RegisterEvent("UNIT_FLAGS")
+    self:SetScript("OnEvent", CombatIndicator.OnEvent)
+    --self:SetScript("OnUpdate", CombatIndicator.OnEvent)
     self.lastTimeUpdated = 0
+end
+
+function CombatIndicator.OnEvent(self, event, ...)
+    CombatIndicator[event](self, ...)
+end
+
+function CombatIndicator:UNIT_FLAGS(unit)
+    if CombatIndicator.frames[unit] then
+        if Gladdy.db.ciEnabled and (CombatIndicator.test or (UnitExists(unit) and UnitAffectingCombat(unit))) then
+            CombatIndicator.frames[unit]:Show()
+        else
+            CombatIndicator.frames[unit]:Hide()
+        end
+    end
 end
 
 function CombatIndicator:CreateFrame(unit)
@@ -45,7 +61,7 @@ function CombatIndicator:CreateFrame(unit)
     ciFrame:SetHeight(Gladdy.db.ciSize)
     ciFrame:SetWidth(Gladdy.db.ciSize * Gladdy.db.ciWidthFactor)
 
-    ciFrame.texture = ciFrame:CreateTexture(nil, "OVERLAY")
+    ciFrame.texture = ciFrame:CreateTexture(nil, "BACKGROUND")
     ciFrame.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
     ciFrame.texture:SetTexture(self.combatIndicatorIcon)
     ciFrame.texture:SetAllPoints(ciFrame)
@@ -102,14 +118,19 @@ end
 function CombatIndicator:Test()
     self.test = true
     self:JOINED_ARENA()
+    for i=1,Gladdy.curBracket do
+        local unit = "arena" .. i
+        self:UNIT_FLAGS(unit)
+    end
 end
 
 function CombatIndicator:Reset()
-    self:SetScript("OnUpdate", nil)
+    self:SetScript("OnEvent", nil)
+    self:UnregisterAllEvents()
     self.test = false
 end
 
-function CombatIndicator.OnEvent(self, elapsed)
+--[[function CombatIndicator.OnEvent(self, elapsed)
     self.lastTimeUpdated = self.lastTimeUpdated + elapsed
 
     if (self.lastTimeUpdated > self.updateInterval) then
@@ -123,7 +144,7 @@ function CombatIndicator.OnEvent(self, elapsed)
         end
         self.lastTimeUpdated = 0
     end
-end
+end--]]
 
 function CombatIndicator:GetOptions()
     return {

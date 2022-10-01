@@ -61,25 +61,28 @@ local function iconTimer(self,elapsed)
             self.timeLeft = self.timeLeft - elapsed
         end
 
-        local timeLeft = ceil(self.timeLeft)
-
-        if timeLeft >= 60 then
-            self.cooldownFont:SetTextColor(1, 1, 0, Gladdy.db.racialCooldownNumberAlpha)
-            self.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), (self:GetWidth()/2 - 0.15* self:GetWidth()) * Gladdy.db.racialFontScale, "OUTLINE")
-        elseif timeLeft < 60 and timeLeft >= 30 then
-            self.cooldownFont:SetTextColor(1, 1, 0, Gladdy.db.racialCooldownNumberAlpha)
-            self.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
-        elseif timeLeft < 30 and timeLeft >= 11 then
-            self.cooldownFont:SetTextColor(1, 0.7, 0, Gladdy.db.racialCooldownNumberAlpha)
-            self.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
-        elseif timeLeft < 10 and timeLeft >= 5 then
-            self.cooldownFont:SetTextColor(1, 0.7, 0, Gladdy.db.racialCooldownNumberAlpha)
-            self.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
-        elseif timeLeft < 5 and timeLeft > 0 then
-            self.cooldownFont:SetTextColor(1, 0, 0, Gladdy.db.racialCooldownNumberAlpha)
-            self.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
+        if Gladdy.db.trinketFontEnabled and not Gladdy.db.useOmnicc then
+            local timeLeft = ceil(self.timeLeft)
+            if timeLeft >= 60 then
+                self.cooldownFont:SetTextColor(1, 1, 0, Gladdy.db.racialCooldownNumberAlpha)
+                self.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), (self:GetWidth()/2 - 0.15* self:GetWidth()) * Gladdy.db.racialFontScale, "OUTLINE")
+            elseif timeLeft < 60 and timeLeft >= 30 then
+                self.cooldownFont:SetTextColor(1, 1, 0, Gladdy.db.racialCooldownNumberAlpha)
+                self.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
+            elseif timeLeft < 30 and timeLeft >= 11 then
+                self.cooldownFont:SetTextColor(1, 0.7, 0, Gladdy.db.racialCooldownNumberAlpha)
+                self.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
+            elseif timeLeft < 10 and timeLeft >= 5 then
+                self.cooldownFont:SetTextColor(1, 0.7, 0, Gladdy.db.racialCooldownNumberAlpha)
+                self.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
+            elseif timeLeft < 5 and timeLeft > 0 then
+                self.cooldownFont:SetTextColor(1, 0, 0, Gladdy.db.racialCooldownNumberAlpha)
+                self.cooldownFont:SetFont(Gladdy:SMFetch("font", "racialFont"), (self:GetWidth()/2 - 1) * Gladdy.db.racialFontScale, "OUTLINE")
+            end
+            Gladdy:FormatTimer(self.cooldownFont, self.timeLeft, self.timeLeft < 10, true)
+        else
+            self.cooldownFont:SetText("")
         end
-        Gladdy:FormatTimer(self.cooldownFont, self.timeLeft, self.timeLeft < 10, true)
     end
 end
 
@@ -211,6 +214,17 @@ function Racial:UpdateFrame(unit)
                 0, 0, "racialEnabled")
     end
 
+    if Gladdy.db.racialDisableCircle then
+        racial.cooldown:SetAlpha(0)
+    end
+
+    racial.cooldown.noCooldownCount = not Gladdy.db.useOmnicc
+    if Gladdy.db.useOmnicc then
+        racial.cooldownFont:Hide()
+    else
+        racial.cooldownFont:Show()
+    end
+
     if (Gladdy.db.racialEnabled == false) then
         racial:Hide()
     else
@@ -267,7 +281,7 @@ function Racial:Used(unit, startTime, duration)
     end
     if not racial.active then
         racial.timeLeft = duration
-        if not Gladdy.db.racialDisableCircle then racial.cooldown:SetCooldown(startTime, duration) end
+        racial.cooldown:SetCooldown(startTime, duration)
         racial.active = true
     end
 end
@@ -416,6 +430,9 @@ function Racial:GetOptions()
                     type = "group",
                     name = L["Font"],
                     order = 3,
+                    disabled = function()
+                        return Gladdy.db.useOmnicc
+                    end,
                     args = {
                         header = {
                             type = "header",

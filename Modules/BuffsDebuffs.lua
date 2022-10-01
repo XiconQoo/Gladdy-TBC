@@ -328,6 +328,13 @@ local function styleIcon(aura, auraType)
     aura.stacks:SetFont(Gladdy:SMFetch("font", "buffsFont"), (Gladdy.db.buffsIconSize/3 - 1) * Gladdy.db.buffsFontScale, "OUTLINE")
     aura.stacks:SetTextColor(Gladdy.db.buffsFontColor.r, Gladdy.db.buffsFontColor.g, Gladdy.db.buffsFontColor.b, 1)
 
+    aura.cooldowncircle.noCooldownCount = not Gladdy.db.useOmnicc
+    if Gladdy.db.useOmnicc then
+        aura.cooldown:Hide()
+    else
+        aura.cooldown:Show()
+    end
+
     return testAgain
 end
 
@@ -427,7 +434,7 @@ local function iconTimer(auraFrame, elapsed)
         local timeLeftMilliSec = auraFrame.endtime - GetTime()
         local timeLeftSec = ceil(timeLeftMilliSec)
         auraFrame.timeLeft = timeLeftMilliSec
-        if Gladdy.db.buffsDynamicColor then
+        if Gladdy.db.buffsDynamicColor and not Gladdy.db.useOmnicc then
             if timeLeftSec >= 60 then
                 auraFrame.cooldown:SetTextColor(0.7, 1, 0, Gladdy.db.buffsFontColor.a)
             elseif timeLeftSec < 60 and timeLeftSec >= 11 then
@@ -443,7 +450,9 @@ local function iconTimer(auraFrame, elapsed)
         if timeLeftMilliSec < 0 then
             auraFrame:Hide()
         end
-        Gladdy:FormatTimer(auraFrame.cooldown, timeLeftMilliSec, timeLeftMilliSec <= 3)
+        if not Gladdy.db.useOmnicc then
+            Gladdy:FormatTimer(auraFrame.cooldown, timeLeftMilliSec, timeLeftMilliSec <= 3)
+        end
     else
         auraFrame.cooldown:SetText("")
     end
@@ -841,6 +850,9 @@ function BuffsDebuffs:GetOptions()
                     type = "group",
                     name = L["Font"],
                     order = 4,
+                    disabled = function()
+                        return Gladdy.db.useOmnicc
+                    end,
                     args = {
                         header = {
                             type = "header",

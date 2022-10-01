@@ -221,6 +221,13 @@ function Cooldowns:UpdateIcon(icon)
     if icon.timer and not icon.timer:IsCancelled() then
         LCG.PixelGlow_Start(icon.glow, Gladdy:ColorAsArray(Gladdy.db.cooldownIconGlowColor), 12, 0.15, nil, 2)
     end
+
+    icon.cooldown.noCooldownCount = not Gladdy.db.useOmnicc
+    if Gladdy.db.useOmnicc then
+        icon.cooldownFont:Hide()
+    else
+        icon.cooldownFont:Show()
+    end
 end
 
 function Cooldowns:IconsSetPoint(button)
@@ -491,15 +498,19 @@ function Cooldowns:CooldownStart(button, spellId, duration, start)
             end
             icon:SetScript("OnUpdate", function(self, elapsed)
                 self.timeLeft = self.timeLeft - elapsed
-                local timeLeft = ceil(self.timeLeft)
-                if timeLeft >= 540 then
-                    self.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), Gladdy.db.cooldownSize / 3.1 * Gladdy.db.cooldownFontScale, "OUTLINE")
-                elseif timeLeft < 540 and timeLeft >= 60 then
-                    self.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), Gladdy.db.cooldownSize / 2.15 * Gladdy.db.cooldownFontScale, "OUTLINE")
-                elseif timeLeft < 60 and timeLeft > 0 then
-                    self.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), Gladdy.db.cooldownSize / 2.15 * Gladdy.db.cooldownFontScale, "OUTLINE")
+                if not Gladdy.db.useOmnicc then
+                    local timeLeft = ceil(self.timeLeft)
+                    if timeLeft >= 540 then
+                        self.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), Gladdy.db.cooldownSize / 3.1 * Gladdy.db.cooldownFontScale, "OUTLINE")
+                    elseif timeLeft < 540 and timeLeft >= 60 then
+                        self.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), Gladdy.db.cooldownSize / 2.15 * Gladdy.db.cooldownFontScale, "OUTLINE")
+                    elseif timeLeft < 60 and timeLeft > 0 then
+                        self.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), Gladdy.db.cooldownSize / 2.15 * Gladdy.db.cooldownFontScale, "OUTLINE")
+                    end
+                    Gladdy:FormatTimer(self.cooldownFont, self.timeLeft, self.timeLeft < 0)
+                else
+                    self.cooldownFont:SetText("")
                 end
-                Gladdy:FormatTimer(self.cooldownFont, self.timeLeft, self.timeLeft < 0)
                 if (self.timeLeft <= 0) then
                     Cooldowns:CooldownReady(button, spellId, icon)
                 end
@@ -856,6 +867,9 @@ function Cooldowns:GetOptions()
                     type = "group",
                     name = L["Font"],
                     order = 4,
+                    disabled = function()
+                        return Gladdy.db.useOmnicc
+                    end,
                     args = {
                         header = {
                             type = "header",
