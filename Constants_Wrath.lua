@@ -959,7 +959,7 @@ local cooldownList = {
         [26669] = 180, -- Evasion
         [31224] = 60, -- Cloak of Shadow
         [26889] = 180, -- Vanish
-        [2094] = 180, -- Blind
+        [2094] = 120, -- Blind
         [51722] = 60, -- Dismantle
         [11305] = 180, -- Sprint
         [14177] = { cd = 180, spec = L["Assassination"], }, -- Cold Blood
