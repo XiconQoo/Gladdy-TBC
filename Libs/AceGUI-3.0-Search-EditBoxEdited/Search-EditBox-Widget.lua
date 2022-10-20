@@ -364,12 +364,13 @@ local function CreatePredictorFrame(num)
 	scrollBar:SetPoint("BOTTOMLEFT", scrollFrame,"BOTTOMRIGHT", 1, 12)
 	scrollFrame.scrollBar = scrollBar
 
-	--scrollFrame.items = CreateDemoModel(50)
 	scrollFrame.items = {}
 	predictor:SetPoint("CENTER", 0, 0)
 	--HybridScrollFrame_SetDoNotHideScrollBar(scrollFrame, true)
 	HybridScrollFrame_CreateButtons(scrollFrame, "SearchEditBoxItemTemplate")
-	update()
+
+	--update once to create buttons
+	scrollFrame.update()
 	predictor:ClearAllPoints()
 	-- EditBoxes override the OnKeyUp/OnKeyDown events so that they can function, meaning in order to make up and down
 	-- arrow navigation of the menu work, I have to do some trickery with temporary bindings.
