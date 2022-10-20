@@ -1,33 +1,66 @@
 local pairs, ipairs, select, tinsert, tbl_sort, tostring, tonumber, rand = pairs, ipairs, select, tinsert, table.sort, tostring, tonumber, math.random
-local str_gsub = string.gsub
+local str_gsub, str_match, str_gmatch = string.gsub, string.match, string.gmatch
 local GetSpellInfo = GetSpellInfo
-local GetSpellDescription = GetSpellDescription
 local CreateFrame, GetTime = CreateFrame, GetTime
 local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
+
+-------------------------------------------
+--- Helper functions for DB stuff and cache
+-------------------------------------------
+
+local interrupts = {}
+local function defaultInterrupts()
+    for _,v in pairs(Gladdy:GetInterrupts()) do
+        interrupts[tostring(v.spellID)] = {}
+        interrupts[tostring(v.spellID)].enabled = true
+        interrupts[tostring(v.spellID)].priority = v.priority
+    end
+    return interrupts
+end
+
 local function defaultSpells(auraType)
     local spells = {}
-    for _,v in pairs(Gladdy:GetImportantAuras()) do
+    for k,v in pairs(Gladdy:GetImportantAuras()) do
         if not auraType or auraType == v.track then
-            spells[tostring(v.spellID)] = {}
-            spells[tostring(v.spellID)].enabled = true
-            spells[tostring(v.spellID)].priority = v.priority
-            spells[tostring(v.spellID)].track = v.track
+            spells[tostring(k)] = {
+                enabled = true,
+                track = v.track,
+                priority = v.priority,
+                spellIDs = v.spellIDs,
+                texture = v.texture or select(3, GetSpellInfo(k)),
+                textureSpell = v.textureSpell or k
+            }
         end
     end
     return spells
 end
-local function defaultInterrupts()
-    local spells = {}
-    for _,v in pairs(Gladdy:GetInterrupts()) do
-        spells[tostring(v.spellID)] = {}
-        spells[tostring(v.spellID)].enabled = true
-        spells[tostring(v.spellID)].priority = v.priority
+
+Gladdy.enabledAuras = {
+    [AURA_TYPE_BUFF] = {}, [AURA_TYPE_DEBUFF] = {}
+}
+local function flatEnabledSpells()
+    Gladdy:Debug("INFO", "flatEnabledSpells")
+    for _,v in pairs(Gladdy.db.auraListDefault) do
+        for _,spellID in ipairs(v.spellIDs) do
+            if v.enabled then
+                Gladdy.enabledAuras[v.track][spellID] = {
+                    texture = v.texture,
+                    priority = v.priority
+                }
+            else
+                print(v.track, spellID)
+                Gladdy.enabledAuras[v.track][spellID] = nil
+            end
+        end
     end
-    return spells
 end
+
+-------------------------------------------
+--- INIT
+-------------------------------------------
 
 local Auras = Gladdy:NewModule("Auras", nil, {
     auraFont = "DorisPP",
@@ -67,13 +100,12 @@ local Auras = Gladdy:NewModule("Auras", nil, {
 function Auras:Initialize()
     self.frames = {}
 
-    self.auras = Gladdy:GetImportantAuras()
-
     self:RegisterMessage("JOINED_ARENA")
     self:RegisterMessage("UNIT_DEATH")
     self:RegisterMessage("AURA_GAIN")
     self:RegisterMessage("AURA_FADE")
     self:RegisterMessage("SPELL_INTERRUPT")
+    flatEnabledSpells()
 end
 
 function Auras:CreateFrame(unit)
@@ -526,7 +558,7 @@ function Auras:ResetUnit(unit)
 end
 
 function Auras:Test(unit)
-    local spellName, spellid, icon, limit
+    local spellName, spellid, icon, rnd
 
     self:AURA_FADE(unit, AURA_TYPE_BUFF)
     self:AURA_FADE(unit, AURA_TYPE_DEBUFF)
@@ -536,39 +568,38 @@ function Auras:Test(unit)
     end
 
     --Auras
-    local enabledDebuffs, enabledBuffs, testauras = {}, {}
-    for spellIdStr,value in pairs(Gladdy.db.auraListDefault) do
-        if value.enabled then
-            if value.track == AURA_TYPE_BUFF then
-                tinsert(enabledBuffs, {value = value, spellIdStr = spellIdStr})
-            else
-                tinsert(enabledDebuffs, {value = value, spellIdStr = spellIdStr})
-            end
-        end
-    end
+    local testauras
+    local track
     if unit == "arena2" then
-        testauras = enabledBuffs
+        testauras = Gladdy.enabledAuras[AURA_TYPE_BUFF]
+        track = AURA_TYPE_BUFF
     else
-        testauras = enabledDebuffs
+        testauras = Gladdy.enabledAuras[AURA_TYPE_DEBUFF]
+        track = AURA_TYPE_DEBUFF
+    end
+    local size = 0
+    for _,_ in pairs(testauras) do
+        size = size + 1
     end
 
-    if #testauras > 0 then
-        limit = rand(1, #testauras)
-        local v = testauras[rand(1, #testauras)]
-        spellid = tonumber(v.spellIdStr)
-        spellName = select(1, GetSpellInfo(tonumber(v.spellIdStr)))
-        icon = select(3, GetSpellInfo(tonumber(v.spellIdStr)))
-        if Gladdy.exceptionNames[spellid] then
-            spellName = Gladdy.exceptionNames[spellid]
-        end
-        local duration = math.random(2,10)
-        if (unit == "arena2") then
-            if (v.value.track == AURA_TYPE_BUFF) then
-                self:AURA_GAIN(unit,v.value.track, spellid, spellName, icon, duration, GetTime() + duration)
+
+    if size > 0 then
+        rnd = rand(1, size)
+        local rndSpell
+        local i = 0
+        for k,_ in pairs(testauras) do
+            i = i + 1
+            if i == rnd then
+                rndSpell = k
+                break
             end
-        else
-            self:AURA_GAIN(unit,v.value.track, spellid, spellName, icon, duration, GetTime() + duration)
         end
+        spellid = tonumber(rndSpell)
+        spellName = select(1, GetSpellInfo(tonumber(rndSpell)))
+        icon = select(3, GetSpellInfo(tonumber(rndSpell)))
+        local duration = rand(2,10)
+        print("Auras:Test", unit, size, track, spellid, duration)
+        self:AURA_GAIN(unit, track, spellid, spellName, icon, duration, GetTime() + duration)
     end
 
     --Interrupts
@@ -592,6 +623,10 @@ function Auras:Test(unit)
     end
 end
 
+-------------------------------------------
+--- EVENTS
+-------------------------------------------
+
 function Auras:JOINED_ARENA()
     for i=1, Gladdy.curBracket do
         local unit = "arena" .. i
@@ -610,17 +645,14 @@ function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, exp
         return
     end
 
-    if not self.auras[spellName] then
-        return
-    end
-    -- don't use spellId from combatlog, in case of different spellrank
-    if not Gladdy.db.auraListDefault[tostring(self.auras[spellName].spellID)]
-            or not Gladdy.db.auraListDefault[tostring(self.auras[spellName].spellID)].enabled
-            or Gladdy.db.auraListDefault[tostring(self.auras[spellName].spellID)].track ~= auraType then
+    if not Gladdy.enabledAuras[auraType][spellID] then
         return
     end
 
-    if (auraFrame.priority and auraFrame.priority > Gladdy.db.auraListDefault[tostring(self.auras[spellName].spellID)].priority) then
+    print("Auras:AURA_GAIN", unit, auraType, spellID)
+    print("---Auras:AURA_GAIN", auraFrame.priority, Gladdy.enabledAuras[auraType][spellID].priority)
+
+    if (auraFrame.priority and auraFrame.priority > Gladdy.enabledAuras[auraType][spellID].priority) then
         return
     end
     auraFrame.startTime = expirationTime - duration
@@ -628,8 +660,8 @@ function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, exp
     auraFrame.name = spellName
     auraFrame.spellID = spellID
     auraFrame.timeLeft = spellID == 8178 and 45 or expirationTime - GetTime()
-    auraFrame.priority = Gladdy.db.auraListDefault[tostring(self.auras[spellName].spellID)].priority
-    auraFrame.icon:SetTexture(Gladdy:GetImportantAuras()[GetSpellInfo(self.auras[spellName].spellID)] and Gladdy:GetImportantAuras()[GetSpellInfo(self.auras[spellName].spellID)].texture or icon)
+    auraFrame.priority = Gladdy.enabledAuras[auraType][spellID].priority
+    auraFrame.icon:SetTexture(Gladdy.enabledAuras[auraType][spellID].texture or icon)
     auraFrame.track = auraType
     auraFrame.active = true
     auraFrame.icon.overlay:Show()
@@ -711,6 +743,39 @@ function Auras:SPELL_INTERRUPT(unit,spellID,spellName,spellSchool,extraSpellId,e
     interruptFrame.cooldown:SetCooldown(interruptFrame.startTime, duration)
 end
 
+-------------------------------------------
+--- OPTIONS
+-------------------------------------------
+
+local Predictor = {}
+function Predictor:Initialize()
+end
+function Predictor:GetValues(text, values, max)
+    values = {}
+    if text and text ~= "" then
+        for k,v in pairs(Gladdy.spellCache) do
+            if str_match(k:lower(), "^" .. text:lower()) then
+                for _,tbl in ipairs(v.spells) do
+                    Gladdy:Dump(tbl)
+                    --values[tbl.spellID] =  "|T".. tbl.icon .. ":0|t " .. tbl.spellName .. " - " .. tbl.spellID
+                    values[tbl.spellID] = {
+                        text = tbl.spellName .. " - " .. tbl.spellID,
+                        icon = tbl.icon
+                    }
+                end
+            end
+        end
+    end
+    return values
+end
+function Predictor:GetValue(text, key)
+    return key
+end
+function Predictor:GetHyperlink(key)
+    return "spell:" .. key .. ":0"
+end
+LibStub("AceGUI-3.0-Search-EditBoxEdited"):Register("Gladdy", Predictor)
+
 function Auras:GetOptions()
     local borderArgs = {
         headerAuras = {
@@ -777,8 +842,7 @@ function Auras:GetOptions()
             end
         }
     end
-
-    return {
+    local options =  {
         header = {
             type = "header",
             name = L["Auras"],
@@ -1195,27 +1259,36 @@ function Auras:GetOptions()
             type = "group",
             childGroups = "tree",
             name = L["Debuffs"],
+            width = "0.5",
+            --dialogInline = true,
             order = 4,
-            args = Auras:GetAuraOptions(AURA_TYPE_DEBUFF)
+            args = {}
         },
         buffList = {
             type = "group",
             childGroups = "tree",
             name = L["Buffs"],
             order = 5,
-            args = Auras:GetAuraOptions(AURA_TYPE_BUFF)
+            args = {}
         },
         interruptList = {
             type = "group",
             childGroups = "tree",
             name = L["Interrupts"],
             order = 6,
-            args = Auras:GetInterruptOptions()
-        }
+            args = {}
+        },
     }
+    options.debuffList.args = Auras:GetAuraOptions(AURA_TYPE_DEBUFF)
+    options.buffList.args = Auras:GetAuraOptions(AURA_TYPE_BUFF)
+    options.interruptList.args = Auras:GetInterruptOptions()
+    return options
 end
 
+
+
 function Auras:GetAuraOptions(auraType)
+    local path = auraType == AURA_TYPE_DEBUFF and "debuffList" or "buffList"
     local options = {
         ckeckAll = {
             order = 1,
@@ -1239,43 +1312,127 @@ function Auras:GetAuraOptions(auraType)
                 end
             end,
         },
+        add = {
+            order = 4,
+            width = "1.5",
+            name = L["Add Aura"],
+            type = "input",
+            dialogControl = "EditBoxGladdy",
+            width = "double",
+            get = function()
+                return ""
+            end,
+            set = function(_, value)
+                local spellName = GetSpellInfo(value)
+                if not spellName then
+                    return
+                end
+
+                local exists = false
+                for k,v in pairs(Gladdy.db.auraListDefault) do
+                    if tostring(k) == value then
+                        value = tostring(k)
+                        path = v.track == AURA_TYPE_DEBUFF and "debuffList" or "buffList"
+                        exists = true
+                        break
+                    else
+                        for _,val in pairs(v.spellIDs) do
+                            if tostring(val) == tostring(value) then
+                                value = tostring(k)
+                                path = v.track == AURA_TYPE_DEBUFF and "debuffList" or "buffList"
+                                exists = true
+                                break
+                            end
+                        end
+                        if exists then
+                            break
+                        end
+                    end
+                end
+                if not exists then
+                    Gladdy.db.auraListDefault[tostring(value)] = {
+                        enabled = true,
+                        track = auraType,
+                        priority = 40,
+                        spellIDs = { [1] = tonumber(value) },
+                        texture = select(3, GetSpellInfo(value)),
+                        textureSpell = tonumber(value)
+                    }
+                    flatEnabledSpells()
+                    Gladdy.options.args["Auras"].args[path].args = Auras:GetAuraOptions(auraType)
+                end
+                LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
+                LibStub("AceConfigDialog-3.0"):SelectGroup("Gladdy", "Auras", path, tostring(value))
+            end,
+        },
+
     }
     local auras = {}
-    for _,v in pairs(Gladdy:GetImportantAuras()) do
-        if v.track == auraType then
-            tinsert(auras, v.spellID)
+    for spellID,v in pairs(Gladdy.db.auraListDefault) do
+        if v.track == auraType and spellID ~= "*" then
+            tinsert(auras,spellID)
         end
     end
     tbl_sort(auras, function(a, b) return GetSpellInfo(a) < GetSpellInfo(b) end)
     for i,k in ipairs(auras) do
+        local texture = Gladdy.db.auraListDefault[tostring(k)] and Gladdy.db.auraListDefault[tostring(k)].texture or select(3, GetSpellInfo(k))
         options[tostring(k)] = {
             type = "group",
             name = Gladdy:GetExceptionSpellName(k),
-            desc = GetSpellDescription(k),
+            desc = Gladdy:GetSpellDescription(k), --GetSpellDescription(k),
             order = i+2,
-            icon = Gladdy:GetImportantAuras()[GetSpellInfo(k)] and Gladdy:GetImportantAuras()[GetSpellInfo(k)].texture or select(3, GetSpellInfo(k)),
+            icon = texture,
             args = {
                 enabled = {
                     order = 1,
                     name = L["Enabled"],
-                    desc = GetSpellDescription(k),
+                    desc = L["Enable Aura to be displayed"],
                     type = "toggle",
-                    image = Gladdy:GetImportantAuras()[GetSpellInfo(k)] and Gladdy:GetImportantAuras()[GetSpellInfo(k)].texture or select(3, GetSpellInfo(k)),
-                    width = "2",
+                    image = texture,
                     set = function(_, value)
                         Gladdy.db.auraListDefault[tostring(k)].enabled = value
                     end,
                     get = function()
+                        print("get enabled")
                         return Gladdy.db.auraListDefault[tostring(k)].enabled
-                    end
+                    end,
+                    width = 0.7,
+                },
+                delete = {
+                    order = 2,
+                    name = L["Delete"],
+                    type = "execute",
+                    width = 0.7,
+                    hidden = function()
+                        return Gladdy:GetImportantAuras()[tonumber(k)]
+                    end,
+                    func = function()
+                        if not Gladdy:GetImportantAuras()[tonumber(k)] then
+                            Gladdy.db.auraListDefault[tostring(k)] = nil
+                            flatEnabledSpells()
+                            Gladdy.options.args["Auras"].args[path].args = Auras:GetAuraOptions(auraType)
+                            LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
+                            if auras[i - 1] then
+                                LibStub("AceConfigDialog-3.0"):SelectGroup("Gladdy", "Auras", path, tostring(auras[i - 1]))
+                            else
+                                LibStub("AceConfigDialog-3.0"):SelectGroup("Gladdy", "Auras", path)
+                            end
+                            end
+                    end,
+                },
+                description = {
+                    order = 2,
+                    name = L["Default Aura"],
+                    type = "description",
+                    width = 0.7,
+
                 },
                 priority = {
-                    order = 2,
+                    order = 3,
                     name = L["Priority"],
                     type = "range",
                     min = 0,
                     max = 50,
-                    width = "2",
                     step = 1,
                     get = function()
                         return Gladdy.db.auraListDefault[tostring(k)].priority
@@ -1284,7 +1441,80 @@ function Auras:GetAuraOptions(auraType)
                         Gladdy.db.auraListDefault[tostring(k)].priority = value
                     end,
                     width = "full",
-                }
+                },
+                texture = { -- /dump LibStub("Gladdy").db.auraListDefault["6770"]
+                    order = 4,
+                    name = L["Texture"] .. " " .. "|T".. texture .. ":0|t",
+                    icon = Gladdy.db.auraListDefault[tostring(k)].texture,
+                    desc = L["Spell ID used for texture"],
+                    type = "input",
+                    get = function()
+                        return tostring(Gladdy.db.auraListDefault[tostring(k)].textureSpell)
+                    end,
+                    set = function(_, value)
+                        local number = tonumber(value)
+                        local tex = select(3, GetSpellInfo(value))
+                        if value == "" or not number or not tex then
+                            Gladdy.db.auraListDefault[tostring(k)].textureSpell = tostring(k)
+                            Gladdy.db.auraListDefault[tostring(k)].texture = select(3, GetSpellInfo(k))
+                        else
+                            Gladdy.db.auraListDefault[tostring(k)].textureSpell = number
+                            Gladdy.db.auraListDefault[tostring(k)].texture = tex
+                        end
+
+                        options[tostring(k)].icon = Gladdy.db.auraListDefault[tostring(k)].texture
+                        options[tostring(k)].args.enabled.image = Gladdy.db.auraListDefault[tostring(k)].texture
+                        options[tostring(k)].args.texture.name = L["Texture"] .. " " .. "|T".. Gladdy.db.auraListDefault[tostring(k)].texture .. ":0|t"
+                        options[tostring(k)].args.texture.icon = Gladdy.db.auraListDefault[tostring(k)].texture
+                    end,
+                    width = "full",
+                },
+                spellIDs = {
+                    order = 5,
+                    type = "input",
+                    pattern = "[%d,%s]+",
+                    usage = L["Only numbers, comma or space is allowed. \n Example: 124, 51243, 4121, 41111"],
+                    name = L["Spell IDs"],
+                    get = function()
+                        local a = ""
+                        for j,v in ipairs(Gladdy.db.auraListDefault[tostring(k)].spellIDs) do
+                            a = a .. v
+                            if j ~= #Gladdy.db.auraListDefault[tostring(k)].spellIDs then
+                                a = a .. ","
+                            end
+                        end
+                        return a
+                    end,
+                    set = function(_, value)
+                        local val = str_match(value,"[%d,%s]+")
+                        if val and val:len() > 0 then
+                            local spells = {}
+                            for spell in str_gmatch(val,"%d+") do
+                                local spellName = GetSpellInfo(spell)
+                                if spellName and spellName == GetSpellInfo(k) then
+                                    tinsert(spells, tonumber(spell))
+                                end
+                            end
+                            if #spells > 0 then
+                                Gladdy.db.auraListDefault[tostring(k)].spellIDs = {}
+                                for _,spell in ipairs(spells) do
+                                    tinsert(Gladdy.db.auraListDefault[tostring(k)].spellIDs, spell)
+                                end
+                                local spellExist = false
+                                for _,spell in ipairs(Gladdy.db.auraListDefault[tostring(k)].spellIDs) do
+                                    if spell == tonumber(k) then
+                                        spellExist = true
+                                        break
+                                    end
+                                end
+                                if not spellExist then
+                                    tinsert(Gladdy.db.auraListDefault[tostring(k)].spellIDs, tonumber(k))
+                                end
+                            end
+                        end
+                    end,
+                    width = "full",
+                },
             }
         }
     end

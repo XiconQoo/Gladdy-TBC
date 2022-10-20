@@ -37,7 +37,7 @@ Gladdy.version_releaseType = RELEASE_TYPES.beta
 Gladdy.version = PREFIX .. string.format("%.2f", Gladdy.version_num) .. "-" .. Gladdy.version_releaseType
 Gladdy.VERSION_REGEX = VERSION_REGEX
 
-Gladdy.debug = false
+Gladdy.debug = true
 
 LibStub("AceTimer-3.0"):Embed(Gladdy)
 LibStub("AceComm-3.0"):Embed(Gladdy)
@@ -244,7 +244,7 @@ function Gladdy:DeleteUnknownOptions(tbl, refTbl, str)
             if type(v) ~= type(refTbl[k]) then
                 Gladdy:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, "type error!", "Expected", type(refTbl[k]), "but found", type(v))
                 tbl[k] = nil
-            elseif type(v) == "table" then
+            elseif type(v) == "table" and (k ~= "auraListDefault" or Gladdy.db.version and Gladdy.db.version < 2.23) then
                 Gladdy:DeleteUnknownOptions(v, refTbl[k], str .. "." .. k)
             end
         end
@@ -274,6 +274,12 @@ function Gladdy:OnInitialize()
     self.dbi.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
     self.dbi.RegisterCallback(self, "OnProfileReset", "OnProfileReset")
     self.db = self.dbi.profile
+
+    --init spell cache
+    if not Gladdy.spellCache then
+        Gladdy.spellCache = {}
+        Gladdy:CacheSpells() -- /dump LibStub("Gladdy").spellCache
+    end
 
     self.LSM = LibStub("LibSharedMedia-3.0")
     self.LSM:Register("statusbar", "Gloss", "Interface\\AddOns\\Gladdy\\Images\\Gloss")

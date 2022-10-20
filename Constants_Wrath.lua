@@ -151,7 +151,7 @@ local specSpells = {
     -- WARLOCK
     [GetSpellInfo(59164)] = L["Affliction"], -- Haunt
     [GetSpellInfo(47843)] = L["Affliction"], -- Unstable Affliction
-    [GetSpellInfo(59672)] = L["Demonology"], -- Metamorphosis
+    [GetSpellInfo(47241)] = L["Demonology"], -- Metamorphosis
     [GetSpellInfo(47193)] = L["Demonology"], -- Demonic Empowerment
     [GetSpellInfo(47996) .. " Felguard"] = L["Demonology"], -- Intercept Felguard
     [GetSpellInfo(59172)] = L["Destruction"], -- Chaos Bolt
@@ -188,532 +188,695 @@ end
 
 local importantAuras = {
     --- Crowd control
-    [GetSpellInfo(33786)] = { -- Cyclone
+    [33786] = {  -- Cyclone
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 33786,
+        spellIDs = { 33786 },
     },
-    [GetSpellInfo(18658)] = { -- Hibernate
+    [18658] = { -- Hibernate
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 18658,
+        spellIDs = { 2637, 18657, 18658 },
     },
-    [GetSpellInfo(14309)] = { -- Freezing Trap Effect
+    [14309] = { -- Freezing Trap Effect
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 14309,
+        spellIDs = { 3355, 14308, 14309 },
     },
-    [GetSpellInfo(60210)] = { -- Freezing arrow effect
+    [60210] = { -- Freezing arrow effect
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 60210,
+        spellIDs = { 60210 },
     },
-    [GetSpellInfo(6770)] = { -- Sap
+    [6770] = {  -- Sap
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 6770,
+        spellIDs = { 2070, 6770, 11297, 51724 },
     },
-    [GetSpellInfo(2094)] = { -- Blind
+    [2094] = { -- Blind
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 2094,
+        spellIDs = { 2094 },
     },
-    [GetSpellInfo(5782)] = { -- Fear
+    [10326] = { -- Turn Evil
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 5782,
+        spellIDs = { 10326 },
     },
-    [GetSpellInfo(47860)] = { -- Death Coil Warlock
+    [5782] = { -- Fear
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 47860,
+        spellIDs = { 5782, 6213, 6215 },
     },
-    [GetSpellInfo(6358)] = { -- Seduction
+    [47860] = { -- Death Coil Warlock
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 6358,
+        spellIDs = { 6789, 17925, 17926, 27223, 47859, 47860 },
     },
-    [GetSpellInfo(5484)] = { -- Howl of Terror
+    [6358] = { -- Seduction
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 5484,
+        spellIDs = { 6358 },
     },
-    [GetSpellInfo(5246)] = { -- Intimidating Shout
+    [5484] = { -- Howl of Terror
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 5246,
+        spellIDs = { 5484, 17928, 50577 },
     },
-    [GetSpellInfo(8122)] = { -- Psychic Scream
+    [5246] = { -- Intimidating Shout
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 8122,
+        spellIDs = { 5246 },
     },
-    [GetSpellInfo(64044)] = { -- Psychic Horror
+    [8122] = { -- Psychic Scream
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 64044,
+        spellIDs = { 8122, 8124, 10888, 10890 },
     },
-    [GetSpellInfo(12826)] = { -- Polymorph
+    [64044] = { -- Psychic Horror
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 12826,
+        spellIDs = { 64044 },
+    },
+    [9484] = { -- Shackle Undead
+        track = AURA_TYPE_DEBUFF,
+        priority = 40,
+        spellIDs = { 9484, 9485, 10955 },
+    },
+    [12826] = { -- Polymorph
+        track = AURA_TYPE_DEBUFF,
+        priority = 40,
+        spellIDs = { 118, 12824, 12825, 12826, 28271, 28272, 61305, 61721, 61780 },
         texture = select(3, GetSpellInfo(12826)),
+        textureSpell = 12826,
     },
-    [GetSpellInfo(51514)] = { -- Hex
+    [51514] = { -- Hex
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 51514,
+        spellIDs = { 51514 },
     },
-    [GetSpellInfo(18647)] = { -- Banish
+    [18647] = { -- Banish
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 18647,
+        spellIDs = { 710, 18647 },
     },
-    [GetSpellInfo(605)] = { -- Mind Control
+    [605] = { -- Mind Control
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 605,
+        spellIDs = { 605 },
     },
-    [GetSpellInfo(14327)] = { -- Scare Beast
+    [14327] = { -- Scare Beast
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 14327,
+        spellIDs = { 1513, 14326, 14327 },
     },
 
     --- Roots
-    -- Entangling Roots
-    [GetSpellInfo(26989)] = {
+    [339] = { -- Entangling Roots
         track = AURA_TYPE_DEBUFF,
-        priority = 30,
-        spellID = 26989,
+        priority = 20,
+        spellIDs = {
+            339, 1062, 5195, 5196, 9852, 9853, 26989, 53308, -- Entangling Roots
+            19975, 19974, 19973, 19972, 19971, 19970, 27010, 53313 -- Nature's Grasp
+        },
     },
-    [select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689))] = {
+    [42917] = { -- Frost Nova
         track = AURA_TYPE_DEBUFF,
-        priority = 30,
-        spellID = 27010,
-        altName = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
+        priority = 20,
+        spellIDs = { 122, 865, 6131, 10230, 27088, 42917 },
     },
-    [GetSpellInfo(42917)] = { -- Frost Nova
+    [33395] = { -- Freeze (Water Elemental)
         track = AURA_TYPE_DEBUFF,
-        priority = 30,
-        spellID = 42917,
+        priority = 20,
+        spellIDs = { 33395, 62469 },
     },
-    [GetSpellInfo(33395)] = { -- Freeze (Water Elemental)
+    [12494] = { -- Frost Bite
         track = AURA_TYPE_DEBUFF,
-        priority = 30,
-        spellID = 33395,
+        priority = 20,
+        spellIDs = { 12494 },
     },
-    [GetSpellInfo(55080)] = { -- Shattered Barrier
+    [55080] = { -- Shattered Barrier
         track = AURA_TYPE_DEBUFF,
-        priority = 30,
-        spellID = 55080,
+        priority = 20,
+        spellIDs = { 55080 },
     },
-    [GetSpellInfo(16979)] = { -- Feral Charge
+    [16979] = { -- Feral Charge
         track = AURA_TYPE_DEBUFF,
-        priority = 30,
-        spellID = 16979,
+        priority = 20,
+        spellIDs = { 16979 },
     },
-    [GetSpellInfo(23694)] = { -- Improved Hamstring
+    [23694] = { -- Improved Hamstring
         track = AURA_TYPE_DEBUFF,
-        priority = 30,
-        spellID = 23694,
+        priority = 20,
+        spellIDs = { 23694 },
     },
-    [GetSpellInfo(4167)] = { -- Web (Hunter Pet)
+    [4167] = { -- Web (Hunter Pet)
         track = AURA_TYPE_DEBUFF,
-        priority = 30,
-        spellID = 4167,
+        priority = 20,
+        spellIDs = { 4167 },
     },
-    [GetSpellInfo(47168)] = { -- Improved Wingclip
+    [19185] = { -- Entrapment
         track = AURA_TYPE_DEBUFF,
-        priority = 30,
-        spellID = 47168,
+        priority = 20,
+        spellIDs = { 19185, 64803, 64804 },
+    },
+    [50245] = { -- Pin (Hunter Pet)
+        track = AURA_TYPE_DEBUFF,
+        priority = 20,
+        spellIDs = { 50245, 53544, 53545, 53546, 53547, 53548 },
+    },
+    [25999] = { -- Boar Charge
+        track = AURA_TYPE_DEBUFF,
+        priority = 20,
+        spellIDs = { 25999 },
+    },
+    [19306] = { -- Counterattack
+        track = AURA_TYPE_DEBUFF,
+        priority = 20,
+        spellIDs = { 19306, 20909, 20910, 27067, 48998, 48999 },
     },
 
     --- Stuns and incapacitates
-    [GetSpellInfo(8983)] = { -- Bash
+    [5211] = { -- Bash
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 8983,
+        spellIDs = { 5211, 6798, 8983 },
     },
-    [GetSpellInfo(1833)] = { -- Cheap Shot
+    [1833] = { -- Cheap Shot
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 1833,
+        spellIDs = { 1833 },
     },
-    [GetSpellInfo(8643)] = { -- Kidney Shot
+    [408] = { -- Kidney Shot
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 8643,
+        spellIDs = { 408, 8643 },
     },
-    [GetSpellInfo(1776)] = { -- Gouge
+    [1776] = { -- Gouge
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 1776,
+        spellIDs = { 1776 },
     },
-    [GetSpellInfo(44572)] = { -- Deep Freeze
+    [44572] = { -- Deep Freeze
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 44572,
+        spellIDs = { 44572 },
     },
-    [GetSpellInfo(49012)] = { -- Wyvern Sting
+    [19386] = { -- Wyvern Sting
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 49012,
+        spellIDs = { 19386, 24132, 24133, 27068, 49011, 49012 },
     },
-    [GetSpellInfo(19503)] = { -- Scatter Shot
+    [19503] = { -- Scatter Shot
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 19503,
+        spellIDs = { 19503 },
     },
-    [GetSpellInfo(49803)] = { -- Pounce
+    [9005] = { -- Pounce
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 49803,
+        spellIDs = { 9005, 9823, 9827, 27006, 49803 },
     },
-    [GetSpellInfo(49802)] = { -- Maim
+    [22570] = { -- Maim
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 49802,
+        spellIDs = { 22570, 49802 },
     },
-    [GetSpellInfo(10308)] = { -- Hammer of Justice
+    [853] = { -- Hammer of Justice
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 10308,
+        spellIDs = { 853, 5588, 5589, 10308 },
     },
-    [GetSpellInfo(20066)] = { -- Repentance
+    [2812] = { -- Holy Wrath
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 20066,
+        spellIDs = { 2812, 10318, 27139, 48816, 48817 },
     },
-    [GetSpellInfo(46968)] = { -- Shockwave
+    [20066] = { -- Repentance
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 46968,
+        spellIDs = { 20066 },
     },
-    [GetSpellInfo(49203)] = { -- Hungering Cold
+    [46968] = { -- Shockwave
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 49203,
+        spellIDs = { 46968 },
     },
-    [GetSpellInfo(47481)] = { -- Gnaw (dk pet stun)
+    [49203] = { -- Hungering Cold
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 47481,
+        spellIDs = { 49203 },
     },
-    [GetSpellInfo(47847)] = { -- Shadowfury Stun
+    [47481] = { -- Gnaw (dk pet stun)
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 47847,
+        spellIDs = { 47481 },
     },
-    [GetSpellInfo(16922)] = { -- Imp Starfire Stun
+    [30283] = { -- Shadowfury Stun
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 16922,
+        spellIDs = { 30283, 30413, 30414, 47846, 47847 },
     },
-    [GetSpellInfo(5530)] = { -- Mace Stun Effect
+    [19482] = { -- War Stomp
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        texture = select(3, GetSpellInfo(12284)),
-        spellID = 5530,
+        spellIDs = { 19482, 20549 },
     },
-    [GetSpellInfo(20549)] = { -- War Stomp
+    [7922] = { -- Charge Stun
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 20549,
+        spellIDs = { 7922, 65929 },
+        texture = select(3, GetSpellInfo(100)),
+        textureSpell = 100
     },
-    [GetSpellInfo(7922)] = { -- Charge Stun
+    [20253] = { -- Intercept Stun
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 7922,
-        texture = select(3, GetSpellInfo(100))
+        spellIDs = {
+            20253, 20614, 67573, 25273, 25274, --Warrior
+            30153, 30195, 30197, 47995, --Felguard
+        },
+        texture = select(3, GetSpellInfo(25272)),
+        textureSpell = 25272,
     },
-    [GetSpellInfo(25274)] = { -- Intercept Stun
+    [60995] = { -- Demon Charge
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 25274,
-        texture = select(3, GetSpellInfo(25272))
+        spellIDs = { 60995 },
+        texture = select(3, GetSpellInfo(54785)),
+        textureSpell = 54785
     },
-    [GetSpellInfo(12809)] = { -- Concussion Blow
+    [12809] = { -- Concussion Blow
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 12809,
+        spellIDs = { 12809 },
     },
-    [GetSpellInfo(12355)] = { -- Impact
+    [64343] = { -- Impact
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 12355,
+        spellIDs = { 64343, 12355 },
     },
-    [GetSpellInfo(19577)] = {-- Intimidation
+    [19577] = {-- Intimidation
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 19577,
+        spellIDs = { 19577 },
     },
-    [GetSpellInfo(31661)] = { -- Dragon's Breath
+    [50518] = { -- Ravage Stun
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellID = 31661,
+        spellIDs = { 50518, 53558, 53559, 53560, 53561, 53562 },
+    },
+    [31661] = { -- Dragon's Breath
+        track = AURA_TYPE_DEBUFF,
+        priority = 40,
+        spellIDs = { 31661, 33041, 33042, 33043, 42949, 42950 },
     },
 
+    --- Stun procs
+    [39796] = { -- Stoneclaw Stun
+        track = AURA_TYPE_DEBUFF,
+        priority = 40,
+        spellIDs = { 39796 },
+    },
+    [20170] = { -- Seal of Justice Stun
+        track = AURA_TYPE_DEBUFF,
+        priority = 40,
+        spellIDs = { 20170 },
+    },
+    [23454] = { -- Brutal Earthstorm Diamond
+        track = AURA_TYPE_DEBUFF,
+        priority = 40,
+        spellIDs = { 39796 },
+    },
+
+
     --- Silences
-    [GetSpellInfo(18469)] = { -- Improved Counterspell
+    [18469] = { -- Improved Counterspell
         track = AURA_TYPE_DEBUFF,
-        priority = 20,
-        spellID = 18469,
+        priority = 30,
+        spellIDs = { 18469, 55021 },
     },
-    [GetSpellInfo(15487)] = { -- Silence
+    [15487] = { -- Silence
         track = AURA_TYPE_DEBUFF,
-        priority = 20,
-        spellID = 15487,
+        priority = 30,
+        spellIDs = { 15487 },
     },
-    [GetSpellInfo(34490)] = { -- Silencing Shot
+    [34490] = { -- Silencing Shot
         track = AURA_TYPE_DEBUFF,
-        priority = 20,
-        spellID = 34490,
+        priority = 30,
+        spellIDs = { 34490 },
     },
-    [GetSpellInfo(18425)] = { -- Improved Kick
+    [18425] = { -- Improved Kick
         track = AURA_TYPE_DEBUFF,
-        priority = 20,
-        spellID = 18425,
+        priority = 30,
+        spellIDs = { 18425 },
     },
-    [GetSpellInfo(49916)] = { -- Strangulate
+    [47476] = { -- Strangulate
         track = AURA_TYPE_DEBUFF,
-        priority = 20,
-        spellID = 49916,
+        priority = 30,
+        spellIDs = { 47476, 49913, 49914, 49915, 49916 },
     },
-    [GetSpellInfo(74347)] = { -- Silenced - Gag Order
+    [74347] = { -- Silenced - Gag Order
         track = AURA_TYPE_DEBUFF,
-        priority = 20,
-        spellID = 74347,
+        priority = 30,
+        spellIDs = { 74347 },
     },
-    [GetSpellInfo(63529)] = { -- Silenced - Shield of the Templar
+    [63529] = { -- Silenced - Shield of the Templar
         track = AURA_TYPE_DEBUFF,
-        priority = 20,
-        spellID = 63529,
+        priority = 30,
+        spellIDs = { 63529 },
     },
-    [select(1, GetSpellInfo(31117)) .. " Silence"] = { -- Unstable Affliction Silence (GetSpellInfo returns "Unstable Affliction")
+    [31117] = { -- Unstable Affliction Silence (GetSpellInfo returns "Unstable Affliction")
         track = AURA_TYPE_DEBUFF,
-        altName = select(1, GetSpellInfo(31117)) .. " Silence",
-        priority = 20,
-        spellID = 31117,
+        priority = 30,
+        spellIDs = { 31117, 43523, 65813 },
     },
-    [GetSpellInfo(24259)] = { -- Spell Lock (Felhunter)
+    [24259] = { -- Spell Lock (Felhunter)
         track = AURA_TYPE_DEBUFF,
-        priority = 20,
-        spellID = 24259,
+        priority = 30,
+        spellIDs = { 19244, 67519, 24259 },
     },
-    [GetSpellInfo(28730)] = { -- Arcane Torrent
+    [28730] = { -- Arcane Torrent
         track = AURA_TYPE_DEBUFF,
-        priority = 20,
-        spellID = 28730,
+        priority = 30,
+        spellIDs = { 28730, 25046, 50613 },
     },
-    [GetSpellInfo(1330)] = { -- Garrote - Silence
+    [1330] = { -- Garrote - Silence
         track = AURA_TYPE_DEBUFF,
-        priority = 20,
-        spellID = 1330,
+        priority = 30,
+        spellIDs = { 1330 },
     },
 
     --- Disarms
-    [GetSpellInfo(676)] = { -- Disarm
+    [676] = { -- Disarm
         track = AURA_TYPE_DEBUFF,
-        priority = 20,
-        spellID = 676,
+        priority = 21,
+        spellIDs = { 676 },
     },
-    [GetSpellInfo(51722)] = { -- Dismantle
+    [51722] = { -- Dismantle
         track = AURA_TYPE_DEBUFF,
-        priority = 20,
-        spellID = 51722,
+        priority = 21,
+        spellIDs = { 51722 },
     },
-    [GetSpellInfo(53359)] = { -- Chimera Shot - Scorpid
+    [53359] = { -- Chimera Shot - Scorpid
         track = AURA_TYPE_DEBUFF,
-        priority = 20,
-        spellID = 53359,
+        priority = 21,
+        spellIDs = { 53359 },
     },
-    [GetSpellInfo(64058)] = { -- Psychic Horror Disarm
+    [64058] = { -- Psychic Horror Disarm
         track = AURA_TYPE_DEBUFF,
-        priority = 20,
-        spellID = 64058,
+        priority = 21,
+        spellIDs = { 64058 },
     },
 
     --- Buffs
-    [GetSpellInfo(1022)] = { -- Hand of Protection
+    [1022] = { -- Hand of Protection
+        track = AURA_TYPE_BUFF,
+        priority = 22,
+        spellIDs = { 1022, 5599, 10278 },
+    },
+    [1044] = { -- Hand of Freedom
         track = AURA_TYPE_BUFF,
         priority = 20,
-        spellID = 1022,
+        spellIDs = { 1044 },
     },
-    [GetSpellInfo(1044)] = { -- Hand of Freedom
+    [6940] = { -- Hand of Sacrifice
         track = AURA_TYPE_BUFF,
-        priority = 20,
-        spellID = 1044,
+        priority = 22,
+        spellIDs = { 6940 },
     },
-    [GetSpellInfo(6940)] = { -- Hand of Sacrifice
+    [64205] = { -- Divine Sacrifice
         track = AURA_TYPE_BUFF,
-        priority = 20,
-        spellID = 6940,
+        priority = 22,
+        spellIDs = { 64205 },
     },
-    [GetSpellInfo(64205)] = { -- Divine Sacrifice
+    [53659] = { -- Sacred Cleansing
         track = AURA_TYPE_BUFF,
-        priority = 20,
-        spellID = 64205,
+        priority = 10,
+        spellIDs = { 53659 },
     },
-    [GetSpellInfo(53271)] = { -- Master's Call (Hunter Pet Hand of Freedom)
+    [54428] = { -- Divine Plea
         track = AURA_TYPE_BUFF,
-        priority = 20,
-        spellID = 53271,
+        priority = 10,
+        spellIDs = { 54428 },
     },
-    [GetSpellInfo(2825)] = { -- Bloodlust
-        track = AURA_TYPE_BUFF,
-        priority = 9,
-        spellID = 2825,
-    },
-    [GetSpellInfo(32182)] = { -- Heroism
-        track = AURA_TYPE_BUFF,
-        priority = 20,
-        spellID = 32182,
-    },
-    [GetSpellInfo(33206)] = { -- Pain Suppression
-        track = AURA_TYPE_BUFF,
-        priority = 20,
-        spellID = 33206,
-    },
-    [GetSpellInfo(29166)] = { -- Innervate
-        track = AURA_TYPE_BUFF,
-        priority = 20,
-        spellID = 29166,
-    },
-    [GetSpellInfo(18708)] = { -- Fel Domination
-        track = AURA_TYPE_BUFF,
-        priority = 20,
-        spellID = 18708,
-    },
-    [GetSpellInfo(54428)] = { -- Divine Plea
-        track = AURA_TYPE_BUFF,
-        priority = 15,
-        spellID = 54428,
-    },
-    [GetSpellInfo(31821)] = { -- Aura mastery
+    [31821] = { -- Aura mastery
         track = AURA_TYPE_BUFF,
         priority = 21,
-        spellID = 31821,
+        spellIDs = { 31821 },
     },
-    [GetSpellInfo(51713)] = { -- Shadow Dance
+    [53271] = { -- Master's Call (Hunter Pet Hand of Freedom)
         track = AURA_TYPE_BUFF,
         priority = 20,
-        spellID = 51713,
+        spellIDs = { 53271 },
     },
-    [GetSpellInfo(12292)] = { -- Death Wish
-        track = AURA_TYPE_BUFF,
-        priority = 15,
-        spellID = 12292,
-    },
-    [GetSpellInfo(23920)] = { -- Spell Reflection
-        track = AURA_TYPE_BUFF,
-        priority = 40,
-        spellID = 23920,
-    },
-    [GetSpellInfo(6346)] = {-- Fear Ward
+    [2825] = { -- Bloodlust
         track = AURA_TYPE_BUFF,
         priority = 9,
-        spellID = 6346,
+        spellIDs = { 2825 },
     },
-    [GetSpellInfo(50334) .. " Feral"] = {-- Berserk
+    [32182] = { -- Heroism
+        track = AURA_TYPE_BUFF,
+        priority = 9,
+        spellIDs = { 32182 },
+    },
+    [33206] = { -- Pain Suppression
+        track = AURA_TYPE_BUFF,
+        priority = 22,
+        spellIDs = { 33206 },
+    },
+    [29166] = { -- Innervate
+        track = AURA_TYPE_BUFF,
+        priority = 21,
+        spellIDs = { 29166 },
+    },
+    [18708] = { -- Fel Domination
         track = AURA_TYPE_BUFF,
         priority = 20,
-        spellID = 50334,
+        spellIDs = { 18708 },
     },
-    [GetSpellInfo(46924)] = { -- Bladestorm
+    [47241] = { -- Metamorphosis
         track = AURA_TYPE_BUFF,
-        priority = 20,
-        spellID = 46924,
+        priority = 10,
+        spellIDs = { 47241 },
+    },
+    [51713] = { -- Shadow Dance
+        track = AURA_TYPE_BUFF,
+        priority = 10,
+        spellIDs = { 51713 },
+    },
+    [12292] = { -- Death Wish
+        track = AURA_TYPE_BUFF,
+        priority = 10,
+        spellIDs = { 12292 },
+    },
+    [23920] = { -- Spell Reflection
+        track = AURA_TYPE_BUFF,
+        priority = 30,
+        spellIDs = { 23920 },
+    },
+    [6346] = { -- Fear Ward
+        track = AURA_TYPE_BUFF,
+        priority = 9,
+        spellIDs = { 6346 },
+    },
+    [50334] = { -- Berserk
+        track = AURA_TYPE_BUFF,
+        priority = 10,
+        spellIDs = { 50334 },
+    },
+    [46924] = { -- Bladestorm
+        track = AURA_TYPE_BUFF,
+        priority = 10,
+        spellIDs = { 46924 },
+    },
+    [13750] = { -- Adrenaline Rush
+        track = AURA_TYPE_BUFF,
+        priority = 10,
+        spellIDs = { 13750 },
+    },
+    [12042] = { -- Arcane Power
+        track = AURA_TYPE_BUFF,
+        priority = 10,
+        spellIDs = { 12042 },
+    },
+    [28682] = { -- Combustion
+        track = AURA_TYPE_BUFF,
+        priority = 10,
+        spellIDs = { 28682 },
+    },
+    [48505] = { -- Starfall
+        track = AURA_TYPE_BUFF,
+        priority = 10,
+        spellIDs = { 48505, 53199, 53200, 53201 },
+    },
+    [3411] = { -- Intervene
+        track = AURA_TYPE_BUFF,
+        priority = 21,
+        spellIDs = { 3411 },
+    },
+    [53476] = { -- Intervene Pet
+        track = AURA_TYPE_BUFF,
+        priority = 21,
+        spellIDs = { 53476 },
+    },
+    [16188] = { -- Nature's Swiftness
+        track = AURA_TYPE_BUFF,
+        priority = 5,
+        spellIDs = { 16188, 17116 },
+    },
+    [16166] = { -- Elemental Mastery
+        track = AURA_TYPE_BUFF,
+        priority = 5,
+        spellIDs = { 16166 },
     },
 
     --- Turtling abilities
-    [GetSpellInfo(871)] = { -- Shield Wall
+    [871] = { -- Shield Wall
         track = AURA_TYPE_BUFF,
         priority = 25,
-        spellID = 871,
+        spellIDs = { 871 },
     },
-    [GetSpellInfo(48707)] = { -- Anti-Magic Shell
+    [48707] = { -- Anti-Magic Shell
         track = AURA_TYPE_BUFF,
         priority = 25,
-        spellID = 48707,
+        spellIDs = { 48707 },
     },
-    [GetSpellInfo(31224)] = { -- Cloak of Shadows
+    [31224] = { -- Cloak of Shadows
         track = AURA_TYPE_BUFF,
         priority = 25,
-        spellID = 31224,
+        spellIDs = { 31224 },
     },
-    [GetSpellInfo(19263)] = { -- Deterrence
+    [19263] = { -- Deterrence
         track = AURA_TYPE_BUFF,
         priority = 25,
-        spellID = 19263,
+        spellIDs = { 19263 },
     },
-    [GetSpellInfo(26669)] = { -- Evasion
+    [26669] = { -- Evasion
         track = AURA_TYPE_BUFF,
         priority = 10,
-        spellID = 26669,
+        spellIDs = { 5277, 26669 },
+    },
+    [47585] = { -- Dispersion
+        track = AURA_TYPE_BUFF,
+        priority = 25,
+        spellIDs = { 47585 },
+    },
+    [498] = { -- Divine Protection
+        track = AURA_TYPE_BUFF,
+        priority = 10,
+        spellIDs = { 498 },
+    },
+    [20230] = { -- Retaliation
+        track = AURA_TYPE_BUFF,
+        priority = 10,
+        spellIDs = { 20230 },
+    },
+    [20594] = { -- Stoneform
+        track = AURA_TYPE_BUFF,
+        priority = 10,
+        spellIDs = { 20594 },
+    },
+    [30823] = { -- Shamanistic Rage
+        track = AURA_TYPE_BUFF,
+        priority = 10,
+        spellIDs = { 30823 },
+    },
+    [55694] = { -- Enraged Regeneration
+        track = AURA_TYPE_BUFF,
+        priority = 10,
+        spellIDs = { 55694 },
+    },
+    [22812] = { -- Barkskin
+        track = AURA_TYPE_BUFF,
+        priority = 10,
+        spellIDs = { 22812 },
     },
 
     --- Immunities
-    [GetSpellInfo(34471)] = { -- The Beast Within (CC Immune)
+    [34471] = { -- The Beast Within (CC Immune)
         track = AURA_TYPE_BUFF,
-        priority = 20,
-        spellID = 34471,
+        priority = 15,
+        spellIDs = { 34471 },
     },
-    [GetSpellInfo(45438)] = { -- Ice Block
+    [45438] = { -- Ice Block
         track = AURA_TYPE_BUFF,
-        priority = 30,
-        spellID = 45438,
+        priority = 15,
+        spellIDs = { 45438 },
     },
-    [GetSpellInfo(41425)] = { -- Hypothermia (Ice Block Immune
+    [41425] = { -- Hypothermia (Ice Block Immune)
         track = AURA_TYPE_DEBUFF,
         priority = 8,
-        spellID = 41425,
+        spellIDs = { 41425 },
     },
-    [GetSpellInfo(642)] = { -- Divine Shield
-        track = AURA_TYPE_BUFF,
-        priority = 30,
-        spellID = 642,
-    },
-    [GetSpellInfo(18499)] = { -- Berserker Rage (Flee Immune)
-        track = AURA_TYPE_BUFF,
-        priority = 30,
-        spellID = 18499,
-    },
-    [GetSpellInfo(1719)] = { -- Recklessness (Flee Immune)
-        track = AURA_TYPE_BUFF,
-        priority = 30,
-        spellID = 1719,
-    },
-    [GetSpellInfo(48792)] = { -- Icebound Fortitude
+    [642] = { -- Divine Shield
         track = AURA_TYPE_BUFF,
         priority = 15,
-        spellID = 48792,
+        spellIDs = { 642 },
     },
-    [GetSpellInfo(49039)] = { -- Lichborne
+    [18499] = { -- Berserker Rage (Flee Immune)
         track = AURA_TYPE_BUFF,
         priority = 15,
-        spellID = 49039,
+        spellIDs = { 18499 },
+    },
+    [1719] = { -- Recklessness (Flee Immune)
+        track = AURA_TYPE_BUFF,
+        priority = 15,
+        spellIDs = { 1719 },
+    },
+    [48792] = { -- Icebound Fortitude
+        track = AURA_TYPE_BUFF,
+        priority = 15,
+        spellIDs = { 48792 },
+    },
+    [49039] = { -- Lichborne
+        track = AURA_TYPE_BUFF,
+        priority = 15,
+        spellIDs = { 49039 },
+    },
+    [27827] = { -- Spirit of Redemption
+        track = AURA_TYPE_BUFF,
+        priority = 10,
+        spellIDs = { 27827 },
+    },
+    [54748] = { -- Burning Determination
+        track = AURA_TYPE_BUFF,
+        priority = 15,
+        spellIDs = { 54748 },
     },
 
     --- Alt Stuff
-    [GetSpellInfo(34709)] = { -- Shadowsight Buff
+    [34709] = { -- Shadowsight Buff
         track = AURA_TYPE_DEBUFF,
-        duration = 15,
         priority = 9,
-        magic = true,
-        spellID = 34709,
+        spellIDs = { 34709 },
     },
-    [GetSpellInfo(8178)] = { -- Grounding Totem Effect
-        track = AURA_TYPE_BUFF,
-        duration = 0,
-        priority = 15,
-        spellID = 8178
-    },
-    [GetSpellInfo(5024)] = { -- Flee (Skull of impending Doom) -- 5024
+    [8178] = { -- Grounding Totem Effect
         track = AURA_TYPE_BUFF,
         priority = 15,
-        spellID = 5024,
-        altName = select(1, GetSpellInfo(5024)) .. " - " .. (select(1, GetItemInfo(4984)) or "Skull of Impending Doom"),
+        spellIDs = { 8178 }
+    },
+    [5024] = { -- Flee (Skull of impending Doom) -- 5024
+        track = AURA_TYPE_BUFF,
+        priority = 15,
+        spellIDs = { 5024 },
+    },
+
+    --- Stances
+    [2457] = { -- Battle Stance
+        track = AURA_TYPE_BUFF,
+        priority = 5,
+        spellIDs = { 2457 },
+    },
+    [2458] = { -- Berserker Stance
+        track = AURA_TYPE_BUFF,
+        priority = 5,
+        spellIDs = { 2458 },
+    },
+    [71] = { -- Defensive Stance
+        track = AURA_TYPE_BUFF,
+        priority = 5,
+        spellIDs = { 71 },
     },
 }
 

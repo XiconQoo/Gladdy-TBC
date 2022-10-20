@@ -213,7 +213,7 @@ function BuffsDebuffs:AURA_GAIN(unit, auraType, spellID, spellName, texture, dur
     end
     local auraFrame = self.frames[unit]
     spellName = LibClassAuras.GetAltName(spellID) or spellName
-    local aura = Gladdy:GetImportantAuras()[spellName] and Gladdy.db.auraListDefault[tostring(Gladdy:GetImportantAuras()[spellName].spellID)].enabled
+    local aura = Gladdy.enabledAuras[spellID]
     if aura and Gladdy.db.buffsShowAuraDebuffs then
         aura = false
     end

@@ -2,6 +2,11 @@ local pairs, ipairs = pairs, ipairs
 local select = select
 local type = type
 local floor = math.floor
+local coroutine = coroutine
+local debugprofilestop = debugprofilestop
+local geterrorhandler = geterrorhandler
+local debugstack = debugstack
+local next = next
 local str_find, str_gsub, str_sub, str_format = string.find, string.gsub, string.sub, string.format
 local tinsert = table.insert
 local Gladdy = LibStub("Gladdy")
@@ -272,6 +277,78 @@ function Gladdy:GetSpellDescription(spellID, cooldown) -- GetSpellPowerCost(5105
         str = str .. (type(cooldown) == "table" and cooldown.cd or cooldown) .. "s" .. " cooldown" .. "\n\n"
     end
     str = str .. castTime
-    str = str .. Gladdy:SetTextColor(GetSpellDescription(spellID), {r = 1, g=0.82, b=0})
+    local desc = GetSpellDescription(spellID)
+    if not desc or desc == "" then
+        for i=1, 100 do
+            desc = GetSpellDescription(spellID)
+            if desc and desc ~= "" then
+                break
+            end
+        end
+    end
+    str = str .. Gladdy:SetTextColor(desc, {r = 1, g=0.82, b=0})
     return str
+end
+
+function Gladdy:CacheSpells()
+    local co = coroutine.create(function()
+        local id = 0
+        local misses = 0
+        while misses < 50000 do
+            id = id + 1
+            local name, _, icon = GetSpellInfo(id)
+
+            if(icon == 136243) then -- 136243 is the a gear icon, we can ignore those spells
+                misses = 0;
+            elseif name and name ~= "" and icon then
+                Gladdy.spellCache[name] = Gladdy.spellCache[name] or {}
+                Gladdy.spellCache[name].spells = Gladdy.spellCache[name].spells or {}
+                tinsert(Gladdy.spellCache[name].spells, {
+                    spellID = id,
+                    icon = icon,
+                    spellName = name
+                })
+                misses = 0
+            else
+                misses = misses + 1
+            end
+            coroutine.yield()
+        end
+    end)
+    Gladdy.coroutineFrame = CreateFrame("Frame")
+    Gladdy.coroutineFrame.update = {}
+    Gladdy.coroutineFrame.update["spellCache"] = co
+    Gladdy.coroutineFrame:SetScript("OnUpdate", function(self, elapsed)
+        -- Start timing
+        local start = debugprofilestop()
+        local hasData = true
+
+        -- Resume as often as possible (Limit to 16ms per frame -> 60 FPS)
+        while (debugprofilestop() - start < 16 and hasData) do
+            -- Stop loop without data
+            hasData = false
+
+            -- Resume all coroutines
+            for name, func in pairs(self.update) do
+                -- Loop has data
+                hasData = true
+
+                -- Resume or remove
+                if coroutine.status(func) ~= "dead" then
+                    local ok, msg = coroutine.resume(func)
+                    if not ok then
+                        geterrorhandler()(msg .. '\n' .. debugstack(func))
+                    end
+                else
+                    Gladdy:Debug("INFO", "done with coroutine " .. name)
+                    self.update[name] = nil
+                end
+            end
+            if next(self.update) == nil then
+                self:SetScript("OnUpdate", nil)
+                Gladdy:Debug("INFO", "done with all corutines in coroutineFrame")
+                break
+            end
+        end
+    end)
 end
