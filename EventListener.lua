@@ -278,7 +278,7 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
     if not button.lastAuras then
         button.lastAuras = {}
     end
-    Gladdy:Debug("INFO", "AURA_FADE", unit, AURA_TYPE_BUFF, AURA_TYPE_DEBUFF)
+    --Gladdy:Debug("INFO", "AURA_FADE", unit, AURA_TYPE_BUFF, AURA_TYPE_DEBUFF)
     Gladdy:SendMessage("AURA_FADE", unit, AURA_TYPE_BUFF)
     Gladdy:SendMessage("AURA_FADE", unit, AURA_TYPE_DEBUFF)
     for i = 1, 2 do
@@ -314,7 +314,7 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
             if Gladdy.cooldownBuffs.racials[spellName] then
                 Gladdy:SendMessage("RACIAL_USED", unit, spellName, Gladdy.cooldownBuffs.racials[spellName].cd(expirationTime - GetTime()), spellName)
             end
-            Gladdy:Debug("INFO", "AURA_GAIN", unit, auraType, spellName)
+            --Gladdy:Debug("INFO", "AURA_GAIN", unit, auraType, spellName)
             Gladdy:SendMessage("AURA_GAIN", unit, auraType, spellID, spellName, texture, duration, expirationTime, count, dispelType, i, unitCaster)
         end
     end
