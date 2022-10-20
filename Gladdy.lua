@@ -31,9 +31,9 @@ local MAJOR, MINOR = "Gladdy", 11
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
 Gladdy.version_major_num = 2
-Gladdy.version_minor_num = 0.22
+Gladdy.version_minor_num = 0.23
 Gladdy.version_num = Gladdy.version_major_num + Gladdy.version_minor_num
-Gladdy.version_releaseType = RELEASE_TYPES.release
+Gladdy.version_releaseType = RELEASE_TYPES.beta
 Gladdy.version = PREFIX .. string.format("%.2f", Gladdy.version_num) .. "-" .. Gladdy.version_releaseType
 Gladdy.VERSION_REGEX = VERSION_REGEX
 
@@ -280,11 +280,16 @@ function Gladdy:OnInitialize()
     self.LSM:Register("statusbar", "Smooth", "Interface\\AddOns\\Gladdy\\Images\\Smooth")
     self.LSM:Register("statusbar", "Minimalist", "Interface\\AddOns\\Gladdy\\Images\\Minimalist")
     self.LSM:Register("statusbar", "LiteStep", "Interface\\AddOns\\Gladdy\\Images\\LiteStep.tga")
+    self.LSM:Register("statusbar", "Gradient", "Interface\\AddOns\\Gladdy\\Images\\Gradient2")
     self.LSM:Register("statusbar", "Flat", "Interface\\AddOns\\Gladdy\\Images\\UI-StatusBar")
     self.LSM:Register("border", "Gladdy Tooltip round", "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round_selfmade")
     self.LSM:Register("border", "Gladdy Tooltip squared", "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_square_selfmade")
-    self.LSM:Register("font", "DorisPP", "Interface\\AddOns\\Gladdy\\Images\\DorisPP.TTF")
     self.LSM:Register("border", "Square Full White", "Interface\\AddOns\\Gladdy\\Images\\Square_FullWhite.tga")
+    self.LSM:Register("font", "DorisPP", "Interface\\AddOns\\Gladdy\\Fonts\\DorisPP.TTF")
+    self.LSM:Register("font", "NotoSans Black", "Interface\\AddOns\\Gladdy\\Fonts\\NotoSansCJK-Black.ttf")
+    self.LSM:Register("font", "NotoSans Bold", "Interface\\AddOns\\Gladdy\\Fonts\\NotoSansCJK-Bold.ttf")
+    self.LSM:Register("font", "NotoSans Medium", "Interface\\AddOns\\Gladdy\\Fonts\\NotoSansCJK-Medium.ttf")
+    self.LSM:Register("font", "NotoSans Regular", "Interface\\AddOns\\Gladdy\\Fonts\\NotoSansCJK-Regular.ttf")
 
     L = self.L
 
