@@ -535,7 +535,7 @@ function Pets:GetOptions()
                             desc = L["Size of the text"],
                             order = 13,
                             min = 0,
-                            max = 20,
+                            max = 50,
                             width = "full",
                         }),
                     },

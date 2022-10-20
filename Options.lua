@@ -58,6 +58,7 @@ Gladdy.defaults = {
         newLayout = false,
         showMover = true,
         useOmnicc =false,
+        version = Gladdy.version_num
     },
 }
 
@@ -154,6 +155,23 @@ local function setColorOpt(info, r, g, b, a)
     local key = info.arg or info[#info]
     Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b, a
     Gladdy:UpdateFrame()
+end
+
+function Gladdy:ResetMenu(name, module, order)
+    self.options.args[name].args = module:GetOptions()
+    self.options.args[name].args.reset = {
+        type = "execute",
+        name = L["Reset module"],
+        desc = L["Reset module to defaults"],
+        order = 1,
+        func = function()
+            for k, v in pairs(module.defaults) do
+                self.dbi.profile[k] = v
+            end
+            Gladdy:UpdateFrame()
+            Gladdy:SetupModule(name, module, order)
+        end
+    }
 end
 
 function Gladdy:SetupModule(name, module, order)
