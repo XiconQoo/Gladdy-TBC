@@ -1,6 +1,8 @@
 local string_gsub, floor, pairs = string.gsub, math.floor, pairs
+local select = select
 local CreateFrame, SetPortraitTexture = CreateFrame, SetPortraitTexture
-local UnitHealthMax, UnitHealth, UnitName, UnitClass, UnitGUID, UnitExists = UnitHealthMax, UnitHealth, UnitName, UnitClass, UnitGUID, UnitExists
+local UnitHealthMax, UnitHealth, UnitName, UnitClass, UnitGUID, UnitIsConnected = UnitHealthMax, UnitHealth, UnitName, UnitClass, UnitGUID, UnitIsConnected
+local UnitIsPlayer, UnitIsDead, UnitIsGhost, UnitExists = UnitIsPlayer, UnitIsDead, UnitIsGhost, UnitExists
 
 local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 
@@ -8,9 +10,11 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local Targets = Gladdy:NewModule("Targets", nil, {
     targetEnabled = true,
-    targetWidth = 128,
-    targetHeight = 40,
+    targetWidth = 90,
+    targetHeight = 30,
+    targetBarEnabled = true,
     targetPortraitEnabled = true,
+    targetPortraitClass = true,
     targetPortraitBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     targetHealthBarFont = "DorisPP",
     targetHealthBarHeight = 60,
@@ -33,25 +37,20 @@ local Targets = Gladdy:NewModule("Targets", nil, {
     targetFrameLevel = 5,
 })
 
+Targets.targetUnits = {
+    "arena1target", "arena2target", "arena3target", "arena4target", "arena5target"
+}
+
 function Targets:Initialize()
     self.frames = {}
     if Gladdy.db.targetEnabled then
         self:RegisterMessage("JOINED_ARENA")
-        self:RegisterMessage("ENEMY_SPOTTED")
-        self:RegisterMessage("UNIT_DESTROYED")
-        self:RegisterMessage("UNIT_DEATH")
-
-        -- self:RegisterMessage("ENEMY_STEALTH")
-        -- self:RegisterMessage("UNIT_SPEC")
     end
 end
 
 function Targets:UpdateFrameOnce()
     if Gladdy.db.targetEnabled then
         self:RegisterMessage("JOINED_ARENA")
-        self:RegisterMessage("ENEMY_SPOTTED")
-        self:RegisterMessage("UNIT_DESTROYED")
-        self:RegisterMessage("UNIT_DEATH")
     else
         self:UnregisterAllMessages()
     end
@@ -59,41 +58,79 @@ end
 
 function Targets:JOINED_ARENA()
     for _,v in pairs(self.frames) do
-        v.healthBar:SetAlpha(0)
+        v:SetAlpha(0)
     end
 
     if Gladdy.db.targetEnabled then
+        self:RegisterEvent("UNIT_HEALTH_FREQUENT")
+        self:RegisterEvent("UNIT_MAXHEALTH")
+        self:RegisterEvent("UNIT_PORTRAIT_UPDATE")
+        self:RegisterEvent("UNIT_NAME_UPDATE")
         self:RegisterEvent("UNIT_TARGET")
-        self:SetScript("OnEvent", function(_, event, unitId)
-            if event == "UNIT_TARGET" then
-                Targets:CheckUnitTarget(unitId)
-            end
-        end)
+        self:SetScript("OnEvent", Targets.OnEvent)
     end
 end
 
-function Targets:UNIT_DEATH(unitId)
-    local unit = string_gsub(unitId, "%d$", "%1target")
-    local healthBar = self.frames[unit].healthBar
-    if (not healthBar) then
-        return
+function Targets:OnEvent(event)
+    for i=1, Gladdy.curBracket do
+        local unit = self.targetUnits[i]
+        local button = self.frames[unit]
+        local healthBar = self.frames[unit].healthBar
+        local unitGUID = UnitGUID(unit)
+        if UnitGUID(unit) then
+            Gladdy:Debug("INFO", unit, "show", event)
+            local health = UnitHealth(unit)
+            local healthMax = UnitHealthMax(unit)
+            local checkedHealth
+            if event == "UNIT_TARGET" and button.unitGUID ~= unitGUID then
+                --changed target
+                button.unitGUID = unitGUID
+                self:UpdateHealthBarColor(unit)
+                self:UpdatePortrait(unit)
+                healthBar.hp:SetMinMaxValues(0, healthMax)
+                healthBar.hp:SetValue(health)
+                self:HealthCheck(unit)
+                self:SetHealthText(healthBar, health, healthMax)
+                self:SetText(unit)
+                checkedHealth = true
+            end
+            if (event == "UNIT_MAXHEALTH" and not checkedHealth) then
+                healthBar.hp:SetMinMaxValues(0, healthMax)
+                healthBar.hp:SetValue(health)
+                self:HealthCheck(unit)
+                self:SetHealthText(healthBar, health, healthMax)
+            end
+            if (event == "UNIT_HEALTH_FREQUENT" and not checkedHealth) then
+                healthBar.hp:SetValue(health)
+                self:HealthCheck(unit)
+                self:SetHealthText(healthBar, health, healthMax)
+            end
+            button:SetAlpha(1)
+        else
+            Gladdy:Debug("INFO", unit, "hide", event)
+            button.unitGUID = nil
+            button:SetAlpha(0)
+        end
     end
+end
 
-    healthBar:SetAlpha(0)
-    healthBar:SetScript("OnUpdate", nil)
-    healthBar.portrait:SetTexture(nil)
+function Targets:Reset()
+    self:UnregisterAllEvents()
+    for _,v in pairs(self.frames) do
+        v:SetAlpha(0)
+    end
 end
 
 function Targets:UNIT_DESTROYED(unitId)
     local unit = string_gsub(unitId, "%d$", "%1target")
     local healthBar = self.frames[unit].healthBar
+    local button = self.frames[unit]
     if (not healthBar) then
         return
     end
 
-    healthBar:SetAlpha(0)
-    healthBar:SetScript("OnUpdate", nil)
-    healthBar.portrait:SetTexture(nil)
+    button:SetAlpha(0)
+    button.portrait:SetTexture(nil)
 end
 
 
@@ -103,78 +140,21 @@ function Targets:ENEMY_SPOTTED(unit)
     end
 end
 
-local targetsHealth = {}
-function Targets:CheckUnitTarget(unitId)
-    if (not unitId) then
-        return
-    end
-
-    local unitPrefix = string_gsub(unitId, "%d$", "")
-    local unit = string_gsub(unitId, "%d$", "%1target")
-
-    if unitPrefix ~= "arena" then
-        return
-    end
-
-    local targetsFrame = self.frames[unit]
-    if (not targetsFrame) then
-        return
-    end
-
-    if ( UnitGUID(unit)) then
-        -- print(unit .. "'s name:" .. UnitName(unit))
-        -- print(unit .. "'s HP:" .. UnitHealth(unit) .."/"..UnitHealthMax(unit))
-
-        targetsFrame.healthBar:SetAlpha(1)
-        targetsFrame.healthBar.hp:SetMinMaxValues(0, UnitHealthMax(unit))
-        targetsFrame.healthBar.hp:SetValue(UnitHealth(unit))
-        Targets:SetHealthText(targetsFrame.healthBar, UnitHealth(unit), UnitHealthMax(unit))
-        SetPortraitTexture(targetsFrame.healthBar.portrait, unit)
-
-        targetsFrame.healthBar:SetScript("OnUpdate", function(self)
-            if targetsHealth[self.unit] ~= UnitHealth(self.unit) then
-                -- print("OnUpdate Unit HP:" .. self.unit ..  " -> " .. UnitHealth(self.unit) .. "/" .. UnitHealthMax(self.unit))
-
-                self.hp:SetValue(UnitHealth(self.unit))
-                Targets:SetHealthText(self, UnitHealth(self.unit), UnitHealthMax(self.unit))
-                
-                targetsHealth[self.unit] = UnitHealth(self.unit)
-            end
-        end)
-
-        Targets:SetText(unit)
-        Targets:SetHealthStatusBarColor(unit)
-    else
-        targetsHealth[unit] = nil
-
-        targetsFrame.healthBar:SetAlpha(0)
-        targetsFrame.healthBar:SetScript("OnUpdate", nil)
-        targetsFrame.healthBar.portrait:SetTexture(nil)
-    end
-end
-
 function Targets:Test(unitId)
     if Gladdy.db.targetEnabled then
         local unit = string_gsub(unitId, "%d$", "%1target")
-        local targetsFrame = self.frames[unit]
-        if (not targetsFrame) then
+        local button = self.frames[unit]
+        if (not button) then
             return
         end
 
-        targetsFrame.healthBar:SetAlpha(1)
-        targetsFrame.healthBar.hp:SetMinMaxValues(0, 12000)
-        targetsFrame.healthBar.hp:SetValue(7000)
-        Targets:SetHealthText(targetsFrame.healthBar, 7000, 12000)
-        SetPortraitTexture(targetsFrame.healthBar.portrait, "player")
+        button:SetAlpha(1)
+        button.healthBar.hp:SetMinMaxValues(0, 12000)
+        button.healthBar.hp:SetValue(7000)
+        Targets:SetHealthText(button.healthBar, 7000, 12000)
+        Targets:UpdatePortrait(unit)
         Targets:SetText(unit)
         Targets:SetHealthStatusBarColor(unit)
-
-        self:RegisterEvent("UNIT_TARGET")
-        self:SetScript("OnEvent", function(_, event, unitId)
-            if event == "UNIT_TARGET" then
-                Targets:CheckUnitTarget(unitId)
-            end
-        end)
     end
 end
 
@@ -185,19 +165,20 @@ function Targets:CreateFrame(unitId)
     end
     local button = CreateFrame("Frame", "GladdyButtonFrameTarget" .. unit, Gladdy.frame)
     button:SetMovable(true)
-    --button:SetAlpha(0)
     button:SetPoint("LEFT", Gladdy.buttons[unitId].healthBar, "RIGHT", Gladdy.db.targetXOffset, Gladdy.db.targetYOffset)
+    button:SetAlpha(0)
 
-    local secure = CreateFrame("Button", "GladdyButton" .. unit, button, "SecureActionButtonTemplate, SecureHandlerEnterLeaveTemplate")
+    --[[local secure = CreateFrame("Button", "GladdyButton" .. unit, button, "SecureActionButtonTemplate, SecureHandlerEnterLeaveTemplate")
     secure:RegisterForClicks("AnyUp")
     secure:RegisterForClicks("AnyDown")
     secure:SetAttribute("*type1", "target")
     secure:SetAttribute("*type2", "focus")
     secure:SetAttribute("unit", unit)
-    secure:SetAllPoints(button)
+    secure:SetAllPoints(button)--]]
 
     button.unit = unit
-    button.secure = secure
+    button.unitSource = unitId
+    --button.secure = secure
 
     local healthBar = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
     healthBar:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "targetHealthBarBorderStyle"),
@@ -206,16 +187,14 @@ function Targets:CreateFrame(unitId)
     healthBar:SetFrameStrata(Gladdy.db.targetFrameStrata)
     healthBar:SetFrameLevel(Gladdy.db.targetFrameLevel)
     healthBar:SetAllPoints(button)
-    healthBar:SetAlpha(0)
 
-    healthBar.portrait = healthBar:CreateTexture(nil, "BACKGROUND")
-    healthBar.portrait:SetPoint("LEFT", healthBar, "RIGHT")
-    healthBar.portrait:SetTexCoord(0.1, 0.9, 0.1, 0.9)
-    -- SetPortraitTexture(healthBar.portrait, "player")
-    healthBar.portrait.border = healthBar:CreateTexture(nil, "OVERLAY")
-    healthBar.portrait.border:SetAllPoints(healthBar.portrait)
-    healthBar.portrait.border:SetTexture(Gladdy.db.classIconBorderStyle)
-    healthBar.portrait.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.targetHealthBarBorderColor))
+    button.portrait = button:CreateTexture(nil, "BACKGROUND")
+    button.portrait:SetPoint("LEFT", healthBar, "RIGHT")
+    --button.portrait:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+    button.portrait.border = button:CreateTexture(nil, "OVERLAY")
+    button.portrait.border:SetAllPoints(button.portrait)
+    button.portrait.border:SetTexture(Gladdy.db.classIconBorderStyle)
+    button.portrait.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.targetHealthBarBorderColor))
 
 
     healthBar.hp = CreateFrame("StatusBar", nil, healthBar)
@@ -262,13 +241,8 @@ function Targets:CreateFrame(unitId)
     healthBar.healthText:SetPoint("RIGHT", -5, 0)
 
     healthBar.unit = unit
+    healthBar.unitSource = unitId
     button.healthBar = healthBar
-
-    healthBar:RegisterUnitEvent("UNIT_HEALTH_FREQUENT", unit)
-    healthBar:RegisterUnitEvent("UNIT_MAXHEALTH", unit)
-    healthBar:RegisterUnitEvent("UNIT_PORTRAIT_UPDATE", unit)
-    healthBar:RegisterUnitEvent("UNIT_NAME_UPDATE", unit)
-    -- healthBar:SetScript("OnEvent", Targets.OnEvent)
 
     button:SetWidth(Gladdy.db.targetWidth)
     button:SetHeight(Gladdy.db.targetHeight)
@@ -276,21 +250,66 @@ function Targets:CreateFrame(unitId)
     self.frames[unit] = button
 end
 
-function Targets.OnEvent(self, event, unit)
-    -- if event == "UNIT_PORTRAIT_UPDATE" then
-    --     SetPortraitTexture(self.portrait, unit)
-    -- end
+function Targets:UpdateHealthBarColor(unit)
+    local button = self.frames[unit]
+    if not button or not Gladdy.db.targetBarEnabled then
+        return
+    end
+    -- player or not
+    if UnitIsPlayer(unit) then
+        local class = select(2, UnitClass(unit))
+        button.healthBar.hp:SetStatusBarColor(
+                RAID_CLASS_COLORS[class].r,
+                RAID_CLASS_COLORS[class].g,
+                RAID_CLASS_COLORS[class].b, 1)
+    else
+        button.healthBar.hp:SetStatusBarColor(Gladdy:SetColor(Gladdy.db.targetHealthBarColor))
+    end
+end
 
-    -- local health = UnitHealth(unit)
-    -- local healthMax = UnitHealthMax(unit)
-    -- self.hp:SetMinMaxValues(0, healthMax)
-    -- self.hp:SetValue(health)
-    -- Targets:SetHealthText(self, health, healthMax)
+function Targets:UpdatePortrait(unit)
+    local button = self.frames[unit]
+    if not button then
+        return
+    end
+    if Gladdy.frame.testing then
+        unit = "player"
+    end
+    if Gladdy.db.targetPortraitClass then
+        button.portrait:SetTexture(Gladdy.classIcons[select(2, UnitClass(unit))])
+    else
+        SetPortraitTexture(button.portrait, unit)
+    end
+end
+
+function Targets:HealthCheck(unit)
+    local button = self.frames[unit]
+    if not button or not Gladdy.db.targetBarEnabled then
+        return
+    end
+    if UnitIsPlayer(unit) then
+        local unitHPMin, unitHPMax, unitCurrHP
+        unitHPMin, unitHPMax = button.healthBar.hp:GetMinMaxValues()
+        unitCurrHP = button.healthBar.hp:GetValue()
+        button.unitHPPercent = unitCurrHP / unitHPMax
+        if UnitIsDead(unit) and not Gladdy:isFeignDeath(unit) then
+            button.portrait:SetVertexColor(0.35, 0.35, 0.35, 1.0)
+        elseif UnitIsGhost(unit) then
+            button.portrait:SetVertexColor(0.2, 0.2, 0.75, 1.0)
+        elseif (button.unitHPPercent > 0) and (button.unitHPPercent <= 0.2) then
+            button.portrait:SetVertexColor(1.0, 0.0, 0.0)
+        else
+            button.portrait:SetVertexColor(1.0, 1.0, 1.0, 1.0)
+        end
+    else
+        button.portrait:SetVertexColor(1.0, 1.0, 1.0, 1.0)
+    end
 end
 
 function Targets:UpdateFrame(unitId)
     local unit = string_gsub(unitId, "%d$", "%1target")
     local healthBar = self.frames[unit].healthBar
+    local button = self.frames[unit]
 
     if (not healthBar) then
         return
@@ -326,17 +345,17 @@ function Targets:UpdateFrame(unitId)
         self.frames[unit]:SetPoint("TOPLEFT", Gladdy.buttons[unitId].healthBar, "TOPLEFT", Gladdy.db.targetXOffset, Gladdy.db.targetYOffset)
     end
 
-    healthBar.portrait:SetHeight(Gladdy.db.targetHeight)
-    healthBar.portrait:SetWidth(Gladdy.db.targetHeight)
+    button.portrait:SetHeight(Gladdy.db.targetHeight)
+    button.portrait:SetWidth(Gladdy.db.targetHeight)
     if not Gladdy.db.targetPortraitEnabled then
-        healthBar.portrait:Hide()
-        healthBar.portrait.border:Hide()
+        button.portrait:Hide()
+        button.portrait.border:Hide()
     else
-        healthBar.portrait:Show()
-        healthBar.portrait.border:Show()
+        button.portrait:Show()
+        button.portrait.border:Show()
     end
-    healthBar.portrait.border:SetTexture(Gladdy.db.targetPortraitBorderStyle)
-    healthBar.portrait.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.targetHealthBarBorderColor))
+    button.portrait.border:SetTexture(Gladdy.db.targetPortraitBorderStyle)
+    button.portrait.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.targetHealthBarBorderColor))
 
     healthBar.bg:SetTexture(Gladdy:SMFetch("statusbar",  "targetHealthBarTexture"))
     healthBar.bg:SetVertexColor(Gladdy:SetColor(Gladdy.db.targetHealthBarBgColor))
@@ -365,6 +384,12 @@ function Targets:UpdateFrame(unitId)
     healthBar.nameText:SetTextColor(Gladdy:SetColor(Gladdy.db.targetHealthBarFontColor))
     healthBar.healthText:SetTextColor(Gladdy:SetColor(Gladdy.db.targetHealthBarFontColor))
 
+    if Gladdy.db.targetBarEnabled then
+        healthBar:Show()
+    else
+        healthBar:Hide()
+    end
+
     if (unit == "arena1target") then
         Gladdy:CreateMover(self.frames[unit], "targetXOffset", "targetYOffset", L["Targets"], {"TOPLEFT", "TOPLEFT"})
     end
@@ -374,6 +399,9 @@ function Targets:SetHealthStatusBarColor(unit)
     local targetsFrame = self.frames[unit]
     if not targetsFrame then
         return
+    end
+    if Gladdy.frame.testing then
+        unit = "player"
     end
 
     local class = select(2, UnitClass(unit))
@@ -415,6 +443,9 @@ function Targets:SetText(unit)
     local targetsFrame = self.frames[unit]
     if not targetsFrame then
         return
+    end
+    if Gladdy.frame.testing then
+        unit = "player"
     end
 
     local nameText = ""
@@ -479,7 +510,7 @@ function Targets:GetOptions()
             args = {
                 general = {
                     type = "group",
-                    name = L["General"],
+                    name = L["Bar"],
                     order = 1,
                     args = {
                         headerAuras = {
@@ -487,6 +518,11 @@ function Targets:GetOptions()
                             name = L["General"],
                             order = 1,
                         },
+                        targetBarEnabled = option({
+                            order = 2,
+                            type = "toggle",
+                            name = L["Enabled"],
+                        }),
                         targetHeight = option({
                             type = "range",
                             name = L["Bar height"],
@@ -527,18 +563,23 @@ function Targets:GetOptions()
                             dialogControl = "LSM30_Statusbar",
                             values = AceGUIWidgetLSMlists.statusbar,
                         }),
+                        targetHealthBarClassColored = Gladdy:option({
+                            type = "toggle",
+                            name = L["Class Colored Bars"],
+                            order = 8,
+                        }),
                         targetHealthBarColor = Gladdy:colorOption({
                             type = "color",
                             name = L["Health color"],
                             desc = L["Color of the status bar"],
-                            order = 8,
+                            order = 9,
                             hasAlpha = true,
                         }),
                         targetHealthBarBgColor = Gladdy:colorOption({
                             type = "color",
                             name = L["Background color"],
                             desc = L["Color of the status bar background"],
-                            order = 9,
+                            order = 10,
                             hasAlpha = true,
                         }),
                     },
@@ -558,10 +599,15 @@ function Targets:GetOptions()
                             name = L["Enabled"],
                             order = 2,
                         }),
+                        targetPortraitClass = Gladdy:option({
+                            type = "toggle",
+                            name = L["Class Icon"],
+                            order = 3,
+                        }),
                         targetPortraitBorderStyle = Gladdy:option({
                             type = "select",
                             name = L["Border style"],
-                            order = 3,
+                            order = 4,
                             values = Gladdy:GetIconStyles()
                         }),
 
@@ -598,7 +644,7 @@ function Targets:GetOptions()
                             desc = L["Size of the text"],
                             order = 13,
                             min = 0,
-                            max = 20,
+                            max = 50,
                             width = "full",
                         }),
                     },
@@ -735,22 +781,6 @@ end
 ---------------------------
 
 function Targets:LegacySetPosition(unit, unitId)
-    if Gladdy.db.newLayout then
-        return Gladdy.db.newLayout
-    end
-    self.frames[unit]:ClearAllPoints()
-    self.frames[unit]:SetPoint("LEFT", Gladdy.buttons[unitId].healthBar, "RIGHT", Gladdy.db.targetXOffset, Gladdy.db.targetYOffset)
-    if (Gladdy.db.tagetsGroup) then
-        if (unit == "arena1target") then
-            self.frames[unit]:SetPoint("LEFT", Gladdy.buttons[unitId].healthBar, "RIGHT", Gladdy.db.targetXOffset, Gladdy.db.targetYOffset)
-        else
-            local previousTarget = "arena" .. string_gsub(string_gsub(unit, "arena", ""), "target", "") - 1 .. "target"
-            self.frames[unit]:ClearAllPoints()
-            self.frames[unit]:SetPoint("TOPLEFT", self.frames[previousTarget], "BOTTOMLEFT", 0, - Gladdy.db.targetMargin)
-        end
-    else
-        self.frames[unit]:ClearAllPoints()
-        self.frames[unit]:SetPoint("LEFT", Gladdy.buttons[unitId].healthBar, "RIGHT", Gladdy.db.targetXOffset, Gladdy.db.targetYOffset)
-    end
+
     return Gladdy.db.newLayout
 end
