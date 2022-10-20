@@ -42,7 +42,6 @@ Gladdy.enabledAuras = {
     [AURA_TYPE_BUFF] = {}, [AURA_TYPE_DEBUFF] = {}
 }
 local function flatEnabledSpells()
-    Gladdy:Debug("INFO", "flatEnabledSpells")
     for _,v in pairs(Gladdy.db.auraListDefault) do
         for _,spellID in ipairs(v.spellIDs) do
             if v.enabled then
@@ -51,7 +50,6 @@ local function flatEnabledSpells()
                     priority = v.priority
                 }
             else
-                print(v.track, spellID)
                 Gladdy.enabledAuras[v.track][spellID] = nil
             end
         end
@@ -598,7 +596,6 @@ function Auras:Test(unit)
         spellName = select(1, GetSpellInfo(tonumber(rndSpell)))
         icon = select(3, GetSpellInfo(tonumber(rndSpell)))
         local duration = rand(2,10)
-        print("Auras:Test", unit, size, track, spellid, duration)
         self:AURA_GAIN(unit, track, spellid, spellName, icon, duration, GetTime() + duration)
     end
 
@@ -648,9 +645,6 @@ function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, exp
     if not Gladdy.enabledAuras[auraType][spellID] then
         return
     end
-
-    print("Auras:AURA_GAIN", unit, auraType, spellID)
-    print("---Auras:AURA_GAIN", auraFrame.priority, Gladdy.enabledAuras[auraType][spellID].priority)
 
     if (auraFrame.priority and auraFrame.priority > Gladdy.enabledAuras[auraType][spellID].priority) then
         return
@@ -1393,7 +1387,6 @@ function Auras:GetAuraOptions(auraType)
                         Gladdy.db.auraListDefault[tostring(k)].enabled = value
                     end,
                     get = function()
-                        print("get enabled")
                         return Gladdy.db.auraListDefault[tostring(k)].enabled
                     end,
                     width = 0.7,
