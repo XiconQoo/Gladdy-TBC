@@ -1418,7 +1418,9 @@ function Auras:GetAuraOptions(auraType)
                     name = L["Default Aura"],
                     type = "description",
                     width = 0.7,
-
+                    hidden = function()
+                        return not Gladdy:GetImportantAuras()[tonumber(k)]
+                    end,
                 },
                 priority = {
                     order = 3,
