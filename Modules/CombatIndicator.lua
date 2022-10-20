@@ -28,6 +28,9 @@ function CombatIndicator:Initialize()
 end
 
 function CombatIndicator:JOINED_ARENA()
+    for i=1, Gladdy.curBracket do
+        CombatIndicator.frames["arena" .. i]:Hide()
+    end
     self:RegisterEvent("UNIT_FLAGS")
     self:SetScript("OnEvent", CombatIndicator.OnEvent)
     --self:SetScript("OnUpdate", CombatIndicator.OnEvent)
