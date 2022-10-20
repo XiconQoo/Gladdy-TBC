@@ -36,6 +36,21 @@ local RACE_ICON_TCOORDS = {
     ["DRAENEI_FEMALE"] = { 0.5, 0.625, 0.5, 0.75 },
 }
 
+local classIconPath = "Interface\\Addons\\Gladdy\\Images\\Classes\\"
+local classIcons = {
+    ["DRUID"] = classIconPath .. "inv_misc_monsterclaw_04",
+    ["DEATHKNIGHT"] = select(3, GetSpellInfo(49023)), --Might of Mograine
+    ["HUNTER"] = classIconPath .. "inv_weapon_bow_07",
+    ["MAGE"] = classIconPath .. "inv_staff_13",
+    ["PALADIN"] = classIconPath .. "inv_hammer_01",
+    ["PRIEST"] = classIconPath .. "inv_staff_30",
+    ["ROGUE"] = classIconPath .. "inv_throwingknife_04",
+    ["SHAMAN"] = classIconPath .. "inv_jewelry_talisman_04",
+    ["WARLOCK"] = classIconPath .. "spell_nature_drowsy",
+    ["WARRIOR"] = classIconPath .. "inv_sword_27",
+}
+Gladdy.classIcons = classIcons
+
 local arenaTimer = {
     ["default"] = {
         [60] = "One minute until the Arena battle begins!",

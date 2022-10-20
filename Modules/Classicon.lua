@@ -20,20 +20,6 @@ local Classicon = Gladdy:NewModule("Class Icon", 81, {
     classIconGroupDirection = "DOWN"
 })
 
-local classIconPath = "Interface\\Addons\\Gladdy\\Images\\Classes\\"
-local classIcons = {
-    ["DRUID"] = classIconPath .. "inv_misc_monsterclaw_04",
-    ["DEATHKNIGHT"] = select(3, GetSpellInfo(49023)), --Might of Mograine
-    ["HUNTER"] = classIconPath .. "inv_weapon_bow_07",
-    ["MAGE"] = classIconPath .. "inv_staff_13",
-    ["PALADIN"] = classIconPath .. "inv_hammer_01",
-    ["PRIEST"] = classIconPath .. "inv_staff_30",
-    ["ROGUE"] = classIconPath .. "inv_throwingknife_04",
-    ["SHAMAN"] = classIconPath .. "inv_jewelry_talisman_04",
-    ["WARLOCK"] = classIconPath .. "spell_nature_drowsy",
-    ["WARRIOR"] = classIconPath .. "inv_sword_27",
-}
-
 local specIcons = {
     --DRUID
     ["DRUID"] = {
@@ -210,7 +196,7 @@ function Classicon:ENEMY_SPOTTED(unit)
         return
     end
 
-    classIcon.texture:SetTexture(classIcons[Gladdy.buttons[unit].class])
+    classIcon.texture:SetTexture(Gladdy.classIcons[Gladdy.buttons[unit].class])
     --classIcon.texture:SetTexCoord(unpack(CLASS_BUTTONS[Gladdy.buttons[unit].class]))
     classIcon.texture:SetAllPoints(classIcon)
 end
