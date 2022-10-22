@@ -213,6 +213,36 @@ function Gladdy:SetupModule(name, module, order)
     end
 end
 
+local function getAll(options)
+    local val = options[1]
+    local isAllSameValue = true
+    for _,v in pairs(options) do
+        if type(v) == "table" then
+            if not (v.r == val.r and v.g == val.g and v.b == val.b and v.a == val.a) then
+                isAllSameValue = false
+                break
+            end
+        else
+            if val ~= v then
+                isAllSameValue = false
+                break
+            end
+        end
+    end
+    if type(val) == "table" then
+        return isAllSameValue and val.r, val.g, val.b, val.a or ""
+    else
+        return isAllSameValue and val or ""
+    end
+end
+
+local function setAll(value, options)
+    for k,_ in pairs(options) do
+        Gladdy.db[k] = value
+    end
+    Gladdy:UpdateFrame()
+end
+
 local function pairsByKeys(t)
     local a = {}
     for k in pairs(t) do
@@ -420,25 +450,27 @@ function Gladdy:SetupOptions()
                                             return Gladdy.db.useOmnicc
                                         end,
                                         get = function(info)
-                                            local a = Gladdy.db.auraDisableCircle
-                                            local b = Gladdy.db.cooldownDisableCircle
-                                            local c = Gladdy.db.trinketDisableCircle
-                                            local d = Gladdy.db.drDisableCircle
-                                            local e = Gladdy.db.buffsDisableCircle
-                                            local f = Gladdy.db.racialDisableCircle
-                                            if (a == b and a == c and a == d and a == e and a == f) then
-                                                return a
+                                            local isAllSameValue =  getAll({
+                                                Gladdy.db.auraDisableCircle,
+                                                Gladdy.db.buffsDisableCircle,
+                                                Gladdy.db.cooldownDisableCircle,
+                                                Gladdy.db.drDisableCircle,
+                                                Gladdy.db.racialDisableCircle,
+                                                Gladdy.db.trinketDisableCircle,
+                                            })
+                                            if isAllSameValue then
+                                                return Gladdy.db.auraDisableCircle
                                             else
-                                                return ""
+                                                return false
                                             end
                                         end,
                                         set = function(info, value)
                                             Gladdy.db.auraDisableCircle = value
-                                            Gladdy.db.cooldownDisableCircle = value
-                                            Gladdy.db.trinketDisableCircle = value
-                                            Gladdy.db.drDisableCircle = value
                                             Gladdy.db.buffsDisableCircle = value
+                                            Gladdy.db.cooldownDisableCircle = value
+                                            Gladdy.db.drDisableCircle = value
                                             Gladdy.db.racialDisableCircle = value
+                                            Gladdy.db.trinketDisableCircle = value
                                             Gladdy:UpdateFrame()
                                         end,
                                         width= "full",
@@ -454,25 +486,24 @@ function Gladdy:SetupOptions()
                                             return Gladdy.db.useOmnicc
                                         end,
                                         get = function(info)
-                                            local a = Gladdy.db.cooldownCooldownAlpha
-                                            local b = Gladdy.db.drCooldownAlpha
-                                            local c = Gladdy.db.auraCooldownAlpha
-                                            local d = Gladdy.db.trinketCooldownAlpha
-                                            local e = Gladdy.db.buffsCooldownAlpha
-                                            local f = Gladdy.db.racialCooldownAlpha
-                                            if (a == b and a == c and a == d and a == e and a == f) then
-                                                return a
-                                            else
-                                                return ""
-                                            end
+                                            return getAll({
+                                                Gladdy.db.auraCooldownAlpha,
+                                                Gladdy.db.buffsCooldownAlpha,
+                                                Gladdy.db.cooldownCooldownAlpha,
+                                                Gladdy.db.drCooldownAlpha,
+                                                Gladdy.db.racialCooldownAlpha,
+                                                Gladdy.db.totemPulseCooldownAlpha,
+                                                Gladdy.db.trinketCooldownAlpha,
+                                            })
                                         end,
                                         set = function(info, value)
+                                            Gladdy.db.auraCooldownAlpha = value
+                                            Gladdy.db.buffsCooldownAlpha = value
                                             Gladdy.db.cooldownCooldownAlpha = value
                                             Gladdy.db.drCooldownAlpha = value
-                                            Gladdy.db.auraCooldownAlpha = value
-                                            Gladdy.db.trinketCooldownAlpha = value
-                                            Gladdy.db.buffsCooldownAlpha = value
                                             Gladdy.db.racialCooldownAlpha = value
+                                            Gladdy.db.totemPulseCooldownAlpha = value
+                                            Gladdy.db.trinketCooldownAlpha = value
                                             Gladdy:UpdateFrame()
                                         end
                                     },
@@ -505,37 +536,40 @@ function Gladdy:SetupOptions()
                                         dialogControl = "LSM30_Font",
                                         values = AceGUIWidgetLSMlists.font,
                                         get = function(info)
-                                            local a = Gladdy.db.auraFont
-                                            local b = Gladdy.db.buffsFont
-                                            local c = Gladdy.db.castBarFont
-                                            local d = Gladdy.db.cooldownFont
-                                            local e = Gladdy.db.drFont
-                                            local f = Gladdy.db.healthBarFont
-                                            local g = Gladdy.db.petHealthBarFont
-                                            local h = Gladdy.db.powerBarFont
-                                            local i = Gladdy.db.racialFont
-                                            local j = Gladdy.db.npTremorFont
-                                            local k = Gladdy.db.trinketFont
-                                            if (a == b and a == c and a == d and a == e and a == f
-                                                    and a == g and a == h and a == i and a == j and a == k) then
-                                                return a
-                                            else
-                                                return ""
-                                            end
+                                            return getAll({
+                                                Gladdy.db.auraFont,
+                                                Gladdy.db.buffsFont,
+                                                Gladdy.db.castBarFont,
+                                                Gladdy.db.cooldownFont,
+                                                Gladdy.db.drFont,
+                                                Gladdy.db.drLevelTextFont,
+                                                Gladdy.db.healthBarFont,
+                                                Gladdy.db.petHealthBarFont,
+                                                Gladdy.db.powerBarFont,
+                                                Gladdy.db.racialFont,
+                                                Gladdy.db.targetsHealthBarFont,
+                                                Gladdy.db.npTremorFont,
+                                                Gladdy.db.totemPulseTextFont,
+                                                Gladdy.db.trinketFont
+                                            })
                                         end,
                                         set = function(info, value)
-                                            Gladdy.db.auraFont = value
-                                            Gladdy.db.buffsFont = value
-                                            Gladdy.db.castBarFont = value
-                                            Gladdy.db.cooldownFont = value
-                                            Gladdy.db.drFont = value
-                                            Gladdy.db.healthBarFont = value
-                                            Gladdy.db.petHealthBarFont = value
-                                            Gladdy.db.powerBarFont = value
-                                            Gladdy.db.racialFont = value
-                                            Gladdy.db.npTremorFont = value
-                                            Gladdy.db.trinketFont = value
-                                            Gladdy:UpdateFrame()
+                                            setAll(value, {
+                                                auraFont = value,
+                                                buffsFont = value,
+                                                castBarFont = value,
+                                                cooldownFont = value,
+                                                drFont = value,
+                                                drLevelTextFont = value,
+                                                healthBarFont = value,
+                                                petHealthBarFont = value,
+                                                powerBarFont = value,
+                                                racialFont = value,
+                                                targetsHealthBarFont = value,
+                                                npTremorFont = value,
+                                                totemPulseTextFont = value,
+                                                trinketFont = value,
+                                            })
                                         end,
                                     },
                                     fontColor = {
@@ -545,25 +579,25 @@ function Gladdy:SetupOptions()
                                         order = 12,
                                         hasAlpha = true,
                                         get = function(info)
-                                            local a = Gladdy.db.healthBarFontColor
-                                            local b = Gladdy.db.powerBarFontColor
-                                            local c = Gladdy.db.castBarFontColor
-                                            local d = Gladdy.db.petHealthBarFontColor
-                                            if (a.r == b.r and a.g == b.g and a.b == b.b and a.a == b.a
-                                                    and a.r == c.r and a.g == c.g and a.b == c.b and a.a == c.a
-                                                    and a.r == d.r and a.g == d.g and a.b == d.b and a.a == d.a) then
-                                                return a.r, a.g, a.b, a.a
-                                            else
-                                                return { r = 0, g = 0, b = 0, a = 0 }
-                                            end
+                                            return getAll({
+                                                Gladdy.db.castBarFontColor,
+                                                Gladdy.db.healthBarFontColor,
+                                                Gladdy.db.petHealthBarFontColor,
+                                                Gladdy.db.powerBarFontColor,
+                                                Gladdy.db.petHealthBarFontColor,
+                                                Gladdy.db.targetHealthBarFontColor,
+                                            })
                                         end,
                                         set = function(info, r, g, b, a)
                                             local rgb = {r = r, g = g, b = b, a = a}
-                                            Gladdy.db.healthBarFontColor = rgb
-                                            Gladdy.db.powerBarFontColor = rgb
-                                            Gladdy.db.castBarFontColor = rgb
-                                            Gladdy.db.petHealthBarFontColor = rgb
-                                            Gladdy:UpdateFrame()
+                                            setAll(rgb, {
+                                                castBarFontColor = true,
+                                                healthBarFontColor = true,
+                                                petHealthBarFontColor = true,
+                                                powerBarFontColor = true,
+                                                petHealthBarFontColor = true,
+                                                targetHealthBarFontColor = true,
+                                            })
                                         end,
                                     },
                                     fontColorCD = {
@@ -573,25 +607,21 @@ function Gladdy:SetupOptions()
                                         order = 12,
                                         hasAlpha = true,
                                         get = function(info)
-                                            local a = Gladdy.db.auraFontColor
-                                            local b = Gladdy.db.buffsFontColor
-                                            local c = Gladdy.db.cooldownFontColor
-                                            local d = Gladdy.db.drFontColor
-                                            if (a.r == b.r and a.g == b.g and a.b == b.b and a.a == b.a
-                                                    and a.r == c.r and a.g == c.g and a.b == c.b and a.a == c.a
-                                                    and a.r == d.r and a.g == d.g and a.b == d.b and a.a == d.a) then
-                                                return a.r, a.g, a.b, a.a
-                                            else
-                                                return { r = 0, g = 0, b = 0, a = 0 }
-                                            end
+                                            return getAll({
+                                                Gladdy.db.auraFontColor,
+                                                Gladdy.db.buffsFontColor,
+                                                Gladdy.db.cooldownFontColor,
+                                                Gladdy.db.drFontColor,
+                                            })
                                         end,
                                         set = function(info, r, g, b, a)
                                             local rgb = {r = r, g = g, b = b, a = a}
-                                            Gladdy.db.auraFontColor = rgb
-                                            Gladdy.db.buffsFontColor = rgb
-                                            Gladdy.db.cooldownFontColor = rgb
-                                            Gladdy.db.drFontColor = rgb
-                                            Gladdy:UpdateFrame()
+                                            setAll(rgb, {
+                                                auraFontColor = true,
+                                                buffsFontColor = true,
+                                                cooldownFontColor = true,
+                                                drFontColor = true,
+                                            })
                                         end,
                                     },
                                 },
@@ -613,35 +643,38 @@ function Gladdy:SetupOptions()
                                         order = 14,
                                         values = Gladdy:GetIconStyles(),
                                         get = function(info)
-                                            if (Gladdy.db.auraBorderStyle == Gladdy.db.buffsBorderStyle
-                                                    and Gladdy.db.auraBorderStyle == Gladdy.db.castBarIconStyle
-                                                    and Gladdy.db.auraBorderStyle == Gladdy.db.classIconBorderStyle
-                                                    and Gladdy.db.auraBorderStyle == Gladdy.db.cooldownBorderStyle
-                                                    and Gladdy.db.auraBorderStyle == Gladdy.db.ciBorderStyle
-                                                    and Gladdy.db.auraBorderStyle == Gladdy.db.cooldownBorderStyle
-                                                    and Gladdy.db.auraBorderStyle == Gladdy.db.drBorderStyle
-                                                    and Gladdy.db.auraBorderStyle == Gladdy.db.racialBorderStyle
-                                                    and Gladdy.db.auraBorderStyle == Gladdy.db.npTotemPlatesBorderStyle
-                                                    and Gladdy.db.auraBorderStyle == Gladdy.db.petPortraitBorderStyle
-                                                    and Gladdy.db.auraBorderStyle == Gladdy.db.trinketBorderStyle) then
-                                                return Gladdy.db.auraBorderStyle
-                                            else
-                                                return ""
-                                            end
+                                            return getAll({
+                                                Gladdy.db.auraBorderStyle,
+                                                Gladdy.db.buffsBorderStyle,
+                                                Gladdy.db.castBarIconStyle,
+                                                Gladdy.db.classIconBorderStyle,
+                                                Gladdy.db.ciBorderStyle,
+                                                Gladdy.db.cooldownBorderStyle,
+                                                Gladdy.db.drBorderStyle,
+                                                Gladdy.db.petPortraitBorderStyle,
+                                                Gladdy.db.racialBorderStyle,
+                                                Gladdy.db.targetPortraitBorderStyle,
+                                                Gladdy.db.npTotemPlatesBorderStyle,
+                                                Gladdy.db.petPortraitBorderStyle,
+                                                Gladdy.db.trinketBorderStyle,
+                                            })
                                         end,
                                         set = function(info, value)
-                                            Gladdy.db.auraBorderStyle = value
-                                            Gladdy.db.buffsBorderStyle = value
-                                            Gladdy.db.castBarIconStyle = value
-                                            Gladdy.db.classIconBorderStyle = value
-                                            Gladdy.db.ciBorderStyle = value
-                                            Gladdy.db.cooldownBorderStyle = value
-                                            Gladdy.db.drBorderStyle = value
-                                            Gladdy.db.racialBorderStyle = value
-                                            Gladdy.db.npTotemPlatesBorderStyle = value
-                                            Gladdy.db.petPortraitBorderStyle = value
-                                            Gladdy.db.trinketBorderStyle = value
-                                            Gladdy:UpdateFrame()
+                                            setAll(value, {
+                                                auraBorderStyle = true,
+                                                buffsBorderStyle = true,
+                                                castBarIconStyle = true,
+                                                classIconBorderStyle = true,
+                                                ciBorderStyle = true,
+                                                cooldownBorderStyle = true,
+                                                drBorderStyle = true,
+                                                petPortraitBorderStyle = true,
+                                                racialBorderStyle = true,
+                                                targetPortraitBorderStyle = true,
+                                                npTotemPlatesBorderStyle = true,
+                                                petPortraitBorderStyle = true,
+                                                trinketBorderStyle = true,
+                                            })
                                         end,
                                     },
                                     buttonBorderColor = {
@@ -651,43 +684,33 @@ function Gladdy:SetupOptions()
                                         order = 15,
                                         hasAlpha = true,
                                         get = function(info)
-                                            local a = Gladdy.db.auraBuffBorderColor
-                                            local b = Gladdy.db.auraDebuffBorderColor
-                                            local c = Gladdy.db.buffsBorderColor
-                                            local d = Gladdy.db.castBarIconColor
-                                            local e = Gladdy.db.classIconBorderColor
-                                            local f = Gladdy.db.ciBorderColor
-                                            local g = Gladdy.db.cooldownBorderColor
-                                            local h = Gladdy.db.drBorderColor
-                                            local i = Gladdy.db.trinketBorderColor
-                                            local j = Gladdy.db.racialBorderColor
-                                            if (a.r == b.r and a.g == b.g and a.b == b.b and a.a == b.a
-                                                    and a.r == c.r and a.g == c.g and a.b == c.b and a.a == c.a
-                                                    and a.r == d.r and a.g == d.g and a.b == d.b and a.a == d.a
-                                                    and a.r == e.r and a.g == e.g and a.b == e.b and a.a == e.a
-                                                    and a.r == f.r and a.g == f.g and a.b == f.b and a.a == f.a
-                                                    and a.r == g.r and a.g == g.g and a.b == g.b and a.a == g.a
-                                                    and a.r == h.r and a.g == h.g and a.b == h.b and a.a == h.a
-                                                    and a.r == i.r and a.g == i.g and a.b == i.b and a.a == i.a
-                                                    and a.r == j.r and a.g == j.g and a.b == j.b and a.a == j.a) then
-                                                return a.r, a.g, a.b, a.a
-                                            else
-                                                return { r = 0, g = 0, b = 0, a = 0 }
-                                            end
+                                            return getAll({
+                                                Gladdy.db.buffsBorderColor,
+                                                Gladdy.db.castBarIconColor,
+                                                Gladdy.db.classIconBorderColor,
+                                                Gladdy.db.ciBorderColor,
+                                                Gladdy.db.cooldownBorderColor,
+                                                Gladdy.db.drBorderColor,
+                                                Gladdy.db.petPortraitBorderColor,
+                                                Gladdy.db.racialBorderColor,
+                                                Gladdy.db.targetPortraitBorderColor,
+                                                Gladdy.db.trinketBorderColor,
+                                            })
                                         end,
                                         set = function(info, r, g, b, a)
                                             local rgb = {r = r, g = g, b = b, a = a}
-                                            Gladdy.db.auraBuffBorderColor = rgb
-                                            Gladdy.db.auraDebuffBorderColor = rgb
-                                            Gladdy.db.buffsBorderColor = rgb
-                                            Gladdy.db.castBarIconColor = rgb
-                                            Gladdy.db.classIconBorderColor = rgb
-                                            Gladdy.db.ciBorderColor = rgb
-                                            Gladdy.db.cooldownBorderColor = rgb
-                                            Gladdy.db.drBorderColor = rgb
-                                            Gladdy.db.trinketBorderColor = rgb
-                                            Gladdy.db.racialBorderColor = rgb
-                                            Gladdy:UpdateFrame()
+                                            setAll(rgb, {
+                                                buffsBorderColor = true,
+                                                castBarIconColor = true,
+                                                classIconBorderColor = true,
+                                                ciBorderColor = true,
+                                                cooldownBorderColor = true,
+                                                drBorderColor = true,
+                                                petPortraitBorderColor = true,
+                                                racialBorderColor = true,
+                                                targetPortraitBorderColor = true,
+                                                trinketBorderColor = true,
+                                            })
                                         end,
                                     },
                                 },
@@ -710,21 +733,22 @@ function Gladdy:SetupOptions()
                                         dialogControl = "LSM30_Statusbar",
                                         values = AceGUIWidgetLSMlists.statusbar,
                                         get = function(info)
-                                            local a = Gladdy.db.healthBarTexture
-                                            local b = Gladdy.db.powerBarTexture
-                                            local c = Gladdy.db.castBarTexture
-                                            local d = Gladdy.db.petHealthBarTexture
-                                            if (a == b and a == c and a == d) then
-                                                return a
-                                            else
-                                                return ""
-                                            end
+                                            return getAll({
+                                                Gladdy.db.castBarTexture,
+                                                Gladdy.db.healthBarTexture,
+                                                Gladdy.db.petHealthBarTexture,
+                                                Gladdy.db.powerBarTexture,
+                                                Gladdy.db.targetHealthBarTexture,
+                                                Gladdy.db.totemPulseBarTexture,
+                                            })
                                         end,
                                         set = function(info, value)
-                                            Gladdy.db.healthBarTexture = value
-                                            Gladdy.db.powerBarTexture = value
                                             Gladdy.db.castBarTexture = value
+                                            Gladdy.db.healthBarTexture = value
                                             Gladdy.db.petHealthBarTexture = value
+                                            Gladdy.db.powerBarTexture = value
+                                            Gladdy.db.targetHealthBarTexture = value
+                                            Gladdy.db.totemPulseBarTexture = value
                                             Gladdy:UpdateFrame()
                                         end,
                                         width= "full",
@@ -737,21 +761,22 @@ function Gladdy:SetupOptions()
                                         dialogControl = "LSM30_Border",
                                         values = AceGUIWidgetLSMlists.border,
                                         get = function(info)
-                                            local a = Gladdy.db.healthBarBorderStyle
-                                            local b = Gladdy.db.powerBarBorderStyle
-                                            local c = Gladdy.db.castBarBorderStyle
-                                            local d = Gladdy.db.petHealthBarBorderStyle
-                                            if (a == b and a == c and a == d) then
-                                                return a
-                                            else
-                                                return ""
-                                            end
+                                            return getAll({
+                                                Gladdy.db.castBarBorderStyle,
+                                                Gladdy.db.healthBarBorderStyle,
+                                                Gladdy.db.petHealthBarBorderStyle,
+                                                Gladdy.db.powerBarBorderStyle,
+                                                Gladdy.db.targetHealthBarBorderStyle,
+                                                Gladdy.db.totemPulseBarBorderStyle,
+                                            })
                                         end,
                                         set = function(info, value)
-                                            Gladdy.db.healthBarBorderStyle = value
-                                            Gladdy.db.powerBarBorderStyle = value
                                             Gladdy.db.castBarBorderStyle = value
+                                            Gladdy.db.healthBarBorderStyle = value
                                             Gladdy.db.petHealthBarBorderStyle = value
+                                            Gladdy.db.powerBarBorderStyle = value
+                                            Gladdy.db.targetHealthBarBorderStyle = value
+                                            Gladdy.db.totemPulseBarBorderStyle = value
                                             Gladdy:UpdateFrame()
                                         end,
                                     },
@@ -770,24 +795,23 @@ function Gladdy:SetupOptions()
                                         order = 50,
                                         hasAlpha = true,
                                         get = function(info)
-                                            local a = Gladdy.db.castBarBorderColor
-                                            local b = Gladdy.db.healthBarBorderColor
-                                            local c = Gladdy.db.powerBarBorderColor
-                                            local d = Gladdy.db.petHealthBarBorderColor
-                                            if (a.r == b.r and a.g == b.g and a.b == b.b and a.a == b.a
-                                                    and a.r == c.r and a.g == c.g and a.b == c.b and a.a == c.a
-                                                    and a.r == d.r and a.g == d.g and a.b == d.b and a.a == d.a) then
-                                                return a.r, a.g, a.b, a.a
-                                            else
-                                                return { r = 0, g = 0, b = 0, a = 0 }
-                                            end
+                                            return getAll({
+                                                Gladdy.db.castBarBorderColor,
+                                                Gladdy.db.healthBarBorderColor,
+                                                Gladdy.db.petHealthBarBorderColor,
+                                                Gladdy.db.powerBarBorderColor,
+                                                Gladdy.db.targetHealthBarBorderColor,
+                                                Gladdy.db.totemPulseBarBorderColor,
+                                            })
                                         end,
                                         set = function(info, r, g, b, a)
-                                            local rgb = {r = r, g = g, b = b, a = a}
-                                            Gladdy.db.castBarBorderColor = rgb
-                                            Gladdy.db.healthBarBorderColor = rgb
-                                            Gladdy.db.powerBarBorderColor = rgb
-                                            Gladdy.db.petHealthBarBorderColor = rgb
+                                            local value = {r = r, g = g, b = b, a = a}
+                                            Gladdy.db.castBarBorderColor = value
+                                            Gladdy.db.healthBarBorderColor = value
+                                            Gladdy.db.petHealthBarBorderColor = value
+                                            Gladdy.db.powerBarBorderColor = value
+                                            Gladdy.db.targetHealthBarBorderColor = value
+                                            Gladdy.db.totemPulseBarBorderColor = value
                                             Gladdy:UpdateFrame()
                                         end,
                                     },
