@@ -1130,7 +1130,7 @@ local cooldownList = {
         [13750] = { cd = 180, spec = L["Combat"], }, -- Adrenaline Rush
         [13877] = { cd = 120, spec = L["Combat"], }, -- Blade Flurry
         [51690] = { cd = 120, spec = L["Combat"], }, -- Killing Spree
-        [36554] = { cd = 30, spec = L["Subtlety"], }, -- Shadowstep
+        [36554] = { cd = 20, spec = L["Subtlety"], }, -- Shadowstep
         [14185] = { cd = 480, spec = L["Subtlety"], -- Preparation
                     resetCD = {
                         [26669] = true,
