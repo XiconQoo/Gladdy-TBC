@@ -10,6 +10,7 @@ local Pets = Gladdy:NewModule("Pets", nil, {
     petHeight = 20,
     petPortraitEnabled = true,
     petPortraitBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
+    petPortraitBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     petHealthBarFont = "DorisPP",
     petHealthBarHeight = 60,
     petHealthBarTexture = "Smooth",
@@ -316,7 +317,7 @@ function Pets:UpdateFrame(unitId)
         healthBar.portrait.border:Show()
     end
     healthBar.portrait.border:SetTexture(Gladdy.db.petPortraitBorderStyle)
-    healthBar.portrait.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.petHealthBarBorderColor))
+    healthBar.portrait.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.targetPortraitBorderColor))
 
     healthBar.bg:SetTexture(Gladdy:SMFetch("statusbar",  "petHealthBarTexture"))
     healthBar.bg:SetVertexColor(Gladdy:SetColor(Gladdy.db.petHealthBarBgColor))
@@ -501,7 +502,13 @@ function Pets:GetOptions()
                             order = 3,
                             values = Gladdy:GetIconStyles()
                         }),
-
+                        petPortraitBorderColor = Gladdy:colorOption({
+                            type = "color",
+                            name = L["Border color"],
+                            desc = L["Color of the border"],
+                            order = 22,
+                            hasAlpha = true,
+                        }),
                     },
                 },
                 font = {
