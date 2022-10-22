@@ -13,9 +13,15 @@ local Targets = Gladdy:NewModule("Targets", nil, {
     targetWidth = 90,
     targetHeight = 30,
     targetBarEnabled = true,
+    targetBarVertical = false,
     targetPortraitEnabled = true,
     targetPortraitClass = true,
     targetPortraitBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
+    targetPortraitBorderColor = { r = 0, g = 0, b = 0, a = 1 },
+    targetPortraitPosition = "RIGHT",
+    targetPortraitMargin = 1,
+    targetPortraitSize = 60,
+    targetPortraitWidthFactor = 1,
     targetHealthBarFont = "DorisPP",
     targetHealthBarHeight = 60,
     targetHealthBarTexture = "Smooth",
@@ -190,7 +196,6 @@ function Targets:CreateFrame(unitId)
 
     button.portrait = button:CreateTexture(nil, "BACKGROUND")
     button.portrait:SetPoint("LEFT", healthBar, "RIGHT")
-    --button.portrait:SetTexCoord(0.1, 0.9, 0.1, 0.9)
     button.portrait.border = button:CreateTexture(nil, "OVERLAY")
     button.portrait.border:SetAllPoints(button.portrait)
     button.portrait.border:SetTexture(Gladdy.db.classIconBorderStyle)
@@ -345,8 +350,20 @@ function Targets:UpdateFrame(unitId)
         self.frames[unit]:SetPoint("TOPLEFT", Gladdy.buttons[unitId].healthBar, "TOPLEFT", Gladdy.db.targetXOffset, Gladdy.db.targetYOffset)
     end
 
-    button.portrait:SetHeight(Gladdy.db.targetHeight)
-    button.portrait:SetWidth(Gladdy.db.targetHeight)
+    button.portrait:SetWidth(Gladdy.db.targetPortraitSize * Gladdy.db.targetPortraitWidthFactor)
+    button.portrait:SetHeight(Gladdy.db.targetPortraitSize)
+    button.portrait:ClearAllPoints()
+    if Gladdy.db.targetPortraitPosition == "RIGHT" then
+        button.portrait:SetPoint("LEFT", healthBar, "RIGHT", Gladdy.db.targetPortraitMargin, 0)
+    elseif Gladdy.db.targetPortraitPosition == "LEFT" then
+        button.portrait:SetPoint("RIGHT", healthBar, "LEFT", -Gladdy.db.targetPortraitMargin, 0)
+    elseif Gladdy.db.targetPortraitPosition == "TOP" then
+        button.portrait:SetPoint("BOTTOM", healthBar, "TOP", 0, Gladdy.db.targetPortraitMargin)
+    elseif Gladdy.db.targetPortraitPosition == "BOTTOM" then
+        button.portrait:SetPoint("TOP", healthBar, "BOTTOM", 0, -Gladdy.db.targetPortraitMargin)
+    end
+
+
     if not Gladdy.db.targetPortraitEnabled then
         button.portrait:Hide()
         button.portrait.border:Hide()
@@ -355,7 +372,7 @@ function Targets:UpdateFrame(unitId)
         button.portrait.border:Show()
     end
     button.portrait.border:SetTexture(Gladdy.db.targetPortraitBorderStyle)
-    button.portrait.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.targetHealthBarBorderColor))
+    button.portrait.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.targetPortraitBorderColor))
 
     healthBar.bg:SetTexture(Gladdy:SMFetch("statusbar",  "targetHealthBarTexture"))
     healthBar.bg:SetVertexColor(Gladdy:SetColor(Gladdy.db.targetHealthBarBgColor))
@@ -369,6 +386,12 @@ function Targets:UpdateFrame(unitId)
     healthBar.hp:ClearAllPoints()
     healthBar.hp:SetPoint("TOPLEFT", healthBar, "TOPLEFT", (Gladdy.db.targetHealthBarBorderSize/Gladdy.db.statusbarBorderOffset), -(Gladdy.db.targetHealthBarBorderSize/Gladdy.db.statusbarBorderOffset))
     healthBar.hp:SetPoint("BOTTOMRIGHT", healthBar, "BOTTOMRIGHT", -(Gladdy.db.targetHealthBarBorderSize/Gladdy.db.statusbarBorderOffset), (Gladdy.db.targetHealthBarBorderSize/Gladdy.db.statusbarBorderOffset))
+
+    if Gladdy.db.targetBarVertical then
+        healthBar.hp:SetOrientation("VERTICAL")
+    else
+        healthBar.hp:SetOrientation("HORIZONTAL")
+    end
 
     if (Gladdy.db.targetHealthBarFontSize < 1) then
         healthBar.nameText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), 1)
@@ -388,6 +411,15 @@ function Targets:UpdateFrame(unitId)
         healthBar:Show()
     else
         healthBar:Hide()
+    end
+
+    if Gladdy.db.targetPortraitClass then
+        button.portrait:SetTexCoord(0,1,0,1)
+    else
+        button.portrait:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+    end
+    if Gladdy.frame.testing then
+        self:Test(unitId)
     end
 
     if (unit == "arena1target") then
@@ -508,7 +540,7 @@ function Targets:GetOptions()
             order = 3,
             disabled = function() return not Gladdy.db.targetEnabled end,
             args = {
-                general = {
+                bar = {
                     type = "group",
                     name = L["Bar"],
                     order = 1,
@@ -523,24 +555,29 @@ function Targets:GetOptions()
                             type = "toggle",
                             name = L["Enabled"],
                         }),
+                        targetBarVertical = option({
+                            type = "toggle",
+                            order = 3,
+                            name = L["Vertical Bar"],
+                        }),
                         targetHeight = option({
                             type = "range",
                             name = L["Bar height"],
                             desc = L["Height of the bar"],
-                            order = 3,
+                            order = 4,
                             min = 10,
-                            max = 100,
-                            step = 1,
+                            max = 600,
+                            step = 0.05,
                             width = "full",
                         }),
                         targetWidth = option({
                             type = "range",
                             name = L["Bar width"],
                             desc = L["Width of the bar"],
-                            order = 4,
+                            order = 5,
                             min = 10,
-                            max = 300,
-                            step = 1,
+                            max = 600,
+                            step = 0.05,
                             width = "full",
                         }),
                         targetMargin = option({
@@ -604,13 +641,64 @@ function Targets:GetOptions()
                             name = L["Class Icon"],
                             order = 3,
                         }),
+                        targetPortraitSize = Gladdy:option({
+                            type = "range",
+                            name = L["Size"],
+                            min = 3,
+                            max = 100,
+                            step = .1,
+                            order = 4,
+                            width = "full",
+                        }),
+                        targetPortraitWidthFactor = Gladdy:option({
+                            type = "range",
+                            name = L["Icon width factor"],
+                            min = 0.5,
+                            max = 2,
+                            step = 0.05,
+                            order = 5,
+                            width = "full",
+                        }),
+                        headerPosition = {
+                            type = "header",
+                            name = L["Position"],
+                            order = 10,
+                        },
+                        targetPortraitPosition = Gladdy:option({
+                            type = "select",
+                            name = L["Anchor"],
+                            order = 11,
+                            values = Gladdy.positions,
+                            width = "full",
+                        }),
+                        targetPortraitMargin = Gladdy:option({
+                            type = "range",
+                            name = L["Margin"],
+                            order = 12,
+                            min = -100,
+                            max = 100,
+                            step = 0.05,
+                            order = 12,
+                            width = "full",
+                        }),
+                        headerBorder = {
+                            type = "header",
+                            name = L["Border"],
+                            order = 20,
+                        },
                         targetPortraitBorderStyle = Gladdy:option({
                             type = "select",
                             name = L["Border style"],
-                            order = 4,
+                            order = 21,
                             values = Gladdy:GetIconStyles()
                         }),
-
+                        targetPortraitBorderColor = Gladdy:colorOption({
+                            type = "color",
+                            name = L["Border color"],
+                            desc = L["Color of the border"],
+                            order = 22,
+                            hasAlpha = true,
+                        }),
                     },
                 },
                 font = {
@@ -645,6 +733,7 @@ function Targets:GetOptions()
                             order = 13,
                             min = 0,
                             max = 50,
+                            step = 0.05,
                             width = "full",
                         }),
                     },
