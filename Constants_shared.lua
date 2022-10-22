@@ -188,7 +188,15 @@ Gladdy.frameStrata = {
     TOOLTIP = L["Tooltip"] .. "(7)",
 }
 
+Gladdy.positions = {
+    ["RIGHT"] = L["Right"],
+    ["LEFT"] = L["Left"],
+    ["TOP"] = L["Above"],
+    ["BOTTOM"] = L["Below"],
+}
+
 Gladdy.fontOutline = {
+    NONE = L["None"],
     OUTLINE = L["Thin Outline"],
     THICKOUTLINE = L["Thick Outline"]
 }
