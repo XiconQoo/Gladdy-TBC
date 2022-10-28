@@ -177,6 +177,7 @@ local specSpells = {
     [GetSpellInfo(48566)] = L["Feral"], -- Mangle (Cat)
     [GetSpellInfo(48564)] = L["Feral"], -- Mangle (Bear)
     [GetSpellInfo(50334) .. " Feral"] = L["Feral"], -- Berserk
+    [GetSpellInfo(61336)] = L["Feral"], -- Survival Instincts
     [GetSpellInfo(18562)] = L["Restoration"], -- Swiftmend
     [GetSpellInfo(17116)] = L["Restoration"], -- Nature's Swiftness
     [GetSpellInfo(33891)] = L["Restoration"], -- Tree of Life
@@ -967,6 +968,7 @@ local cooldownList = {
         [53312] = 60, -- Natures Grasp
         [48505] = { cd = 90, spec = L["Balance"], }, -- Starfall
         [50334] = { cd = 180, spec = L["Feral"], altName = GetSpellInfo(50334) .. " Feral" }, -- Berserk
+        [61336] = { cd = 180, spec = L["Feral"], }, -- Survival Instincts
         [17116] = { cd = 120, spec = L["Restoration"], }, -- Natures Swiftness
         [18562] = { cd = 15, spec = L["Restoration"], }, -- Swiftmend
         [33831] = { cd = 180, spec = L["Balance"], }, -- Force of Nature
