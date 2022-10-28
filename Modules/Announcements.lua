@@ -13,6 +13,7 @@ local LE_PARTY_CATEGORY_HOME = LE_PARTY_CATEGORY_HOME
 local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
 local CombatText_AddMessage = CombatText_AddMessage
 local UnitName = UnitName
+local GetSchoolString = GetSchoolString
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
@@ -27,6 +28,7 @@ local Announcements = Gladdy:NewModule("Announcements", 101, {
         trinketUsed = true,
         trinketReady = false,
         spellInterrupt = true,
+        spellInterruptSpellSchool = true,
         dest = "party",
     },
 })
@@ -156,6 +158,9 @@ function Announcements:SPELL_INTERRUPT(unit,spellID,spellName,spellSchool,extraS
     if (not button or not Gladdy.db.announcements.spellInterrupt) then
         return
     end
+    if Gladdy.db.spellInterruptSpellSchool then
+        extraSpellName = GetSchoolString(extraSpellSchool)
+    end
     self:Send(L["INTERRUPTED: %s (%s)"]:format(extraSpellName, button.name or ""), nil, RAID_CLASS_COLORS[button.class], unit)
 end
 
@@ -268,41 +273,48 @@ function Announcements:GetOptions()
             desc = L["Announces when enemies' spells are interrupted"],
             order = 5,
         }),
+        spellInterruptSpellSchool = option({
+            type = "toggle",
+            name = L["Announce Spell School"],
+            desc = L["Announces Spell School like \"Holy\" instead of Spell Name"],
+            order = 6,
+            disabled = function() return not Gladdy.db.spellInterrupt end,
+        }),
         drinks = option({
             type = "toggle",
             name = L["Drinking"],
             desc = L["Announces when enemies sit down to drink"],
-            order = 6,
+            order = 7,
         }),
         resurrections = option({
             type = "toggle",
             name = L["Resurrection"],
             desc = L["Announces when an enemy tries to resurrect a teammate"],
-            order = 7,
+            order = 8,
         }),
         enemy = option({
             type = "toggle",
             name = L["New enemies"],
             desc = L["Announces when new enemies are discovered"],
-            order = 8,
+            order = 9,
         }),
         spec = option({
             type = "toggle",
             name = L["Spec Detection"],
             desc = L["Announces when the spec of an enemy was detected"],
-            order = 9,
+            order = 10,
         }),
         health = option({
             type = "toggle",
             name = L["Low health"],
             desc = L["Announces when an enemy drops below a certain health threshold"],
-            order = 10,
+            order = 11,
         }),
         healthThreshold = option({
             type = "range",
             name = L["Low health threshold"],
             desc = L["Choose how low an enemy must be before low health is announced"],
-            order = 11,
+            order = 12,
             min = 1,
             max = 100,
             step = 1,
@@ -314,7 +326,7 @@ function Announcements:GetOptions()
             type = "select",
             name = L["Destination"],
             desc = L["Choose how your announcements are displayed"],
-            order = 12,
+            order = 13,
             values = destValues,
         }),
     }

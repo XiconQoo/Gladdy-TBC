@@ -41,6 +41,9 @@ function EventListener:JOINED_ARENA()
         if Gladdy.buttons["arena"..i].lastAuras then
             wipe(Gladdy.buttons["arena"..i].lastAuras)
         end
+        if Gladdy.buttons["arena"..i].lastCastSpell then
+            wipe(Gladdy.buttons["arena"..i].lastCastSpell)
+        end
         if UnitExists("arena" .. i) then
             Gladdy:SpotEnemy("arena" .. i, true)
         end
@@ -144,8 +147,18 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
             Gladdy:SpotEnemy(destUnit, true)
         end
         --interrupt detection
-        if Gladdy.buttons[destUnit] and eventType == "SPELL_INTERRUPT" then
-            Gladdy:SendMessage("SPELL_INTERRUPT", destUnit,spellID,spellName,spellSchool,extraSpellId,extraSpellName,extraSpellSchool)
+        if Gladdy.buttons[destUnit] then
+            if eventType == "SPELL_INTERRUPT" then
+                Gladdy:SendMessage("SPELL_INTERRUPT", destUnit,spellID,spellName,spellSchool,extraSpellId,extraSpellName,extraSpellSchool)
+            elseif (eventType == "SPELL_CAST_SUCCESS" and Gladdy:GetInterrupts()[spellName]) then
+                local spellNameChanneled, _, _, _, _, _, interruptable, spellIdChanneled = UnitChannelInfo(destUnit)
+                if interruptable == false and spellNameChanneled then
+                    if Gladdy.buttons[destUnit].lastCastSpell and Gladdy.buttons[destUnit].lastCastSpell.spellName == spellNameChanneled then
+                        extraSpellSchool = Gladdy.buttons[destUnit].lastCastSpell.spellSchool
+                    end
+                    Gladdy:SendMessage("SPELL_INTERRUPT", destUnit,spellID,spellName,spellSchool,spellIdChanneled,spellNameChanneled,extraSpellSchool)
+                end
+            end
         end
     end
     if srcUnit then
@@ -160,6 +173,12 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
             self:DetectSpec(srcUnit, Gladdy.specSpells[spellName])
         end
         if (eventType == "SPELL_CAST_SUCCESS" or eventType == "SPELL_MISSED") then
+            -- caching last cast spell
+            if not Gladdy.buttons[srcUnit].lastCastSpell then
+                Gladdy.buttons[srcUnit].lastCastSpell = {}
+            end
+            Gladdy.buttons[srcUnit].lastCastSpell.spellName = spellName
+            Gladdy.buttons[srcUnit].lastCastSpell.spellSchool = spellSchool
             -- cooldown tracker
             if Gladdy.db.cooldown and Cooldowns.cooldownSpellIds[spellName] then
                 local unitClass
