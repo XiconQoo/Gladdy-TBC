@@ -982,7 +982,7 @@ local cooldownList = {
         [8177] = 15, -- Grounding Totem
         [30823] = { cd = 60, spec = L["Enhancement"], }, -- Shamanistic Rage
         [16166] = { cd = 180, spec = L["Elemental"], }, -- Elemental Mastery
-        [59159] = { cd = 45, spec = L["Elemental"], }, -- Thunderstorm
+        [59159] = { cd = 35, spec = L["Elemental"], }, -- Thunderstorm
         [16188] = { cd = 120, spec = L["Restoration"], }, -- Natures Swiftness
         [51533] = { cd = 180, spec = L["Enhancement"], }, -- Feral Spirit
         [16190] = { cd = 300, spec = L["Restoration"], }, -- Mana Tide Totem
