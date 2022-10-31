@@ -273,8 +273,9 @@ end
 
 function Cooldowns:UpdateFrameOnce()
     for _,icon in ipairs(self.iconCache) do
-        Cooldowns:UpdateIcon(icon)
+        self:UpdateIcon(icon)
     end
+    self:UpdateCooldownOptions()
 end
 
 function Cooldowns:UpdateFrame(unit)
@@ -665,8 +666,17 @@ function Cooldowns:UpdateCooldowns(button)
             if (type(v) ~= "table" or (type(v) == "table" and v.spec == nil)) then
                 Cooldowns:AddCooldown(k, v, button)
             end
-            if (type(v) == "table" and v.spec ~= nil and v.spec == spec) then
-                Cooldowns:AddCooldown(k, v, button)
+            if (type(v) == "table" and v.spec ~= nil) then
+                if type(v.spec) == "table" then
+                    for _,specialization in pairs(v.spec) do
+                        if spec == specialization then
+                            Cooldowns:AddCooldown(k, v, button)
+                            break
+                        end
+                    end
+                elseif v.spec == spec then
+                    Cooldowns:AddCooldown(k, v, button)
+                end
             end
         end
     end
@@ -1035,7 +1045,24 @@ function Cooldowns:GetOptions()
 end
 
 local function getName(spellID, cooldown)
-    return select(1, GetSpellInfo(spellID)) .. (type(cooldown) == "table" and cooldown.spec and (" - " .. cooldown.spec) or "")
+    local spec = ""
+    if type(cooldown) == "table" and cooldown.spec then
+        if type(cooldown.spec) == "table" then
+            spec = " - ("
+            for _,specialization in ipairs(cooldown.spec) do
+                spec = spec .. specialization .. ", "
+            end
+            spec = spec:sub(1, -3) .. ")"
+        else
+            spec = " - " .. cooldown.spec
+        end
+
+    end
+    return select(1, GetSpellInfo(spellID)) .. spec
+end
+
+function Cooldowns:UpdateCooldownOptions()
+    Gladdy.options.args["Cooldowns"].args.cooldowns.args = Cooldowns:GetCooldownOptions()
 end
 
 function Cooldowns:GetCooldownOptions()
