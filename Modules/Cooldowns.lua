@@ -81,7 +81,7 @@ local Cooldowns = Gladdy:NewModule("Cooldowns", nil, {
 
 function Cooldowns:Initialize()
     self.frames = {}
-    self.cooldownSpellIds = {}
+    self.cooldownSpells = {}
     self.spellTextures = {}
     self.iconCache = {}
     for _,spellTable in pairs(Gladdy:GetCooldownList()) do
@@ -96,7 +96,7 @@ function Cooldowns:Initialize()
                 end
             end
             if spellName then
-                self.cooldownSpellIds[spellName] = spellId
+                self.cooldownSpells[spellName] = spellId
                 self.spellTextures[spellId] = texture
             else
                 Gladdy:Debug("ERROR", "spellid does not exist  " .. spellId)
@@ -431,7 +431,7 @@ function Cooldowns:AURA_GAIN(_, auraType, spellID, spellName, _, duration, _, _,
     end
     local cooldownFrame = Gladdy.buttons[arenaUnit].spellCooldownFrame
 
-    local spellId = Cooldowns.cooldownSpellIds[spellName] -- don't use spellId from combatlog, in case of different spellrank
+    local spellId = Cooldowns.cooldownSpells[spellName] -- don't use spellId from combatlog, in case of different spellrank
     if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
         spellId = spellID
     end
