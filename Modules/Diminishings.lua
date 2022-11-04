@@ -68,6 +68,7 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drGroupDirection = "DOWN",
     drLevelTextXOffset = 0,
     drLevelTextYOffset = 0,
+    drShowIconOnAuraApplied = false,
 })
 
 local function getDiminishColor(dr)
@@ -492,16 +493,17 @@ function Diminishings:AuraGain(unit, spellID)
     end
 
     -- add icon with no timer
-    local lastIcon = Diminishings:FindLastIcon(unit, drCat)
-    if not lastIcon then return end
+    if Gladdy.db.drShowIconOnAuraApplied then
+        local lastIcon = Diminishings:FindLastIcon(unit, drCat)
+        if not lastIcon then return end
 
-    Diminishings:PrepareIcon(unit, lastIcon, drCat, spellID)
+        Diminishings:PrepareIcon(unit, lastIcon, drCat, spellID)
 
-
-    lastIcon.running = false
-    lastIcon.cooldown:Hide()
-    lastIcon.cooldown:SetCooldown(0, 0)
-    lastIcon.timeText:SetText("")
+        lastIcon.running = false
+        lastIcon.cooldown:Hide()
+        lastIcon.cooldown:SetCooldown(0, 0)
+        lastIcon.timeText:SetText("")
+    end
 end
 
 function Diminishings:AuraFade(unit, spellID)
@@ -583,16 +585,23 @@ function Diminishings:GetOptions()
             max = 20,
             step = .1,
         }),
+        drShowIconOnAuraApplied = Gladdy:option({
+            type = "toggle",
+            name = L["Show when Aura applied"],
+            order = 5,
+            disabled = function() return not Gladdy.db.drEnabled end,
+            width = "full"
+        }),
         drGroup = Gladdy:option({
             type = "toggle",
-            name = L["Group"] .. " " .. L["Class Icon"],
-            order = 5,
+            name = L["Group"] .. " " .. L["DR Icon"],
+            order = 6,
             disabled = function() return not Gladdy.db.drEnabled end,
         }),
         drGroupDirection = Gladdy:option({
             type = "select",
             name = L["Group direction"],
-            order = 6,
+            order = 7,
             values = {
                 ["RIGHT"] = L["Right"],
                 ["LEFT"] = L["Left"],
