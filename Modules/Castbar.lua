@@ -107,15 +107,20 @@ function Castbar:CreateFrame(unit)
     castBar.icon = CreateFrame("Frame", nil, castBar)
     castBar.icon:SetFrameStrata(Gladdy.db.castBarFrameStrata)
     castBar.icon:SetFrameLevel(Gladdy.db.castBarFrameLevel)
-    castBar.icon.texture = castBar.icon:CreateTexture(nil, "BACKGROUND")
+    castBar.icon.texture = castBar.icon:CreateTexture(nil, "BORDER")
     castBar.icon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
     castBar.icon.texture:SetAllPoints(castBar.icon)
     castBar.icon.texture.masked = true
-    castBar.icon.texture.overlay = castBar.icon:CreateTexture(nil, "BORDER")
+    castBar.icon.texture.overlay = castBar.icon:CreateTexture(nil, "ARTWORK")
     castBar.icon.texture.overlay:SetAllPoints(castBar.icon.texture)
     castBar.icon.texture.overlay:SetTexture(Gladdy.db.castBarIconStyle)
 
-    castBar.shield = castBar.icon:CreateTexture(nil, "OVERLAY")
+    castBar.shield = castBar.icon:CreateTexture(nil, "BACKGROUND")
+    --[[
+    bar.Shield:SetTexture("Interface\\CastingBar\\UI-CastingBar-Small-Shield")
+	bar.Shield:SetTexCoord(0, 36/256, 0, 1)
+    --]]
+    --castBar.shield:SetTexture("Interface\\AddOns\\Gladdy\\Images\\castbar-shield")
     castBar.shield:SetTexture("Interface\\AddOns\\Gladdy\\Images\\castbar-shield")
     castBar.shield:SetHeight(80)
     castBar.shield:SetWidth(80)
@@ -219,8 +224,8 @@ function Castbar:UpdateFrame(unit)
     end
     castBar.icon:ClearAllPoints()
 
-    castBar.shield:SetWidth(Gladdy.db.castBarIconSize * 3.2)
-    castBar.shield:SetHeight(Gladdy.db.castBarIconSize * 3.2)
+    castBar.shield:SetWidth(Gladdy.db.castBarIconSize * 2.4)
+    castBar.shield:SetHeight(Gladdy.db.castBarIconSize * 2.4)
 
     local rightMargin = 0
     local leftMargin = 0
@@ -348,7 +353,7 @@ Castbar.CastEventsFunc["UNIT_SPELLCAST_START"] = function(castBar, event, ...)
     castBar.castID = castID
     castBar.channeling = nil
     castBar.fadeOut = nil
-    Castbar:CAST_START(castBar.unit, name, texture, castBar.value, castBar.maxValue)
+    Castbar:CAST_START(castBar.unit, name, texture, castBar.value, castBar.maxValue, notInterruptible)
 end
 Castbar.CastEventsFunc["UNIT_SPELLCAST_SUCCEEDED"] = function(castBar, event, ...)
     if (castBar.casting and event == "UNIT_SPELLCAST_SUCCEEDED" and select(2, ...) == castBar.castID) then
@@ -443,18 +448,18 @@ Castbar.CastEventsFunc["UNIT_SPELLCAST_CHANNEL_START"] = function(castBar, event
     castBar.casting = nil
     castBar.channeling = true
     castBar.fadeOut = nil
-    Castbar:CAST_START(castBar.unit, name, texture, castBar.value, castBar.maxValue)
+    Castbar:CAST_START(castBar.unit, name, texture, castBar.value, castBar.maxValue, notInterruptible)
 end
 Castbar.CastEventsFunc["UNIT_SPELLCAST_CHANNEL_UPDATE"] = function(castBar, event, ...)
     if ( castBar:IsShown() ) then
-        local name, text, texture, startTime, endTime, isTradeSkill = UnitChannelInfo(castBar.unit)
+        local name, text, texture, startTime, endTime, isTradeSkill, nonInterruptable = UnitChannelInfo(castBar.unit)
         if ( not name or (not castBar.showTradeSkills and isTradeSkill)) then
             castBar:SetAlpha(0)
             return
         end
         castBar.value = ((endTime / 1000) - GetTime())
         castBar.maxValue = (endTime - startTime) / 1000
-        Castbar:CAST_START(castBar.unit, name, texture, castBar.value, castBar.maxValue)
+        Castbar:CAST_START(castBar.unit, name, texture, castBar.value, castBar.maxValue, nonInterruptable)
     end
 end
 
@@ -480,8 +485,10 @@ function Castbar:CAST_START(unit, spell, icon, value, maxValue, notInterruptible
 
     if notInterruptible then
         castBar.bar:SetStatusBarColor(.8,.8,.8,1)
+        castBar.shield:Show()
     else
         castBar.bar:SetStatusBarColor(Gladdy:SetColor(Gladdy.db.castBarColor))
+        castBar.shield:Hide()
     end
 
     castBar.value = value
@@ -496,11 +503,6 @@ function Castbar:CAST_START(unit, spell, icon, value, maxValue, notInterruptible
     castBar.backdrop:Show()
     if Gladdy.db.castBarSparkEnabled then
         castBar.spark:Show()
-    end
-    if notInterruptible then
-        castBar.shield:Show()
-    else
-        castBar.shield:Hide()
     end
     castBar:SetAlpha(1)
     if Gladdy.db.castBarIconEnabled then
