@@ -158,8 +158,10 @@ function Announcements:SPELL_INTERRUPT(unit,spellID,spellName,spellSchool,extraS
     if (not button or not Gladdy.db.announcements.spellInterrupt) then
         return
     end
-    if Gladdy.db.spellInterruptSpellSchool then
-        extraSpellName = GetSchoolString(extraSpellSchool)
+    if Gladdy.db.announcements.spellInterruptSpellSchool then
+        if extraSpellSchool ~= "unknown" then
+            extraSpellName = GetSchoolString(extraSpellSchool)
+        end
     end
     self:Send(L["INTERRUPTED: %s (%s)"]:format(extraSpellName, button.name or ""), nil, RAID_CLASS_COLORS[button.class], unit)
 end
@@ -278,7 +280,7 @@ function Announcements:GetOptions()
             name = L["Announce Spell School"],
             desc = L["Announces Spell School like \"Holy\" instead of Spell Name"],
             order = 6,
-            disabled = function() return not Gladdy.db.spellInterrupt end,
+            disabled = function() return not Gladdy.db.announcements.spellInterrupt end,
         }),
         drinks = option({
             type = "toggle",
