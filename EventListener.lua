@@ -22,6 +22,7 @@ local EventListener = Gladdy:NewModule("EventListener", 101, {
 })
 
 function EventListener:Initialize()
+    self.friendlyUnits = {}
     self:RegisterMessage("JOINED_ARENA")
 end
 
@@ -30,6 +31,10 @@ function EventListener.OnEvent(self, event, ...)
 end
 
 function EventListener:JOINED_ARENA()
+    self.friendlyUnits = {["player"] = true}
+    for i=2, Gladdy.curBracket do
+        self.friendlyUnits["party" .. i-1] = true
+    end
     self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self:RegisterEvent("ARENA_OPPONENT_UPDATE")
     self:RegisterEvent("UNIT_AURA")
@@ -57,6 +62,7 @@ end
 function EventListener:Reset()
     self:UnregisterAllEvents()
     self:SetScript("OnEvent", nil)
+    self.friendlyUnits = {}
 end
 
 function Gladdy:SpotEnemy(unit, auraScan)
@@ -277,17 +283,17 @@ Gladdy.cooldownBuffs = {
         return expTime
     end, spellId = 6346 }, -- Fear Ward
     [GetSpellInfo(11305)] = { cd = function(expTime) -- 15s uptime
-        return 300 - (15 - expTime)
-    end, spellId = 11305 }, -- Sprint
+        return 180 - (15 - expTime)
+    end, spellId = 11305, class = "ROGUE" }, -- Sprint
     [36554] = { cd = function(expTime) -- 3s uptime
         return 30 - (3 - expTime)
-    end, spellId = 36554 }, -- Shadowstep speed buff
+    end, spellId = 36554, class = "ROGUE" }, -- Shadowstep speed buff
     [36563] = { cd = function(expTime) -- 10s uptime
         return 30 - (10 - expTime)
-    end, spellId = 36554 }, -- Shadowstep dmg buff
+    end, spellId = 36554, class = "ROGUE" }, -- Shadowstep dmg buff
     [GetSpellInfo(26889)] = { cd = function(expTime) -- 3s uptime
         return 180 - (10 - expTime)
-    end, spellId = 26889 }, -- Vanish
+    end, spellId = 26889, class = "ROGUE" }, -- Vanish
     racials = {
         [GetSpellInfo(20600)] = { cd = function(expTime) -- 20s uptime
             return GetTime() - (20 - expTime)
@@ -295,7 +301,10 @@ Gladdy.cooldownBuffs = {
     },
     [GetSpellInfo(31224)] = { cd = function(expTime) -- 180s uptime == cd
         return 60 - (5 - expTime)
-    end, spellId = 31224 }, -- Cloak of Shadows
+    end, spellId = 31224, class = "ROGUE" }, -- Cloak of Shadows
+    [GetSpellInfo(2094)] = { cd = function(expTime) -- 180s uptime == cd
+        return 120 - (10 - expTime)
+    end, spellId = 2094, class = "ROGUE" }, -- Blind
 }
 --[[
 /run local f,sn,dt for i=1,2 do f=(i==1 and "HELPFUL"or"HARMFUL")for n=1,30 do sn,_,_,dt=UnitAura("player",n,f) if(not sn)then break end print(sn,dt,dt and dt:len())end end
@@ -303,6 +312,37 @@ Gladdy.cooldownBuffs = {
 function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
     local button = Gladdy.buttons[unit]
     if not button then
+        local skip = true
+        for i=1, Gladdy.curBracket do
+            if not Gladdy.buttons["arena" .. i].class then
+                skip = false
+                break
+            end
+        end
+        if not skip then
+            if self.friendlyUnits[unit] then -- this is mainly for Blind detection when the unit was not seen before
+                for n = 1, 30 do
+                    local spellName, texture, count, dispelType, duration, expirationTime, unitCaster, _, shouldConsolidate, spellID = UnitAura(unit, n, "HARMFUL")
+                    if spellName and (Gladdy.cooldownBuffs[spellName] or Gladdy.cooldownBuffs[spellID]) and unitCaster then
+                        local cooldownBuff = Gladdy.cooldownBuffs[spellID] or Gladdy.cooldownBuffs[spellName]
+                        for arenaUnit,v in pairs(Gladdy.buttons) do
+                            if (UnitIsUnit(arenaUnit, unitCaster)) then
+                                if not v.class then
+                                    Gladdy:SpotEnemy(arenaUnit, false)
+                                end
+                                if not v.class and Gladdy.expansion == "Wrath" then
+                                    Gladdy.buttons[arenaUnit].class = Gladdy.cooldownBuffs[spellName].class
+                                    Cooldowns:UpdateCooldowns(Gladdy.buttons[arenaUnit])
+                                end
+                                Cooldowns:CooldownUsed(arenaUnit, Gladdy.buttons[arenaUnit].class, cooldownBuff.spellId, cooldownBuff.cd(expirationTime - GetTime()))
+                            end
+                        end
+                    else
+                        break
+                    end
+                end
+            end
+        end
         return
     end
     if not button.auras then
