@@ -361,7 +361,7 @@ local importantAuras = {
     [5211] = { -- Bash
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellIDs = { 5211, 6798, 8983 },
+        spellIDs = { 5211, 6798, 8983, 58861 },
     },
     [1833] = { -- Cheap Shot
         track = AURA_TYPE_DEBUFF,
@@ -1050,6 +1050,7 @@ local cooldownList = {
         [23920] = 10, -- Spell Reflection
         [3411] = 30, -- Intervene
         [20252] = { cd = 30, [L["Arms"]] = 20, }, -- Intercept
+        [11578] = 15, -- Charge
         [676] = 60, -- Disarm
         [5246] = 120, -- Intimidating Shout
         [2565] = 60, -- Shield Block
