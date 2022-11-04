@@ -163,7 +163,7 @@ function Announcements:SPELL_INTERRUPT(unit,spellID,spellName,spellSchool,extraS
             extraSpellName = GetSchoolString(extraSpellSchool)
         end
     end
-    self:Send(L["INTERRUPTED: %s (%s)"]:format(extraSpellName, button.name or ""), nil, RAID_CLASS_COLORS[button.class], unit)
+    self:Send(L["INTERRUPTED: %s (%s)"]:format(extraSpellName, button.name or ""), 1, RAID_CLASS_COLORS[button.class], unit)
 end
 
 function Announcements:AURA_GAIN(unit, auraType, spellID, spellName)
