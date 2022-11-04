@@ -489,7 +489,7 @@ function Diminishings:AuraGain(unit, spellID)
     if not drFrame.tracked[drCat] or drFrame.tracked[drCat] == 0 then
         drFrame.tracked[drCat] = DRData:NextDR(1)
     else
-        drFrame.tracked[drCat] = DRData:NextDR(drFrame.tracked[drCat] == 1.0 and 1 or drFrame.tracked[drCat] == 0.5 and 2 or 3)
+        drFrame.tracked[drCat] = DRData:NextDR(drFrame.tracked[drCat] == 0.5 and 2 or 3)
     end
 
     -- add icon with no timer
