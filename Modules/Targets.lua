@@ -57,16 +57,13 @@ end
 function Targets:UpdateFrameOnce()
     if Gladdy.db.targetEnabled then
         self:RegisterMessage("JOINED_ARENA")
+        self:RegisterMessage("ENEMY_STEALTH")
     else
         self:UnregisterAllMessages()
     end
 end
 
 function Targets:JOINED_ARENA()
-    for _,v in pairs(self.frames) do
-        v:SetAlpha(0)
-    end
-
     if Gladdy.db.targetEnabled then
         self:RegisterEvent("UNIT_HEALTH_FREQUENT")
         self:RegisterEvent("UNIT_MAXHEALTH")
@@ -75,15 +72,46 @@ function Targets:JOINED_ARENA()
         self:RegisterEvent("UNIT_TARGET")
         self:SetScript("OnEvent", Targets.OnEvent)
     end
+
+    for _,v in pairs(self.frames) do
+        v:SetAlpha(0)
+    end
+    for i=1, Gladdy.curBracket do
+        Targets:ENEMY_STEALTH(Targets.targetUnits[i], false)
+    end
+end
+
+function Targets:ENEMY_STEALTH(unit, stealth)
+    unit = string_gsub(unit, "%d$", "%1target")
+    local button = self.frames[unit]
+    if stealth then
+        button:SetAlpha(0)
+    else
+        local unitGUID = UnitGUID(unit)
+        if unitGUID then
+            button.unitGUID = unitGUID
+            local health = UnitHealth(unit)
+            local healthMax = UnitHealthMax(unit)
+            self:UpdateHealthBarColor(unit)
+            self:UpdatePortrait(unit)
+            button.healthBar.hp:SetMinMaxValues(0, healthMax)
+            button.healthBar.hp:SetValue(health)
+            self:HealthCheck(unit)
+            self:SetHealthText(button.healthBar, health, healthMax)
+            self:SetText(unit)
+            button:SetAlpha(1)
+        else
+            button:SetAlpha(0)
+        end
+    end
 end
 
 function Targets:OnEvent(event)
     for i=1, Gladdy.curBracket do
         local unit = self.targetUnits[i]
         local button = self.frames[unit]
-        local healthBar = self.frames[unit].healthBar
         local unitGUID = UnitGUID(unit)
-        if UnitGUID(unit) then
+        if unitGUID then
             Gladdy:Debug("INFO", unit, "show", event)
             local health = UnitHealth(unit)
             local healthMax = UnitHealthMax(unit)
@@ -93,23 +121,23 @@ function Targets:OnEvent(event)
                 button.unitGUID = unitGUID
                 self:UpdateHealthBarColor(unit)
                 self:UpdatePortrait(unit)
-                healthBar.hp:SetMinMaxValues(0, healthMax)
-                healthBar.hp:SetValue(health)
+                button.healthBar.hp:SetMinMaxValues(0, healthMax)
+                button.healthBar.hp:SetValue(health)
                 self:HealthCheck(unit)
-                self:SetHealthText(healthBar, health, healthMax)
+                self:SetHealthText(button.healthBar, health, healthMax)
                 self:SetText(unit)
                 checkedHealth = true
             end
             if (event == "UNIT_MAXHEALTH" and not checkedHealth) then
-                healthBar.hp:SetMinMaxValues(0, healthMax)
-                healthBar.hp:SetValue(health)
+                button.healthBar.hp:SetMinMaxValues(0, healthMax)
+                button.healthBar.hp:SetValue(health)
                 self:HealthCheck(unit)
-                self:SetHealthText(healthBar, health, healthMax)
+                self:SetHealthText(button.healthBar, health, healthMax)
             end
             if (event == "UNIT_HEALTH_FREQUENT" and not checkedHealth) then
-                healthBar.hp:SetValue(health)
+                button.healthBar.hp:SetValue(health)
                 self:HealthCheck(unit)
-                self:SetHealthText(healthBar, health, healthMax)
+                self:SetHealthText(button.healthBar, health, healthMax)
             end
             button:SetAlpha(1)
         else
@@ -137,13 +165,6 @@ function Targets:UNIT_DESTROYED(unitId)
 
     button:SetAlpha(0)
     button.portrait:SetTexture(nil)
-end
-
-
-function Targets:ENEMY_SPOTTED(unit)
-    if Gladdy.db.targetEnabled then
-        self:CheckUnitTarget(unit)
-    end
 end
 
 function Targets:Test(unitId)
@@ -174,17 +195,8 @@ function Targets:CreateFrame(unitId)
     button:SetPoint("LEFT", Gladdy.buttons[unitId].healthBar, "RIGHT", Gladdy.db.targetXOffset, Gladdy.db.targetYOffset)
     button:SetAlpha(0)
 
-    --[[local secure = CreateFrame("Button", "GladdyButton" .. unit, button, "SecureActionButtonTemplate, SecureHandlerEnterLeaveTemplate")
-    secure:RegisterForClicks("AnyUp")
-    secure:RegisterForClicks("AnyDown")
-    secure:SetAttribute("*type1", "target")
-    secure:SetAttribute("*type2", "focus")
-    secure:SetAttribute("unit", unit)
-    secure:SetAllPoints(button)--]]
-
     button.unit = unit
     button.unitSource = unitId
-    --button.secure = secure
 
     local healthBar = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
     healthBar:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "targetHealthBarBorderStyle"),
