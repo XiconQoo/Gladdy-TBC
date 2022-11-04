@@ -615,7 +615,7 @@ function Auras:Test(unit)
             local extraSpellSchool = spellSchools[rand(1, #spellSchools)]
             spellid = tonumber(enabledInterrupts[rand(1, #enabledInterrupts)])
             spellName = select(1, GetSpellInfo(spellid))
-            Gladdy:SendMessage("SPELL_INTERRUPT", unit,spellid, spellName, "physical", spellid, spellName, extraSpellSchool)
+            Gladdy:SendMessage("SPELL_INTERRUPT", unit,spellid, spellName, "physical", 2061, select(1, GetSpellInfo(2061)), extraSpellSchool)
         end
     end
 end
@@ -747,13 +747,14 @@ end
 function Predictor:GetValues(text, values, max)
     values = {}
     if text and text ~= "" then
+        if GetSpellInfo(text) then
+            text = GetSpellInfo(text)
+        end
         for k,v in pairs(Gladdy.spellCache) do
             if str_match(k:lower(), "^" .. text:lower()) then
                 for _,tbl in ipairs(v.spells) do
-                    Gladdy:Dump(tbl)
-                    --values[tbl.spellID] =  "|T".. tbl.icon .. ":0|t " .. tbl.spellName .. " - " .. tbl.spellID
                     values[tbl.spellID] = {
-                        text = tbl.spellName .. " - " .. tbl.spellID,
+                        text = tbl.spellName .. " - (" .. tbl.spellID .. ")",
                         icon = tbl.icon
                     }
                 end
@@ -1308,7 +1309,7 @@ function Auras:GetAuraOptions(auraType)
         },
         add = {
             order = 4,
-            width = "1.5",
+            width = "2",
             name = L["Add Aura"],
             type = "input",
             dialogControl = "EditBoxGladdy",
@@ -1324,11 +1325,27 @@ function Auras:GetAuraOptions(auraType)
 
                 local exists = false
                 for k,v in pairs(Gladdy.db.auraListDefault) do
+                    local searchName, _, searchIcon = GetSpellInfo(value)
+                    local dbName, _, dbIcon = GetSpellInfo(k)
                     if tostring(k) == value then
                         value = tostring(k)
                         path = v.track == AURA_TYPE_DEBUFF and "debuffList" or "buffList"
                         exists = true
                         break
+                    elseif searchName == dbName and searchIcon == dbIcon then -- same spell
+                        exists = true
+                        local existsInSpellIDs = false
+                        for _,spellID in ipairs(v.spellIDs) do
+                            if tonumber(value) == spellID then
+                                existsInSpellIDs = true
+                                break
+                            end
+                        end
+                        if not existsInSpellIDs then
+                            table.insert(Gladdy.db.auraListDefault[k].spellIDs, tonumber(value))
+                            flatEnabledSpells()
+                        end
+                        value = k
                     else
                         for _,val in pairs(v.spellIDs) do
                             if tostring(val) == tostring(value) then
