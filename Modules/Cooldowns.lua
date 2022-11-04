@@ -657,7 +657,7 @@ function Cooldowns:UpdateCooldowns(button)
     local class = button.class
     local race = button.race
     local spec = button.spec
-    if not class or not race then
+    if not class or (not race and Gladdy.expansion ~= "Wrath") then
         return
     end
 
@@ -680,13 +680,15 @@ function Cooldowns:UpdateCooldowns(button)
             end
         end
     end
-    for k, v in pairs(Gladdy:GetCooldownList()[race]) do
-        if Gladdy.db.cooldownCooldowns[tostring(k)] then
-            if (type(v) ~= "table" or (type(v) == "table" and v.spec == nil)) then
-                Cooldowns:AddCooldown(k, v, button)
-            end
-            if (type(v) == "table" and v.spec ~= nil and v.spec == spec) then
-                Cooldowns:AddCooldown(k, v, button)
+    if race then
+        for k, v in pairs(Gladdy:GetCooldownList()[race]) do
+            if Gladdy.db.cooldownCooldowns[tostring(k)] then
+                if (type(v) ~= "table" or (type(v) == "table" and v.spec == nil)) then
+                    Cooldowns:AddCooldown(k, v, button)
+                end
+                if (type(v) == "table" and v.spec ~= nil and v.spec == spec) then
+                    Cooldowns:AddCooldown(k, v, button)
+                end
             end
         end
     end
