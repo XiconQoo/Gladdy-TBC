@@ -110,6 +110,30 @@ function Gladdy:SpotEnemy(unit, auraScan)
     end
 end
 
+function EventListener:CooldownCheck(eventType, srcUnit, spellName, spellID)
+    if not Gladdy.buttons[srcUnit] or not spellName or not spellID then
+        return
+    end
+    if Gladdy.db.cooldown and Cooldowns.cooldownSpells[spellName] then
+        local unitClass
+        local spellId = Cooldowns.cooldownSpells[spellName] -- don't use spellId from combatlog, in case of different spellrank
+        if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
+            spellId = spellID
+        end
+        if Gladdy.db.cooldownCooldowns[tostring(spellId)] then
+            if (Gladdy:GetCooldownList()[Gladdy.buttons[srcUnit].class][spellId]) then
+                unitClass = Gladdy.buttons[srcUnit].class
+            else
+                unitClass = Gladdy.buttons[srcUnit].race
+            end
+            if spellID ~= 16188 and spellID ~= 17116 and spellID ~= 16166 and spellID ~= 12043 and spellID ~= 5384 then -- Nature's Swiftness CD starts when buff fades
+                Gladdy:Debug("INFO", eventType, "- CooldownUsed", srcUnit, "spellID:", spellID)
+                Cooldowns:CooldownUsed(srcUnit, unitClass, spellId)
+            end
+        end
+    end
+end
+
 function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
     -- timestamp,eventType,hideCaster,sourceGUID,sourceName,sourceFlags,sourceRaidFlags,destGUID,destName,destFlags,destRaidFlags,spellId,spellName,spellSchool
     local _,eventType,_,sourceGUID,_,_,_,destGUID,_,_,_,spellID,spellName,spellSchool,extraSpellId,extraSpellName,extraSpellSchool = CombatLogGetCurrentEventInfo()
@@ -129,8 +153,10 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
                 Diminishings:AuraFade(destUnit, spellID)
             end
             if (eventType == "SPELL_AURA_REFRESH") then
+                if not Gladdy.db.drShowIconOnAuraApplied then
+                    Diminishings:AuraFade(destUnit, spellID)
+                end
                 Diminishings:AuraGain(destUnit, spellID)
-                --Diminishings:AuraFade(destUnit, spellID)
             end
             if (eventType == "SPELL_AURA_APPLIED") then
                 Diminishings:AuraGain(destUnit, spellID)
@@ -172,7 +198,7 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
         if not Gladdy.buttons[srcUnit].spec then
             self:DetectSpec(srcUnit, Gladdy.specSpells[spellName])
         end
-        if (eventType == "SPELL_CAST_SUCCESS" or eventType == "SPELL_MISSED") then
+        if (eventType == "SPELL_CAST_SUCCESS" or eventType == "SPELL_MISSED" or eventType == "SPELL_DODGED") then
             -- caching last cast spell
             if not Gladdy.buttons[srcUnit].lastCastSpell then
                 Gladdy.buttons[srcUnit].lastCastSpell = {}
@@ -180,32 +206,18 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
             Gladdy.buttons[srcUnit].lastCastSpell.spellName = spellName
             Gladdy.buttons[srcUnit].lastCastSpell.spellSchool = spellSchool
             -- cooldown tracker
-            if Gladdy.db.cooldown and Cooldowns.cooldownSpellIds[spellName] then
-                local unitClass
-                local spellId = Cooldowns.cooldownSpellIds[spellName] -- don't use spellId from combatlog, in case of different spellrank
-                if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
-                    spellId = spellID
-                end
-                if Gladdy.db.cooldownCooldowns[tostring(spellId)] and (eventType == "SPELL_CAST_SUCCESS" or eventType == "SPELL_MISSED" or eventType == "SPELL_DODGED") then
-                    if (Gladdy:GetCooldownList()[Gladdy.buttons[srcUnit].class][spellId]) then
-                        unitClass = Gladdy.buttons[srcUnit].class
-                    else
-                        unitClass = Gladdy.buttons[srcUnit].race
-                    end
-                    if spellID ~= 16188 and spellID ~= 17116 and spellID ~= 16166 and spellID ~= 12043 and spellID ~= 5384 then -- Nature's Swiftness CD starts when buff fades
-                        Gladdy:Debug("INFO", eventType, "- CooldownUsed", srcUnit, "spellID:", spellID)
-                        Cooldowns:CooldownUsed(srcUnit, unitClass, spellId)
-                    end
-                end
-            end
+            EventListener:CooldownCheck(eventType, srcUnit, spellName, spellID)
+        end
+        if (eventType == "SPELL_AURA_APPLIED") then
+            EventListener:CooldownCheck(eventType, srcUnit, spellName, spellID)
         end
         if (eventType == "SPELL_AURA_REMOVED" and (spellID == 16188 or spellID == 17116 or spellID == 16166 or spellID == 12043) and Gladdy.buttons[srcUnit].class) then
             Gladdy:Debug("INFO", "SPELL_AURA_REMOVED - CooldownUsed", srcUnit, "spellID:", spellID)
             Cooldowns:CooldownUsed(srcUnit, Gladdy.buttons[srcUnit].class, spellID)
         end
-        if (eventType == "SPELL_AURA_REMOVED" and Gladdy.db.cooldown and Cooldowns.cooldownSpellIds[spellName]) then
+        if (eventType == "SPELL_AURA_REMOVED" and Gladdy.db.cooldown and Cooldowns.cooldownSpells[spellName]) then
             local unit = Gladdy:GetArenaUnit(srcUnit, true)
-            local spellId = Cooldowns.cooldownSpellIds[spellName] -- don't use spellId from combatlog, in case of different spellrank
+            local spellId = Cooldowns.cooldownSpells[spellName] -- don't use spellId from combatlog, in case of different spellrank
             if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
                 spellId = spellID
             end
@@ -280,7 +292,10 @@ Gladdy.cooldownBuffs = {
         [GetSpellInfo(20600)] = { cd = function(expTime) -- 20s uptime
             return GetTime() - (20 - expTime)
         end, spellId = 20600 }, -- Perception
-    }
+    },
+    [GetSpellInfo(31224)] = { cd = function(expTime) -- 180s uptime == cd
+        return 60 - (5 - expTime)
+    end, spellId = 31224 }, -- Cloak of Shadows
 }
 --[[
 /run local f,sn,dt for i=1,2 do f=(i==1 and "HELPFUL"or"HARMFUL")for n=1,30 do sn,_,_,dt=UnitAura("player",n,f) if(not sn)then break end print(sn,dt,dt and dt:len())end end
@@ -340,8 +355,8 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
     -- check auras
     for spellID,v in pairs(button.lastAuras) do
         if not button.auras[spellID] then
-            if Gladdy.db.cooldown and Cooldowns.cooldownSpellIds[v[3]] then
-                local spellId = Cooldowns.cooldownSpellIds[v[3]] -- don't use spellId from combatlog, in case of different spellrank
+            if Gladdy.db.cooldown and Cooldowns.cooldownSpells[v[3]] then
+                local spellId = Cooldowns.cooldownSpells[v[3]] -- don't use spellId from combatlog, in case of different spellrank
                 if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
                     spellId = spellID
                 end
@@ -419,22 +434,7 @@ function EventListener:UNIT_SPELLCAST_SUCCEEDED(...)
         end
 
         -- cooldown tracker
-        if Gladdy.db.cooldown and Cooldowns.cooldownSpellIds[spellName] then
-            local spellId = Cooldowns.cooldownSpellIds[spellName] -- don't use spellId from combatlog, in case of different spellrank
-            if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
-                spellId = spellID
-            end
-            if Gladdy.db.cooldownCooldowns[tostring(spellId)] then
-                if (Gladdy:GetCooldownList()[button.class][spellId]) then
-                    unitClass = button.class
-                else
-                    unitClass = button.race
-                end
-                if spellID ~= 16188 and spellID ~= 17116 and spellID ~= 16166 and spellID ~= 12043 and spellID ~= 5384 then -- Nature's Swiftness CD starts when buff fades
-                    Cooldowns:CooldownUsed(unit, unitClass, spellId)
-                end
-            end
-        end
+        EventListener:CooldownCheck("UNIT_SPELLCAST_SUCCEEDED", unit, spellName, spellID)
     end
 end
 
