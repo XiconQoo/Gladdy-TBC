@@ -23,7 +23,15 @@ local function GetTotemColorDefaultOptions()
         return a.name < b.name
     end)
     for i=1,#indexedList do
-        defaultDB["totem" .. indexedList[i].id] = {color = indexedList[i].color, enabled = true, alpha = 0.6, customText = ""}
+        defaultDB["totem" .. indexedList[i].id] = {
+            color = indexedList[i].color,
+            friendlyColor = indexedList[i].color,
+            enabled = true,
+            alpha = 0.6,
+            customText = "",
+            enemySize = 40,
+            friendlySize = 40,
+        }
         options["npTotemsHideDisabledTotems"] = {
             order = 1,
             name = L["Hide Disabled Totem Plates"],
@@ -61,11 +69,61 @@ local function GetTotemColorDefaultOptions()
                         Gladdy:UpdateFrame()
                     end
                 },
+                headerGeneral = {
+                    type = "header",
+                    name = L["General"],
+                    order = 10,
+                },
+                alpha = {
+                    type = "range",
+                    name = L["Alpha"],
+                    order = 11,
+                    min = 0,
+                    max = 1,
+                    step = 0.1,
+                    width = "full",
+                    get = function()
+                        return Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].alpha
+                    end,
+                    set = function(_, value)
+                        Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].alpha = value
+                        Gladdy:UpdateFrame()
+                    end
+                },
+                customText = {
+                    type = "input",
+                    name = L["Custom totem name"],
+                    order = 12,
+                    width = "full",
+                    get = function() return Gladdy.db.npTotemColors["totem" .. indexedList[i].id].customText end,
+                    set = function(_, value) Gladdy.db.npTotemColors["totem" .. indexedList[i].id].customText = value Gladdy:UpdateFrame() end
+                },
+                headerEnemy = {
+                    type = "header",
+                    name = L["Enemy"],
+                    order = 20,
+                },
+                enemySize = {
+                    type = "range",
+                    name = L["Size"],
+                    order = 21,
+                    min = 0,
+                    max = 1,
+                    step = 0.1,
+                    width = "full",
+                    get = function()
+                        return Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].enemySize
+                    end,
+                    set = function(_, value)
+                        Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].enemySize = value
+                        Gladdy:UpdateFrame()
+                    end
+                },
                 color = {
                     type = "color",
                     name = L["Border color"],
                     desc = L["Color of the border"],
-                    order = 3,
+                    order = 22,
                     hasAlpha = true,
                     width = "full",
                     get = function()
@@ -82,29 +140,47 @@ local function GetTotemColorDefaultOptions()
                         Gladdy:UpdateFrame()
                     end,
                 },
-                alpha = {
+                headerFriendly = {
+                    type = "header",
+                    name = L["Enemy"],
+                    order = 30,
+                },
+                friendlySize = {
                     type = "range",
-                    name = L["Alpha"],
-                    order = 4,
+                    name = L["Size"],
+                    order = 31,
                     min = 0,
                     max = 1,
                     step = 0.1,
                     width = "full",
                     get = function()
-                        return Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].alpha
+                        return Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].friendlySize
                     end,
                     set = function(_, value)
-                        Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].alpha = value
+                        Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].friendlySize = value
                         Gladdy:UpdateFrame()
                     end
                 },
-                customText = {
-                    type = "input",
-                    name = L["Custom totem name"],
-                    order = 5,
+                friendlyColor = {
+                    type = "color",
+                    name = L["Border color"],
+                    desc = L["Color of the border"],
+                    order = 32,
+                    hasAlpha = true,
                     width = "full",
-                    get = function() return Gladdy.db.npTotemColors["totem" .. indexedList[i].id].customText end,
-                    set = function(_, value) Gladdy.db.npTotemColors["totem" .. indexedList[i].id].customText = value Gladdy:UpdateFrame() end
+                    get = function()
+                        return Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].friendlyColor.r,
+                        Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].friendlyColor.g,
+                        Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].friendlyColor.b,
+                        Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].friendlyColor.a
+                    end,
+                    set = function(_, r, g, b, a)
+                        Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].friendlyColor.r,
+                        Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].friendlyColor.g,
+                        Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].friendlyColor.b,
+                        Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].friendlyColor.a = r, g, b, a
+                        Gladdy:UpdateFrame()
+                    end,
                 },
             }
         }
@@ -439,6 +515,21 @@ function TotemPlates:OnUnitEvent(unitID)
         else
             self:CreateTotemFrame(nameplate)
         end
+        if isEnemy then
+            nameplate.gladdyTotemFrame:SetHeight(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enemySize)
+            nameplate.gladdyTotemFrame:SetWidth(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enemySize * Gladdy.db.npTotemPlatesSize)
+            nameplate.gladdyTotemFrame.totemBorder:SetVertexColor(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.r,
+                    Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.g,
+                    Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.b,
+                    Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.a)
+        else
+            nameplate.gladdyTotemFrame:SetHeight(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].friendlySize)
+            nameplate.gladdyTotemFrame:SetWidth(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].friendlySize * Gladdy.db.npTotemPlatesSize)
+            nameplate.gladdyTotemFrame.totemBorder:SetVertexColor(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].friendlyColor.r,
+                    Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].friendlyColor.g,
+                    Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].friendlyColor.b,
+                    Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].friendlyColor.a)
+        end
         nameplate.gladdyTotemFrame.unitID = unitID
         nameplate.gladdyTotemFrame.totemDataEntry = totemDataEntry
         nameplate.gladdyTotemFrame.parent = nameplate
@@ -446,10 +537,6 @@ function TotemPlates:OnUnitEvent(unitID)
         nameplate.gladdyTotemFrame:ClearAllPoints()
         nameplate.gladdyTotemFrame:SetPoint("CENTER", nameplate, "CENTER", 0, 0)
         nameplate.gladdyTotemFrame.totemIcon:SetTexture(totemDataEntry.texture)
-        nameplate.gladdyTotemFrame.totemBorder:SetVertexColor(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.r,
-                Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.g,
-                Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.b,
-                Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.a)
         nameplate.gladdyTotemFrame.totemName:SetText(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].customText or "")
         nameplate.gladdyTotemFrame.parent = nameplate
         nameplate.gladdyTotemFrame:Show()
