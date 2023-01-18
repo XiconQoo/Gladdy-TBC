@@ -1,5 +1,5 @@
 ## Title: Gladdy |cFFFF0000 game client not supported|r
-## Version: 2.22-Release
+## Version: 2.23-Release
 ## Notes: The most powerful arena AddOn for WoW Classic TBC/WotLK
 ## Author: XiconQoo, DnB_Junkee, Knall
 ## X-Email: contact me on discord Knall#1751
