@@ -37,7 +37,7 @@ Gladdy.version_releaseType = RELEASE_TYPES.beta
 Gladdy.version = PREFIX .. string.format("%.2f", Gladdy.version_num) .. "-" .. Gladdy.version_releaseType
 Gladdy.VERSION_REGEX = VERSION_REGEX
 
-Gladdy.debug = true
+Gladdy.debug = false
 
 LibStub("AceTimer-3.0"):Embed(Gladdy)
 LibStub("AceComm-3.0"):Embed(Gladdy)
