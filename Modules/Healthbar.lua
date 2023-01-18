@@ -79,7 +79,7 @@ function Healthbar:CreateFrame(unit)
     healthBar.bg:SetAlpha(1)
     healthBar.bg:SetVertexColor(Gladdy:SetColor(Gladdy.db.healthBarBgColor))
 
-    healthBar.nameText = healthBar:CreateFontString(nil, "LOW", "GameFontNormalSmall")
+    healthBar.nameText = healthBar:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     if (Gladdy.db.healthBarNameFontSize < 1) then
         healthBar.nameText:SetFont(Gladdy:SMFetch("font", "healthBarNameFont"), 1)
         healthBar.nameText:Hide()
@@ -93,7 +93,7 @@ function Healthbar:CreateFrame(unit)
     healthBar.nameText:SetJustifyH("CENTER")
     healthBar.nameText:SetPoint("LEFT", Gladdy.db.healthTextLeftHOffset, Gladdy.db.healthTextLeftVOffset)
 
-    healthBar.healthText = healthBar:CreateFontString(nil, "LOW")
+    healthBar.healthText = healthBar:CreateFontString(nil, "OVERLAY")
     if (Gladdy.db.healthBarHealthFontSize < 1) then
         healthBar.healthText:SetFont(Gladdy:SMFetch("font", "healthBarFont"), 1)
         healthBar.healthText:Hide()

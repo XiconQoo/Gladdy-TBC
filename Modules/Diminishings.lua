@@ -294,13 +294,13 @@ function Diminishings:UpdateFrame(unit)
 
         if Gladdy.db.drIconZoomed then
             if icon.texture.masked then
-                icon.texture:SetMask(nil)
+                icon.texture:SetMask("")
                 icon.texture:SetTexCoord(0.1,0.9,0.1,0.9)
                 icon.texture.masked = nil
             end
         else
             if not icon.texture.masked then
-                icon.texture:SetMask(nil)
+                icon.texture:SetMask("")
                 icon.texture:SetTexCoord(0,1,0,1)
                 icon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
                 icon.texture.masked = true

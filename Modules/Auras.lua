@@ -331,13 +331,13 @@ function Auras:UpdateFrame(unit)
 
     if Gladdy.db.auraIconZoomed then
         if auraFrame.icon.masked then
-            auraFrame.icon:SetMask(nil)
+            auraFrame.icon:SetMask("")
             auraFrame.icon:SetTexCoord(0.1,0.9,0.1,0.9)
             auraFrame.icon.masked = nil
         end
     else
         if not auraFrame.icon.masked then
-            auraFrame.icon:SetMask(nil)
+            auraFrame.icon:SetMask("")
             auraFrame.icon:SetTexCoord(0,1,0,1)
             auraFrame.icon:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
             auraFrame.icon.masked = true
@@ -479,13 +479,13 @@ function Auras:UpdateInterruptFrame(unit)
 
     if Gladdy.db.auraInterruptIconZoomed then
         if interruptFrame.icon.masked then
-            interruptFrame.icon:SetMask(nil)
+            interruptFrame.icon:SetMask("")
             interruptFrame.icon:SetTexCoord(0.1,0.9,0.1,0.9)
             interruptFrame.icon.masked = nil
         end
     else
         if not interruptFrame.icon.masked then
-            interruptFrame.icon:SetMask(nil)
+            interruptFrame.icon:SetMask("")
             interruptFrame.icon:SetTexCoord(0,1,0,1)
             interruptFrame.icon:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
             interruptFrame.icon.masked = true
