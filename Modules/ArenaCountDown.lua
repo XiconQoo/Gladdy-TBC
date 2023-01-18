@@ -27,19 +27,19 @@ function ACDFrame:Initialize()
     self.ACDNumFrame:SetPoint("CENTER", 0, 128)
     self.ACDNumFrame:Hide()
 
-    local ACDNumTens = ACDNumFrame:CreateTexture("ACDNumTens", "HIGH")
+    local ACDNumTens = ACDNumFrame:CreateTexture("ACDNumTens", "OVERLAY")
     self.ACDNumTens = ACDNumTens
     self.ACDNumTens:SetWidth(Gladdy.db.arenaCountdownSize)
     self.ACDNumTens:SetHeight(Gladdy.db.arenaCountdownSize)
     self.ACDNumTens:SetPoint("CENTER", self.ACDNumFrame, "CENTER", -(Gladdy.db.arenaCountdownSize/8 + Gladdy.db.arenaCountdownSize/8/2), 0)
 
-    local ACDNumOnes = ACDNumFrame:CreateTexture("ACDNumOnes", "HIGH")
+    local ACDNumOnes = ACDNumFrame:CreateTexture("ACDNumOnes", "OVERLAY")
     self.ACDNumOnes = ACDNumOnes
     self.ACDNumOnes:SetWidth(Gladdy.db.arenaCountdownSize)
     self.ACDNumOnes:SetHeight(Gladdy.db.arenaCountdownSize)
     self.ACDNumOnes:SetPoint("CENTER", self.ACDNumFrame, "CENTER", (Gladdy.db.arenaCountdownSize/8 + Gladdy.db.arenaCountdownSize/8/2), 0)
 
-    local ACDNumOne = ACDNumFrame:CreateTexture("ACDNumOne", "HIGH")
+    local ACDNumOne = ACDNumFrame:CreateTexture("ACDNumOne", "OVERLAY")
     self.ACDNumOne = ACDNumOne
     self.ACDNumOne:SetWidth(Gladdy.db.arenaCountdownSize)
     self.ACDNumOne:SetHeight(Gladdy.db.arenaCountdownSize)

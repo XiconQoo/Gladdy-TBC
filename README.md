@@ -55,6 +55,7 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 
 ## Contributors
 
+- [XyzKangUI](https://github.com/XyzKangUI)
 - [ManneN1](https://github.com/ManneN1)
 - [AlexFolland](https://github.com/AlexFolland)
 - [dfherr](https://github.com/dfherr)
@@ -80,8 +81,7 @@ Thank you!
 ### Changes
 
 ### v2.23-Release
-- **Targets**
-  - show targets
+- fix for WotLK v30401 (update libs + layers + masks)
 
 ### v2.22-Release
 - fixed unwanted committed changes to LibCustomGlow
