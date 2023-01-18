@@ -145,13 +145,13 @@ function Classicon:UpdateFrame(unit)
 
     if Gladdy.db.classIconZoomed then
         if classIcon.texture.masked then
-            classIcon.texture:SetMask(nil)
+            classIcon.texture:SetMask("")
             classIcon.texture:SetTexCoord(0.1,0.9,0.1,0.9)
             classIcon.texture.masked = nil
         end
     else
         if not classIcon.texture.masked then
-            classIcon.texture:SetMask(nil)
+            classIcon.texture:SetMask("")
             classIcon.texture:SetTexCoord(0,1,0,1)
             classIcon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
             classIcon.texture.masked = true

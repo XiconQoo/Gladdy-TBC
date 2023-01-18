@@ -169,13 +169,13 @@ function Racial:UpdateFrame(unit)
 
     if Gladdy.db.racialIconZoomed then
         if racial.texture.masked then
-            racial.texture:SetMask(nil)
+            racial.texture:SetMask("")
             racial.texture:SetTexCoord(0.1,0.9,0.1,0.9)
             racial.texture.masked = nil
         end
     else
         if not racial.texture.masked then
-            racial.texture:SetMask(nil)
+            racial.texture:SetMask("")
             racial.texture:SetTexCoord(0,1,0,1)
             racial.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
             racial.texture.masked = true

@@ -123,7 +123,7 @@ function Castbar:CreateFrame(unit)
         castBar.icon:SetPoint("LEFT", castBar, "RIGHT", 3, 0) -- Icon of castbar
     end
 
-    castBar.spellText = castBar:CreateFontString(nil, "LOW")
+    castBar.spellText = castBar:CreateFontString(nil, "OVERLAY")
     castBar.spellText:SetFont(Gladdy:SMFetch("font", "auraFont"), Gladdy.db.castBarFontSize, Gladdy.db.castBarFontOutline and "OUTLINE")
     castBar.spellText:SetTextColor(Gladdy:SetColor(Gladdy.db.castBarFontColor))
     castBar.spellText:SetShadowOffset(1, -1)
@@ -131,7 +131,7 @@ function Castbar:CreateFrame(unit)
     castBar.spellText:SetJustifyH("CENTER")
     castBar.spellText:SetPoint("LEFT", 10, 0) -- Text of the spell
 
-    castBar.timeText = castBar:CreateFontString(nil, "LOW")
+    castBar.timeText = castBar:CreateFontString(nil, "OVERLAY")
     castBar.timeText:SetFont(Gladdy:SMFetch("font", "auraFont"), Gladdy.db.castBarFontSize, Gladdy.db.castBarFontOutline and "OUTLINE")
     castBar.timeText:SetTextColor(Gladdy:SetColor(Gladdy.db.castBarFontColor))
     castBar.timeText:SetShadowOffset(1, -1)
@@ -197,13 +197,13 @@ function Castbar:UpdateFrame(unit)
     castBar.icon.texture:SetAllPoints(castBar.icon)
     if Gladdy.db.castBarIconZoomed then
         if castBar.icon.texture.masked then
-            castBar.icon.texture:SetMask(nil)
+            castBar.icon.texture:SetMask("")
             castBar.icon.texture:SetTexCoord(0.1,0.9,0.1,0.9)
             castBar.icon.texture.masked = nil
         end
     else
         if not castBar.icon.texture.masked then
-            castBar.icon.texture:SetMask(nil)
+            castBar.icon.texture:SetMask("")
             castBar.icon.texture:SetTexCoord(0,1,0,1)
             castBar.icon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
             castBar.icon.texture.masked = true

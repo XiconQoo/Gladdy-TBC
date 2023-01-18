@@ -182,13 +182,13 @@ function Trinket:UpdateFrame(unit)
 
     if Gladdy.db.trinketIconZoomed then
         if trinket.texture.masked then
-            trinket.texture:SetMask(nil)
+            trinket.texture:SetMask("")
             trinket.texture:SetTexCoord(0.1,0.9,0.1,0.9)
             trinket.texture.masked = nil
         end
     else
         if not trinket.texture.masked then
-            trinket.texture:SetMask(nil)
+            trinket.texture:SetMask("")
             trinket.texture:SetTexCoord(0,1,0,1)
             trinket.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
             trinket.texture.masked = true

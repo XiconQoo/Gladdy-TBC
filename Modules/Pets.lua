@@ -215,7 +215,7 @@ function Pets:CreateFrame(unitId)
     healthBar.bg:SetAlpha(1)
     healthBar.bg:SetVertexColor(Gladdy:SetColor(Gladdy.db.petHealthBarBgColor))
 
-    healthBar.nameText = healthBar:CreateFontString(nil, "LOW", "GameFontNormalSmall")
+    healthBar.nameText = healthBar:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     if (Gladdy.db.petHealthBarFontSize < 1) then
         healthBar.nameText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), 1)
         healthBar.nameText:Hide()
@@ -229,7 +229,7 @@ function Pets:CreateFrame(unitId)
     healthBar.nameText:SetJustifyH("CENTER")
     healthBar.nameText:SetPoint("LEFT", 5, 0)
 
-    healthBar.healthText = healthBar:CreateFontString(nil, "LOW")
+    healthBar.healthText = healthBar:CreateFontString(nil, "OVERLAY")
     if (Gladdy.db.petHealthBarFontSize < 1) then
         healthBar.healthText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), 1)
         healthBar.healthText:Hide()

@@ -300,13 +300,13 @@ local function styleIcon(aura, auraType)
 
     if zoomedOption then
         if aura.texture.masked then
-            aura.texture:SetMask(nil)
+            aura.texture:SetMask("")
             aura.texture:SetTexCoord(0.1,0.9,0.1,0.9)
             aura.texture.masked = nil
         end
     else
         if not aura.texture.masked then
-            aura.texture:SetMask(nil)
+            aura.texture:SetMask("")
             aura.texture:SetTexCoord(0,1,0,1)
             aura.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
             aura.texture.masked = true
