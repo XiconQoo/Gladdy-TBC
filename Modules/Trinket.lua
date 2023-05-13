@@ -67,21 +67,23 @@ local function iconTimer(self, elapsed)
 
         if Gladdy.db.trinketFontEnabled and not Gladdy.db.useOmnicc then
             local timeLeft = ceil(self.timeLeft)
+            local fontSizeAboveOneMin = (self:GetWidth()/2 - 0.15*self:GetWidth()) * Gladdy.db.trinketFontScale
+            local fontSizeBelowOneMin = (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale
             if timeLeft >= 60 then
                 self.cooldownFont:SetTextColor(1, 1, 0, Gladdy.db.trinketCooldownNumberAlpha)
-                self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 0.15*self:GetWidth()) * Gladdy.db.trinketFontScale, "OUTLINE")
+                self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), fontSizeAboveOneMin > 0 and fontSizeAboveOneMin or 0.01, "OUTLINE")
             elseif timeLeft < 60 and timeLeft >= 30 then
                 self.cooldownFont:SetTextColor(1, 1, 0, Gladdy.db.trinketCooldownNumberAlpha)
-                self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
+                self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), fontSizeBelowOneMin > 0 and fontSizeBelowOneMin or 0.01, "OUTLINE")
             elseif timeLeft < 30 and timeLeft >= 11 then
                 self.cooldownFont:SetTextColor(1, 0.7, 0, Gladdy.db.trinketCooldownNumberAlpha)
-                self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
+                self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), fontSizeBelowOneMin > 0 and fontSizeBelowOneMin or 0.01, "OUTLINE")
             elseif timeLeft <= 10 and timeLeft >= 5 then
                 self.cooldownFont:SetTextColor(1, 0.7, 0, Gladdy.db.trinketCooldownNumberAlpha)
-                self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
+                self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), fontSizeBelowOneMin > 0 and fontSizeBelowOneMin or 0.01, "OUTLINE")
             elseif timeLeft < 5 and timeLeft > 0 then
                 self.cooldownFont:SetTextColor(1, 0, 0, Gladdy.db.trinketCooldownNumberAlpha)
-                self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
+                self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), fontSizeBelowOneMin > 0 and fontSizeBelowOneMin or 0.01, "OUTLINE")
             end
             Gladdy:FormatTimer(self.cooldownFont, self.timeLeft, self.timeLeft < 10, true)
         else
