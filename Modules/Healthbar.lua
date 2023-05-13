@@ -271,7 +271,11 @@ function Healthbar:UpdateFrame(unit)
         healthBar.healthText:Hide()
     else
         healthBar.healthText:SetFont(Gladdy:SMFetch("font", "healthBarFont"), Gladdy.db.healthBarHealthFontSize, Gladdy.db.healthTextRightOutline and "OUTLINE")
-        healthBar.healthText:Show()
+        if Gladdy.db.healthPercentage or Gladdy.db.healthCustomTagsEnabled then
+            healthBar.healthText:Show()
+        else
+            healthBar.healthText:Hide()
+        end
     end
     if (Gladdy.db.healthBarNameFontSize < 1) then
         healthBar.nameText:SetFont(Gladdy:SMFetch("font", "healthBarNameFont"), 1)
@@ -573,7 +577,7 @@ function Healthbar:GetOptions()
                         },
                         healthBarNameFontSize = option({
                             type = "range",
-                            name = L["Name font size"],
+                            name = L["Left font size"],
                             desc = L["Size of the name text"],
                             order = 21,
                             step = 0.1,
@@ -583,7 +587,7 @@ function Healthbar:GetOptions()
                         }),
                         healthBarHealthFontSize = option({
                             type = "range",
-                            name = L["Health font size"],
+                            name = L["Right font size"],
                             desc = L["Size of the health text"],
                             order = 22,
                             step = 0.1,
