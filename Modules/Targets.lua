@@ -20,10 +20,9 @@ local Targets = Gladdy:NewModule("Targets", nil, {
     targetPortraitBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     targetPortraitPosition = "RIGHT",
     targetPortraitMargin = 1,
-    targetPortraitSize = 60,
+    targetPortraitSize = 30,
     targetPortraitWidthFactor = 1,
     targetHealthBarFont = "DorisPP",
-    targetHealthBarHeight = 60,
     targetHealthBarTexture = "Smooth",
     targetHealthBarBorderStyle = "Gladdy Tooltip round",
     targetHealthBarBorderSize = 9,
@@ -32,6 +31,14 @@ local Targets = Gladdy:NewModule("Targets", nil, {
     targetHealthBarBgColor = { r = 0, g = 0, b = 0, a = 0.4 },
     targetHealthBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
     targetHealthBarFontSize = 12,
+    targetHealthTextLeftFontSize = 12,
+    targetHealthTextRightFontSize = 12,
+    targetHealthTextLeftOutline = false,
+    targetHealthTextRightOutline = false,
+    targetHealthTextLeftVOffset = 0,
+    targetHealthTextLeftHOffset = 5,
+    targetHealthTextRightVOffset = 0,
+    targetHealthTextRightHOffset = -5,
     targetHealthUnitName = true,
     targetHealthPercentage = true,
     targetHealthBarClassColored = true,
@@ -57,7 +64,6 @@ end
 function Targets:UpdateFrameOnce()
     if Gladdy.db.targetEnabled then
         self:RegisterMessage("JOINED_ARENA")
-        self:RegisterMessage("ENEMY_STEALTH")
     else
         self:UnregisterAllMessages()
     end
@@ -67,42 +73,12 @@ function Targets:JOINED_ARENA()
     if Gladdy.db.targetEnabled then
         self:RegisterEvent("UNIT_HEALTH_FREQUENT")
         self:RegisterEvent("UNIT_MAXHEALTH")
-        self:RegisterEvent("UNIT_PORTRAIT_UPDATE")
-        self:RegisterEvent("UNIT_NAME_UPDATE")
         self:RegisterEvent("UNIT_TARGET")
         self:SetScript("OnEvent", Targets.OnEvent)
     end
 
     for _,v in pairs(self.frames) do
         v:SetAlpha(0)
-    end
-    for i=1, Gladdy.curBracket do
-        Targets:ENEMY_STEALTH(Targets.targetUnits[i], false)
-    end
-end
-
-function Targets:ENEMY_STEALTH(unit, stealth)
-    unit = string_gsub(unit, "%d$", "%1target")
-    local button = self.frames[unit]
-    if stealth then
-        button:SetAlpha(0)
-    else
-        local unitGUID = UnitGUID(unit)
-        if unitGUID then
-            button.unitGUID = unitGUID
-            local health = UnitHealth(unit)
-            local healthMax = UnitHealthMax(unit)
-            self:UpdateHealthBarColor(unit)
-            self:UpdatePortrait(unit)
-            button.healthBar.hp:SetMinMaxValues(0, healthMax)
-            button.healthBar.hp:SetValue(health)
-            self:HealthCheck(unit)
-            self:SetHealthText(button.healthBar, health, healthMax)
-            self:SetText(unit)
-            button:SetAlpha(1)
-        else
-            button:SetAlpha(0)
-        end
     end
 end
 
@@ -153,18 +129,6 @@ function Targets:Reset()
     for _,v in pairs(self.frames) do
         v:SetAlpha(0)
     end
-end
-
-function Targets:UNIT_DESTROYED(unitId)
-    local unit = string_gsub(unitId, "%d$", "%1target")
-    local healthBar = self.frames[unit].healthBar
-    local button = self.frames[unit]
-    if (not healthBar) then
-        return
-    end
-
-    button:SetAlpha(0)
-    button.portrait:SetTexture(nil)
 end
 
 function Targets:Test(unitId)
@@ -229,12 +193,12 @@ function Targets:CreateFrame(unitId)
     healthBar.bg:SetAlpha(1)
     healthBar.bg:SetVertexColor(Gladdy:SetColor(Gladdy.db.targetHealthBarBgColor))
 
-    healthBar.nameText = healthBar:CreateFontString(nil, "LOW", "GameFontNormalSmall")
-    if (Gladdy.db.targetHealthBarFontSize < 1) then
+    healthBar.nameText = healthBar:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    if (Gladdy.db.targetHealthTextLeftFontSize < 1) then
         healthBar.nameText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), 1)
         healthBar.nameText:Hide()
     else
-        healthBar.nameText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), Gladdy.db.targetHealthBarFontSize)
+        healthBar.nameText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), Gladdy.db.targetHealthTextLeftFontSize, Gladdy.db.targetHealthTextLeftOutline and "OUTLINE")
         healthBar.nameText:Show()
     end
     healthBar.nameText:SetTextColor(Gladdy:SetColor(Gladdy.db.targetHealthBarFontColor))
@@ -242,20 +206,21 @@ function Targets:CreateFrame(unitId)
     healthBar.nameText:SetShadowColor(0, 0, 0, 1)
     healthBar.nameText:SetJustifyH("CENTER")
     healthBar.nameText:SetPoint("LEFT", 5, 0)
+    healthBar.nameText:SetPoint("LEFT", Gladdy.db.targetHealthTextLeftHOffset, Gladdy.db.targetHealthTextLeftVOffset)
 
-    healthBar.healthText = healthBar:CreateFontString(nil, "LOW")
-    if (Gladdy.db.targetHealthBarFontSize < 1) then
+    healthBar.healthText = healthBar:CreateFontString(nil, "OVERLAY")
+    if (Gladdy.db.targetHealthTextRightFontSize < 1) then
         healthBar.healthText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), 1)
         healthBar.healthText:Hide()
     else
-        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), Gladdy.db.targetHealthBarFontSize)
-        healthBar.healthText:Hide()
+        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), Gladdy.db.targetHealthTextRightFontSize, Gladdy.db.targetHealthTextRightOutline and "OUTLINE")
+        healthBar.healthText:Show()
     end
     healthBar.healthText:SetTextColor(Gladdy:SetColor(Gladdy.db.targetHealthBarFontColor))
     healthBar.healthText:SetShadowOffset(1, -1)
     healthBar.healthText:SetShadowColor(0, 0, 0, 1)
     healthBar.healthText:SetJustifyH("CENTER")
-    healthBar.healthText:SetPoint("RIGHT", -5, 0)
+    healthBar.healthText:SetPoint("RIGHT", Gladdy.db.targetHealthTextRightHOffset, Gladdy.db.targetHealthTextRightVOffset)
 
     healthBar.unit = unit
     healthBar.unitSource = unitId
@@ -405,19 +370,25 @@ function Targets:UpdateFrame(unitId)
         healthBar.hp:SetOrientation("HORIZONTAL")
     end
 
-    if (Gladdy.db.targetHealthBarFontSize < 1) then
+    if (Gladdy.db.targetHealthTextLeftFontSize < 1) then
         healthBar.nameText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), 1)
-        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), 1)
         healthBar.nameText:Hide()
+    else
+        healthBar.nameText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), Gladdy.db.targetHealthTextLeftFontSize, Gladdy.db.targetHealthTextLeftOutline and "OUTLINE")
+        healthBar.nameText:Show()
+    end
+    if (Gladdy.db.targetHealthTextRightFontSize < 1) then
+        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), 1)
         healthBar.healthText:Hide()
     else
-        healthBar.nameText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), Gladdy.db.targetHealthBarFontSize)
-        healthBar.nameText:Show()
-        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), Gladdy.db.targetHealthBarFontSize)
+        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), Gladdy.db.targetHealthTextRightFontSize, Gladdy.db.targetHealthTextRightOutline and "OUTLINE")
         healthBar.healthText:Show()
     end
+
     healthBar.nameText:SetTextColor(Gladdy:SetColor(Gladdy.db.targetHealthBarFontColor))
     healthBar.healthText:SetTextColor(Gladdy:SetColor(Gladdy.db.targetHealthBarFontColor))
+    healthBar.nameText:SetPoint("LEFT", Gladdy.db.targetHealthTextLeftHOffset, Gladdy.db.targetHealthTextLeftVOffset)
+    healthBar.healthText:SetPoint("RIGHT", Gladdy.db.targetHealthTextRightHOffset, Gladdy.db.targetHealthTextRightVOffset)
 
     if Gladdy.db.targetBarEnabled then
         healthBar:Show()
@@ -738,14 +709,82 @@ function Targets:GetOptions()
                             order = 12,
                             hasAlpha = true,
                         }),
-                        targetHealthBarFontSize = option({
-                            type = "range",
-                            name = L["Font size"],
-                            desc = L["Size of the text"],
+                        targetHealthTextLeftOutline = option({
+                            type = "toggle",
+                            name = L["Left Font Outline"],
                             order = 13,
+                            width = "full",
+                        }),
+                        targetHealthTextRightOutline = option({
+                            type = "toggle",
+                            name = L["Right Font Outline"],
+                            order = 14,
+                            width = "full",
+                        }),
+                        headerSize = {
+                            type = "header",
+                            name = L["Size"],
+                            order = 20,
+                        },
+                        targetHealthTextLeftFontSize = option({
+                            type = "range",
+                            name = L["Font size left text"],
+                            desc = L["Size of the left text"],
+                            order = 21,
                             min = 0,
                             max = 50,
                             step = 0.05,
+                            width = "full",
+                        }),
+                        targetHealthTextRightFontSize = option({
+                            type = "range",
+                            name = L["Font size right text"],
+                            desc = L["Size of the right text"],
+                            order = 22,
+                            min = 0,
+                            max = 50,
+                            step = 0.05,
+                            width = "full",
+                        }),
+                        headerOffsets = {
+                            type = "header",
+                            name = L["Offsets"],
+                            order = 30,
+                        },
+                        targetHealthTextLeftVOffset = option({
+                            type = "range",
+                            name = L["Left Text Vertical Offset"],
+                            order = 31,
+                            step = 0.1,
+                            min = -200,
+                            max = 200,
+                            width = "full",
+                        }),
+                        targetHealthTextLeftHOffset = option({
+                            type = "range",
+                            name = L["Left Text Horizontal Offset"],
+                            order = 32,
+                            step = 0.1,
+                            min = -200,
+                            max = 200,
+                            width = "full",
+                        }),
+                        targetHealthTextRightVOffset = option({
+                            type = "range",
+                            name = L["Right Text Vertical Offset"],
+                            order = 33,
+                            step = 0.1,
+                            min = -200,
+                            max = 200,
+                            width = "full",
+                        }),
+                        targetHealthTextRightHOffset = option({
+                            type = "range",
+                            name = L["Right Text Horizontal Offset"],
+                            order = 34,
+                            step = 0.1,
+                            min = -200,
+                            max = 200,
                             width = "full",
                         }),
                     },
