@@ -197,7 +197,7 @@ function Pets:CreateFrame(unitId)
     SetPortraitTexture(healthBar.portrait, "player")
     healthBar.portrait.border = healthBar:CreateTexture(nil, "OVERLAY")
     healthBar.portrait.border:SetAllPoints(healthBar.portrait)
-    healthBar.portrait.border:SetTexture(Gladdy.db.classIconBorderStyle)
+    healthBar.portrait.border:SetTexture(Gladdy.db.petPortraitBorderStyle)
     healthBar.portrait.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.petHealthBarBorderColor))
 
 
@@ -317,7 +317,7 @@ function Pets:UpdateFrame(unitId)
         healthBar.portrait.border:Show()
     end
     healthBar.portrait.border:SetTexture(Gladdy.db.petPortraitBorderStyle)
-    healthBar.portrait.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.targetPortraitBorderColor))
+    healthBar.portrait.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.petPortraitBorderColor))
 
     healthBar.bg:SetTexture(Gladdy:SMFetch("statusbar",  "petHealthBarTexture"))
     healthBar.bg:SetVertexColor(Gladdy:SetColor(Gladdy.db.petHealthBarBgColor))
