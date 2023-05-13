@@ -142,9 +142,9 @@ local function setOpt(info, value)
     Gladdy.dbi.profile[key] = value
     Gladdy:UpdateFrame()
     if Gladdy.db.hideBlizzard == "always" then
-        SetCVar("showArenaEnemyFrames", 0)
+        Gladdy:BlizzArenaSetAlpha(0)
     elseif Gladdy.db.hideBlizzard == "never" then
-        SetCVar("showArenaEnemyFrames", 1)
+        Gladdy:BlizzArenaSetAlpha(1)
     end
 end
 local function getColorOpt(info)
@@ -230,7 +230,7 @@ local function getAll(options)
         end
     end
     if type(val) == "table" then
-        return isAllSameValue and val.r, val.g, val.b, val.a or ""
+        return isAllSameValue and val.r, val.g, val.b, val.a or 0,0,0,0
     else
         return isAllSameValue and val or ""
     end
