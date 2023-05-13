@@ -14,6 +14,7 @@ local Trinket = Gladdy:NewModule("Trinket", 80, {
     trinketSize = 60 + 20 + 1,
     trinketWidthFactor = 0.9,
     trinketIconZoomed = false,
+    trinketIconDynamic = false,
     trinketBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     trinketBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     trinketDisableCircle = false,
@@ -305,7 +306,7 @@ function Trinket:ARENA_CROWD_CONTROL_SPELL_UPDATE(...)
     Gladdy:Debug("INFO", "Trinket:ARENA_CROWD_CONTROL_SPELL_UPDATE", unitID, spellID, itemID)
     if Gladdy.buttons[unitID] and Gladdy:GetPvpTrinkets()[itemID] then
         Gladdy.buttons[unitID].trinket.itemID = itemID
-        if not Gladdy.db.trinketColored then
+        if not Gladdy.db.trinketColored and Gladdy.db.trinketIconDynamic then
             self.frames[unitID].texture:SetTexture(GetItemIcon(itemID))
         end
     end
@@ -442,6 +443,13 @@ function Trinket:GetOptions()
                             name = L["Zoomed Icon"],
                             desc = L["Zoomes the icon to remove borders"],
                             order = 2,
+                            width = "full",
+                        }),
+                        trinketIconDynamic = Gladdy:option({
+                            type = "toggle",
+                            name = L["Dynamic Icon"],
+                            desc = L["Changes icon texture to enemy's equipped trinket icon when detected"],
+                            order = 3,
                             width = "full",
                         }),
                         trinketSize = Gladdy:option({
