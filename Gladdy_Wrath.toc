@@ -38,6 +38,7 @@ Modules\ArenaCountDown.lua
 Modules\BuffsDebuffs.lua
 Modules\VersionCheck.lua
 Modules\XiconProfiles.lua
+Modules\Targets.lua
 Modules\Pets.lua
 Modules\ExportImport.lua
 Modules\CombatIndicator.lua
