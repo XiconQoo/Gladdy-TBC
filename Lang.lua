@@ -22,11 +22,13 @@ L["Human"] = C_CreatureInfo.GetRaceInfo(1).raceName
 L["Orc"] = C_CreatureInfo.GetRaceInfo(2).raceName
 L["Dwarf"] = C_CreatureInfo.GetRaceInfo(3).raceName
 L["Night Elf"] = C_CreatureInfo.GetRaceInfo(4).raceName
+L["NightElf"] = C_CreatureInfo.GetRaceInfo(4).raceName
 L["Undead"] = C_CreatureInfo.GetRaceInfo(5).raceName
 L["Tauren"] = C_CreatureInfo.GetRaceInfo(6).raceName
 L["Gnome"] = C_CreatureInfo.GetRaceInfo(7).raceName
 L["Troll"] = C_CreatureInfo.GetRaceInfo(8).raceName
 L["Blood Elf"] = C_CreatureInfo.GetRaceInfo(10).raceName
+L["BloodElf"] = C_CreatureInfo.GetRaceInfo(10).raceName
 L["Draenei"] = C_CreatureInfo.GetRaceInfo(11).raceName
 
 --Specs

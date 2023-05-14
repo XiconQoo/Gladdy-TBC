@@ -1,11 +1,45 @@
-local ceil, str_gsub = ceil, string.gsub
+local ceil, str_gsub, ipairs, select = ceil, string.gsub, ipairs, select
 
 local CreateFrame = CreateFrame
 local GetTime = GetTime
 
 local Gladdy = LibStub("Gladdy")
+local Racial = {}
 local L = Gladdy.L
-local Racial = Gladdy:NewModule("Racial", 79, {
+
+local function disabledRaces()
+    local dbEntries, options = {}, {
+        header = {
+            type = "header",
+            name = L["Disabled Racials"],
+            order = 1,
+        },
+    }
+    for order, race in ipairs(Gladdy.RACES) do
+        local info = Gladdy:Racials()[race]
+        dbEntries[race] = false
+        options[race] = {
+            type = "toggle",
+            image = info.texture,
+            name = "|cff17d1c8" .. info.spellName .. "|r" .. " - " .. L[race],
+            desc = L["Disable showing racial"],
+            order = order + 1,
+            width = "full",
+            get = function()
+                return Gladdy.db.racialDisableForRace[race]
+            end,
+            set = function(_, value)
+                Gladdy.db.racialDisableForRace[race] = value
+                for i=1, Gladdy.curBracket do
+                    Racial:ENEMY_SPOTTED("arena" .. i)
+                end
+            end,
+        }
+    end
+    return dbEntries, options
+end
+
+Racial = Gladdy:NewModule("Racial", 79, {
     racialFont = "DorisPP",
     racialFontScale = 1,
     racialEnabled = true,
@@ -23,6 +57,7 @@ local Racial = Gladdy:NewModule("Racial", 79, {
     racialFrameLevel = 5,
     racialGroup = false,
     racialGroupDirection = "DOWN",
+    racialDisableForRace = select(1, disabledRaces()),
 })
 
 
@@ -293,7 +328,12 @@ function Racial:ENEMY_SPOTTED(unit)
     if (not racial or not Gladdy.buttons[unit].race) then
         return
     end
-    racial.texture:SetTexture(Gladdy:Racials()[Gladdy.buttons[unit].race].texture)
+    if Gladdy.db.racialDisableForRace[Gladdy.buttons[unit].race] then
+        racial:Hide()
+    elseif Gladdy.db.racialEnabled then
+        racial:Show()
+        racial.texture:SetTexture(Gladdy:Racials()[Gladdy.buttons[unit].race].texture)
+    end
 end
 
 function Racial:ResetUnit(unit)
@@ -355,10 +395,16 @@ function Racial:GetOptions()
             order = 6,
             disabled = function() return not Gladdy.db.racialEnabled end,
             args = {
+                disabledRaces = {
+                    type = "group",
+                    name = L["Disabled Racials"],
+                    order = 1,
+                    args = select(2, disabledRaces())
+                },
                 general = {
                     type = "group",
                     name = L["Icon"],
-                    order = 1,
+                    order = 2,
                     args = {
                         header = {
                             type = "header",
@@ -369,7 +415,7 @@ function Racial:GetOptions()
                             type = "toggle",
                             name = L["Zoomed Icon"],
                             desc = L["Zoomes the icon to remove borders"],
-                            order = 2,
+                            order = 3,
                             width = "full",
                         }),
                         racialSize = Gladdy:option({
@@ -378,7 +424,7 @@ function Racial:GetOptions()
                             min = 5,
                             max = 100,
                             step = 1,
-                            order = 3,
+                            order = 4,
                             width = "full",
                         }),
                         racialWidthFactor = Gladdy:option({
@@ -387,7 +433,7 @@ function Racial:GetOptions()
                             min = 0.5,
                             max = 2,
                             step = 0.05,
-                            order = 4,
+                            order = 5,
                             width = "full",
                         }),
                     },
