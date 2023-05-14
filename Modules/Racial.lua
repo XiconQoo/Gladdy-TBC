@@ -7,29 +7,29 @@ local Gladdy = LibStub("Gladdy")
 local Racial = {}
 local L = Gladdy.L
 
-local function disabledRaces()
+local function enabledRaces()
     local dbEntries, options = {}, {
         header = {
             type = "header",
-            name = L["Disabled Racials"],
+            name = L["Enabled Racials"],
             order = 1,
         },
     }
     for order, race in ipairs(Gladdy.RACES) do
         local info = Gladdy:Racials()[race]
-        dbEntries[race] = false
+        dbEntries[race] = true
         options[race] = {
             type = "toggle",
             image = info.texture,
             name = "|cff17d1c8" .. info.spellName .. "|r" .. " - " .. L[race],
-            desc = L["Disable showing racial"],
+            desc = L["Enabled showing racial"],
             order = order + 1,
             width = "full",
             get = function()
-                return Gladdy.db.racialDisableForRace[race]
+                return Gladdy.db.racialEnabledForRace[race]
             end,
             set = function(_, value)
-                Gladdy.db.racialDisableForRace[race] = value
+                Gladdy.db.racialEnabledForRace[race] = value
                 for i=1, Gladdy.curBracket do
                     Racial:ENEMY_SPOTTED("arena" .. i)
                 end
@@ -57,7 +57,7 @@ Racial = Gladdy:NewModule("Racial", 79, {
     racialFrameLevel = 5,
     racialGroup = false,
     racialGroupDirection = "DOWN",
-    racialDisableForRace = select(1, disabledRaces()),
+    racialEnabledForRace = select(1, enabledRaces()),
 })
 
 
@@ -328,7 +328,7 @@ function Racial:ENEMY_SPOTTED(unit)
     if (not racial or not Gladdy.buttons[unit].race) then
         return
     end
-    if Gladdy.db.racialDisableForRace[Gladdy.buttons[unit].race] then
+    if not Gladdy.db.racialEnabledForRace[Gladdy.buttons[unit].race] then
         racial:Hide()
     elseif Gladdy.db.racialEnabled then
         racial:Show()
@@ -395,11 +395,11 @@ function Racial:GetOptions()
             order = 6,
             disabled = function() return not Gladdy.db.racialEnabled end,
             args = {
-                disabledRaces = {
+                enabledRaces = {
                     type = "group",
-                    name = L["Disabled Racials"],
+                    name = L["Enabled Racials"],
                     order = 1,
-                    args = select(2, disabledRaces())
+                    args = select(2, enabledRaces())
                 },
                 general = {
                     type = "group",
@@ -441,7 +441,7 @@ function Racial:GetOptions()
                 cooldown = {
                     type = "group",
                     name = L["Cooldown"],
-                    order = 2,
+                    order = 3,
                     args = {
                         header = {
                             type = "header",
@@ -477,7 +477,7 @@ function Racial:GetOptions()
                 font = {
                     type = "group",
                     name = L["Font"],
-                    order = 3,
+                    order = 4,
                     disabled = function()
                         return Gladdy.db.useOmnicc
                     end,
@@ -540,7 +540,7 @@ function Racial:GetOptions()
                 border = {
                     type = "group",
                     name = L["Border"],
-                    order = 4,
+                    order = 6,
                     args = {
                         header = {
                             type = "header",
@@ -565,7 +565,7 @@ function Racial:GetOptions()
                 frameStrata = {
                     type = "group",
                     name = L["Frame Strata and Level"],
-                    order = 6,
+                    order = 7,
                     args = {
                         headerAuraLevel = {
                             type = "header",
