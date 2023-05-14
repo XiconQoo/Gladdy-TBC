@@ -751,7 +751,8 @@ function Predictor:GetValues(text, values, max)
             text = GetSpellInfo(text)
         end
         for k,v in pairs(Gladdy.spellCache) do
-            if str_match(k:lower(), "^" .. text:lower()) then
+            local status, result = pcall(str_match, k:lower(), "^" .. text:lower())
+            if status and result then
                 for _,tbl in ipairs(v.spells) do
                     values[tbl.spellID] = {
                         text = tbl.spellName .. " - (" .. tbl.spellID .. ")",
@@ -769,7 +770,7 @@ end
 function Predictor:GetHyperlink(key)
     return "spell:" .. key .. ":0"
 end
-LibStub("AceGUI-3.0-Search-EditBoxEdited"):Register("Gladdy", Predictor)
+LibStub("AceGUI-3.0-GladdySearchEditBox"):Register("Auras", Predictor)
 
 function Auras:GetOptions()
     local borderArgs = {
@@ -1312,7 +1313,7 @@ function Auras:GetAuraOptions(auraType)
             width = "2",
             name = L["Add Aura"],
             type = "input",
-            dialogControl = "EditBoxGladdy",
+            dialogControl = "GladdySearchEditBoxAuras",
             width = "double",
             get = function()
                 return ""
@@ -1327,13 +1328,14 @@ function Auras:GetAuraOptions(auraType)
                 for k,v in pairs(Gladdy.db.auraListDefault) do
                     local searchName, _, searchIcon = GetSpellInfo(value)
                     local dbName, _, dbIcon = GetSpellInfo(k)
-                    if tostring(k) == value then
-                        value = tostring(k)
+                    if tostring(k) == tostring(value) then
+                        value = tostring(value)
                         path = v.track == AURA_TYPE_DEBUFF and "debuffList" or "buffList"
                         exists = true
                         break
                     elseif searchName == dbName and searchIcon == dbIcon then -- same spell
                         exists = true
+                        path = v.track == AURA_TYPE_DEBUFF and "debuffList" or "buffList"
                         local existsInSpellIDs = false
                         for _,spellID in ipairs(v.spellIDs) do
                             if tonumber(value) == spellID then

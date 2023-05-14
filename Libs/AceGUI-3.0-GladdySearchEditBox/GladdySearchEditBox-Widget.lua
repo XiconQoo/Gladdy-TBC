@@ -1,4 +1,4 @@
-local Type, Version = "SearchEditBox_Base_Edited", 1
+local Type, Version = "GladdySearchEditBox", 1
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -299,7 +299,7 @@ end
 -- }}
 -- This function is only executed once and them removed, because the same predictor frame is used for all widgets
 local function CreatePredictorFrame(num)
-	local predictor = CreateFrame("Frame", "AceGUI30SearchEditBoxEdited" .. num .. "Predictor", UIParent, BackdropTemplateMixin and "BackdropTemplate" or nil)
+	local predictor = CreateFrame("Frame", "AceGUI30GladdySearchEditBox" .. num .. "Predictor", UIParent, BackdropTemplateMixin and "BackdropTemplate" or nil)
 	predictor:SetBackdrop(predictorBackdrop)
 	predictor:SetBackdropColor(0, 0, 0, 0.85)
 	predictor:SetFrameStrata("TOOLTIP")
@@ -367,7 +367,7 @@ local function CreatePredictorFrame(num)
 	scrollFrame.items = {}
 	predictor:SetPoint("CENTER", 0, 0)
 	--HybridScrollFrame_SetDoNotHideScrollBar(scrollFrame, true)
-	HybridScrollFrame_CreateButtons(scrollFrame, "SearchEditBoxItemTemplate")
+	HybridScrollFrame_CreateButtons(scrollFrame, "GladdySearchEditBoxItemTemplate")
 
 	--update once to create buttons
 	scrollFrame.update()
@@ -384,7 +384,7 @@ end
 local function Constructor()
 	local num = AceGUI:GetNextWidgetNum(Type)
 	local frame = CreateFrame("Frame", nil, UIParent)
-	local editBox = CreateFrame("EditBox", "AceGUI30SearchEditBoxEdited" .. num, frame, "InputBoxTemplate")
+	local editBox = CreateFrame("EditBox", "AceGUI30GladdySearchEditBox" .. num, frame, "InputBoxTemplate")
 	local label = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 	local predictor = CreatePredictorFrame(num)
 	-- Parent frame for all widgets
