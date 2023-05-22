@@ -36,7 +36,7 @@ Gladdy.version_releaseType = RELEASE_TYPES.beta
 Gladdy.version = PREFIX .. string.format("%.2f", Gladdy.version_num) .. "-" .. Gladdy.version_releaseType
 Gladdy.VERSION_REGEX = VERSION_REGEX
 
-Gladdy.debug = false
+Gladdy.debug = true
 
 LibStub("AceTimer-3.0"):Embed(Gladdy)
 LibStub("AceComm-3.0"):Embed(Gladdy)
@@ -58,36 +58,17 @@ function Gladdy:Print(...)
     DEFAULT_CHAT_FRAME:AddMessage(text)
 end
 
-function Gladdy:Warn(...)
-    local text = "|cfff29f05Gladdy|r:"
-    local val
-    for i = 1, select("#", ...) do
-        val = select(i, ...)
-        if (type(val) == 'boolean') then val = val and "true" or false end
-        text = text .. " " .. tostring(val)
-    end
-    DEFAULT_CHAT_FRAME:AddMessage(text)
-end
-
-function Gladdy:Error(...)
-    local text = "|cfffc0303Gladdy|r:"
-    local val
-    for i = 1, select("#", ...) do
-        val = select(i, ...)
-        if (type(val) == 'boolean') then val = val and "true" or false end
-        text = text .. " " .. tostring(val)
-    end
-    DEFAULT_CHAT_FRAME:AddMessage(text)
-end
-
+Gladdy.INFO = "[INFO]" --Gladdy:SetRGBTextColor("[INFO]", 35, 167, 204)
+Gladdy.WARN = "[WARN]"--Gladdy:SetRGBTextColor("[WARN]", 204, 145, 35)
+Gladdy.ERROR = "[ERROR]"--Gladdy:SetRGBTextColor("[ERROR]", 196, 52, 29)
 function Gladdy:Debug(lvl, ...)
     if Gladdy.debug then
         if lvl == "INFO" then
-            Gladdy:Print("[INFO]", ...)
+            self:Print(self.INFO, ...)
         elseif lvl == "WARN" then
-            Gladdy:Warn("[WARN]", ...)
+            self:Warn(self.WARN, ...)
         elseif lvl == "ERROR" then
-            Gladdy:Error("[ERROR]", ...)
+            self:Error(self.ERROR, ...)
         end
     end
 end
@@ -237,14 +218,14 @@ function Gladdy:DeleteUnknownOptions(tbl, refTbl, str)
     end
     for k,v in pairs(tbl) do
         if refTbl[k] == nil then
-            Gladdy:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, "not found!")
+            self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, "not found!")
             tbl[k] = nil
         else
             if type(v) ~= type(refTbl[k]) then
-                Gladdy:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, "type error!", "Expected", type(refTbl[k]), "but found", type(v))
+                self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, "type error!", "Expected", type(refTbl[k]), "but found", type(v))
                 tbl[k] = nil
-            elseif type(v) == "table" and (k ~= "auraListDefault" or Gladdy.db.version and Gladdy.db.version < 2.23) then
-                Gladdy:DeleteUnknownOptions(v, refTbl[k], str .. "." .. k)
+            elseif type(v) == "table" and (k ~= "auraListDefault" or self.db.version and self.db.version < 2.23) then
+                self:DeleteUnknownOptions(v, refTbl[k], str .. "." .. k)
             end
         end
     end
@@ -275,9 +256,9 @@ function Gladdy:OnInitialize()
     self.db = self.dbi.profile
 
     --init spell cache
-    if not Gladdy.spellCache then
-        Gladdy.spellCache = {}
-        Gladdy:CacheSpells() -- /dump LibStub("Gladdy").spellCache
+    if not self.spellCache then
+        self.spellCache = {}
+        self:CacheSpells() -- /dump LibStub("Gladdy").spellCache
     end
 
     self.LSM = LibStub("LibSharedMedia-3.0")
@@ -291,10 +272,10 @@ function Gladdy:OnInitialize()
     self.LSM:Register("border", "Gladdy Tooltip squared", "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_square_selfmade")
     self.LSM:Register("border", "Square Full White", "Interface\\AddOns\\Gladdy\\Images\\Square_FullWhite.tga")
     self.LSM:Register("font", "DorisPP", "Interface\\AddOns\\Gladdy\\Fonts\\DorisPP.TTF")
-    self.LSM:Register("font", "NotoSans Black", "Interface\\AddOns\\Gladdy\\Fonts\\NotoSansCJK-Black.ttf")
-    self.LSM:Register("font", "NotoSans Bold", "Interface\\AddOns\\Gladdy\\Fonts\\NotoSansCJK-Bold.ttf")
-    self.LSM:Register("font", "NotoSans Medium", "Interface\\AddOns\\Gladdy\\Fonts\\NotoSansCJK-Medium.ttf")
-    self.LSM:Register("font", "NotoSans Regular", "Interface\\AddOns\\Gladdy\\Fonts\\NotoSansCJK-Regular.ttf")
+    --self.LSM:Register("font", "NotoSans Black", "Interface\\AddOns\\Gladdy\\Fonts\\NotoSansCJK-Black.ttf")
+    --self.LSM:Register("font", "NotoSans Bold", "Interface\\AddOns\\Gladdy\\Fonts\\NotoSansCJK-Bold.ttf")
+    --self.LSM:Register("font", "NotoSans Medium", "Interface\\AddOns\\Gladdy\\Fonts\\NotoSansCJK-Medium.ttf")
+    --self.LSM:Register("font", "NotoSans Regular", "Interface\\AddOns\\Gladdy\\Fonts\\NotoSansCJK-Regular.ttf")
 
     L = self.L
 
@@ -320,8 +301,8 @@ function Gladdy:OnInitialize()
     for _, module in self:IterModules() do
         self:Call(module, "Initialize") -- B.E > A.E :D
     end
-    if Gladdy.db.hideBlizzard == "always" then
-        Gladdy:BlizzArenaSetAlpha(0)
+    if self.db.hideBlizzard == "always" then
+        self:BlizzArenaSetAlpha(0)
     end
     if not self.db.newLayout then
         self:ToggleFrame(3)
@@ -331,11 +312,11 @@ end
 
 function Gladdy:OnProfileReset()
     self.db = self.dbi.profile
-    Gladdy:Debug("INFO", "OnProfileReset")
+    self:Debug("INFO", "OnProfileReset")
     self:HideFrame()
     self:ToggleFrame(3)
-    Gladdy.options.args.lock.name = Gladdy.db.locked and L["Unlock frame"] or L["Lock frame"]
-    Gladdy.options.args.showMover.name = Gladdy.db.showMover and L["Hide Mover"] or L["Show Mover"]
+    self.options.args.lock.name = self.db.locked and L["Unlock frame"] or L["Lock frame"]
+    self.options.args.showMover.name = self.db.showMover and L["Hide Mover"] or L["Show Mover"]
     LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
 end
 
@@ -343,8 +324,8 @@ function Gladdy:OnProfileChanged()
     self.db = self.dbi.profile
     self:HideFrame()
     self:ToggleFrame(3)
-    Gladdy.options.args.lock.name = Gladdy.db.locked and L["Unlock frame"] or L["Lock frame"]
-    Gladdy.options.args.showMover.name = Gladdy.db.showMover and L["Hide Mover"] or L["Show Mover"]
+    self.options.args.lock.name = self.db.locked and L["Unlock frame"] or L["Lock frame"]
+    self.options.args.showMover.name = self.db.showMover and L["Hide Mover"] or L["Show Mover"]
     LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
 end
 
@@ -388,6 +369,7 @@ function Gladdy:GetIconStyles()
         ["Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp"] = L["Gladdy Tooltip round"],
         ["Interface\\AddOns\\Gladdy\\Images\\Border_squared_blp"] = L["Gladdy Tooltip squared"],
         ["Interface\\AddOns\\Gladdy\\Images\\Border_Gloss"] = L["Gloss (black border)"],
+        ["Interface\\AddOns\\Gladdy\\Images\\HabBorder1"] = L["Habborder"],
     }
 end
 
@@ -458,7 +440,7 @@ end
 
 function Gladdy:PLAYER_REGEN_ENABLED()
     if self.showFrame then
-        Gladdy:InitFrames()
+        self:InitFrames()
     end
     if self.hideFrame then
         self:Reset()
@@ -490,8 +472,8 @@ function Gladdy:Reset()
     for unit in pairs(self.buttons) do
         self:ResetUnit(unit)
     end
-    if Gladdy.db.hideBlizzard == "never" or Gladdy.db.hideBlizzard == "arena" then
-        Gladdy:BlizzArenaSetAlpha(1)
+    if self.db.hideBlizzard == "never" or self.db.hideBlizzard == "arena" then
+        self:BlizzArenaSetAlpha(1)
     end
 end
 
@@ -535,7 +517,7 @@ end
 
 function Gladdy:JoinedArena()
     if InCombatLockdown() then
-        Gladdy:Print("Gladdy frames show as soon as you leave combat")
+        self:Print("Gladdy frames show as soon as you leave combat")
         self.showFrame = true
     else
         self:InitFrames()
@@ -543,6 +525,7 @@ function Gladdy:JoinedArena()
 end
 
 function Gladdy:InitFrames()
+    self.showFrame = nil
     if not self.curBracket then
         self.curBracket = 2
     end
@@ -564,10 +547,10 @@ function Gladdy:InitFrames()
     for i=1, self.curBracket do
         self.buttons["arena" .. i]:SetAlpha(1)
     end
-    if Gladdy.db.hideBlizzard == "arena" or Gladdy.db.hideBlizzard == "always" then
-        Gladdy:BlizzArenaSetAlpha(0)
+    if self.db.hideBlizzard == "arena" or self.db.hideBlizzard == "always" then
+        self:BlizzArenaSetAlpha(0)
     else
-        Gladdy:BlizzArenaSetAlpha(1)
+        self:BlizzArenaSetAlpha(1)
     end
 end
 
