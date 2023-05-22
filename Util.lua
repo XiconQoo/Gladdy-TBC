@@ -248,8 +248,17 @@ function Gladdy:SetTextColor(text, color)
     return "|cff" .. toHex(color) .. text or "" .. "|r"
 end
 
+function Gladdy:SetRGBTextColor(text, r, g, b)
+    r, g, b = self:RGBtoDecimal(r, g, b)
+    Gladdy:SetTextColor(text, { r = r, g = g, b = b })
+end
+
 function Gladdy:ColorAsArray(color)
     return {color.r, color.g, color.b, color.a}
+end
+
+function Gladdy:RGBtoDecimal(r, g, b)
+    return floor(r/255), floor(g/255), floor(b/255)
 end
 
 function Gladdy:Dump(table, space)
@@ -346,6 +355,7 @@ function Gladdy:CacheSpells()
             end
             if next(self.update) == nil then
                 self:SetScript("OnUpdate", nil)
+                Gladdy:Debug("INFO",elapsed)
                 Gladdy:Debug("INFO", "done with all corutines in coroutineFrame")
                 break
             end
