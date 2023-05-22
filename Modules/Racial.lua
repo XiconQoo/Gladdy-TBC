@@ -274,11 +274,13 @@ function Racial:UpdateFrame(unit)
 end
 
 function Racial:JOINED_ARENA()
-    self:SetScript("OnEvent", function(self, event, ...)
-        if self[event] then
-            self[event](self, ...)
-        end
-    end)
+    if Gladdy.db.racialEnabled then
+        self:SetScript("OnEvent", function(self, event, ...)
+            if self[event] then
+                self[event](self, ...)
+            end
+        end)
+    end
 end
 
 function Racial:RACIAL_USED(unit, expirationTime, spellName)
@@ -328,7 +330,7 @@ function Racial:ENEMY_SPOTTED(unit)
     if (not racial or not Gladdy.buttons[unit].race) then
         return
     end
-    if not Gladdy.db.racialEnabledForRace[Gladdy.buttons[unit].race] then
+    if not Gladdy.db.racialEnabledForRace[Gladdy.buttons[unit].race] or not Gladdy.db.racialEnabled then
         racial:Hide()
     elseif Gladdy.db.racialEnabled then
         racial:Show()
