@@ -613,7 +613,7 @@ local importantAuras = {
     },
     [53659] = { -- Sacred Cleansing
         track = AURA_TYPE_BUFF,
-        priority = 10,
+        priority = 9,
         spellIDs = { 53659 },
     },
     [54428] = { -- Divine Plea
