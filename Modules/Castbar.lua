@@ -6,6 +6,7 @@ local GetSpellInfo = GetSpellInfo
 local UnitChannelInfo = UnitChannelInfo
 local UnitCastingInfo = UnitCastingInfo
 local GetTime = GetTime
+local GetBuildInfo = GetBuildInfo
 local CASTING_BAR_ALPHA_STEP = CASTING_BAR_ALPHA_STEP
 local BackdropTemplateMixin = BackdropTemplateMixin
 
@@ -463,6 +464,19 @@ Castbar.CastEventsFunc["UNIT_SPELLCAST_CHANNEL_UPDATE"] = function(castBar, even
     end
 end
 
+Castbar.CastEventsFunc["UNIT_SPELLCAST_INTERRUPTIBLE"] = function(castBar, event, ...)
+    if ( castBar:IsShown() ) then
+        if event == "UNIT_SPELLCAST_NOT_INTERRUPTIBLE" then
+            castBar.bar:SetStatusBarColor(.8,.8,.8,1)
+            castBar.shield:Show()
+        else
+            castBar.bar:SetStatusBarColor(Gladdy:SetColor(Gladdy.db.castBarColor))
+            castBar.shield:Hide()
+        end
+    end
+end
+Castbar.CastEventsFunc["UNIT_SPELLCAST_CHANNEL_UPDATE"] = Castbar.CastEventsFunc["UNIT_SPELLCAST_INTERRUPTIBLE"]
+
 function Castbar.OnEvent(self, event, ...)
     local unit = ...
     if ( unit ~= self.unit ) then
@@ -557,11 +571,15 @@ function Castbar:JOINED_ARENA()
             castBar:RegisterUnitEvent("UNIT_SPELLCAST_STOP", unit)
             castBar:RegisterUnitEvent("UNIT_SPELLCAST_FAILED", unit)
             castBar:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", unit)
+            local _, _, _, nr = GetBuildInfo()
+            if nr >= 30402 then
+                castBar:RegisterUnitEvent("UNIT_SPELLCAST_INTERRUPTIBLE", unit)
+                castBar:RegisterUnitEvent("UNIT_SPELLCAST_NOT_INTERRUPTIBLE", unit)
+            end
             castBar:SetScript("OnEvent", Castbar.OnEvent)
             castBar:SetScript("OnUpdate", Castbar.OnUpdate)
             castBar.fadeOut = nil
             self:CAST_STOP(unit)
-            --Castbar.OnEvent(castBar, "PLAYER_ENTERING_WORLD")
         end
     end
 end
