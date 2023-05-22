@@ -1,4 +1,4 @@
-## Interface: 30401
+## Interface: 30402
 ## Title: Gladdy - WotLK
 ## Version: 2.23-Release
 ## Notes: The most powerful arena AddOn for WoW 3.4.0
