@@ -107,8 +107,8 @@ local function GetTotemColorDefaultOptions()
                     type = "range",
                     name = L["Size"],
                     order = 21,
-                    min = 0,
-                    max = 1,
+                    min = 1,
+                    max = 100,
                     step = 0.1,
                     width = "full",
                     get = function()
@@ -142,15 +142,15 @@ local function GetTotemColorDefaultOptions()
                 },
                 headerFriendly = {
                     type = "header",
-                    name = L["Enemy"],
+                    name = L["Friendly"],
                     order = 30,
                 },
                 friendlySize = {
                     type = "range",
                     name = L["Size"],
                     order = 31,
-                    min = 0,
-                    max = 1,
+                    min = 1,
+                    max = 100,
                     step = 0.1,
                     width = "full",
                     get = function()
@@ -317,14 +317,25 @@ function TotemPlates:UpdateFrameOnce()
     end
 
     for k,nameplate in pairs(self.activeTotemNameplates) do
+        local isEnemy = UnitIsEnemy("player", nameplate.gladdyTotemFrame.unitID)
+
         local totemDataEntry = nameplate.gladdyTotemFrame.totemDataEntry
-        nameplate.gladdyTotemFrame:SetWidth(Gladdy.db.npTotemPlatesSize * Gladdy.db.npTotemPlatesWidthFactor)
-        nameplate.gladdyTotemFrame:SetHeight(Gladdy.db.npTotemPlatesSize)
         nameplate.gladdyTotemFrame.totemBorder:SetTexture(Gladdy.db.npTotemPlatesBorderStyle)
-        nameplate.gladdyTotemFrame.totemBorder:SetVertexColor(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.r,
-                Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.g,
-                Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.b,
-                Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.a)
+        if isEnemy then
+            nameplate.gladdyTotemFrame:SetHeight(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enemySize)
+            nameplate.gladdyTotemFrame:SetWidth(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enemySize * Gladdy.db.npTotemPlatesWidthFactor)
+            nameplate.gladdyTotemFrame.totemBorder:SetVertexColor(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.r,
+                    Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.g,
+                    Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.b,
+                    Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.a)
+        else
+            nameplate.gladdyTotemFrame:SetHeight(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].friendlySize)
+            nameplate.gladdyTotemFrame:SetWidth(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].friendlySize * Gladdy.db.npTotemPlatesWidthFactor)
+            nameplate.gladdyTotemFrame.totemBorder:SetVertexColor(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].friendlyColor.r,
+                    Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].friendlyColor.g,
+                    Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].friendlyColor.b,
+                    Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].friendlyColor.a)
+        end
         nameplate.gladdyTotemFrame.totemName:SetPoint("TOP", nameplate.gladdyTotemFrame, "BOTTOM", Gladdy.db.npTremorFontXOffset, Gladdy.db.npTremorFontYOffset)
         nameplate.gladdyTotemFrame.totemName:SetFont(Gladdy:SMFetch("font", "npTremorFont"), Gladdy.db.npTremorFontSize, "OUTLINE")
         nameplate.gladdyTotemFrame.totemName:SetText(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].customText or "")
@@ -517,14 +528,14 @@ function TotemPlates:OnUnitEvent(unitID)
         end
         if isEnemy then
             nameplate.gladdyTotemFrame:SetHeight(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enemySize)
-            nameplate.gladdyTotemFrame:SetWidth(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enemySize * Gladdy.db.npTotemPlatesSize)
+            nameplate.gladdyTotemFrame:SetWidth(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enemySize * Gladdy.db.npTotemPlatesWidthFactor)
             nameplate.gladdyTotemFrame.totemBorder:SetVertexColor(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.r,
                     Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.g,
                     Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.b,
                     Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.a)
         else
             nameplate.gladdyTotemFrame:SetHeight(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].friendlySize)
-            nameplate.gladdyTotemFrame:SetWidth(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].friendlySize * Gladdy.db.npTotemPlatesSize)
+            nameplate.gladdyTotemFrame:SetWidth(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].friendlySize * Gladdy.db.npTotemPlatesWidthFactor)
             nameplate.gladdyTotemFrame.totemBorder:SetVertexColor(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].friendlyColor.r,
                     Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].friendlyColor.g,
                     Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].friendlyColor.b,
@@ -690,7 +701,7 @@ function TotemPlates:GetOptions()
                             name = L["Icon"],
                             order = 1,
                         },
-                        npTotemPlatesSize = Gladdy:option({
+                        npTotemPlatesSize = {
                             type = "range",
                             name = L["Totem size"],
                             desc = L["Size of totem icons"],
@@ -699,7 +710,20 @@ function TotemPlates:GetOptions()
                             max = 100,
                             step = 1,
                             width = "full",
-                        }),
+                            get = function(info)
+                                local key = info.arg or info[#info]
+                                return Gladdy.dbi.profile[key]
+                            end,
+                            set = function(info, value)
+                                local key = info.arg or info[#info]
+                                Gladdy.dbi.profile[key] = value
+                                for k,v in pairs(GetTotemColorDefaultOptions()) do
+                                    Gladdy.dbi.profile[k].enemySize = value
+                                    Gladdy.dbi.profile[k].friendlySize = value
+                                end
+                                Gladdy:UpdateFrame()
+                            end,
+                        },
                         npTotemPlatesWidthFactor = Gladdy:option({
                             type = "range",
                             name = L["Icon Width Factor"],
