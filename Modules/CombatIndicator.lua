@@ -1,4 +1,5 @@
-local select = select
+local select, str_match = select, string.match
+local UnitDetailedThreatSituation = UnitDetailedThreatSituation
 local UnitExists, UnitAffectingCombat, GetSpellInfo = UnitExists, UnitAffectingCombat, GetSpellInfo
 local CreateFrame = CreateFrame
 
@@ -18,6 +19,32 @@ local CombatIndicator = Gladdy:NewModule("Combat Indicator", nil, {
     ciFrameLevel = 5,
 })
 
+local petClasses = {["MAGE"] = 1, ["PRIEST"] = 1, ["SHAMAN"] = 1, ["WARLOCK"] = 1, ["HUNTER"] = 1, ["DEATHKNIGHT"] = 1}
+local function InCombat(unit)
+    if not Gladdy.buttons[unit] then
+        return
+    end
+    local class = Gladdy.buttons[unit].class
+
+    if UnitExists(unit) and UnitAffectingCombat(unit) then
+        return true
+    elseif (petClasses[class]) then
+        local arenaNumber = str_match(unit, "%d")
+        if UnitExists("arenapet" .. arenaNumber .. "target")
+                or UnitDetailedThreatSituation("player", "arenapet" .. arenaNumber)
+                or UnitDetailedThreatSituation("playerpet", "arenapet" .. arenaNumber) then
+            return true
+        end
+        for i = 1, Gladdy.curBracket - 1 do
+            if UnitDetailedThreatSituation("party"..i, "arenapet" .. arenaNumber)
+                    or UnitDetailedThreatSituation("party"..i .. "pet", "arenapet" .. arenaNumber) then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 function CombatIndicator:Initialize()
     self.frames = {}
     if Gladdy.db.ciEnabled then
@@ -33,7 +60,6 @@ function CombatIndicator:JOINED_ARENA()
     end
     self:RegisterEvent("UNIT_FLAGS")
     self:SetScript("OnEvent", CombatIndicator.OnEvent)
-    --self:SetScript("OnUpdate", CombatIndicator.OnEvent)
     self.lastTimeUpdated = 0
 end
 
@@ -43,7 +69,7 @@ end
 
 function CombatIndicator:UNIT_FLAGS(unit)
     if CombatIndicator.frames[unit] then
-        if Gladdy.db.ciEnabled and (CombatIndicator.test or (UnitExists(unit) and UnitAffectingCombat(unit))) then
+        if Gladdy.db.ciEnabled and (CombatIndicator.test or InCombat(unit)) then
             CombatIndicator.frames[unit]:Show()
         else
             CombatIndicator.frames[unit]:Hide()
