@@ -158,6 +158,8 @@ function Targets:CreateFrame(unitId)
     button:SetMovable(true)
     button:SetPoint("LEFT", Gladdy.buttons[unitId].healthBar, "RIGHT", Gladdy.db.targetXOffset, Gladdy.db.targetYOffset)
     button:SetAlpha(0)
+    button:SetFrameStrata(Gladdy.db.targetFrameStrata)
+    button:SetFrameLevel(Gladdy.db.targetFrameLevel)
 
     button.unit = unit
     button.unitSource = unitId
@@ -193,7 +195,7 @@ function Targets:CreateFrame(unitId)
     healthBar.bg:SetAlpha(1)
     healthBar.bg:SetVertexColor(Gladdy:SetColor(Gladdy.db.targetHealthBarBgColor))
 
-    healthBar.nameText = healthBar:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    healthBar.nameText = button:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     if (Gladdy.db.targetHealthTextLeftFontSize < 1) then
         healthBar.nameText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), 1)
         healthBar.nameText:Hide()
@@ -208,7 +210,7 @@ function Targets:CreateFrame(unitId)
     healthBar.nameText:SetPoint("LEFT", 5, 0)
     healthBar.nameText:SetPoint("LEFT", Gladdy.db.targetHealthTextLeftHOffset, Gladdy.db.targetHealthTextLeftVOffset)
 
-    healthBar.healthText = healthBar:CreateFontString(nil, "OVERLAY")
+    healthBar.healthText = button:CreateFontString(nil, "OVERLAY")
     if (Gladdy.db.targetHealthTextRightFontSize < 1) then
         healthBar.healthText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), 1)
         healthBar.healthText:Hide()
@@ -257,7 +259,7 @@ function Targets:UpdatePortrait(unit)
     if Gladdy.frame.testing then
         unit = "player"
     end
-    if Gladdy.db.targetPortraitClass then
+    if Gladdy.db.targetPortraitClass and UnitIsPlayer(unit) then
         button.portrait:SetTexture(Gladdy.classIcons[select(2, UnitClass(unit))])
     else
         SetPortraitTexture(button.portrait, unit)
@@ -275,16 +277,16 @@ function Targets:HealthCheck(unit)
         unitCurrHP = button.healthBar.hp:GetValue()
         button.unitHPPercent = unitCurrHP / unitHPMax
         if UnitIsDead(unit) and not Gladdy:isFeignDeath(unit) then
-            button.portrait:SetVertexColor(0.35, 0.35, 0.35, 1.0)
+            button.portrait.border:SetVertexColor(0.35, 0.35, 0.35, 1.0)
         elseif UnitIsGhost(unit) then
-            button.portrait:SetVertexColor(0.2, 0.2, 0.75, 1.0)
+            button.portrait.border:SetVertexColor(0.2, 0.2, 0.75, 1.0)
         elseif (button.unitHPPercent > 0) and (button.unitHPPercent <= 0.2) then
-            button.portrait:SetVertexColor(1.0, 0.0, 0.0)
+            button.portrait.border:SetVertexColor(1.0, 0.0, 0.0)
         else
-            button.portrait:SetVertexColor(1.0, 1.0, 1.0, 1.0)
+            button.portrait.border:SetVertexColor(1.0, 1.0, 1.0, 1.0)
         end
     else
-        button.portrait:SetVertexColor(1.0, 1.0, 1.0, 1.0)
+        button.portrait.border:SetVertexColor(1.0, 1.0, 1.0, 1.0)
     end
 end
 
@@ -359,7 +361,12 @@ function Targets:UpdateFrame(unitId)
     healthBar:SetBackdropBorderColor(Gladdy:SetColor(Gladdy.db.targetHealthBarBorderColor))
 
     healthBar.hp:SetStatusBarTexture(Gladdy:SMFetch("statusbar", "targetHealthBarTexture"))
-    healthBar.hp:SetStatusBarColor(Gladdy:SetColor(Gladdy.db.targetHealthBarColor))
+    if Gladdy.testing then
+        healthBar.hp:SetStatusBarColor(Gladdy:SetColor(Gladdy.db.targetHealthBarColor))
+    else
+        self:UpdateHealthBarColor(unit)
+    end
+
     healthBar.hp:ClearAllPoints()
     healthBar.hp:SetPoint("TOPLEFT", healthBar, "TOPLEFT", (Gladdy.db.targetHealthBarBorderSize/Gladdy.db.statusbarBorderOffset), -(Gladdy.db.targetHealthBarBorderSize/Gladdy.db.statusbarBorderOffset))
     healthBar.hp:SetPoint("BOTTOMRIGHT", healthBar, "BOTTOMRIGHT", -(Gladdy.db.targetHealthBarBorderSize/Gladdy.db.statusbarBorderOffset), (Gladdy.db.targetHealthBarBorderSize/Gladdy.db.statusbarBorderOffset))
