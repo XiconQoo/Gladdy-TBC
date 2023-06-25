@@ -47,7 +47,7 @@ local Targets = Gladdy:NewModule("Targets", nil, {
     targetGroup = false,
     targetMargin = 1,
     targetFrameStrata = "MEDIUM",
-    targetFrameLevel = 5,
+    targetFrameLevel = 8,
 })
 
 Targets.targetUnits = {
@@ -299,6 +299,8 @@ function Targets:UpdateFrame(unitId)
         return
     end
 
+    button:SetFrameStrata(Gladdy.db.targetFrameStrata)
+    button:SetFrameLevel(Gladdy.db.targetFrameLevel)
     healthBar:SetFrameStrata(Gladdy.db.targetFrameStrata)
     healthBar:SetFrameLevel(Gladdy.db.targetFrameLevel)
     healthBar.hp:SetFrameStrata(Gladdy.db.targetFrameStrata)
