@@ -859,9 +859,81 @@ function Gladdy:ShowOptions()
 end
 
 function Gladdy:GetAuras(auraType)
+    local path = auraType == AURA_TYPE_DEBUFF and "trackedDebuffs" or "trackedBuffs"
     local spells = {
-        ckeckAll = {
+        add = {
             order = 1,
+            width = "2",
+            name = auraType == AURA_TYPE_DEBUFF and L["Add Debuff"] or L["Add Buff"],
+            type = "input",
+            dialogControl = "GladdySearchEditBoxAuras",
+            width = "double",
+            get = function()
+                return ""
+            end,
+            set = function(_, value)
+                local spellName = GetSpellInfo(value)
+                if not spellName then
+                    return
+                end
+                local db = Gladdy.dbi.profile[path]
+
+                local exists = false
+                for k,v in pairs(Gladdy.db.auraListDefault) do
+                    local searchName, _, searchIcon = GetSpellInfo(value)
+                    local dbName, _, dbIcon = GetSpellInfo(k)
+                    if tostring(k) == tostring(value) then
+                        value = tostring(value)
+                        path = v.track == AURA_TYPE_DEBUFF and "debuffList" or "buffList"
+                        exists = true
+                        break
+                    elseif searchName == dbName and searchIcon == dbIcon then -- same spell
+                        exists = true
+                        path = v.track == AURA_TYPE_DEBUFF and "debuffList" or "buffList"
+                        local existsInSpellIDs = false
+                        for _,spellID in ipairs(v.spellIDs) do
+                            if tonumber(value) == spellID then
+                                existsInSpellIDs = true
+                                break
+                            end
+                        end
+                        if not existsInSpellIDs then
+                            table.insert(Gladdy.db.auraListDefault[k].spellIDs, tonumber(value))
+                            flatEnabledSpells()
+                        end
+                        value = k
+                    else
+                        for _,val in pairs(v.spellIDs) do
+                            if tostring(val) == tostring(value) then
+                                value = tostring(k)
+                                path = v.track == AURA_TYPE_DEBUFF and "debuffList" or "buffList"
+                                exists = true
+                                break
+                            end
+                        end
+                        if exists then
+                            break
+                        end
+                    end
+                end
+                if not exists then
+                    Gladdy.db.auraListDefault[tostring(value)] = {
+                        enabled = true,
+                        track = auraType,
+                        priority = 40,
+                        spellIDs = { [1] = tonumber(value) },
+                        texture = select(3, GetSpellInfo(value)),
+                        textureSpell = tonumber(value)
+                    }
+                    flatEnabledSpells()
+                    Gladdy.options.args["Auras"].args[path].args = Auras:GetAuraOptions(auraType)
+                end
+                LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
+                LibStub("AceConfigDialog-3.0"):SelectGroup("Gladdy", "Auras", path, tostring(value))
+            end,
+        },
+        ckeckAll = {
+            order = 2,
             width = "0.7",
             name = L["Check All"],
             type = "execute",
@@ -878,7 +950,7 @@ function Gladdy:GetAuras(auraType)
             end,
         },
         uncheckAll = {
-            order = 2,
+            order = 3,
             width = "0.7",
             name = L["Uncheck All"],
             type = "execute",
@@ -895,7 +967,7 @@ function Gladdy:GetAuras(auraType)
             end,
         },
         druid = {
-            order = 3,
+            order = 4,
             type = "group",
             name = LOCALIZED_CLASS_NAMES_MALE["DRUID"],
             icon = "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes",
@@ -903,7 +975,7 @@ function Gladdy:GetAuras(auraType)
             args = {},
         },
         hunter = {
-            order = 4,
+            order = 5,
             type = "group",
             name = LOCALIZED_CLASS_NAMES_MALE["HUNTER"],
             icon = "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes",
@@ -911,7 +983,7 @@ function Gladdy:GetAuras(auraType)
             args = {},
         },
         mage = {
-            order = 5,
+            order = 6,
             type = "group",
             name = LOCALIZED_CLASS_NAMES_MALE["MAGE"],
             icon = "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes",
@@ -919,7 +991,7 @@ function Gladdy:GetAuras(auraType)
             args = {},
         },
         paladin = {
-            order = 6,
+            order = 7,
             type = "group",
             name = LOCALIZED_CLASS_NAMES_MALE["PALADIN"],
             icon = "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes",
@@ -927,7 +999,7 @@ function Gladdy:GetAuras(auraType)
             args = {},
         },
         priest = {
-            order = 7,
+            order = 8,
             type = "group",
             name = LOCALIZED_CLASS_NAMES_MALE["PRIEST"],
             icon = "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes",
@@ -935,7 +1007,7 @@ function Gladdy:GetAuras(auraType)
             args = {},
         },
         rogue = {
-            order = 8,
+            order = 9,
             type = "group",
             name = LOCALIZED_CLASS_NAMES_MALE["ROGUE"],
             icon = "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes",
@@ -943,7 +1015,7 @@ function Gladdy:GetAuras(auraType)
             args = {},
         },
         shaman = {
-            order = 9,
+            order = 10,
             type = "group",
             name = LOCALIZED_CLASS_NAMES_MALE["SHAMAN"],
             icon = "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes",
@@ -951,7 +1023,7 @@ function Gladdy:GetAuras(auraType)
             args = {},
         },
         warlock = {
-            order = 10,
+            order = 11,
             type = "group",
             name = LOCALIZED_CLASS_NAMES_MALE["WARLOCK"],
             icon = "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes",
@@ -959,7 +1031,7 @@ function Gladdy:GetAuras(auraType)
             args = {},
         },
         warrior = {
-            order = 10,
+            order = 12,
             type = "group",
             name = LOCALIZED_CLASS_NAMES_MALE["WARRIOR"],
             icon = "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes",

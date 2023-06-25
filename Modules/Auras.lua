@@ -41,7 +41,7 @@ end
 Gladdy.enabledAuras = {
     [AURA_TYPE_BUFF] = {}, [AURA_TYPE_DEBUFF] = {}
 }
-local function flatEnabledSpells()
+local function updateEnabledAuras()
     for _,v in pairs(Gladdy.db.auraListDefault) do
         for _,spellID in ipairs(v.spellIDs) do
             if v.enabled then
@@ -103,7 +103,7 @@ function Auras:Initialize()
     self:RegisterMessage("AURA_GAIN")
     self:RegisterMessage("AURA_FADE")
     self:RegisterMessage("SPELL_INTERRUPT")
-    flatEnabledSpells()
+    updateEnabledAuras()
 end
 
 function Auras:CreateFrame(unit)
@@ -741,37 +741,6 @@ end
 --- OPTIONS
 -------------------------------------------
 
-local Predictor = {}
-function Predictor:Initialize()
-end
-function Predictor:GetValues(text, values, max)
-    values = {}
-    if text and text ~= "" then
-        if GetSpellInfo(text) then
-            text = GetSpellInfo(text)
-        end
-        for k,v in pairs(Gladdy.spellCache) do
-            local status, result = pcall(str_match, k:lower(), "^" .. text:lower())
-            if status and result then
-                for _,tbl in ipairs(v.spells) do
-                    values[tbl.spellID] = {
-                        text = tbl.spellName .. " - (" .. tbl.spellID .. ")",
-                        icon = tbl.icon
-                    }
-                end
-            end
-        end
-    end
-    return values
-end
-function Predictor:GetValue(text, key)
-    return key
-end
-function Predictor:GetHyperlink(key)
-    return "spell:" .. key .. ":0"
-end
-LibStub("AceGUI-3.0-GladdySearchEditBox"):Register("Auras", Predictor)
-
 function Auras:GetOptions()
     local borderArgs = {
         headerAuras = {
@@ -1345,7 +1314,7 @@ function Auras:GetAuraOptions(auraType)
                         end
                         if not existsInSpellIDs then
                             table.insert(Gladdy.db.auraListDefault[k].spellIDs, tonumber(value))
-                            flatEnabledSpells()
+                            updateEnabledAuras()
                         end
                         value = k
                     else
@@ -1371,7 +1340,7 @@ function Auras:GetAuraOptions(auraType)
                         texture = select(3, GetSpellInfo(value)),
                         textureSpell = tonumber(value)
                     }
-                    flatEnabledSpells()
+                    updateEnabledAuras()
                     Gladdy.options.args["Auras"].args[path].args = Auras:GetAuraOptions(auraType)
                 end
                 LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
@@ -1421,7 +1390,7 @@ function Auras:GetAuraOptions(auraType)
                     func = function()
                         if not Gladdy:GetImportantAuras()[tonumber(k)] then
                             Gladdy.db.auraListDefault[tostring(k)] = nil
-                            flatEnabledSpells()
+                            updateEnabledAuras()
                             Gladdy.options.args["Auras"].args[path].args = Auras:GetAuraOptions(auraType)
                             LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
                             if auras[i - 1] then

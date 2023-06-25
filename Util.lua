@@ -7,8 +7,9 @@ local debugprofilestop = debugprofilestop
 local geterrorhandler = geterrorhandler
 local debugstack = debugstack
 local next = next
-local str_find, str_gsub, str_sub, str_format = string.find, string.gsub, string.sub, string.format
+local str_find, str_gsub, str_sub, str_format, str_match = string.find, string.gsub, string.sub, string.format, string.match
 local tinsert = table.insert
+local pcall = pcall
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local AuraUtil = AuraUtil
@@ -362,3 +363,34 @@ function Gladdy:CacheSpells()
         end
     end)
 end
+
+local Predictor = {}
+function Predictor:Initialize()
+end
+function Predictor:GetValues(text, values, max)
+    values = {}
+    if text and text ~= "" then
+        if GetSpellInfo(text) then
+            text = GetSpellInfo(text)
+        end
+        for k,v in pairs(Gladdy.spellCache) do
+            local status, result = pcall(str_match, k:lower(), "^" .. text:lower())
+            if status and result then
+                for _,tbl in ipairs(v.spells) do
+                    values[tbl.spellID] = {
+                        text = tbl.spellName .. " - (" .. tbl.spellID .. ")",
+                        icon = tbl.icon
+                    }
+                end
+            end
+        end
+    end
+    return values
+end
+function Predictor:GetValue(text, key)
+    return key
+end
+function Predictor:GetHyperlink(key)
+    return "spell:" .. key .. ":0"
+end
+LibStub("AceGUI-3.0-GladdySearchEditBox"):Register("Auras", Predictor)
