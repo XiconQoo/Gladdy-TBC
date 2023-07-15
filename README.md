@@ -4,7 +4,7 @@
 
 ---
 
-## [v2.23-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.23-Release/Gladdy_Classic_v2.23-Release.zip)
+## [v2.24-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.24-Release/Gladdy_Classic_v2.24-Release.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -79,6 +79,11 @@ Thank you!
 ---
 
 ### Changes
+
+### v2.24-Release
+- fix for WotLK v30402 (update libs)
+- update DRList
+- fix taint issue on first load up
 
 ### v2.23-Release
 - fix for WotLK v30401 (update libs + layers + masks)
