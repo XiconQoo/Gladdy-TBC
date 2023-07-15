@@ -1,7 +1,7 @@
-## Interface: 30401
+## Interface: 30402
 ## Title: Gladdy - WotLK
-## Version: 2.23-Release
-## Notes: The most powerful arena AddOn for WoW 3.4.0
+## Version: 2.24-Release
+## Notes: The most powerful arena AddOn for WoW 3.4.2
 ## Author: XiconQoo, DnB_Junkee, Knall
 ## X-Email: contact me on discord Knall#1751
 ## X-Curse-Project-ID: 482332

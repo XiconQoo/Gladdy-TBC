@@ -1,4 +1,4 @@
-local MAJOR, MINOR = "DRList-1.0", 49 -- Don't forget to change this in DRList-1.0.lua aswell!
+local MAJOR, MINOR = "DRList-1.0", 54 -- Don't forget to change this in DRList-1.0.lua aswell!
 local Lib = LibStub(MAJOR)
 if Lib.spellListVersion and Lib.spellListVersion >= MINOR then
     return
@@ -17,7 +17,7 @@ if Lib.gameExpansion == "retail" then
         [1513]    = "disorient",       -- Scare Beast
         [31661]   = "disorient",       -- Dragon's Breath
         [198909]  = "disorient",       -- Song of Chi-ji
-        [202274]  = "disorient",       -- Incendiary Brew
+        [202274]  = "disorient",       -- Hot Trub
         [105421]  = "disorient",       -- Blinding Light
         [10326]   = "disorient",       -- Turn Evil
         [205364]  = "disorient",       -- Dominate Mind
@@ -26,6 +26,7 @@ if Lib.gameExpansion == "retail" then
         [226943]  = "disorient",       -- Mind Bomb
         [2094]    = "disorient",       -- Blind
         [118699]  = "disorient",       -- Fear
+        [130616]  = "disorient",       -- Fear (Horrify)
         [5484]    = "disorient",       -- Howl of Terror
         [261589]  = "disorient",       -- Seduction (Grimoire of Sacrifice)
         [6358]    = "disorient",       -- Seduction (Succubus)
@@ -85,6 +86,7 @@ if Lib.gameExpansion == "retail" then
         [47476]   = "silence",         -- Strangulate
         [204490]  = "silence",         -- Sigil of Silence
 --      [78675]   = "silence",         -- Solar Beam (has no DR)
+        [410065]  = "silence",         -- Reactive Resin
         [202933]  = "silence",         -- Spider Sting
         [356727]  = "silence",         -- Spider Venom
         [354831]  = "silence",         -- Wailing Arrow 1
@@ -169,6 +171,7 @@ if Lib.gameExpansion == "retail" then
         [64695]   = "root",            -- Earthgrab (Totem effect)
 --      [356738]  = "root",            -- Earth Unleashed (doesn't seem to DR)
         [285515]  = "root",            -- Surge of Power
+        [199042]  = "root",            -- Thunderstruck (Protection PvP Talent)
         --[356356]  = "root",            -- Warbringer TODO: has DR?
         [39965]   = "root",            -- Frost Grenade (Item)
         [75148]   = "root",            -- Embersilk Net (Item)
@@ -176,6 +179,8 @@ if Lib.gameExpansion == "retail" then
         [268966]  = "root",            -- Hooked Deep Sea Net (Item)
 
         [209749]  = "disarm",          -- Faerie Swarm (Balance Honor Talent)
+        [407032]  = "disarm",          -- Sticky Tar Bomb 1
+        [407031]  = "disarm",          -- Sticky Tar Bomb 2
         [207777]  = "disarm",          -- Dismantle
         [233759]  = "disarm",          -- Grapple Weapon
         [236077]  = "disarm",          -- Disarm
@@ -528,6 +533,7 @@ elseif Lib.gameExpansion == "wotlk" then
         [9853]  = "root", -- Entangling Roots (Rank 6)
         [26989] = "root", -- Entangling Roots (Rank 7)
         [53308] = "root", -- Entangling Roots (Rank 8)
+        [65857] = "root", -- Entangling Roots (Rank 8) (TODO: Not sure which ID is correct)
         [19975] = "root", -- Nature's Grasp (Rank 1)
         [19974] = "root", -- Nature's Grasp (Rank 2)
         [19973] = "root", -- Nature's Grasp (Rank 3)
@@ -535,7 +541,8 @@ elseif Lib.gameExpansion == "wotlk" then
         [19971] = "root", -- Nature's Grasp (Rank 5)
         [19970] = "root", -- Nature's Grasp (Rank 6)
         [27010] = "root", -- Nature's Grasp (Rank 7)
-        [53312] = "root", -- Nature's Grasp (Rank 8)
+        [53313] = "root", -- Nature's Grasp (Rank 8)
+        [66070] = "root", -- Nature's Grasp (Rank 8) (TODO: Not sure which ID is correct)
         [50245] = "root", -- Pin (Rank 1)
         [53544] = "root", -- Pin (Rank 2)
         [53545] = "root", -- Pin (Rank 3)
@@ -549,6 +556,7 @@ elseif Lib.gameExpansion == "wotlk" then
         [10230] = "root", -- Frost Nova (Rank 4)
         [27088] = "root", -- Frost Nova (Rank 5)
         [42917] = "root", -- Frost Nova (Rank 6)
+        [64695] = "root", -- Earthgrab
         [39965] = "root", -- Frost Grenade (Item)
         [63685] = "root", -- Freeze (Frost Shock)
         [55536] = "root", -- Frostweave Net (Item)
@@ -626,7 +634,6 @@ elseif Lib.gameExpansion == "wotlk" then
         [27067] = "counterattack",  -- Counterattack 4
         [48998] = "counterattack",  -- Counterattack 5
         [48999] = "counterattack",  -- Counterattack 6
-        --Storm, Earth and Fire has no DR
     }
 
 elseif Lib.gameExpansion == "classic" then
