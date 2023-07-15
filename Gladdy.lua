@@ -13,7 +13,6 @@ local CreateFrame = CreateFrame
 local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
 local IsAddOnLoaded = IsAddOnLoaded
 local GetBattlefieldStatus = GetBattlefieldStatus
-local IsActiveBattlefieldArena = IsActiveBattlefieldArena
 local IsInInstance = IsInInstance
 local GetNumArenaOpponents = GetNumArenaOpponents
 local RELEASE_TYPES = { alpha = "Alpha", beta = "Beta", release = "Release"}
@@ -27,11 +26,11 @@ local LibStub = LibStub
 
 ---------------------------
 
-local MAJOR, MINOR = "Gladdy", 11
+local MAJOR, MINOR = "Gladdy", 12
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
 Gladdy.version_major_num = 2
-Gladdy.version_minor_num = 0.23
+Gladdy.version_minor_num = 0.24
 Gladdy.version_num = Gladdy.version_major_num + Gladdy.version_minor_num
 Gladdy.version_releaseType = RELEASE_TYPES.release
 Gladdy.version = PREFIX .. string.format("%.2f", Gladdy.version_num) .. "-" .. Gladdy.version_releaseType
@@ -433,23 +432,22 @@ end
 function Gladdy:UPDATE_BATTLEFIELD_STATUS(_, index)
     local status, mapName, instanceID, levelRangeMin, levelRangeMax, teamSize, isRankedArena, suspendedQueue, bool, queueType = GetBattlefieldStatus(index)
     local instanceType = select(2, IsInInstance())
-    Gladdy:Debug("INFO", "UPDATE_BATTLEFIELD_STATUS", instanceType, status, teamSize)
+    self:Debug("INFO", "UPDATE_BATTLEFIELD_STATUS", instanceType, status, teamSize)
     if ((instanceType == "arena" or GetNumArenaOpponents() > 0) and status == "active" and teamSize > 0) then
         self.curBracket = teamSize
         self:JoinedArena()
+    elseif status == "active" then
+        if self.db.hideBlizzard == "always" then
+            self:BlizzArenaSetAlpha(0)
+        else
+            self:BlizzArenaSetAlpha(1)
+        end
     end
 end
 
 function Gladdy:PLAYER_REGEN_ENABLED()
     if self.showFrame then
-        self:UpdateFrame()
-        if self.startTest then
-            self:Test()
-            self.startTest = nil
-        end
-        self.frame:Show()
-        self:SendMessage("JOINED_ARENA")
-        self.showFrame = nil
+        self:InitFrames()
     end
     if self.hideFrame then
         self:Reset()
@@ -481,8 +479,8 @@ function Gladdy:Reset()
     for unit in pairs(self.buttons) do
         self:ResetUnit(unit)
     end
-    if Gladdy.db.hideBlizzard == "never" or Gladdy.db.hideBlizzard == "arena" then
-        Gladdy:BlizzArenaSetAlpha(1)
+    if self.db.hideBlizzard == "never" or self.db.hideBlizzard == "arena" then
+        self:BlizzArenaSetAlpha(1)
     end
 end
 
@@ -525,6 +523,16 @@ end
 ---------------------------
 
 function Gladdy:JoinedArena()
+    if InCombatLockdown() then
+        self:Print("Gladdy frames show as soon as you leave combat")
+        self.showFrame = true
+    else
+        self:InitFrames()
+    end
+end
+
+function Gladdy:InitFrames()
+    self.showFrame = nil
     if not self.curBracket then
         self.curBracket = 2
     end
@@ -535,19 +543,21 @@ function Gladdy:JoinedArena()
         end
     end
 
-    if InCombatLockdown() then
-        Gladdy:Print("Gladdy frames show as soon as you leave combat")
-        self.showFrame = true
-    else
-        self:UpdateFrame()
-        self.frame:Show()
-        self:SendMessage("JOINED_ARENA")
+    self:UpdateFrame()
+    if self.startTest then
+        self:Test()
+        self.startTest = nil
     end
+    self.frame:Show()
+    self:SendMessage("JOINED_ARENA")
+
     for i=1, self.curBracket do
         self.buttons["arena" .. i]:SetAlpha(1)
     end
-    if Gladdy.db.hideBlizzard == "arena" or Gladdy.db.hideBlizzard == "always" then
-        Gladdy:BlizzArenaSetAlpha(0)
+    if self.db.hideBlizzard == "arena" or self.db.hideBlizzard == "always" then
+        self:BlizzArenaSetAlpha(0)
+    else
+        self:BlizzArenaSetAlpha(1)
     end
 end
 
