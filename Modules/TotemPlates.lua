@@ -209,6 +209,10 @@ function TotemPlates:NAME_PLATE_UNIT_REMOVED(unitID)
         nameplate.gladdyTotemFrame:SetParent(nil)
         tinsert(self.totemPlateCache, nameplate.gladdyTotemFrame)
         nameplate.gladdyTotemFrame = nil
+        --Show ElvUI nameplates when totem frame is removed.
+        if (TotemPlates.addon == "ElvUI") and nameplate.unitFrame then
+            nameplate.unitFrame:Show()
+        end
     end
 end
 
@@ -402,7 +406,7 @@ function TotemPlates.OnUpdate(self)
     else
         self.selectionHighlight:SetAlpha(0)
     end
-    if (TotemPlates.addon == "Plater" or TotemPlates.addon == "Tukui" or TotemPlates.addon == "ElvUI") and self.parent and self.parent.unitFrame then
+    if (TotemPlates.addon == "Plater" or TotemPlates.addon == "Tukui") and self.parent and self.parent.unitFrame then
         self.parent.unitFrame:Hide()
     end
 end
@@ -453,6 +457,10 @@ function TotemPlates:OnUnitEvent(unitID)
         nameplate.gladdyTotemFrame.totemName:SetText(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].customText or "")
         nameplate.gladdyTotemFrame.parent = nameplate
         nameplate.gladdyTotemFrame:Show()
+        --Hide ElvUI nameplates once instead of in OnUpdate
+        if (TotemPlates.addon == "ElvUI") and nameplate.unitFrame then
+            nameplate.unitFrame:Hide()
+        end
         TotemPlates:SetTotemAlpha(nameplate.gladdyTotemFrame, unitID)
         self:ToggleAddon(nameplate)
         self.activeTotemNameplates[unitID] = nameplate
@@ -462,6 +470,10 @@ function TotemPlates:OnUnitEvent(unitID)
             nameplate.gladdyTotemFrame:SetParent(nil)
             tinsert(self.totemPlateCache, nameplate.gladdyTotemFrame)
             nameplate.gladdyTotemFrame = nil
+            --Show ElvUI nameplates when totem frame is removed.
+            if (TotemPlates.addon == "ElvUI") and nameplate.unitFrame then
+                nameplate.unitFrame:Show()
+            end
         end
         self:ToggleAddon(nameplate)
     else
