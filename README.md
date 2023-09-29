@@ -4,7 +4,7 @@
 
 ---
 
-## [v2.24-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.24-Release/Gladdy_Classic_v2.24-Release.zip)
+## [v2.25-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.25-Release/Gladdy_Classic_v2.25-Release.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -61,6 +61,7 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 - [dfherr](https://github.com/dfherr)
 - [miraage](https://github.com/miraage)
 - [veiz](https://github.com/veiz)
+- [Flamanis](https://github.com/Flamanis)
 
 Thank you!
 
@@ -79,6 +80,9 @@ Thank you!
 ---
 
 ### Changes
+
+### v2.25-Release
+- fix TotemPlates interfering with ElvUI (thanks [Flamanis](https://github.com/Flamanis))
 
 ### v2.24-Release
 - fix for WotLK v30402 (update libs)
