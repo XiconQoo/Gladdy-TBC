@@ -203,13 +203,13 @@ end
 function TotemPlates:NAME_PLATE_UNIT_REMOVED(unitID)
     local nameplate = C_NamePlate.GetNamePlateForUnit(unitID)
     self.activeTotemNameplates[unitID] = nil
-    --self:ToggleAddon(nameplate, true)
     if nameplate.gladdyTotemFrame then
         nameplate.gladdyTotemFrame:Hide()
         nameplate.gladdyTotemFrame:SetParent(nil)
         tinsert(self.totemPlateCache, nameplate.gladdyTotemFrame)
         nameplate.gladdyTotemFrame = nil
     end
+    self:ToggleAddon(nameplate, true)
 end
 
 ---------------------------------------------------
@@ -373,23 +373,25 @@ function TotemPlates:ToggleAddon(nameplate, show)
     local addonFrames = { self:GetAddonFrame(nameplate) }
     if addonFrames and #addonFrames > 0 then
         if show then
-            for _,v in ipairs(addonFrames) do
-                if nameplate.unitFrame and nameplate.unitFrame.UpdateAllElements then
+            for _, frame in ipairs(addonFrames) do
+                if frame.UpdateAllElements then
                     Gladdy:Debug("INFO", "TotemPlates:ToggleAddon - NAME_PLATE_UNIT_ADDED - nameplate.unitFrame:UpdateAllElements")
-                    nameplate.unitFrame:UpdateAllElements("NAME_PLATE_UNIT_ADDED")
+                    frame:Show()
+                    frame:UpdateAllElements("NAME_PLATE_UNIT_ADDED")
                 else
                     Gladdy:Debug("INFO", "TotemPlates:ToggleAddon - NAME_PLATE_UNIT_ADDED - Show")
-                    v:Show()
+                    frame:Show()
                 end
             end
         else
-            for _,v in ipairs(addonFrames) do
-                if nameplate.unitFrame and nameplate.unitFrame.UpdateAllElements then
+            for _, frame in ipairs(addonFrames) do
+                if frame.UpdateAllElements then
                     Gladdy:Debug("INFO", "TotemPlates:ToggleAddon - NAME_PLATE_UNIT_REMOVED - nameplate.unitFrame:UpdateAllElements")
-                    nameplate.unitFrame:UpdateAllElements("NAME_PLATE_UNIT_REMOVED")
+                    frame:UpdateAllElements("NAME_PLATE_UNIT_REMOVED")
+                    frame:Hide()
                 else
                     Gladdy:Debug("INFO", "TotemPlates:ToggleAddon - NAME_PLATE_UNIT_REMOVED - Hide")
-                    v:Hide()
+                    frame:Hide()
                 end
             end
         end
@@ -402,7 +404,7 @@ function TotemPlates.OnUpdate(self)
     else
         self.selectionHighlight:SetAlpha(0)
     end
-    if (TotemPlates.addon == "Plater" or TotemPlates.addon == "Tukui" or TotemPlates.addon == "ElvUI") and self.parent and self.parent.unitFrame then
+    if (TotemPlates.addon == "Plater" or TotemPlates.addon == "Tukui") and self.parent and self.parent.unitFrame then
         self.parent.unitFrame:Hide()
     end
 end
@@ -454,7 +456,7 @@ function TotemPlates:OnUnitEvent(unitID)
         nameplate.gladdyTotemFrame.parent = nameplate
         nameplate.gladdyTotemFrame:Show()
         TotemPlates:SetTotemAlpha(nameplate.gladdyTotemFrame, unitID)
-        self:ToggleAddon(nameplate)
+        self:ToggleAddon(nameplate, false)
         self.activeTotemNameplates[unitID] = nameplate
     elseif totemDataEntry and not Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enabled and Gladdy.db.npTotemsHideDisabledTotems then
         if nameplate.gladdyTotemFrame then
@@ -463,7 +465,7 @@ function TotemPlates:OnUnitEvent(unitID)
             tinsert(self.totemPlateCache, nameplate.gladdyTotemFrame)
             nameplate.gladdyTotemFrame = nil
         end
-        self:ToggleAddon(nameplate)
+        self:ToggleAddon(nameplate, false)
     else
         self:ToggleAddon(nameplate, true)
     end
