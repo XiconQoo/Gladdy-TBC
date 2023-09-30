@@ -209,7 +209,9 @@ function TotemPlates:NAME_PLATE_UNIT_REMOVED(unitID)
         tinsert(self.totemPlateCache, nameplate.gladdyTotemFrame)
         nameplate.gladdyTotemFrame = nil
     end
-    self:ToggleAddon(nameplate, true)
+    if (self.addon ~= "Plater") then
+        self:ToggleAddon(nameplate, true)
+    end
 end
 
 ---------------------------------------------------
