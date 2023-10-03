@@ -81,6 +81,9 @@ Thank you!
 
 ### Changes
 
+### v2.27-Release
+- fix TotemPlates interfering with NeatPlates
+
 ### v2.26-Release
 - fix TotemPlates interfering with Plater (thanks again [Flamanis](https://github.com/Flamanis))
 
