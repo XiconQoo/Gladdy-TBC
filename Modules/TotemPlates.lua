@@ -285,7 +285,7 @@ function TotemPlates:NAME_PLATE_UNIT_REMOVED(unitID)
         tinsert(self.totemPlateCache, nameplate.gladdyTotemFrame)
         nameplate.gladdyTotemFrame = nil
     end
-    if (self.addon ~= "Plater") then
+    if (self.addon == "ElvUI") then
         self:ToggleAddon(nameplate, true)
     end
 end
