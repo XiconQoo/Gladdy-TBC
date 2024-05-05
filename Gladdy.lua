@@ -30,13 +30,13 @@ local MAJOR, MINOR = "Gladdy", 15
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
 Gladdy.version_major_num = 2
-Gladdy.version_minor_num = 0.27
+Gladdy.version_minor_num = 0.5
 Gladdy.version_num = Gladdy.version_major_num + Gladdy.version_minor_num
 Gladdy.version_releaseType = RELEASE_TYPES.beta
 Gladdy.version = PREFIX .. string.format("%.2f", Gladdy.version_num) .. "-" .. Gladdy.version_releaseType
 Gladdy.VERSION_REGEX = VERSION_REGEX
 
-Gladdy.debug = true
+Gladdy.debug = false
 
 LibStub("AceTimer-3.0"):Embed(Gladdy)
 LibStub("AceComm-3.0"):Embed(Gladdy)
@@ -66,9 +66,9 @@ function Gladdy:Debug(lvl, ...)
         if lvl == "INFO" then
             self:Print(self.INFO, ...)
         elseif lvl == "WARN" then
-            self:Warn(self.WARN, ...)
+            self:Print(self.WARN, ...)
         elseif lvl == "ERROR" then
-            self:Error(self.ERROR, ...)
+            self:Print(self.ERROR, ...)
         end
     end
 end
@@ -289,7 +289,7 @@ function Gladdy:OnInitialize()
 
     self.cooldownSpellIds = {}
     self.spellTextures = {}
-    self.specBuffs = self:GetSpecBuffs()
+    --self.specBuffs = self:GetSpecBuffs()
     self.specSpells = self:GetSpecSpells()
     self.buttons = {}
     self.guids = {}

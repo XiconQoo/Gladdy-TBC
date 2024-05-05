@@ -39,9 +39,9 @@ function Announcements:Initialize()
 
     self.DRINK_AURA = GetSpellInfo(46755)
     self.RES_SPELLS = {
-        [GetSpellInfo(20770)] = true,
-        [GetSpellInfo(20773)] = true,
-        [GetSpellInfo(20777)] = true,
+        [GetSpellInfo(2006)] = true,
+        [GetSpellInfo(7328)] = true,
+        --[GetSpellInfo(20777)] = true,
     }
 
     self:RegisterMessage("JOINED_ARENA")

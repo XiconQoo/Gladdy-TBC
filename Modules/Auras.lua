@@ -1350,12 +1350,14 @@ function Auras:GetAuraOptions(auraType)
 
     }
     local auras = {}
-    for spellID,v in pairs(Gladdy.db.auraListDefault) do
-        if v.track == auraType and spellID ~= "*" then
-            tinsert(auras,spellID)
+    for spellid,v in pairs(Gladdy.db.auraListDefault) do
+        if v.track == auraType and spellid ~= "*" then
+            tinsert(auras, spellid)
         end
     end
-    tbl_sort(auras, function(a, b) return GetSpellInfo(a) < GetSpellInfo(b) end)
+    tbl_sort(auras, function(a, b)
+        return GetSpellInfo(a) < GetSpellInfo(b)
+    end)
     for i,k in ipairs(auras) do
         local texture = Gladdy.db.auraListDefault[tostring(k)] and Gladdy.db.auraListDefault[tostring(k)].texture or select(3, GetSpellInfo(k))
         options[tostring(k)] = {
@@ -1533,7 +1535,9 @@ function Auras:GetInterruptOptions()
     for _,v in pairs(Gladdy:GetInterrupts()) do
         tinsert(auras, v.spellID)
     end
-    tbl_sort(auras, function(a, b) return GetSpellInfo(a) < GetSpellInfo(b) end)
+    tbl_sort(auras, function(a, b)
+        return GetSpellInfo(a) < GetSpellInfo(b)
+    end)
     for i,k in ipairs(auras) do
         options[tostring(k)] = {
             type = "group",

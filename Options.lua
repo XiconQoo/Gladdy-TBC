@@ -899,7 +899,8 @@ function Gladdy:GetAuras(auraType)
                         end
                         if not existsInSpellIDs then
                             table.insert(Gladdy.db.auraListDefault[k].spellIDs, tonumber(value))
-                            flatEnabledSpells()
+                            --flatEnabledSpells()
+                            --TODO update module options here
                         end
                         value = k
                     else
@@ -925,8 +926,9 @@ function Gladdy:GetAuras(auraType)
                         texture = select(3, GetSpellInfo(value)),
                         textureSpell = tonumber(value)
                     }
-                    flatEnabledSpells()
-                    Gladdy.options.args["Auras"].args[path].args = Auras:GetAuraOptions(auraType)
+                    --flatEnabledSpells()
+                    --Gladdy.options.args["Auras"].args[path].args = Auras:GetAuraOptions(auraType)
+                    --TODO update module options here
                 end
                 LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
                 LibStub("AceConfigDialog-3.0"):SelectGroup("Gladdy", "Auras", path, tostring(value))

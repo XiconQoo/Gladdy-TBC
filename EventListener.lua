@@ -282,22 +282,22 @@ Gladdy.cooldownBuffs = {
     [GetSpellInfo(6346)] = { cd = function(expTime) -- 180s uptime == cd
         return expTime
     end, spellId = 6346 }, -- Fear Ward
-    [GetSpellInfo(11305)] = { cd = function(expTime) -- 15s uptime
-        return 180 - (15 - expTime)
-    end, spellId = 11305, class = "ROGUE" }, -- Sprint
+    [GetSpellInfo(2983)] = { cd = function(expTime) -- 15s uptime
+        return 60 - (8 - expTime)
+    end, spellId = 2983, class = "ROGUE" }, -- Sprint
     [36554] = { cd = function(expTime) -- 3s uptime
         return 30 - (3 - expTime)
     end, spellId = 36554, class = "ROGUE" }, -- Shadowstep speed buff
     [36563] = { cd = function(expTime) -- 10s uptime
         return 30 - (10 - expTime)
-    end, spellId = 36554, class = "ROGUE" }, -- Shadowstep dmg buff
-    [GetSpellInfo(26889)] = { cd = function(expTime) -- 3s uptime
-        return 180 - (10 - expTime)
-    end, spellId = 26889, class = "ROGUE" }, -- Vanish
+    end, spellId = 36554 }, -- Shadowstep dmg buff
+    [GetSpellInfo(1856)] = { cd = function(expTime) -- 3s uptime
+        return 180 - (3 - expTime)
+    end, spellId = 1856, class = "ROGUE" }, -- Vanish
     racials = {
-        [GetSpellInfo(20600)] = { cd = function(expTime) -- 20s uptime
+        --[[[GetSpellInfo(20600)] = { cd = function(expTime) -- 20s uptime
             return GetTime() - (20 - expTime)
-        end, spellId = 20600 }, -- Perception
+        end, spellId = 20600 }, -- Perception]]
     },
     [GetSpellInfo(31224)] = { cd = function(expTime) -- 180s uptime == cd
         return 60 - (5 - expTime)

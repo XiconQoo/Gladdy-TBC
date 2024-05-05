@@ -488,7 +488,8 @@ function TotemPlates:ToggleAddon(nameplate, show)
 end
 
 function TotemPlates.OnUpdate(self)
-    if (UnitIsUnit("mouseover", self.unitID) or UnitIsUnit("target", self.unitID)) and Gladdy.db.npTotemColors["totem" .. self.totemDataEntry.id].alpha > 0 then
+    local db = self.totemDataEntry.npc and self.totemDataEntry or Gladdy.db.npTotemColors["totem" .. self.totemDataEntry.id]
+    if (UnitIsUnit("mouseover", self.unitID) or UnitIsUnit("target", self.unitID)) and db.alpha > 0 then
         self.selectionHighlight:SetAlpha(.25)
     else
         self.selectionHighlight:SetAlpha(0)
@@ -524,7 +525,8 @@ function TotemPlates:OnUnitEvent(unitID)
     if not totemDataEntry then
         return
     end
-    if totemDataEntry and Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enabled then-- modify this nameplates
+    local dbTotemData = totemDataEntry.npc and totemDataEntry or Gladdy.db.npTotemColors["totem" .. totemDataEntry.id]
+    if totemDataEntry and dbTotemData and dbTotemData.enabled then-- modify this nameplates
         if #self.totemPlateCache > 0 then
             nameplate.gladdyTotemFrame = tremove(self.totemPlateCache, #self.totemPlateCache)
         else
@@ -552,13 +554,17 @@ function TotemPlates:OnUnitEvent(unitID)
         nameplate.gladdyTotemFrame:ClearAllPoints()
         nameplate.gladdyTotemFrame:SetPoint("CENTER", nameplate, "CENTER", 0, 0)
         nameplate.gladdyTotemFrame.totemIcon:SetTexture(totemDataEntry.texture)
-        nameplate.gladdyTotemFrame.totemName:SetText(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].customText or "")
+        nameplate.gladdyTotemFrame.totemBorder:SetVertexColor(dbTotemData.color.r,
+                dbTotemData.color.g,
+                dbTotemData.color.b,
+                dbTotemData.color.a)
+        nameplate.gladdyTotemFrame.totemName:SetText(dbTotemData.customText or "")
         nameplate.gladdyTotemFrame.parent = nameplate
         nameplate.gladdyTotemFrame:Show()
         TotemPlates:SetTotemAlpha(nameplate.gladdyTotemFrame, unitID)
         self:ToggleAddon(nameplate, false)
         self.activeTotemNameplates[unitID] = nameplate
-    elseif totemDataEntry and not Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enabled and Gladdy.db.npTotemsHideDisabledTotems then
+    elseif totemDataEntry and dbTotemData and not dbTotemData.enabled and Gladdy.db.npTotemsHideDisabledTotems then
         if nameplate.gladdyTotemFrame then
             nameplate.gladdyTotemFrame:Hide()
             nameplate.gladdyTotemFrame:SetParent(nil)
@@ -574,19 +580,20 @@ end
 function TotemPlates:SetTotemAlpha(gladdyTotemFrame, unitID)
     local targetExists = UnitExists("target")
     local totemDataEntry = gladdyTotemFrame.totemDataEntry
+    local db = totemDataEntry.npc and totemDataEntry or Gladdy.db.npTotemColors["totem" .. totemDataEntry.id]
     if targetExists then
         if (UnitIsUnit(unitID, "target")) then -- is target
             if Gladdy.db.npTotemPlatesAlphaAlwaysTargeted then
-                gladdyTotemFrame:SetAlpha(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].alpha)
+                gladdyTotemFrame:SetAlpha(db.alpha)
             else
                 gladdyTotemFrame:SetAlpha(1)
             end
         else -- is not target
-            gladdyTotemFrame:SetAlpha(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].alpha)
+            gladdyTotemFrame:SetAlpha(db.alpha)
         end
     else -- no target
         if Gladdy.db.npTotemPlatesAlphaAlways then
-            gladdyTotemFrame:SetAlpha(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].alpha)
+            gladdyTotemFrame:SetAlpha(db.alpha)
         else
             gladdyTotemFrame:SetAlpha(0.95)
         end

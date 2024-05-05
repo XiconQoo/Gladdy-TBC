@@ -1254,7 +1254,7 @@ end
 local totemData = {
     -- Fire
     -- Water
-    [string_lower("Disease Cleansing Totem")] = {id = 8170,texture = select(3, GetSpellInfo(8170)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 3},
+    --[string_lower("Disease Cleansing Totem")] = {id = 8170,texture = select(3, GetSpellInfo(8170)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 3},
     [string_lower("Mana Spring Totem")] = { id = 5675, texture = select(3, GetSpellInfo(5675)), color = { r = 0, g = 0, b = 0, a = 1 } },
     -- Earth
     -- Air
@@ -1277,8 +1277,6 @@ local totemNpcIdsToTotemData = {
     [31186] = totemData[string_lower("Mana Spring Totem")],
     [31189] = totemData[string_lower("Mana Spring Totem")],
     [31190] = totemData[string_lower("Mana Spring Totem")],
-
-
 }
 
 local totemDataShared, totemNpcIdsToTotemDataShared, totemSpellIdToPulseShared = Gladdy:GetSharedTotemData()
