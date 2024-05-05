@@ -94,10 +94,10 @@ function Gladdy:SpotEnemy(unit, auraScan)
                 spellName = Gladdy.exceptionNames[spellID]
             end
 
-            if Gladdy.specBuffs[spellName] and unitCaster then -- Check for auras that detect a spec
+            if Gladdy.specSpells[spellName] and unitCaster then -- Check for auras that detect a spec
                 local unitPet = string_gsub(unit, "%d$", "pet%1")
                 if UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster) then
-                    EventListener:DetectSpec(unit, Gladdy.specBuffs[spellName])
+                    EventListener:DetectSpec(unit, Gladdy.specSpells[spellName])
                 end
             end
             if Gladdy.cooldownBuffs[spellName] and unitCaster then -- Check for auras that detect used CDs (like Fear Ward)
@@ -371,10 +371,10 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
                 spellName = Gladdy.exceptionNames[spellID]
             end
             button.auras[spellID] = { auraType, spellID, spellName, texture, duration, expirationTime, count, dispelType }
-            if not button.spec and Gladdy.specBuffs[spellName] and unitCaster then
+            if not button.spec and Gladdy.specSpells[spellName] and unitCaster then
                 local unitPet = string_gsub(unit, "%d$", "pet%1")
                 if unitCaster and (UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster)) then
-                    self:DetectSpec(unit, Gladdy.specBuffs[spellName])
+                    self:DetectSpec(unit, Gladdy.specSpells[spellName])
                 end
             end
             if (Gladdy.cooldownBuffs[spellName] or Gladdy.cooldownBuffs[spellID]) and unitCaster then -- Check for auras that hint used CDs (like Fear Ward)

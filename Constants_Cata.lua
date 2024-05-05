@@ -11,99 +11,6 @@ Gladdy.expansion = "Wrath"
 Gladdy.CLASSES = { "MAGE", "PRIEST", "DRUID", "SHAMAN", "PALADIN", "WARLOCK", "WARRIOR", "HUNTER", "ROGUE", "DEATHKNIGHT" }
 tbl_sort(Gladdy.CLASSES)
 
---[[local specBuffs = {
-    -- WARRIOR
-    [GetSpellInfo(56638)] = L["Arms"], -- Taste for Blood
-    [GetSpellInfo(64976)] = L["Arms"], -- Juggernaut
-    [GetSpellInfo(12880)] = L["Arms"], -- Enrage
-    [GetSpellInfo(52437)] = L["Arms"], -- Sudden Death
-    [GetSpellInfo(46857)] = L["Arms"], -- Trauma
-    [GetSpellInfo(56112)] = L["Fury"], -- Furious Attacks
-    [GetSpellInfo(29801)] = L["Fury"], -- Rampage
-    [GetSpellInfo(46916)] = L["Fury"], -- Slam!
-    [GetSpellInfo(50227)] = L["Protection"], -- Sword and Board
-    [GetSpellInfo(50720)] = L["Protection"], -- Vigilance
-    [GetSpellInfo(18498)] = L["Protection"], -- Silenced - Gag Order
-    -- PALADIN
-    [GetSpellInfo(20375)] = L["Retribution"], -- Seal of Command
-    [GetSpellInfo(59578)] = L["Retribution"], -- The Art of War
-    [GetSpellInfo(31836)] = L["Holy"], -- Light's Grace
-    [GetSpellInfo(53563)] = L["Holy"], -- Beacon of Light
-    [GetSpellInfo(54149)] = L["Holy"], -- Infusion of Light
-    [GetSpellInfo(63529)] = L["Protection"], -- Silenced - Shield of the Templar
-    -- ROGUE
-    [GetSpellInfo(36554)] = L["Subtlety"], -- Shadowstep
-    [GetSpellInfo(44373)] = L["Subtlety"], -- Shadowstep Speed
-    [GetSpellInfo(36563)] = L["Subtlety"], -- Shadowstep DMG
-    [GetSpellInfo(51713)] = L["Subtlety"], -- Shadow Dance
-    [GetSpellInfo(31665)] = L["Subtlety"], -- Master of Subtlety
-    [GetSpellInfo(14278)] = L["Subtlety"], -- Ghostly Strike
-    [GetSpellInfo(51690)] = L["Combat"], -- Killing Spree
-    [GetSpellInfo(13877)] = L["Combat"], -- Blade Flurry
-    [GetSpellInfo(13750)] = L["Combat"], -- Adrenaline Rush
-    [GetSpellInfo(14177)] = L["Assassination"], -- Cold Blood
-    -- PRIEST
-    [GetSpellInfo(47788)] = L["Holy"], -- Guardian Spirit
-    [GetSpellInfo(52800)] = L["Discipline"], -- Borrowed Time
-    [GetSpellInfo(63944)] = L["Discipline"], -- Renewed Hope
-    [GetSpellInfo(15473)] = L["Shadow"], -- Shadowform
-    [GetSpellInfo(15286)] = L["Shadow"], -- Vampiric Embrace
-    -- DEATHKNIGHT
-    [GetSpellInfo(49222)] = L["Blood"], -- Bone Shield
-    [GetSpellInfo(49016)] = L["Unholy"], -- Hysteria
-    [GetSpellInfo(53138)] = L["Blood"], -- Abomination's Might
-    [GetSpellInfo(55610)] = L["Frost"], -- Imp. Icy Talons
-    -- MAGE
-    [GetSpellInfo(43039)] = L["Frost"], -- Ice Barrier
-    [GetSpellInfo(74396)] = L["Frost"], -- Fingers of Frost
-    [GetSpellInfo(57761)] = L["Frost"], -- Fireball!
-    [GetSpellInfo(11129)] = L["Fire"], -- Combustion
-    [GetSpellInfo(64346)] = L["Fire"], -- Fiery Payback
-    [GetSpellInfo(48108)] = L["Fire"], -- Hot Streak
-    [GetSpellInfo(54741)] = L["Fire"], -- Firestarter
-    [GetSpellInfo(55360)] = L["Fire"], -- Living Bomb
-    [GetSpellInfo(31583)] = L["Arcane"], -- Arcane Empowerment
-    [GetSpellInfo(44413)] = L["Arcane"], -- Incanter's Absorption
-    -- WARLOCK
-    [GetSpellInfo(30302)] = L["Destruction"], -- Nether Protection
-    [GetSpellInfo(63244)] = L["Destruction"], -- Pyroclasm
-    [GetSpellInfo(54277)] = L["Destruction"], -- Backdraft
-    [GetSpellInfo(47283)] = L["Destruction"], -- Empowered Imp
-    [GetSpellInfo(34936)] = L["Destruction"], -- Backlash
-    [GetSpellInfo(47193)] = L["Demonology"], -- Demonic Empowerment
-    [GetSpellInfo(64371)] = L["Affliction"], -- Eradication
-    -- SHAMAN
-    [GetSpellInfo(57663)] = L["Elemental"], -- Totem of Wrath
-    [GetSpellInfo(65264)] = L["Elemental"], -- Lava Flows
-    [GetSpellInfo(51470)] = L["Elemental"], -- Elemental Oath
-    [GetSpellInfo(52179)] = L["Elemental"], -- Astral Shift
-    [GetSpellInfo(49284)] = L["Restoration"], -- Earth Shield
-    [GetSpellInfo(53390)] = L["Restoration"], -- Tidal Waves
-    [GetSpellInfo(30809)] = L["Enhancement"], -- Unleashed Rage
-    [GetSpellInfo(53817)] = L["Enhancement"], -- Maelstrom Weapon
-    [GetSpellInfo(63685)] = L["Enhancement"], -- Freeze (Frozen Power)
-    -- HUNTER
-    [GetSpellInfo(20895)] = L["Beast Mastery"], -- Spirit Bond
-    [GetSpellInfo(34471)] = L["Beast Mastery"], -- The Beast Within
-    [GetSpellInfo(75447)] = L["Beast Mastery"], -- Ferocious Inspiration
-    [GetSpellInfo(19506)] = L["Marksmanship"], -- Trueshot Aura
-    [GetSpellInfo(64420)] = L["Survival"], -- Sniper Training
-    -- DRUID
-    [GetSpellInfo(24932)] = L["Feral"], -- Leader of the Pack
-    [GetSpellInfo(16975)] = L["Feral"], -- Predatory Strikes
-    [GetSpellInfo(50334) .. " Feral"] = L["Feral"], -- Berserk
-    [GetSpellInfo(24907)] = L["Balance"], -- Moonkin Aura
-    [GetSpellInfo(24858)] = L["Balance"], -- Moonkin Form
-    [GetSpellInfo(48504)] = L["Restoration"], -- Living Seed
-    [GetSpellInfo(45283)] = L["Restoration"], -- Natural Perfection
-    [GetSpellInfo(53251)] = L["Restoration"], -- Wild Growth
-    [GetSpellInfo(16188)] = L["Restoration"], -- Nature's Swiftness
-    [GetSpellInfo(33891)] = L["Restoration"], -- Tree of Life
-}
-function Gladdy:GetSpecBuffs()
-    return specBuffs
-end]]
-
 local metaDB = {
     ["DEATHKNIGHT"] = {
         ["Unholy"] = 135775,
@@ -1046,20 +953,10 @@ local importantAuras = {
         priority = 20,
         spellIDs = { 96263 },
     },
-    [86659] = { -- Guardian
-        track = AURA_TYPE_BUFF,
-        priority = 20,
-        spellIDs = { 86659 },
-    },
-    [86698] = { -- Guardian
-        track = AURA_TYPE_BUFF,
-        priority = 20,
-        spellIDs = { 86698 },
-    },
     [86669] = { -- Guardian
         track = AURA_TYPE_BUFF,
         priority = 20,
-        spellIDs = { 86669 },
+        spellIDs = { 86669, 86659, 86698 },
     },
     [89485] = { -- Inner Focus
         track = AURA_TYPE_BUFF,

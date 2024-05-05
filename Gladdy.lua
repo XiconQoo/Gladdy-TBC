@@ -289,7 +289,6 @@ function Gladdy:OnInitialize()
 
     self.cooldownSpellIds = {}
     self.spellTextures = {}
-    --self.specBuffs = self:GetSpecBuffs()
     self.specSpells = self:GetSpecSpells()
     self.buttons = {}
     self.guids = {}
