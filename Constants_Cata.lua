@@ -11,59 +11,6 @@ Gladdy.expansion = "Wrath"
 Gladdy.CLASSES = { "MAGE", "PRIEST", "DRUID", "SHAMAN", "PALADIN", "WARLOCK", "WARRIOR", "HUNTER", "ROGUE", "DEATHKNIGHT" }
 tbl_sort(Gladdy.CLASSES)
 
-local metaDB = {
-    ["DEATHKNIGHT"] = {
-        ["Unholy"] = 135775,
-        ["Blood"] = 135770,
-        ["Frost"] = 135773,
-    },
-    ["DRUID"] = {
-        ["Balance"] = 136096,
-        ["Feral"] = 132276,
-        ["Restoration"] = 136041,
-    },
-    ["HUNTER"] = {
-        ["BeastMastery"] = 461112, -- New icon
-        ["Marksmanship"] = 236179, -- New icon
-        ["Survival"] = 461113, -- New icon
-    },
-    ["MAGE"] = {
-        ["Arcane"] = 135932,
-        ["Fire"] = 135812,
-        ["Frost"] = 135846,
-    },
-    ["PALADIN"] = {
-        ["Holy"] = 135920,
-        ["Protection"] = 236264, -- New icon
-        ["Retribution"] = 135873,
-    },
-    ["PRIEST"] = {
-        ["Discipline"] = 135940,
-        ["Shadow"] = 136207,
-        ["Holy"] = 237542,
-    },
-    ["ROGUE"] = {
-        ["Assassination"] = 132304,
-        ["Combat"] = 132090,
-        ["Subtlety"] = 132320,
-    },
-    ["SHAMAN"] = {
-        ["Elemental"] = 136048,
-        ["Enhancement"] = 136051,
-        ["Restoration"] = 136052,
-    },
-    ["WARLOCK"] = {
-        ["Affliction"] = 136145,
-        ["Demonology"] = 136172,
-        ["Destruction"] = 5740,
-    },
-    ["WARRIOR"] = {
-        ["Arms"] = 132355,
-        ["Fury"] = 132347,
-        ["Protection"] = 132341,
-    }
-}
-
 local specSpells = {
     [GetSpellInfo(55050)] = L["Blood"], -- Heart Strike
     [GetSpellInfo(55233)] = L["Blood"], -- Vampiric Blood
@@ -1669,12 +1616,14 @@ local totemData = {
     --[string_lower("Disease Cleansing Totem")] = {id = 8170,texture = select(3, GetSpellInfo(8170)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 3},
     [string_lower("Mana Spring Totem")] = { id = 5675, texture = select(3, GetSpellInfo(5675)), color = { r = 0, g = 0, b = 0, a = 1 } },
     -- Earth
+    [string_lower("Tremor Totem")] = {id = 8143,texture = select(3, GetSpellInfo(8143)), color = {r = 1, g = 0.9, b = 0.1, a = 1}, pulse = { cd = 6, once = true }},
     -- Air
 }
 
 local totemSpellIdToPulse = {
     --[GetSpellInfo(totemData[string_lower("Disease Cleansing Totem")].id)] = totemData[string_lower("Disease Cleansing Totem")].pulse,
     --[8170] = totemData[string_lower("Disease Cleansing Totem")].pulse,
+    [8143] = totemData[string_lower("Tremor Totem")].pulse,
 }
 
 local totemNpcIdsToTotemData = {
