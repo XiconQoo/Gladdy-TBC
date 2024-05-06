@@ -10,6 +10,8 @@ local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
 Gladdy.expansion = "Wrath"
 Gladdy.CLASSES = { "MAGE", "PRIEST", "DRUID", "SHAMAN", "PALADIN", "WARLOCK", "WARRIOR", "HUNTER", "ROGUE", "DEATHKNIGHT" }
 tbl_sort(Gladdy.CLASSES)
+Gladdy.RACES[#Gladdy.RACES + 1] = "Goblin"
+tbl_sort(Gladdy.RACES)
 
 local specSpells = {
     [GetSpellInfo(55050)] = L["Blood"], -- Heart Strike
@@ -63,6 +65,8 @@ local specSpells = {
     [GetSpellInfo(81006)] = L["Balance"], -- Lunar Shower
     [GetSpellInfo(81288)] = L["Balance"], -- Fungal Growth (debuff)
     [GetSpellInfo(81281)] = L["Balance"], -- Fungal Growth (debuff)
+    [GetSpellInfo(78675)] = L["Balance"], -- Solar Beam
+    [GetSpellInfo(88751)] = L["Balance"], -- Wild Mushroom: Detonate
     [GetSpellInfo(24932)] = L["Feral"], -- Leader of the Pack
     [GetSpellInfo(58180)] = L["Feral"], -- Infected Wounds
     [GetSpellInfo(58179)] = L["Feral"], -- Infected Wounds
@@ -280,6 +284,7 @@ local specSpells = {
     [GetSpellInfo(45182)] = L["Subtlety"], -- Cheat Death
     [GetSpellInfo(14185)] = L["Subtlety"], -- Preparation
     [GetSpellInfo(31666)] = L["Subtlety"], -- Master of Subtlety
+    [GetSpellInfo(51701)] = L["Subtlety"], -- Honor Among Thieves
     --
     [GetSpellInfo(77746)] = L["Elemental"], -- Totem Wrath
     [GetSpellInfo(51490)] = L["Elemental"], -- Thunderstorm
@@ -810,10 +815,10 @@ local importantAuras = {
         spellIDs = { 93985 },
     },
 
-    [18469] = { -- Improved Counterspell
+    [55021] = { -- Improved Counterspell
         track = AURA_TYPE_DEBUFF,
         priority = 20,
-        spellIDs = { 18469 },
+        spellIDs = { 55021 },
     },
     [15487] = { -- Silence
         track = AURA_TYPE_DEBUFF,
@@ -880,6 +885,11 @@ local importantAuras = {
     },
 
     --- Buffs
+    [22812] = { -- Barkskin
+        track = AURA_TYPE_BUFF,
+        priority = 25,
+        spellIDs = { 22812 },
+    },
     [55233] = { -- Vampiric Blood
         track = AURA_TYPE_BUFF,
         priority = 20,
@@ -1144,7 +1154,7 @@ local interrupts = {
     [GetSpellInfo(79870)] = { duration = 4, spellID = 79870, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(79870)), priority = 15 }, -- Feral Charge Effect (Druid)
     [GetSpellInfo(2139)] = { duration = 7, spellID = 2139, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(2139)), priority = 15 }, -- Counterspell (Mage)
     [GetSpellInfo(1766)] = { duration = 5, spellID = 1766, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(1766)), priority = 15 }, -- Kick (Rogue)
-    [GetSpellInfo(6552)] = { duration = 4, spellID = 6552, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(6552)), priority = 15 }, -- Pummel (Warrior)
+    [GetSpellInfo(6552) .. "WARRIOR"] = { duration = 4, spellID = 6552, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(6552)), priority = 15 }, -- Pummel (Warrior)
     [GetSpellInfo(57994)] = { duration = 2, spellID = 57994, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(57994)), priority = 15 }, -- Wind Shear (Shaman)
     [GetSpellInfo(19647)] = { duration = 6, spellID = 19647, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(19647)), priority = 15 }, -- Spell Lock (Warlock
     [GetSpellInfo(47528)] = { duration = 4, spellID = 47528, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(47528)), priority = 15 }, -- Mind Freeze (Deathknight)
@@ -1154,7 +1164,7 @@ local interrupts = {
     [GetSpellInfo(80965)] = { duration = 2, spellID = 80965, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(80965)), priority = 15 }, -- Skull Bash (Cat)
     [GetSpellInfo(31935)] = { duration = 3, spellID = 31935, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(31935)), priority = 15 }, -- Avenger's Shield (Paladin)
     [GetSpellInfo(34490)] = { duration = 3, spellID = 34490, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(34490)), priority = 15 }, -- Silencing Shot (Hunter)
-    [GetSpellInfo(26090)] = { duration = 2, spellID = 26090, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(26090)), priority = 15 }, -- Pummel (Hunter Pet)
+    [GetSpellInfo(26090) .. "PET"] = { duration = 2, spellID = 26090, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(26090)), priority = 15 }, -- Pummel (Hunter Pet)
     [GetSpellInfo(97547)] = { duration = 5, spellID = 97547, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(97547)), priority = 15 }, -- Solar Beam (Druid)
     [GetSpellInfo(51680)] = { duration = 3, spellID = 51680, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(51680)), priority = 15 }, -- Throwing Specialization (Rogue)
     [GetSpellInfo(93985)] = { duration = 4, spellID = 93985, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(93985)), priority = 15 }, -- Skull Bash
@@ -1396,7 +1406,7 @@ local cooldownList = {
 
         [19503] = 30, -- Scatter Shot
         [19263] = 120, -- Deterrence (110 with Glyph)
-        [781] = 15, -- Disengage
+        [781] = 20, -- Disengage
         [5384] = 30, -- Feign Death
         [77769] = 1.5, -- Trap Launcher
         [60192] = { cd = 30, [L["Survival"]] = 24, }, -- Freezing Trap Trap Launcher

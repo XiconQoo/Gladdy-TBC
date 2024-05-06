@@ -605,21 +605,22 @@ end
 
 function Castbar:Test(unit)
     self.test = true
+
     if Gladdy.db.castBarEnabled then
         local spell, _, icon, value, maxValue, event, endTime, startTime
 
         if (unit == "arena2") then
-            spell, _, icon = GetSpellInfo(27072)
+            spell, _, icon = GetSpellInfo(116)
             value, maxValue, event = 0, 40, "cast"
         elseif (unit == "arena1") then
-            spell, _, icon = GetSpellInfo(27220)
+            spell, _, icon = GetSpellInfo(689)
             endTime = GetTime() * 1000 + 60*1000
             startTime = GetTime() * 1000
             value = (endTime / 1000) - GetTime()
             maxValue = (endTime - startTime) / 1000
             event = "channel"
         else
-            spell, _, icon = GetSpellInfo(20770)
+            spell, _, icon = GetSpellInfo(2006)
             value, maxValue, event = 0, 60, "cast"
         end
 

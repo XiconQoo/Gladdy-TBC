@@ -1,5 +1,6 @@
 local ceil, str_gsub = ceil, string.gsub
 local C_PvP = C_PvP
+local GetItemIcon = GetItemIcon
 
 local CreateFrame = CreateFrame
 local GetTime = GetTime
@@ -342,7 +343,7 @@ function Trinket:ARENA_COOLDOWNS_UPDATE()
         local spellID, itemID, startTime, duration = C_PvP.GetArenaCrowdControlInfo(unitID)
         if (spellID) then
             Gladdy:Debug("INFO", "Trinket:ARENA_COOLDOWNS_UPDATE", spellID, itemID, startTime, duration)
-            if not Gladdy.db.trinketColored and Gladdy:GetPvpTrinkets()[itemID] then
+            if not Gladdy.db.trinketColored and Gladdy.db.trinketIconDynamic and Gladdy:GetPvpTrinkets()[itemID] then
                 self.frames[unitID].texture:SetTexture(GetItemIcon(itemID))
             end
             if (startTime ~= 0 and duration ~= 0) then

@@ -212,6 +212,12 @@ end
 
 ---------------------------
 
+local ignoredOptions = {
+    ["auraListDefault"] = true,
+    ["trackedDebuffs"] = true,
+    ["trackedBuffs"] = true
+}
+
 function Gladdy:DeleteUnknownOptions(tbl, refTbl, str)
     if str == nil then
         str = "Gladdy.db"
@@ -224,7 +230,7 @@ function Gladdy:DeleteUnknownOptions(tbl, refTbl, str)
             if type(v) ~= type(refTbl[k]) then
                 self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, "type error!", "Expected", type(refTbl[k]), "but found", type(v))
                 tbl[k] = nil
-            elseif type(v) == "table" and (k ~= "auraListDefault" or self.db.version and self.db.version < 2.23) then
+            elseif type(v) == "table" and (not ignoredOptions[k] or self.db.version and self.db.version < 2.23) then
                 self:DeleteUnknownOptions(v, refTbl[k], str .. "." .. k)
             end
         end
@@ -254,12 +260,6 @@ function Gladdy:OnInitialize()
     self.dbi.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
     self.dbi.RegisterCallback(self, "OnProfileReset", "OnProfileReset")
     self.db = self.dbi.profile
-
-    --init spell cache
-    if not self.spellCache then
-        self.spellCache = {}
-        self:CacheSpells() -- /dump LibStub("Gladdy").spellCache
-    end
 
     self.LSM = LibStub("LibSharedMedia-3.0")
     self.LSM:Register("statusbar", "Gloss", "Interface\\AddOns\\Gladdy\\Images\\Gloss")

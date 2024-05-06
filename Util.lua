@@ -297,6 +297,7 @@ function Gladdy:GetSpellDescription(spellID, cooldown) -- GetSpellPowerCost(5105
         end
     end
     str = str .. Gladdy:SetTextColor(desc, {r = 1, g=0.82, b=0})
+    str = str .. "\n\n" .. Gladdy:SetTextColor("spell id = ".. spellID, {r = 0, g=0.82, b=0})
     return str
 end
 
@@ -373,6 +374,11 @@ function Predictor:GetValues(text, values, max)
         if GetSpellInfo(text) then
             text = GetSpellInfo(text)
         end
+        --init spell cache
+        if not Gladdy.spellCache then
+            Gladdy.spellCache = {}
+            Gladdy:CacheSpells()
+        end
         for k,v in pairs(Gladdy.spellCache) do
             local status, result = pcall(str_match, k:lower(), "^" .. text:lower())
             if status and result then
@@ -394,3 +400,24 @@ function Predictor:GetHyperlink(key)
     return "spell:" .. key .. ":0"
 end
 LibStub("AceGUI-3.0-GladdySearchEditBox"):Register("Auras", Predictor)
+
+
+function Gladdy:SearchAllSpellIdsBySpellId(spellId)
+    local values =  {}
+    if spellId then
+        local text,_,texture = GetSpellInfo(spellId)
+        if text and texture then
+            for k,v in pairs(Gladdy.spellCache) do
+                local status, result = pcall(str_match, k:lower(), "^" .. text:lower())
+                if status and result then
+                    for _,tbl in ipairs(v.spells) do
+                        if tbl.icon == texture and tbl.spellName == text then
+                            tinsert(values, tbl.spellID)
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return values
+end

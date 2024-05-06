@@ -1542,6 +1542,7 @@ function Auras:GetInterruptOptions()
         options[tostring(k)] = {
             type = "group",
             name = GetSpellInfo(k),
+            desc = Gladdy:GetSpellDescription(k),
             order = i+2,
             icon = Gladdy:GetInterrupts()[GetSpellInfo(k)] and Gladdy:GetInterrupts()[GetSpellInfo(k)].texture or select(3, GetSpellInfo(k)),
             args = {

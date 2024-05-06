@@ -30,14 +30,14 @@ local function InCombat(unit)
         return true
     elseif (petClasses[class]) then
         local arenaNumber = str_match(unit, "%d")
-        if UnitExists("arenapet" .. arenaNumber .. "target")
-                or UnitDetailedThreatSituation("player", "arenapet" .. arenaNumber)
+        if UnitExists("arenapet" .. arenaNumber .. "target") and
+                UnitDetailedThreatSituation("player", "arenapet" .. arenaNumber)
                 or UnitDetailedThreatSituation("playerpet", "arenapet" .. arenaNumber) then
             return true
         end
         for i = 1, Gladdy.curBracket - 1 do
-            if UnitDetailedThreatSituation("party"..i, "arenapet" .. arenaNumber)
-                    or UnitDetailedThreatSituation("party"..i .. "pet", "arenapet" .. arenaNumber) then
+            if UnitExists("party"..i) and UnitDetailedThreatSituation("party"..i, "arenapet" .. arenaNumber)
+                    or UnitExists("party" .. i .. "pet") and UnitDetailedThreatSituation("party".. i .. "pet", "arenapet" .. arenaNumber) then
                 return true
             end
         end

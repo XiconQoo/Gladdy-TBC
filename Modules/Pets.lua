@@ -98,7 +98,7 @@ function Pets:PET_SPOTTED(unit)
             Pets:SetHealthText(self, UnitHealth(unit), UnitHealthMax(unit))
         end)
     end
-    Gladdy:Print(self.frames[unit].healthBar:GetAlpha())
+    --Gladdy:Print(self.frames[unit].healthBar:GetAlpha())
 end
 
 function Pets:PET_DESTROYED(unit)

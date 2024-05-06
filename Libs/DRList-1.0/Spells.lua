@@ -1,4 +1,4 @@
-local MAJOR, MINOR = "DRList-1.0", 60 -- Don't forget to change this in DRList-1.0.lua aswell!
+local MAJOR, MINOR = "DRList-1.0", 62 -- Don't forget to change this in DRList-1.0.lua aswell!
 local Lib = LibStub(MAJOR)
 if Lib.spellListVersion and Lib.spellListVersion >= MINOR then
     return
@@ -776,17 +776,15 @@ elseif Lib.gameExpansion == "cata" then
         [96294] = "root", -- Chains of Ice (Chilblains Rank 2)
         [339]   = "root", -- Entangling Roots
         [19975] = "root", -- Nature's Grasp
-        [93987] = "root", -- Aura of Foreboding (TODO: verify)
         [50245] = "root", -- Pin
         [33395] = "root", -- Freeze (Water Elemental)
         [122]   = "root", -- Frost Nova
+        [87193] = "root", -- Paralysis
         [64695] = "root", -- Earthgrab
         [63685] = "root", -- Freeze (Frost Shock)
         [39965] = "root", -- Frost Grenade (Item)
         [55536] = "root", -- Frostweave Net (Item)
         [90327] = "root", -- Lock Jaw (Dog)
-        [83301] = "root", -- Improved Cone of Cold (Rank 1)
-        [83302] = "root", -- Improved Cone of Cold (Rank 2)
         [54706] = "root", -- Venom Web Spray (Silithid)
         [4167]  = "root", -- Web (Spider)
 
@@ -825,7 +823,6 @@ elseif Lib.gameExpansion == "cata" then
         [31117] = "silence", -- Silenced - Unstable Affliction (Rank 1)
         [43523] = "silence", -- Silenced - Unstable Affliction (Rank 2)
         [18498] = "silence", -- Silenced - Gag Order (Shield Slam)
-        [18498] = "silence", -- Silenced - Gag Order (Heroic Throw)
         [50613] = "silence", -- Arcane Torrent (Racial, Runic Power)
         [28730] = "silence", -- Arcane Torrent (Racial, Mana)
         [25046] = "silence", -- Arcane Torrent (Racial, Energy)
@@ -838,8 +835,6 @@ elseif Lib.gameExpansion == "cata" then
         -- *** Horror Effects ***
         [64044] = "horror", -- Psychic Horror
         [6789]  = "horror", -- Death Coil
-        [87099] = "horror", -- Sin and Punishment (Rank 1)
-        [87100] = "horror", -- Sin and Punishment (Rank 2)
         [87204] = "horror", -- Sin and Punishment (TODO: check which ID is correct)
 
         -- *** Mind Control Effects ***

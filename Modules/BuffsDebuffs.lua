@@ -57,6 +57,11 @@ local BuffsDebuffs = Gladdy:NewModule("Buffs and Debuffs", nil, {
     buffsFrameLevel = 9,
 })
 
+function BuffsDebuffs:UpdateTrackedAuras()
+    defaultTrackedDebuffs = select(2, Gladdy:GetAuras(AURA_TYPE_DEBUFF))
+    defaultTrackedBuffs = select(2, Gladdy:GetAuras(AURA_TYPE_BUFF))
+end
+
 local dispelTypeToOptionValueTable
 local function dispelTypeToOptionValue(dispelType)
     if Gladdy.db.buffsBorderColorsEnabled then
@@ -106,7 +111,7 @@ function BuffsDebuffs:Initialize()
         form = Gladdy.db.buffsBorderColorForm,
         enrage = Gladdy.db.buffsBorderColorEnrage,
     }
-
+    self:UpdateTrackedAuras()
 end
 
 function BuffsDebuffs:JOINED_ARENA()
@@ -217,18 +222,20 @@ function BuffsDebuffs:AURA_GAIN(unit, auraType, spellID, spellName, texture, dur
     if aura and Gladdy.db.buffsShowAuraDebuffs then
         aura = false
     end
-    local auraNames = LibClassAuras.GetSpellNameToId(auraType)
+    local auraNames = auraType == AURA_TYPE_DEBUFF and Gladdy.db.trackedDebuffs or Gladdy.db.trackedBuffs
     local spellId
     local isTracked = false
-    if auraNames[spellName] then
-        for _, spellInfo in ipairs(auraNames[spellName]) do
-            spellId = spellInfo.id[1]
-            if (Gladdy.db.trackedBuffs[tostring(spellId)] or Gladdy.db.trackedDebuffs[tostring(spellId)]) then
+    local entry
+    --if auraNames[spellID] then
+    --print(auraType, spellID, spellName, Gladdy.db.trackedBuffs["6117"], auraNames["6117"])
+        for k, spellInfo in pairs(auraNames) do
+            spellId = tonumber(k)
+            if (spellInfo.active and GetSpellInfo(spellId) == spellName) then
                 isTracked = true
                 break
             end
         end
-    end
+    --end
     if not aura and spellID and expirationTime and isTracked then
         local index
         if auraType == AURA_TYPE_DEBUFF then
@@ -1025,11 +1032,11 @@ function BuffsDebuffs:GetOptions()
             args = select(1, Gladdy:GetAuras(AURA_TYPE_DEBUFF)),
             set = function(info, state)
                 local optionKey = info[#info]
-                Gladdy.dbi.profile.trackedDebuffs[optionKey] = state
+                Gladdy.dbi.profile.trackedDebuffs[optionKey].active = state
             end,
             get = function(info)
                 local optionKey = info[#info]
-                return Gladdy.dbi.profile.trackedDebuffs[optionKey]
+                return Gladdy.dbi.profile.trackedDebuffs[optionKey].active
             end,
         },
         buffList = {
@@ -1041,11 +1048,11 @@ function BuffsDebuffs:GetOptions()
             args = select(1, Gladdy:GetAuras(AURA_TYPE_BUFF)),
             set = function(info, state)
                 local optionKey = info[#info]
-                Gladdy.dbi.profile.trackedBuffs[optionKey] = state
+                Gladdy.dbi.profile.trackedBuffs[optionKey].active = state
             end,
             get = function(info)
                 local optionKey = info[#info]
-                return Gladdy.dbi.profile.trackedBuffs[optionKey]
+                return Gladdy.dbi.profile.trackedBuffs[optionKey].active
             end,
         },
     }

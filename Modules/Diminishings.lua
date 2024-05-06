@@ -1144,7 +1144,10 @@ function Diminishings:GetDRIcons(category)
     local icons = {}
     for k,v in pairs(DRData:GetSpells()) do
         if v == category then
-            icons[select(3, GetSpellInfo(k))] = format("|T%s:20|t %s", select(3, GetSpellInfo(k)), select(1, GetSpellInfo(k)))
+            local name, _, texture = GetSpellInfo(k)
+            if name then
+                icons[texture] = format("|T%s:20|t %s", texture, name)
+            end
         end
     end
     return icons
