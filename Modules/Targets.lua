@@ -58,12 +58,14 @@ function Targets:Initialize()
     self.frames = {}
     if Gladdy.db.targetEnabled then
         self:RegisterMessage("JOINED_ARENA")
+        self:RegisterMessage("ENEMY_SPOTTED")
     end
 end
 
 function Targets:UpdateFrameOnce()
     if Gladdy.db.targetEnabled then
         self:RegisterMessage("JOINED_ARENA")
+        self:RegisterMessage("ENEMY_SPOTTED")
     else
         self:UnregisterAllMessages()
     end
@@ -82,13 +84,49 @@ function Targets:JOINED_ARENA()
     end
 end
 
+--[[local function checkTargets(unitTarget, checkUnits)
+    local unit = unitTarget:gsub("target", "")
+    for _,checkUnit in pairs(checkUnits) do
+        if UnitIsUnit(unit, checkUnit) and not UnitIsUnit(unitTarget, checkUnit .. "target") then
+            Gladdy:Debug("WARN", unitTarget, "is currupted", "checked", checkUnit)
+            return false
+        end
+    end
+    return true
+end]]
+
+function Targets:ENEMY_SPOTTED(unit)
+    unit = unit .. "target"
+    Gladdy:Debug("ENEMY_SPOTTED", unit)
+    local unitGUID = UnitExists(unit) and UnitGUID(unit)
+    local button = self.frames[unit]
+    if button then
+        if unitGUID then
+            local health = UnitHealth(unit)
+            local healthMax = UnitHealthMax(unit)
+
+            button.unitGUID = unitGUID
+            self:UpdateHealthBarColor(unit)
+            self:UpdatePortrait(unit)
+            button.healthBar.hp:SetMinMaxValues(0, healthMax)
+            button.healthBar.hp:SetValue(health)
+            self:HealthCheck(unit)
+            self:SetHealthText(button.healthBar, health, healthMax)
+            self:SetText(unit)
+        else
+            button.unitGUID = nil
+            button:SetAlpha(0)
+        end
+    end
+end
+
 function Targets:OnEvent(event)
     for i=1, Gladdy.curBracket do
         local unit = self.targetUnits[i]
         local button = self.frames[unit]
-        local unitGUID = UnitGUID(unit)
+        local unitGUID = UnitExists(unit) and UnitGUID(unit)
         if unitGUID then
-            Gladdy:Debug("INFO", unit, "show", event)
+            Gladdy:Debug("INFO", unit, "show", event, unitGUID)
             local health = UnitHealth(unit)
             local healthMax = UnitHealthMax(unit)
             local checkedHealth
