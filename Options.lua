@@ -213,7 +213,7 @@ function Gladdy:SetupModule(name, module, order)
     end
 end
 
-local function getAll(options)
+function Gladdy:GetFromMultipleOptions(options)
     local val = options[1]
     local isAllSameValue = true
     for _,v in pairs(options) do
@@ -455,7 +455,7 @@ function Gladdy:SetupOptions()
                                             return Gladdy.db.useOmnicc
                                         end,
                                         get = function(info)
-                                            local isAllSameValue =  getAll({
+                                            local isAllSameValue =  Gladdy:GetFromMultipleOptions({
                                                 Gladdy.db.auraDisableCircle,
                                                 Gladdy.db.buffsDisableCircle,
                                                 Gladdy.db.cooldownDisableCircle,
@@ -491,7 +491,7 @@ function Gladdy:SetupOptions()
                                             return Gladdy.db.useOmnicc
                                         end,
                                         get = function(info)
-                                            return getAll({
+                                            return Gladdy:GetFromMultipleOptions({
                                                 Gladdy.db.auraCooldownAlpha,
                                                 Gladdy.db.buffsCooldownAlpha,
                                                 Gladdy.db.cooldownCooldownAlpha,
@@ -541,7 +541,7 @@ function Gladdy:SetupOptions()
                                         dialogControl = "LSM30_Font",
                                         values = AceGUIWidgetLSMlists.font,
                                         get = function(info)
-                                            return getAll({
+                                            return Gladdy:GetFromMultipleOptions({
                                                 Gladdy.db.auraFont,
                                                 Gladdy.db.buffsFont,
                                                 Gladdy.db.castBarFont,
@@ -584,7 +584,7 @@ function Gladdy:SetupOptions()
                                         order = 12,
                                         hasAlpha = true,
                                         get = function(info)
-                                            return getAll({
+                                            return Gladdy:GetFromMultipleOptions({
                                                 Gladdy.db.castBarFontColor,
                                                 Gladdy.db.healthBarFontColor,
                                                 Gladdy.db.petHealthBarFontColor,
@@ -612,7 +612,7 @@ function Gladdy:SetupOptions()
                                         order = 12,
                                         hasAlpha = true,
                                         get = function(info)
-                                            return getAll({
+                                            return Gladdy:GetFromMultipleOptions({
                                                 Gladdy.db.auraFontColor,
                                                 Gladdy.db.buffsFontColor,
                                                 Gladdy.db.cooldownFontColor,
@@ -648,7 +648,7 @@ function Gladdy:SetupOptions()
                                         order = 14,
                                         values = Gladdy:GetIconStyles(),
                                         get = function(info)
-                                            return getAll({
+                                            return Gladdy:GetFromMultipleOptions({
                                                 Gladdy.db.auraBorderStyle,
                                                 Gladdy.db.buffsBorderStyle,
                                                 Gladdy.db.castBarIconStyle,
@@ -687,7 +687,7 @@ function Gladdy:SetupOptions()
                                         order = 15,
                                         hasAlpha = true,
                                         get = function(info)
-                                            return getAll({
+                                            return Gladdy:GetFromMultipleOptions({
                                                 Gladdy.db.buffsBorderColor,
                                                 Gladdy.db.castBarIconColor,
                                                 Gladdy.db.classIconBorderColor,
@@ -736,7 +736,7 @@ function Gladdy:SetupOptions()
                                         dialogControl = "LSM30_Statusbar",
                                         values = AceGUIWidgetLSMlists.statusbar,
                                         get = function(info)
-                                            return getAll({
+                                            return Gladdy:GetFromMultipleOptions({
                                                 Gladdy.db.castBarTexture,
                                                 Gladdy.db.healthBarTexture,
                                                 Gladdy.db.petHealthBarTexture,
@@ -764,7 +764,7 @@ function Gladdy:SetupOptions()
                                         dialogControl = "LSM30_Border",
                                         values = AceGUIWidgetLSMlists.border,
                                         get = function(info)
-                                            return getAll({
+                                            return Gladdy:GetFromMultipleOptions({
                                                 Gladdy.db.castBarBorderStyle,
                                                 Gladdy.db.healthBarBorderStyle,
                                                 Gladdy.db.petHealthBarBorderStyle,
@@ -798,7 +798,7 @@ function Gladdy:SetupOptions()
                                         order = 50,
                                         hasAlpha = true,
                                         get = function(info)
-                                            return getAll({
+                                            return Gladdy:GetFromMultipleOptions({
                                                 Gladdy.db.castBarBorderColor,
                                                 Gladdy.db.healthBarBorderColor,
                                                 Gladdy.db.petHealthBarBorderColor,
@@ -1022,37 +1022,14 @@ function Gladdy:GetAuras(auraType)
                     local dbName, _, dbIcon = GetSpellInfo(k)
                     if tostring(k) == tostring(value) then
                         value = tostring(value)
-                        --path = v.track == AURA_TYPE_DEBUFF and "debuffList" or "buffList"
                         exists = true
+                        class = v.class
                         break
                     elseif searchName == dbName and searchIcon == dbIcon then -- same spell
                         exists = true
-                        --path = v.track == AURA_TYPE_DEBUFF and "debuffList" or "buffList"
-                        --[[local existsInSpellIDs = false
-                        for _,spellID in ipairs(v.spellIDs) do
-                            if tonumber(value) == spellID then
-                                existsInSpellIDs = true
-                                break
-                            end
-                        end
-                        if not existsInSpellIDs then
-                            table.insert(Gladdy.db[path][k].spellIDs, tonumber(value))
-                            --flatEnabledSpells()
-                            --TODO update module options here
-                        end]]
                         value = k
-                    else
-                        --[[for _,val in pairs(v.spellIDs) do
-                            if tostring(val) == tostring(value) then
-                                value = tostring(k)
-                                --path = v.track == AURA_TYPE_DEBUFF and "debuffList" or "buffList"
-                                exists = true
-                                break
-                            end
-                        end
-                        if exists then
-                            break
-                        end]]
+                        class = v.class
+                        break
                     end
                 end
                 if not exists then
@@ -1060,18 +1037,16 @@ function Gladdy:GetAuras(auraType)
                     Gladdy.db[path][tostring(value)] = {
                         class = class,
                         active = true,
-                        ids = Gladdy:SearchAllSpellIdsBySpellId(value)
+                        ids = values
                     }
-                    --flatEnabledSpells()
+
                     Gladdy.options.args["Buffs and Debuffs"].args = Gladdy.modules["Buffs and Debuffs"]:GetOptions()
-                    --BuffsDebuffs:GetOptions()
-                    --Gladdy.options.args["Auras"].args[path].args = Auras:GetAuraOptions(auraType)
-                    --TODO update module options here
                     Gladdy.modules["Buffs and Debuffs"]:UpdateTrackedAuras()
-                    --/dump LibStub("Gladdy").options.args["Buffs and Debuffs"].args["debuffList"].args["DRUID"].args["19975"]
+
                     LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
-                    LibStub("AceConfigDialog-3.0"):SelectGroup("Gladdy", "Buffs and Debuffs", optionPath, class)--optionPath, class, tostring(value))
+                    LibStub("AceConfigDialog-3.0"):SelectGroup("Gladdy", "Buffs and Debuffs", optionPath, class)
                 end
+                LibStub("AceConfigDialog-3.0"):SelectGroup("Gladdy", "Buffs and Debuffs", optionPath, class)
             end,
         }
         for i=1, #classSpells do

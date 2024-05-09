@@ -13,10 +13,10 @@ local L = Gladdy.L
 
 local interrupts = {}
 local function defaultInterrupts()
-    for _,v in pairs(Gladdy:GetInterrupts()) do
-        interrupts[tostring(v.spellID)] = {}
-        interrupts[tostring(v.spellID)].enabled = true
-        interrupts[tostring(v.spellID)].priority = v.priority
+    for spellID,v in pairs(Gladdy:GetInterrupts()) do
+        interrupts[tostring(spellID)] = {}
+        interrupts[tostring(spellID)].enabled = true
+        interrupts[tostring(spellID)].priority = v.priority
     end
     return interrupts
 end
@@ -711,22 +711,23 @@ function Auras:SPELL_INTERRUPT(unit,spellID,spellName,spellSchool,extraSpellId,e
     if (not interruptFrame) then
         return
     end
-    if not Gladdy.db.auraListInterrupts[tostring(Gladdy:GetInterrupts()[spellName].spellID)] or not Gladdy.db.auraListInterrupts[tostring(Gladdy:GetInterrupts()[spellName].spellID)].enabled then
+    local dbEntry = Gladdy.db.auraListInterrupts[tostring(spellID)]
+    if not dbEntry or not dbEntry.enabled then
         return
     end
-    if (interruptFrame.priority and interruptFrame.priority > Gladdy.db.auraListInterrupts[tostring(Gladdy:GetInterrupts()[spellName].spellID)].priority) then
+    if (interruptFrame.priority and interruptFrame.priority > dbEntry.priority) then
         return
     end
     local multiplier = ((button.spec == L["Restoration"] and button.class == "SHAMAN") or (button.spec == L["Holy"] and button.class == "PALADIN")) and 0.7 or 1
 
-    local duration = Gladdy:GetInterrupts()[spellName].duration * multiplier
+    local duration = Gladdy:GetInterrupts()[spellID].duration * multiplier
 
     interruptFrame.startTime = GetTime()
     interruptFrame.endTime = GetTime() + duration
     interruptFrame.name = spellName
     interruptFrame.timeLeft = duration
-    interruptFrame.priority = Gladdy.db.auraListInterrupts[tostring(Gladdy:GetInterrupts()[spellName].spellID)].priority
-    interruptFrame.icon:SetTexture(Gladdy:GetInterrupts()[spellName].texture)
+    interruptFrame.priority = dbEntry.priority
+    interruptFrame.icon:SetTexture(Gladdy:GetInterrupts()[spellID].texture)
     interruptFrame.spellSchool = extraSpellSchool
     interruptFrame.active = true
     interruptFrame.icon.overlay:Show()
@@ -1532,31 +1533,31 @@ function Auras:GetInterruptOptions()
         },
     }
     local auras = {}
-    for _,v in pairs(Gladdy:GetInterrupts()) do
-        tinsert(auras, v.spellID)
+    for spellID,v in pairs(Gladdy:GetInterrupts()) do
+        tinsert(auras, spellID)
     end
     tbl_sort(auras, function(a, b)
         return GetSpellInfo(a) < GetSpellInfo(b)
     end)
-    for i,k in ipairs(auras) do
-        options[tostring(k)] = {
+    for i, spellID in ipairs(auras) do
+        options[tostring(spellID)] = {
             type = "group",
-            name = GetSpellInfo(k),
-            desc = Gladdy:GetSpellDescription(k),
+            name = GetSpellInfo(spellID),
+            desc = Gladdy:GetSpellDescription(spellID),
             order = i+2,
-            icon = Gladdy:GetInterrupts()[GetSpellInfo(k)] and Gladdy:GetInterrupts()[GetSpellInfo(k)].texture or select(3, GetSpellInfo(k)),
+            icon = Gladdy:GetInterrupts()[spellID] and Gladdy:GetInterrupts()[spellID].texture or select(3, GetSpellInfo(spellID)),
             args = {
                 enabled = {
                     order = 1,
                     name = L["Enabled"],
                     type = "toggle",
-                    image = Gladdy:GetInterrupts()[GetSpellInfo(k)] and Gladdy:GetInterrupts()[GetSpellInfo(k)].texture or select(3, GetSpellInfo(k)),
+                    image = Gladdy:GetInterrupts()[spellID] and Gladdy:GetInterrupts()[spellID].texture or select(3, GetSpellInfo(spellID)),
                     width = "2",
                     set = function(_, value)
-                        Gladdy.db.auraListInterrupts[tostring(k)].enabled = value
+                        Gladdy.db.auraListInterrupts[tostring(spellID)].enabled = value
                     end,
                     get = function()
-                        return Gladdy.db.auraListInterrupts[tostring(k)].enabled
+                        return Gladdy.db.auraListInterrupts[tostring(spellID)].enabled
                     end
                 },
                 priority = {
@@ -1568,10 +1569,10 @@ function Auras:GetInterruptOptions()
                     width = "2",
                     step = 1,
                     get = function()
-                        return Gladdy.db.auraListInterrupts[tostring(k)].priority
+                        return Gladdy.db.auraListInterrupts[tostring(spellID)].priority
                     end,
                     set = function(_, value)
-                        Gladdy.db.auraListInterrupts[tostring(k)].priority = value
+                        Gladdy.db.auraListInterrupts[tostring(spellID)].priority = value
                     end,
                     width = "full",
                 }
