@@ -9,7 +9,7 @@ License: MIT
 
 --- DRList-1.0
 -- @module DRList-1.0
-local MAJOR, MINOR = "DRList-1.0", 60 -- Don't forget to change this in Spells.lua aswell!
+local MAJOR, MINOR = "DRList-1.0", 64 -- Don't forget to change this in Spells.lua aswell!
 local Lib = assert(LibStub, MAJOR .. " requires LibStub."):NewLibrary(MAJOR, MINOR)
 if not Lib then return end -- already loaded
 
@@ -129,14 +129,8 @@ Lib.gameExpansion = ({
     [WOW_PROJECT_CLASSIC] = "classic",
     [WOW_PROJECT_BURNING_CRUSADE_CLASSIC or 5] = "tbc",
     [WOW_PROJECT_WRATH_CLASSIC or 11] = "wotlk",
-    [WOW_PROJECT_CATA_CLASSIC or 12] = "cata",
+    [WOW_PROJECT_CATACLYSM_CLASSIC or 14] = "cata",
 })[WOW_PROJECT_ID] or "cata" -- Fallback to cata when unknown (most likely a new classic expansion build)
-
--- temporary Cata beta fix because WOW_PROJECT_ID is still 11
-local _, _, _, toc = GetBuildInfo()
-if toc > 40000 and toc < 50000 then
-    Lib.gameExpansion = "cata"
-end
 
 -- How long it takes for a DR to expire, in seconds.
 Lib.resetTimes = {
