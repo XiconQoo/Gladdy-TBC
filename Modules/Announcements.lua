@@ -41,7 +41,7 @@ function Announcements:Initialize()
     self.RES_SPELLS = {
         [GetSpellInfo(2006)] = true,
         [GetSpellInfo(7328)] = true,
-        --[GetSpellInfo(20777)] = true,
+        [GetSpellInfo(2008)] = true,
     }
 
     self:RegisterMessage("JOINED_ARENA")
