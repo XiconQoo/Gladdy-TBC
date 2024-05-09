@@ -276,7 +276,6 @@ local specSpells = {
     [GetSpellInfo(36563)] = L["Subtlety"], -- Shadowstep
     [GetSpellInfo(51713)] = L["Subtlety"], -- Shadow Dance
     [GetSpellInfo(14183)] = L["Subtlety"], -- Premeditation
-    [GetSpellInfo(45182)] = L["Subtlety"], -- Cheat Death
     [GetSpellInfo(51693)] = L["Subtlety"], -- Waylay
     [GetSpellInfo(31666)] = L["Subtlety"], -- Master of Subtlety
     [GetSpellInfo(16511)] = L["Subtlety"], -- Hemorrhage
@@ -553,7 +552,7 @@ local importantAuras = {
     [118] = { -- Polymorph
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellIDs = { 118 },
+        spellIDs = { 118, 61305, 61780, 61721, 28271, 28272 },
         texture = 136071,
     },
     [51514] = { -- Hex
@@ -576,36 +575,91 @@ local importantAuras = {
         priority = 40,
         spellIDs = { 1513 },
     },
+    [9484] = { -- shackle undead
+        track = AURA_TYPE_DEBUFF,
+        priority = 40,
+        spellIDs = { 9484 },
+    },
+    [39796] = { -- Stoneclaw Stun
+        track = AURA_TYPE_DEBUFF,
+        priority = 40,
+        spellIDs = { 39796 },
+    },
+    [2812] = { -- Holy Wrath
+        track = AURA_TYPE_DEBUFF,
+        priority = 40,
+        spellIDs = { 2812 },
+    },
+    [10326] = { -- Turn Evil
+        track = AURA_TYPE_DEBUFF,
+        priority = 40,
+        spellIDs = { 10326 },
+    },
+    [3355] = { -- Freezing Trap
+        track = AURA_TYPE_DEBUFF,
+        priority = 40,
+        spellIDs = { 1499, 3355 },
+    },
+    [83046] = { -- Improved polymorph
+        track = AURA_TYPE_DEBUFF,
+        priority = 40,
+        spellIDs = { 83046 },
+    },
 
     --- Roots
     [87193] = { -- Paralysis
         track = AURA_TYPE_DEBUFF,
-        priority = 40,
-        spellIDs = { 87193 },
+        priority = 30,
+        spellIDs = { 87193, 87194 },
+    },
+    [50245] = { -- Pin (hunter pet)
+        track = AURA_TYPE_DEBUFF,
+        priority = 30,
+        spellIDs = { 50245 },
+    },
+    [54706] = { -- Venom Web Spray (hunter pet)
+        track = AURA_TYPE_DEBUFF,
+        priority = 30,
+        spellIDs = { 54706 },
     },
 
     [83302] = { -- Improved Cone of Cold
         track = AURA_TYPE_DEBUFF,
-        priority = 40,
+        priority = 30,
         spellIDs = { 83302 },
+    },
+    [91807] = { -- Shambling Rush, Root
+        track = AURA_TYPE_DEBUFF,
+        priority = 30,
+        spellIDs = { 91807 },
+    },
+    [64695] = { -- Earthgrab Shaman
+        track = AURA_TYPE_DEBUFF,
+        priority = 30,
+        spellIDs = { 64695 },
+    },
+    [19306] = { -- Counterattack
+        track = AURA_TYPE_DEBUFF,
+        priority = 30,
+        spellIDs = { 19306 },
     },
 
     -- Entangling Roots
     [339] = {
         track = AURA_TYPE_DEBUFF,
         priority = 30,
-        spellIDs = { 339 },
+        spellIDs = { 339, 19975 },
     },
 
     [122] = { -- Frost Nova
         track = AURA_TYPE_DEBUFF,
         priority = 30,
-        spellIDs = { 122 },
+        spellIDs = { 122, 55080 },
     },
     [33395] = { -- Freeze (Water Elemental)
         track = AURA_TYPE_DEBUFF,
         priority = 30,
-        spellIDs = { 33395 },
+        spellIDs = { 33395, 63685 },
     },
     [55080] = { -- Shattered Barrier
         track = AURA_TYPE_DEBUFF,
@@ -615,7 +669,7 @@ local importantAuras = {
     [16979] = { -- Feral Charge
         track = AURA_TYPE_DEBUFF,
         priority = 30,
-        spellIDs = { 16979 },
+        spellIDs = { 16979, 45334 },
     },
     [23694] = { -- Improved Hamstring
         track = AURA_TYPE_DEBUFF,
@@ -639,7 +693,16 @@ local importantAuras = {
         priority = 40,
         spellIDs = { 87204 },
     },
-
+    [54786] = { -- Demon Leap
+        track = AURA_TYPE_DEBUFF,
+        priority = 40,
+        spellIDs = { 54786 },
+    },
+    [60995] = { -- Demon Charge
+        track = AURA_TYPE_DEBUFF,
+        priority = 40,
+        spellIDs = { 60995 },
+    },
     [90337] = { -- Bad Manner
         track = AURA_TYPE_DEBUFF,
         priority = 40,
@@ -747,10 +810,10 @@ local importantAuras = {
         priority = 40,
         spellIDs = { 49203 },
     },
-    [47481] = { -- Gnaw (dk pet stun)
+    [91800] = { -- Gnaw (dk pet stun)
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellIDs = { 47481 },
+        spellIDs = { 47481, 91800 },
     },
     [30283] = { -- Shadowfury Stun
         track = AURA_TYPE_DEBUFF,
@@ -788,7 +851,7 @@ local importantAuras = {
     [19577] = {-- Intimidation
         track = AURA_TYPE_DEBUFF,
         priority = 40,
-        spellIDs = { 19577 },
+        spellIDs = { 19577, 24394 },
     },
     [31661] = { -- Dragon's Breath
         track = AURA_TYPE_DEBUFF,
@@ -800,7 +863,7 @@ local importantAuras = {
     [81261] = { -- Solar Beam
         track = AURA_TYPE_DEBUFF,
         priority = 20,
-        spellIDs = { 81261 },
+        spellIDs = { 81261, 78675 },
     },
 
     [31935] = { -- Avenger's Shield
@@ -866,6 +929,11 @@ local importantAuras = {
         priority = 20,
         spellIDs = { 1330 },
     },
+    [87023] = { -- Cauterize
+        track = AURA_TYPE_DEBUFF,
+        priority = 10,
+        spellIDs = { 87023 },
+    },
 
     --- Disarms
     [676] = { -- Disarm
@@ -883,12 +951,37 @@ local importantAuras = {
         priority = 20,
         spellIDs = { 64058 },
     },
+    [91644] = { -- Snapch Disarm
+        track = AURA_TYPE_DEBUFF,
+        priority = 20,
+        spellIDs = { 91644 },
+    },
+    [64346] = { -- Fiery Payback
+        track = AURA_TYPE_DEBUFF,
+        priority = 20,
+        spellIDs = { 64346 },
+    },
 
     --- Buffs
     [22812] = { -- Barkskin
         track = AURA_TYPE_BUFF,
         priority = 25,
         spellIDs = { 22812 },
+    },
+    [33891] = { -- Tree of Life
+        track = AURA_TYPE_BUFF,
+        priority = 25,
+        spellIDs = { 33891 },
+    },
+    [3411] = { -- Intervene
+        track = AURA_TYPE_BUFF,
+        priority = 25,
+        spellIDs = { 3411 },
+    },
+    [55694] = { -- Enraged Regeneration
+        track = AURA_TYPE_BUFF,
+        priority = 25,
+        spellIDs = { 55694 },
     },
     [55233] = { -- Vampiric Blood
         track = AURA_TYPE_BUFF,
@@ -945,10 +1038,10 @@ local importantAuras = {
         priority = 20,
         spellIDs = { 64205 },
     },
-    [53271] = { -- Master's Call (Hunter Pet Hand of Freedom)
+    [54216] = { -- Master's Call (Hunter Pet Hand of Freedom)
         track = AURA_TYPE_BUFF,
         priority = 20,
-        spellIDs = { 53271 },
+        spellIDs = { 54216, 53271 },
     },
     [2825] = { -- Bloodlust
         track = AURA_TYPE_BUFF,
@@ -992,7 +1085,7 @@ local importantAuras = {
     },
     [51713] = { -- Shadow Dance
         track = AURA_TYPE_BUFF,
-        priority = 20,
+        priority = 21,
         spellIDs = { 51713 },
     },
     [12292] = { -- Death Wish
@@ -1012,25 +1105,56 @@ local importantAuras = {
     },
     [50334] = {-- Berserk
         track = AURA_TYPE_BUFF,
-        priority = 20,
+        priority = 15,
         spellIDs = { 50334 },
-    },
-    [46924] = { -- Bladestorm
-        track = AURA_TYPE_BUFF,
-        priority = 20,
-        spellIDs = { 46924 },
     },
     [79206] = { -- Spiritwalker's Grace
         track = AURA_TYPE_BUFF,
-        priority = 20,
+        priority = 9,
         spellIDs = { 79206 },
+    },
+    [12472] = { -- Icy Veins
+        track = AURA_TYPE_BUFF,
+        priority = 9,
+        spellIDs = { 12472 },
     },
 
     --- Turtling abilities
+    [88611] = { -- Smoke Bommb
+        track = AURA_TYPE_BUFF,
+        priority = 25,
+        spellIDs = { 88611, 76577 },
+        duration = 6
+    },
+    [45182] = { -- Cheating Death
+        track = AURA_TYPE_BUFF,
+        priority = 25,
+        spellIDs = { 45182 },
+    },
+    [2565] = { -- Shield Block
+        track = AURA_TYPE_BUFF,
+        priority = 25,
+        spellIDs = { 2565 },
+    },
+    [12976] = { -- Last Stand
+        track = AURA_TYPE_BUFF,
+        priority = 25,
+        spellIDs = { 12976 },
+    },
     [47788] = { -- Guardian Spirit
         track = AURA_TYPE_BUFF,
         priority = 25,
         spellIDs = { 47788 },
+    },
+    [31850] = { -- Ardent Defender
+        track = AURA_TYPE_BUFF,
+        priority = 25,
+        spellIDs = { 31850 },
+    },
+    [498] = { -- Divine Protection
+        track = AURA_TYPE_BUFF,
+        priority = 25,
+        spellIDs = { 498 },
     },
     [98008] = { -- Spirit Link Totem
         track = AURA_TYPE_BUFF,
@@ -1042,7 +1166,7 @@ local importantAuras = {
         priority = 25,
         spellIDs = { 53480 },
     },
-    [62618] = { -- Shield Wall
+    [62618] = { -- Power Word: Barrier
         track = AURA_TYPE_BUFF,
         priority = 25,
         spellIDs = { 62618 },
@@ -1072,17 +1196,42 @@ local importantAuras = {
         priority = 10,
         spellIDs = { 5277 },
     },
-    [87023] = { -- Cauterize
+    [50461] = { -- Anti-Magic Zone
         track = AURA_TYPE_BUFF,
         priority = 10,
-        spellIDs = { 87023 },
+        spellIDs = { 50461 },
+    },
+    [47788] = { -- Guardian Spirit
+        track = AURA_TYPE_BUFF,
+        priority = 10,
+        spellIDs = { 47788 },
+    },
+    [5384] = { -- Feign Death
+        track = AURA_TYPE_BUFF,
+        priority = 10,
+        spellIDs = { 5384 },
     },
 
     --- Immunities
+    [46924] = { -- Bladestorm
+        track = AURA_TYPE_BUFF,
+        priority = 20,
+        spellIDs = { 46924 },
+    },
     [34471] = { -- The Beast Within (CC Immune)
         track = AURA_TYPE_BUFF,
         priority = 20,
         spellIDs = { 34471 },
+    },
+    [27827] = {-- Spirit of Redemption
+        track = AURA_TYPE_BUFF,
+        priority = 20,
+        spellIDs = { 27827 },
+    },
+    [47585] = { -- Dispersion
+        track = AURA_TYPE_BUFF,
+        priority = 20,
+        spellIDs = { 47585 },
     },
     [45438] = { -- Ice Block
         track = AURA_TYPE_BUFF,
@@ -1119,11 +1268,7 @@ local importantAuras = {
         priority = 15,
         spellIDs = { 49039 },
     },
-    [49039] = { -- Lichborne
-        track = AURA_TYPE_BUFF,
-        priority = 15,
-        spellIDs = { 49039 },
-    },
+
     --- Alt Stuff
     [34709] = { -- Shadowsight Buff
         track = AURA_TYPE_DEBUFF,
@@ -1151,23 +1296,24 @@ function Gladdy:GetImportantAuras()
 end
 
 local interrupts = {
-    [GetSpellInfo(79870)] = { duration = 4, spellID = 79870, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(79870)), priority = 15 }, -- Feral Charge Effect (Druid)
-    [GetSpellInfo(2139)] = { duration = 7, spellID = 2139, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(2139)), priority = 15 }, -- Counterspell (Mage)
-    [GetSpellInfo(1766)] = { duration = 5, spellID = 1766, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(1766)), priority = 15 }, -- Kick (Rogue)
-    [GetSpellInfo(6552) .. "WARRIOR"] = { duration = 4, spellID = 6552, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(6552)), priority = 15 }, -- Pummel (Warrior)
-    [GetSpellInfo(57994)] = { duration = 2, spellID = 57994, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(57994)), priority = 15 }, -- Wind Shear (Shaman)
-    [GetSpellInfo(19647)] = { duration = 6, spellID = 19647, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(19647)), priority = 15 }, -- Spell Lock (Warlock
-    [GetSpellInfo(47528)] = { duration = 4, spellID = 47528, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(47528)), priority = 15 }, -- Mind Freeze (Deathknight)
-    [GetSpellInfo(96231)] = { duration = 4, spellID = 96231, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(96231)), priority = 15 }, -- Rebuke (Paladin)
-    [GetSpellInfo(91807)] = { duration = 2, spellID = 91807, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(91807)), priority = 15 }, -- Shambling Rush (DK pet)
-    [GetSpellInfo(80964)] = { duration = 4, spellID = 80964, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(80964)), priority = 15 }, -- Skull Bash (Bear)
-    [GetSpellInfo(80965)] = { duration = 2, spellID = 80965, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(80965)), priority = 15 }, -- Skull Bash (Cat)
-    [GetSpellInfo(31935)] = { duration = 3, spellID = 31935, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(31935)), priority = 15 }, -- Avenger's Shield (Paladin)
-    [GetSpellInfo(34490)] = { duration = 3, spellID = 34490, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(34490)), priority = 15 }, -- Silencing Shot (Hunter)
-    [GetSpellInfo(26090) .. "PET"] = { duration = 2, spellID = 26090, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(26090)), priority = 15 }, -- Pummel (Hunter Pet)
-    [GetSpellInfo(97547)] = { duration = 5, spellID = 97547, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(97547)), priority = 15 }, -- Solar Beam (Druid)
-    [GetSpellInfo(51680)] = { duration = 3, spellID = 51680, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(51680)), priority = 15 }, -- Throwing Specialization (Rogue)
-    [GetSpellInfo(93985)] = { duration = 4, spellID = 93985, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(93985)), priority = 15 }, -- Skull Bash
+    --[GetSpellInfo(79870)] = { duration = 4, spellID = 79870, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(79870)), priority = 15 }, -- Feral Charge Effect (Druid)
+    [2139] = { duration = 7, spellID = 2139, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(2139)), priority = 15 }, -- Counterspell (Mage)
+    [1766] = { duration = 5, spellID = 1766, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(1766)), priority = 15 }, -- Kick (Rogue)
+    [6552] = { duration = 4, spellID = 6552, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(6552)), priority = 15 }, -- Pummel (Warrior)
+    [57994] = { duration = 2, spellID = 57994, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(57994)), priority = 15 }, -- Wind Shear (Shaman)
+    [19647] = { duration = 6, spellID = 19647, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(19647)), priority = 15 }, -- Spell Lock (Warlock
+    [47528] = { duration = 4, spellID = 47528, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(47528)), priority = 15 }, -- Mind Freeze (Deathknight)
+    [96231] = { duration = 4, spellID = 96231, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(96231)), priority = 15 }, -- Rebuke (Paladin)
+    [91802] = { duration = 2, spellID = 91802, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(91802)), priority = 15 }, -- Shambling Rush (DK pet)
+    [91807] = { duration = 2, spellID = 91807, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(91807)), priority = 15 }, -- Shambling Rush (DK pet)
+    [80964] = { duration = 4, spellID = 80964, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(80964)), priority = 15 }, -- Skull Bash (Bear)
+    [80965] = { duration = 2, spellID = 80965, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(80965)), priority = 15 }, -- Skull Bash (Cat)
+    [31935] = { duration = 3, spellID = 31935, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(31935)), priority = 15 }, -- Avenger's Shield (Paladin)
+    [34490] = { duration = 3, spellID = 34490, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(34490)), priority = 15 }, -- Silencing Shot (Hunter)
+    [26090] = { duration = 2, spellID = 26090, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(26090)), priority = 15 }, -- Pummel (Hunter Pet)
+    [97547] = { duration = 5, spellID = 97547, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(97547)), priority = 15 }, -- Solar Beam (Druid)
+    [51680] = { duration = 3, spellID = 51680, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(51680)), priority = 15 }, -- Throwing Specialization (Rogue)
+    [93985] = { duration = 4, spellID = 93985, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(93985)), priority = 15 }, -- Skull Bash
 }
 function Gladdy:GetInterrupts()
     return interrupts
@@ -1593,10 +1739,10 @@ local racials = {
         texture = select(3, GetSpellInfo(20589))
     },
     ["Dwarf"] = {
-        [20594] = true, -- Stoneform
+        [65116] = true, -- Stoneform
         duration = 120,
-        spellName = select(1, GetSpellInfo(20594)),
-        texture = select(3, GetSpellInfo(20594))
+        spellName = select(1, GetSpellInfo(65116)),
+        texture = select(3, GetSpellInfo(65116))
     },
     ["Goblin"] = {
         [69070] = true, -- Rocket Jump
@@ -1623,22 +1769,21 @@ end
 local totemData = {
     -- Fire
     -- Water
-    --[string_lower("Disease Cleansing Totem")] = {id = 8170,texture = select(3, GetSpellInfo(8170)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 3},
     [string_lower("Mana Spring Totem")] = { id = 5675, texture = select(3, GetSpellInfo(5675)), color = { r = 0, g = 0, b = 0, a = 1 } },
+    [string_lower("Elemental Resistance Totem")] = { id = 8184, texture = select(3, GetSpellInfo(8184)), color = { r = 0, g = 0, b = 0, a = 1 } },
+    [string_lower("Totem of Tranquil Mind")] = { id = 87718, texture = select(3, GetSpellInfo(87718)), color = { r = 0, g = 0, b = 0, a = 1 } },
     -- Earth
     [string_lower("Tremor Totem")] = {id = 8143,texture = select(3, GetSpellInfo(8143)), color = {r = 1, g = 0.9, b = 0.1, a = 1}, pulse = { cd = 6, once = true }},
     -- Air
+    [string_lower("Spirit Link Totem")] = { id = 98008, texture = select(3, GetSpellInfo(98008)), color = { r = 0, g = 0, b = 0, a = 1 }, pulse = 1 },
 }
 
 local totemSpellIdToPulse = {
-    --[GetSpellInfo(totemData[string_lower("Disease Cleansing Totem")].id)] = totemData[string_lower("Disease Cleansing Totem")].pulse,
-    --[8170] = totemData[string_lower("Disease Cleansing Totem")].pulse,
     [8143] = totemData[string_lower("Tremor Totem")].pulse,
+    [98008] = totemData[string_lower("Spirit Link Totem")].pulse,
 }
 
 local totemNpcIdsToTotemData = {
-    --[5924] = totemData[string_lower("Disease Cleansing Totem")],
-
     [3573] = totemData[string_lower("Mana Spring Totem")],
     [7414] = totemData[string_lower("Mana Spring Totem")],
     [7415] = totemData[string_lower("Mana Spring Totem")],
@@ -1649,7 +1794,9 @@ local totemNpcIdsToTotemData = {
     [31189] = totemData[string_lower("Mana Spring Totem")],
     [31190] = totemData[string_lower("Mana Spring Totem")],
 
-    [5927] = totemData[string_lower("Elemental Resistance Totem")]
+    [5927] = totemData[string_lower("Elemental Resistance Totem")],
+    [47069] = totemData[string_lower("Totem of Tranquil Mind")],
+    [53006] = totemData[string_lower("Spirit Link Totem")],
 
 }
 

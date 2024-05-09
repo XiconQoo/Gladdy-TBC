@@ -1,6 +1,6 @@
 ## Interface: 40400
 ## Title: Gladdy - Cata
-## Version: 2.5-Beta
+## Version: 2.3-Beta
 ## Notes: The most powerful arena AddOn for WoW 3.4.0
 ## Author: XiconQoo, DnB_Junkee, Knall
 ## X-Email: contact me on discord Knall#1751
@@ -34,7 +34,7 @@ Modules\TotemPulse.lua
 Modules\Trinket.lua
 Modules\Racial.lua
 Modules\Cooldowns.lua
-Modules\ArenaCountDown.lua
+#Modules\ArenaCountDown.lua
 Modules\BuffsDebuffs.lua
 Modules\VersionCheck.lua
 Modules\XiconProfiles.lua

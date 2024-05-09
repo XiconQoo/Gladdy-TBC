@@ -81,6 +81,28 @@ Thank you!
 
 ### Changes
 
+### v2.3-Beta
+- Cata support
+- new Module **Targets**
+  - bar, icon or both can be displayed and moved freely
+- **Auras** & **BuffsDebuffs**
+  - spells can be added through the UI
+  - search by spell name or spell ID
+  - there are plans to apply this to all modules on the long run
+- **TotemPlates**
+  - size by reaction (friendly/hostile)
+  - borders color by reaction (friendly/hostile)
+- **RangeCheck**
+  - adjusted some spells
+  - new option to also track melee attack and/or autoshot range
+- **Trinket**
+  - dynamic trinket icon option added
+- **Racials**
+  - can be disabled by race
+- **CombatIndicator** improved tracking
+- added lib AceGUI-3.0-GladdySearchEditBox
+- fix some taint and timer issues
+
 ### v2.27-Release
 - fix TotemPlates interfering with NeatPlates
 
