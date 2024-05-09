@@ -1092,7 +1092,6 @@ function Cooldowns:GetCooldownOptions()
                         type = "toggle",
                         name = getName(spellId, cooldown),
                         desc = Gladdy:GetSpellDescription(spellId, cooldown),
-                        --desc = getSpellText(spellId),
                         order = 1,
                         width = 1.1,
                         image = select(3, GetSpellInfo(spellId)),

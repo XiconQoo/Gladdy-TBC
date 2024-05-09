@@ -44,17 +44,18 @@ end
 
 --- Register as follows
 --[[
-LibStub("AceGUI-3.0-GladdySearchEditBox"):Register("Auras", Predictor)
+local PREDICTOR_NAME = "MyAddonPredictor"
+LibStub("AceGUI-3.0-GladdySearchEditBox"):Register(PREDICTOR_NAME, Predictor)
 ]]
 
---- usage in config
+--- usage in AceConfig
 --[[
 editBox = {
 	order = 1,
-	width = "2",
-	name = L["Add Aura"],
+	width = "full",
+	name = "SomeName",
 	type = "input",
-	dialogControl = "GladdySearchEditBoxAuras",
+	dialogControl = "GladdySearchEditBox" .. PREDICTOR_NAME, -- "GladdySearchEditBoxMyAddonPredictor"
 	get = function()
 
 	end,
