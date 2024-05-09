@@ -20,22 +20,22 @@ local L = Gladdy.L
 local HealthBar = Gladdy.modules["Health Bar"]
 
 local classSpells = {
-    ["MAGE"] =  118,
-    ["PRIEST"] = 32379,
-    ["DRUID"] = 33786,
-    ["SHAMAN"] = 10414,
-    ["PALADIN"] = 10308,
-    ["WARLOCK"] = 5782,
-    ["WARRIOR"] = 25275,
-    ["HUNTER"] = 3034,
-    ["ROGUE"] = 36554,
-    ["DEATHKNIGHT"] = 49576,
+    ["MAGE"] = { spellID = 118, melee = false, range = false },
+    ["PRIEST"] = { spellID = 32379, melee = false, range = false },
+    ["DRUID"] = { spellID = 33786, melee = true, range = false },
+    ["SHAMAN"] = { spellID = 8042, melee = true, range = false },
+    ["PALADIN"] = { spellID = 853, melee = true, range = false },
+    ["WARLOCK"] = { spellID = 5782, melee = false, range = false },
+    ["WARRIOR"] = { spellID = 20252, melee = true, range = false },
+    ["HUNTER"] = { spellID = 1978, melee = true, range = true },
+    ["ROGUE"] = { spellID = 36554, melee = true, range = false },
+    ["DEATHKNIGHT"] = { spellID = 49576, melee = true, range = false },
 }
 
 local function defaultSpells()
     local defaults = {}
-    for _,class in ipairs(Gladdy.CLASSES) do
-        defaults[class] = { min = classSpells[class] }
+    for class,option in pairs(classSpells) do
+        defaults[class] = option--{ min = classSpells[class] }
     end
     return defaults
 end
@@ -182,18 +182,50 @@ end
 function RangeCheck.CheckRange(self)
     local button = self.parent
 
-    local spell = Gladdy.db.rangeCheckDefaultSpells[RangeCheck.playerClass].min
+    local dbEntry = Gladdy.db.rangeCheckDefaultSpells[RangeCheck.playerClass]
 
     if (not UnitIsConnected(button.unit) or not UnitInPhase(button.unit)) then
         RangeCheck:SetRangeAlpha(button, false)
-    elseif (spell) then
-        RangeCheck:SetRangeAlpha(button, LSR.IsSpellInRange(spell, button.unit) == 1)
-        -- That didn't work, but they are grouped lets try the actual API for this, it's a bit flaky though and not that useful generally
+    elseif (dbEntry) then
+        local isInSpellRange = dbEntry.spellID and LSR.IsSpellInRange(dbEntry.spellID, button.unit) == 1
+        local isInMeleeRange = dbEntry.melee and RangeCheck:isAutoattackInRange(button) == 1
+        local isInAutoshotRange = dbEntry.range and RangeCheck:isAutoshotInRange(button) == 1
+
+        RangeCheck:SetRangeAlpha(button, isInSpellRange or isInMeleeRange or isInAutoshotRange)
+    -- That didn't work, but they are grouped lets try the actual API for this, it's a bit flaky though and not that useful generally
     elseif (UnitInRaid(button.unit) or UnitInParty(button.unit)) then
         RangeCheck:SetRangeAlpha(button, UnitInRange(button.unit, "player"))
-        -- Nope, fall back to interaction :(
+    -- Nope, fall back to interaction :(
     else
         RangeCheck:SetRangeAlpha(button, CheckInteractDistance(button.unit, 4))
+    end
+end
+
+local IsItemInRange,IsCurrentSpell = IsItemInRange,IsCurrentSpell
+local UnitExists, UnitIsFriend, UnitIsDeadOrGhost = UnitExists, UnitIsFriend, UnitIsDeadOrGhost
+local AuraUtil
+local feignDeath = GetSpellInfo(5384)
+
+function RangeCheck:isAutoshotInRange(button)
+    return UnitExists(button.unit) and LSR.IsSpellInRange(75, button.unit) -- Autoshot
+end
+function RangeCheck:isAutoattackInRange(button)
+    if not UnitExists(button.unit) then
+        return false
+    end
+    if UnitIsFriend("player", button.unit) then
+        return nil
+    end
+    if UnitIsDeadOrGhost(button.unit) and not AuraUtil.FindAuraByName(feignDeath, button.unit) then
+        return nil
+    end
+
+    if not IsItemInRange(16114, button.unit) then --not in melee range
+        return 0 --aura_env.displayText = "TOO FAR"
+    elseif IsCurrentSpell(6603) == false then --auto attack is not queued
+        return 1 --aura_env.displayText = "NOT ATTACKING"
+    else
+        return 1
     end
 end
 
@@ -338,30 +370,55 @@ function RangeCheck:GetSpells()
             args = {
                 headerMin = {
                     type = "header",
-                    name = GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min) and format("|T%s:20|t %s - %d" .. L["yds"], select(3, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(1, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(6, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)))
+                    name = GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID) and format("|T%s:20|t %s - %d" .. L["yds"], select(3, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID)), select(1, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID)), select(6, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID)))
                             or "nil",
                     order = 1,
                 },
-                min = {
+                spellID = {
                     type = "input",
                     name = "Spell ID", --format("|T%s:20|t %s", select(3, GetSpellInfo(k)), select(1, GetSpellInfo(k)))
                     order = 2,
                     width = "full",
-                    pattern = "%d+",
+                    --pattern = "%s*|%d+",
                     validate = function(_, value)
                         LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
-                        return type(tonumber(value)) == "number"
+                        return type(tonumber(value)) == "number" or value == ""
                     end,
-                    --image = select(3, GetSpellInfo(defaultSpells()[class].min)),
+                    --image = select(3, GetSpellInfo(defaultSpells()[class].spellID)),
                     get = function(_)
-                        return tostring(Gladdy.db.rangeCheckDefaultSpells[class].min)
+                        return tostring(Gladdy.db.rangeCheckDefaultSpells[class].spellID)
                         end,
                     set = function(_, value)
-                        Gladdy.db.rangeCheckDefaultSpells[class].min = tonumber(value)
-                        Gladdy.options.args["Range Check"].args.oorSpells.args[class].args.headerMin.name = GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min) and format("|T%s:20|t %s - %d" .. L["yds"], select(3, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(1, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)), select(6, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].min)))
+                        Gladdy.db.rangeCheckDefaultSpells[class].spellID = tonumber(value)
+                        Gladdy.options.args["Range Check"].args.oorSpells.args[class].args.headerMin.name = GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID) and format("|T%s:20|t %s - %d" .. L["yds"], select(3, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID)), select(1, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID)), select(6, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID)))
                                 or "nil"
                     end
                 },
+                melee = {
+                    type = "toggle",
+                    name = "Melee Range Check Enabled",
+                    order = 3,
+                    width = "full",
+                    get = function()
+                        return Gladdy.db.rangeCheckDefaultSpells[class].melee
+                    end,
+                    set = function(_, value)
+                        Gladdy.db.rangeCheckDefaultSpells[class].melee = value
+                    end
+                },
+                range = {
+                    type = "toggle",
+                    name = "Autoshot Range Check Enabled",
+                    order = 4,
+                    width = "full",
+                    get = function()
+                        return Gladdy.db.rangeCheckDefaultSpells[class].range
+                    end,
+                    set = function(_, value)
+                        Gladdy.db.rangeCheckDefaultSpells[class].range = value
+                    end
+                },
+
                 --[[headerMax = {
                     type = "header",
                     name = L["Max"],
