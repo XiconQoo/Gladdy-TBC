@@ -281,7 +281,9 @@ end
 function Gladdy:GetSpellDescription(spellID, cooldown) -- GetSpellPowerCost(51052) GetSpellDescription(2983)
     local cost = (GetSpellPowerCost(spellID) and GetSpellPowerCost(spellID)[1] and (GetSpellPowerCost(spellID)[1].cost .. " " .. _G[GetSpellPowerCost(spellID)[1].name])) or ""
     cost = cost .. (cost ~= "" and "\n\n" or "")
-    local castTime = select(4, GetSpellInfo(spellID))
+    local castTimeInfo = select(4, GetSpellInfo(spellID))
+    local castTime = tonumber(castTimeInfo)
+
     castTime = (castTime <= 0 and "Instant" or castTime / 1000 .. "s") .. "\n\n"
     local str = ""
     if cooldown then
@@ -426,13 +428,22 @@ end
 LibStub("AceGUI-3.0-GladdySearchEditBox"):Register("Auras", Predictor)
 
 
+local function replace(str)
+    return str:gsub("%s", "%%s"):gsub("%-", "%%-")
+end
+
 function Gladdy:SearchAllSpellIdsBySpellId(spellId)
     local values =  {}
     if spellId then
         local text,_,texture = GetSpellInfo(spellId)
         if text and texture then
+            --init spell cache
+            if not Gladdy.spellCache then
+                Gladdy.spellCache = {}
+                Gladdy:CacheSpells()
+            end
             for k,v in pairs(Gladdy.spellCache) do
-                local status, result = pcall(str_match, k:lower(), "^" .. text:lower())
+                local status, result = pcall(str_match, k:lower(), "^" .. replace(text:lower()))
                 if status and result then
                     for _,tbl in ipairs(v.spells) do
                         if tbl.icon == texture and tbl.spellName == text then

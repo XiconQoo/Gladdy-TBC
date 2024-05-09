@@ -9,6 +9,7 @@ local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
 
 Gladdy.expansion = "Wrath"
 Gladdy.CLASSES = { "MAGE", "PRIEST", "DRUID", "SHAMAN", "PALADIN", "WARLOCK", "WARRIOR", "HUNTER", "ROGUE", "DEATHKNIGHT" }
+table.sort(Gladdy.CLASSES, function(a, b) return a > b end)
 tbl_sort(Gladdy.CLASSES)
 Gladdy.RACES[#Gladdy.RACES + 1] = "Goblin"
 tbl_sort(Gladdy.RACES)

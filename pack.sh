@@ -2,4 +2,4 @@
 
 
 stashName=`git stash create`;
-git archive -o ${PWD##*/}.zip $stashName
+git archive --prefix=Gladdy/ -o ${PWD##*/}.zip $stashName

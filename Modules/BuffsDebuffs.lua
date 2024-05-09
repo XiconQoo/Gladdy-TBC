@@ -6,6 +6,8 @@ local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
 local auraTypes = {AURA_TYPE_BUFF, AURA_TYPE_DEBUFF}
 
 local TRACKED_BUFFS, TRACKED_DEBUFFS = "trackedBuffs", "trackedDebuffs"
+local LOCALIZED_CLASS_NAMES_MALE = LOCALIZED_CLASS_NAMES_MALE
+local CLASS_ICON_TCOORDS = CLASS_ICON_TCOORDS
 
 local LibStub = LibStub
 local Gladdy = LibStub("Gladdy")
@@ -17,9 +19,24 @@ local MODULE_NAME = "Buffs and Debuffs"
 -- Module init
 ---------------------------
 
+local function getDefaultSpells(auraType, filter)
+    local defaultDebuffs = {}
+    for _, class in pairs(Gladdy.CLASSES) do
+        if not filter or filter and filter == class then
+            local classSpells = auraType == AURA_TYPE_DEBUFF and LibClassAuras.GetClassDebuffs(class) or LibClassAuras.GetClassBuffs(class)
+            for _,v in pairs(classSpells) do
+                local libSpellId = v.id[1]
+                defaultDebuffs[tostring(libSpellId)] = {
+                    id = v.id,
+                    class = class,
+                    active = true,
+                }
+            end
+        end
+    end
+    return defaultDebuffs
+end
 
-local defaultTrackedDebuffs = select(2, Gladdy:GetAuras(AURA_TYPE_DEBUFF))
-local defaultTrackedBuffs = select(2, Gladdy:GetAuras(AURA_TYPE_BUFF))
 local BuffsDebuffs = Gladdy:NewModule(MODULE_NAME, nil, {
     buffsEnabled = true,
     buffsShowAuraDebuffs = false,
@@ -48,8 +65,8 @@ local BuffsDebuffs = Gladdy:NewModule(MODULE_NAME, nil, {
     buffsBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_squared_blp",
     buffsBorderColor = {r = 1, g = 1, b = 1, a = 1},
     buffsBorderColorsEnabled = true,
-    trackedDebuffs = defaultTrackedDebuffs,
-    trackedBuffs = defaultTrackedBuffs,
+    trackedDebuffs = getDefaultSpells(AURA_TYPE_DEBUFF),
+    trackedBuffs = getDefaultSpells(AURA_TYPE_BUFF),
     buffsBorderColorEnrage = Gladdy:GetDispelTypeColors()["enrage"],
     buffsBorderColorCurse = Gladdy:GetDispelTypeColors()["curse"],
     buffsBorderColorMagic = Gladdy:GetDispelTypeColors()["magic"],
@@ -62,11 +79,6 @@ local BuffsDebuffs = Gladdy:NewModule(MODULE_NAME, nil, {
     buffFrameStrata = "MEDIUM",
     buffsFrameLevel = 9,
 })
-
-function BuffsDebuffs:UpdateTrackedAuras()
-    defaultTrackedDebuffs = select(2, Gladdy:GetAuras(AURA_TYPE_DEBUFF))
-    defaultTrackedBuffs = select(2, Gladdy:GetAuras(AURA_TYPE_BUFF))
-end
 
 local dispelTypeToOptionValueTable
 local function dispelTypeToOptionValue(dispelType)
@@ -81,6 +93,20 @@ local function dispelTypeToOptionValue(dispelType)
         dispelTypeToOptionValueTable[dispelType].a
     else
         return Gladdy:SetColor(Gladdy.db.buffsBorderColor)
+    end
+end
+
+BuffsDebuffs[TRACKED_DEBUFFS] = {}
+BuffsDebuffs[TRACKED_BUFFS] = {}
+function BuffsDebuffs:UpdateTrackedBuffs(trackedDbKey)
+    self[trackedDbKey] = {}
+    for libSpellId,tbl in pairs(Gladdy.db[trackedDbKey]) do
+        if tbl.active then
+            self[trackedDbKey][libSpellId] = GetSpellInfo(libSpellId)
+            for _,spellID in pairs(tbl.id) do
+                self[trackedDbKey][spellID] = GetSpellInfo(spellID)
+            end
+        end
     end
 end
 
@@ -117,7 +143,8 @@ function BuffsDebuffs:Initialize()
         form = Gladdy.db.buffsBorderColorForm,
         enrage = Gladdy.db.buffsBorderColorEnrage,
     }
-    self:UpdateTrackedAuras()
+    BuffsDebuffs:UpdateTrackedBuffs(TRACKED_BUFFS)
+    BuffsDebuffs:UpdateTrackedBuffs(TRACKED_DEBUFFS)
 end
 
 function BuffsDebuffs:JOINED_ARENA()
@@ -224,30 +251,30 @@ function BuffsDebuffs:AURA_GAIN(unit, auraType, spellID, spellName, texture, dur
     end
     local auraFrame = self.frames[unit]
     spellName = LibClassAuras.GetAltName(spellID) or spellName
-    local aura = Gladdy.enabledAuras[spellID]
-    if aura and Gladdy.db.buffsShowAuraDebuffs then
-        aura = false
+    local enabledAura = Gladdy.enabledAuras[spellID]
+    if enabledAura and Gladdy.db.buffsShowAuraDebuffs then
+        enabledAura = false
     end
-    local auraNames = auraType == AURA_TYPE_DEBUFF and Gladdy.db[TRACKED_DEBUFFS] or Gladdy.db[TRACKED_BUFFS]
-    local spellId
-    local isTracked = false
-    for k, spellInfo in pairs(auraNames) do
-        spellId = tonumber(k)
-        if (spellInfo.active and GetSpellInfo(spellId) == spellName) then
-            isTracked = true
-            break
+    if not enabledAura then
+        local enabledBuffs = auraType == AURA_TYPE_DEBUFF and self[TRACKED_DEBUFFS] or self[TRACKED_BUFFS]
+        local isTracked = false
+        for spellId, name in pairs(enabledBuffs) do
+            if (spellId == spellID or name == spellName) then
+                isTracked = true
+                break
+            end
         end
-    end
-    if not aura and spellID and expirationTime and isTracked then
-        local index
-        if auraType == AURA_TYPE_DEBUFF then
-            auraFrame.numDebuffs = auraFrame.numDebuffs + 1
-            index = auraFrame.numDebuffs
-        else
-            auraFrame.numBuffs = auraFrame.numBuffs + 1
-            index = auraFrame.numBuffs
+        if spellID and expirationTime and isTracked then
+            local index
+            if auraType == AURA_TYPE_DEBUFF then
+                auraFrame.numDebuffs = auraFrame.numDebuffs + 1
+                index = auraFrame.numDebuffs
+            else
+                auraFrame.numBuffs = auraFrame.numBuffs + 1
+                index = auraFrame.numBuffs
+            end
+            BuffsDebuffs:AddOrRefreshAura(unit,spellID, auraType, duration, expirationTime - GetTime(), count, dispelType, texture, index)
         end
-        BuffsDebuffs:AddOrRefreshAura(unit,spellID, auraType, duration, expirationTime - GetTime(), count, dispelType, texture, index)
     end
 end
 
@@ -550,6 +577,179 @@ end
 ------------
 -- OPTIONS
 ------------
+
+function BuffsDebuffs:GetAuraOptions(auraType)
+    local path = auraType == AURA_TYPE_DEBUFF and TRACKED_DEBUFFS or TRACKED_BUFFS
+    local optionPath = auraType == AURA_TYPE_DEBUFF and "debuffList" or "buffList"
+    local options = {
+        ckeckAll = {
+            order = 2,
+            width = "0.7",
+            name = L["Check All"],
+            type = "execute",
+            func = function(info)
+                for k,v in pairs(Gladdy.db[path]) do
+                    Gladdy.db[path][k].active = true
+                end
+            end,
+        },
+        uncheckAll = {
+            order = 3,
+            width = "0.7",
+            name = L["Uncheck All"],
+            type = "execute",
+            func = function(info)
+                for k,v in pairs(Gladdy.db[path]) do
+                    Gladdy.db[path][k].active = false
+                end
+            end,
+        },
+    }
+
+    local assignForClass = function(class)
+        local args = {}
+        local defaultSpells = getDefaultSpells(auraType, class)
+        local classSpells = getDefaultSpells(auraType, class)
+        local dbSpells = Gladdy.dbi and Gladdy.dbi.profile[path]
+        if dbSpells then
+            for k,v in pairs(dbSpells) do
+                if v.class == class then
+                    tinsert(classSpells, {
+                        id = { k },
+                        name = GetSpellInfo(k),
+                        texture = select(3, GetSpellInfo(k))
+                    })
+                end
+            end
+        end
+        table.sort(classSpells, function(a, b)
+            return a.name:upper() < b.name:upper()
+        end)
+        args.group = {
+            name = "",
+            type = "group",
+            inline = true,
+            order = 1,
+            args = {
+                add = {
+                    order = 0,
+                    width = "2",
+                    name = auraType == AURA_TYPE_DEBUFF and L["Add Debuff"] or L["Add Buff"],
+                    type = "input",
+                    dialogControl = "GladdySearchEditBoxAuras",
+                    width = "double",
+                    get = function()
+                        return ""
+                    end,
+                    set = function(_, value)
+                        local spellName = GetSpellInfo(value)
+                        if not spellName then
+                            return
+                        end
+                        local db = Gladdy.dbi.profile[path]
+
+                        local exists = false
+                        for k,v in pairs(Gladdy.db[path]) do
+                            local searchName, _, searchIcon = GetSpellInfo(value)
+                            local dbName, _, dbIcon = GetSpellInfo(k)
+                            if tostring(k) == tostring(value) then
+                                value = tostring(value)
+                                exists = true
+                                class = v.class
+                                break
+                            elseif searchName == dbName and searchIcon == dbIcon then -- same spell
+                                exists = true
+                                value = k
+                                class = v.class
+                                break
+                            end
+                        end
+                        if not exists then
+                            local values = Gladdy:SearchAllSpellIdsBySpellId(value)
+                            Gladdy.db[path][tostring(value)] = {
+                                class = class,
+                                active = true,
+                                id = values
+                            }
+
+                            BuffsDebuffs:UpdateTrackedBuffs(path)
+
+                            Gladdy.options.args[MODULE_NAME].args = Gladdy.modules[MODULE_NAME]:GetOptions()
+
+                            LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
+                            LibStub("AceConfigDialog-3.0"):SelectGroup("Gladdy", MODULE_NAME, optionPath, class)
+                        end
+                        LibStub("AceConfigDialog-3.0"):SelectGroup("Gladdy", MODULE_NAME, optionPath, class)
+                    end,
+                }
+            }
+        }
+        for i=1, #classSpells do
+            local libSpellId = classSpells[i].id[1]
+            local _, _, texture = GetSpellInfo(libSpellId)
+            if classSpells[i].texture then
+                texture = classSpells[i].texture
+            end
+            args.group.args[tostring(libSpellId)] = {
+                name = "",
+                type = "group",
+                inline = true,
+                order = i,
+                args = {
+                    [tostring(libSpellId)] = {
+                        order = 1,
+                        name = classSpells[i].name,
+                        desc = Gladdy:GetSpellDescription(libSpellId),
+                        type = "toggle",
+                        width = 1.1,
+                        image = texture,
+                        arg = libSpellId
+                    },
+                    delete = {
+                        order = 2,
+                        name = "",
+                        type = "execute",
+                        width = 0.1,
+                        image = select(3, GetSpellInfo(28084)),
+                        imageWidth = 15,
+                        imageHeight = 15,
+                        hidden = function()
+                            for _,v in pairs(defaultSpells) do
+                                if v and tostring(v.id[1]) == tostring(libSpellId) then
+                                    return true
+                                end
+                            end
+                        end,
+                        func = function()
+                            Gladdy.db[path][libSpellId] = nil
+                            Gladdy.options.args[MODULE_NAME].args = Gladdy.modules[MODULE_NAME]:GetOptions()
+                            BuffsDebuffs:UpdateTrackedBuffs(path)
+                            LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
+                            LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
+                            LibStub("AceConfigDialog-3.0"):SelectGroup("Gladdy", MODULE_NAME, optionPath, class)--LibStub("AceConfigDialog-3.0"):SelectGroup("Gladdy", MODULE_NAME, "trackedDebuffs", "HUNTER")
+                        end,
+                    }
+                },
+
+            }
+        end
+        return args
+    end
+
+    local order = 4
+    for _,class in pairs(Gladdy.CLASSES) do
+        options[class] = {
+            order = order,
+            type = "group",
+            name = LOCALIZED_CLASS_NAMES_MALE[class],
+            icon = "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes",
+            iconCoords = CLASS_ICON_TCOORDS[class],
+            args = assignForClass(class),
+        }
+        order = order + 1
+    end
+    return options
+end
 
 function BuffsDebuffs:GetOptions()
     return {
@@ -1031,7 +1231,7 @@ function BuffsDebuffs:GetOptions()
             order = 11,
             disabled = function() return not Gladdy.db.buffsEnabled end,
             childGroups = "tree",
-            args = select(1, Gladdy:GetAuras(AURA_TYPE_DEBUFF)),
+            args = BuffsDebuffs:GetAuraOptions(AURA_TYPE_DEBUFF),
             set = function(info, state)
                 local optionKey = info[#info]
                 Gladdy.db[TRACKED_DEBUFFS][optionKey].active = state
@@ -1047,7 +1247,7 @@ function BuffsDebuffs:GetOptions()
             order = 12,
             disabled = function() return not Gladdy.db.buffsEnabled end,
             childGroups = "tree",
-            args = select(1, Gladdy:GetAuras(AURA_TYPE_BUFF)),
+            args = BuffsDebuffs:GetAuraOptions(AURA_TYPE_BUFF),
             set = function(info, state)
                 local optionKey = info[#info]
                 Gladdy.db[TRACKED_BUFFS][optionKey].active = state
