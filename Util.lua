@@ -1,5 +1,6 @@
 local pairs, ipairs = pairs, ipairs
 local select = select
+local tonumber = tonumber
 local type = type
 local floor = math.floor
 local coroutine = coroutine
@@ -284,7 +285,25 @@ function Gladdy:GetSpellDescription(spellID, cooldown) -- GetSpellPowerCost(5105
     castTime = (castTime <= 0 and "Instant" or castTime / 1000 .. "s") .. "\n\n"
     local str = ""
     if cooldown then
-        str = str .. (type(cooldown) == "table" and cooldown.cd or cooldown) .. "s" .. " cooldown" .. "\n\n"
+        --[586] = { cd = 30, [L["Shadow"]] = 15, }
+        if type(cooldown) == "table" then
+            local defaultCD = cooldown.cd .. "s" .. " cd" .. "\n"
+
+            local spec = cooldown.spec or cooldown.notSpec
+            if spec and not cooldown.sharedCD then
+                str = str .. ((cooldown.spec and "") or (cooldown.notSpec and "NOT ")) .. (cooldown.spec or cooldown.notSpec) .. " : " .. defaultCD
+            else
+                str = str .. defaultCD
+                for k,v in pairs(cooldown) do
+                    if k ~= "cd" and k ~= "pet" and k ~= "sharedCD" and k ~= "notSpec" then
+                        str = str .. k .. " : " .. v .. "s" .. " cd" .. "\n"
+                    end
+                end
+            end
+            str = str .. "\n"
+        else
+            str = str .. cooldown .. "s" .. " cd" .. "\n\n"
+        end
     end
     str = str .. castTime
     local desc = GetSpellDescription(spellID)
@@ -371,8 +390,13 @@ end
 function Predictor:GetValues(text, values, max)
     values = {}
     if text and text ~= "" then
-        if GetSpellInfo(text) then
-            text = GetSpellInfo(text)
+        local spellName,_,icon = GetSpellInfo(text)
+        if spellName then
+            values[tonumber(text)] = {
+                text = spellName .. " - (" .. text .. ")",
+                icon = icon
+            }
+            return values
         end
         --init spell cache
         if not Gladdy.spellCache then
