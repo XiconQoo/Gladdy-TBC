@@ -140,6 +140,8 @@ function EventListener:CooldownCheck(eventType, srcUnit, spellName, spellID)
     end
 end
 
+local bombExpireTime = {}
+
 function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
     -- timestamp,eventType,hideCaster,sourceGUID,sourceName,sourceFlags,sourceRaidFlags,destGUID,destName,destFlags,destRaidFlags,spellId,spellName,spellSchool
     local _,eventType,_,sourceGUID,_,_,_,destGUID,_,_,_,spellID,spellName,spellSchool,extraSpellId,extraSpellName,extraSpellSchool = CombatLogGetCurrentEventInfo()
@@ -151,6 +153,15 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
 
     if Gladdy.exceptionNames[spellID] then
         spellName = Gladdy.exceptionNames[spellID]
+    end
+    -- smoke bomb
+    if (eventType == "SPELL_CAST_SUCCESS" or eventType == "SPELL_AURA_APPLIED") and spellID == 76577 then
+        local now = GetTime()
+        if (bombExpireTime[sourceGUID] and now >= bombExpireTime[sourceGUID]) or eventType == "SPELL_CAST_SUCCESS" then
+            bombExpireTime[sourceGUID] = now + 6
+        elseif not bombExpireTime[sourceGUID] then
+            bombExpireTime[sourceGUID] = now + 6
+        end
     end
     if destUnit then
         -- diminish tracker
@@ -367,8 +378,13 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
                 Gladdy:SendMessage("AURA_GAIN_LIMIT", unit, auraType, n - 1)
                 break
             end
+            local sourceGUID = UnitGUID(unitCaster)
             if Gladdy.exceptionNames[spellID] then
                 spellName = Gladdy.exceptionNames[spellID]
+            end
+            if spellID == 88611 and bombExpireTime[sourceGUID] then
+                duration = 6
+                expirationTime = bombExpireTime[sourceGUID]
             end
             button.auras[spellID] = { auraType, spellID, spellName, texture, duration, expirationTime, count, dispelType }
             if not button.spec and Gladdy.specSpells[spellName] and unitCaster then
