@@ -541,7 +541,7 @@ function Gladdy:InitFrames()
         self.startTest = nil
     end
     self.frame:Show()
-    self:SendMessage("JOINED_ARENA")
+    self:SendMessage("JOINED_ARENA") -- /run LibStub("Gladdy"):SendMessage("JOINED_ARENA")
 
     for i=1, self.curBracket do
         self.buttons["arena" .. i]:SetAlpha(1)

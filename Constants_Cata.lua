@@ -1122,7 +1122,7 @@ local importantAuras = {
 
     --- Turtling abilities
     [88611] = { -- Smoke Bommb
-        track = AURA_TYPE_BUFF,
+        track = AURA_TYPE_DEBUFF,
         priority = 25,
         spellIDs = { 88611, 76577 },
         duration = 6

@@ -103,6 +103,10 @@ function BuffsDebuffs:UpdateTrackedBuffs(trackedDbKey)
     for libSpellId,tbl in pairs(Gladdy.db[trackedDbKey]) do
         if tbl.active then
             self[trackedDbKey][libSpellId] = GetSpellInfo(libSpellId)
+            if tbl.ids and not tbl.id then
+                tbl.id = tbl.ids
+                Gladdy.db[trackedDbKey][libSpellId].id = tbl.ids
+            end
             for _,spellID in pairs(tbl.id) do
                 self[trackedDbKey][spellID] = GetSpellInfo(spellID)
             end

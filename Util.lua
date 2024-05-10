@@ -392,14 +392,17 @@ end
 function Predictor:GetValues(text, values, max)
     values = {}
     if text and text ~= "" then
-        local spellName,_,icon = GetSpellInfo(text)
-        if spellName then
-            values[tonumber(text)] = {
-                text = spellName .. " - (" .. text .. ")",
-                icon = icon
-            }
-            return values
+        if tonumber(text) then
+            local spellName,_,icon = GetSpellInfo(text)
+            if spellName then
+                values[tonumber(text)] = {
+                    text = spellName .. " - (" .. text .. ")",
+                    icon = icon
+                }
+                return values
+            end
         end
+
         --init spell cache
         if not Gladdy.spellCache then
             Gladdy.spellCache = {}
