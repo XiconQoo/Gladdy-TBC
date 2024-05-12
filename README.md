@@ -81,6 +81,10 @@ Thank you!
 
 ### Changes
 
+### v2.33-Beta
+- fix for profiles not correctly loading when changing profiles
+- added tremor cd in Cooldowns
+
 ### v2.32-Beta
 - some might have encountered errors when loading up Gladdy
 - bug fixes
