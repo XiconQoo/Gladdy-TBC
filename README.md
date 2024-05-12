@@ -82,6 +82,7 @@ Thank you!
 ### Changes
 
 ### v2.32-Beta
+- some might have encountered errors when loading up Gladdy
 - bug fixes
 - smokebomb detection
 
