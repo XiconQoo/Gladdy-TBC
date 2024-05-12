@@ -83,14 +83,11 @@ local BuffsDebuffs = Gladdy:NewModule(MODULE_NAME, nil, {
 local dispelTypeToOptionValueTable
 local function dispelTypeToOptionValue(dispelType)
     if Gladdy.db.buffsBorderColorsEnabled then
-        dispelType = dispelType and lower(dispelType) or "physical"
+        dispelType = dispelType and lower(dispelType) or "none"
         if not dispelTypeToOptionValueTable[dispelType] then
-            dispelType = "physical"
+            dispelType = "none"
         end
-        return dispelTypeToOptionValueTable[dispelType].r,
-        dispelTypeToOptionValueTable[dispelType].g,
-        dispelTypeToOptionValueTable[dispelType].b,
-        dispelTypeToOptionValueTable[dispelType].a
+        return Gladdy:SetColor(dispelTypeToOptionValueTable[dispelType]())
     else
         return Gladdy:SetColor(Gladdy.db.buffsBorderColor)
     end
@@ -101,7 +98,7 @@ BuffsDebuffs[TRACKED_BUFFS] = {}
 function BuffsDebuffs:UpdateTrackedBuffs(trackedDbKey)
     self[trackedDbKey] = {}
     for libSpellId,tbl in pairs(Gladdy.db[trackedDbKey]) do
-        if tbl.active then
+        if type(tbl) == "table" and tbl.active or type(tbl) == "boolean" and tbl then
             self[trackedDbKey][libSpellId] = GetSpellInfo(libSpellId)
             if tbl.ids and not tbl.id then
                 tbl.id = tbl.ids
@@ -135,17 +132,17 @@ function BuffsDebuffs:Initialize()
         self:SetScript("OnEvent", BuffsDebuffs.OnEvent)
     end
     dispelTypeToOptionValueTable = {
-        none = Gladdy.db.buffsBorderColorPhysical,
-        magic = Gladdy.db.buffsBorderColorMagic,
-        curse = Gladdy.db.buffsBorderColorCurse,
-        disease = Gladdy.db.buffsBorderColorDisease,
-        poison = Gladdy.db.buffsBorderColorPoison,
-        stealth = Gladdy.db.buffsBorderColorPhysical,
-        invisibility = Gladdy.db.buffsBorderColorPhysical,
-        physical = Gladdy.db.buffsBorderColorPhysical,
-        immune = Gladdy.db.buffsBorderColorImmune,
-        form = Gladdy.db.buffsBorderColorForm,
-        enrage = Gladdy.db.buffsBorderColorEnrage,
+        none = function() return Gladdy.db.buffsBorderColorPhysical end,
+        magic = function() return Gladdy.db.buffsBorderColorMagic end,
+        curse = function() return Gladdy.db.buffsBorderColorCurse end,
+        disease = function() return Gladdy.db.buffsBorderColorDisease end,
+        poison = function() return Gladdy.db.buffsBorderColorPoison end,
+        stealth = function() return Gladdy.db.buffsBorderColorPhysical end,
+        invisibility = function() return Gladdy.db.buffsBorderColorPhysical end,
+        physical = function() return Gladdy.db.buffsBorderColorPhysical end,
+        immune = function() return Gladdy.db.buffsBorderColorImmune end,
+        form = function() return Gladdy.db.buffsBorderColorForm end,
+        enrage = function() return Gladdy.db.buffsBorderColorEnrage end,
     }
     BuffsDebuffs:UpdateTrackedBuffs(TRACKED_BUFFS)
     BuffsDebuffs:UpdateTrackedBuffs(TRACKED_DEBUFFS)
@@ -617,7 +614,7 @@ function BuffsDebuffs:GetAuraOptions(auraType)
         local dbSpells = Gladdy.dbi and Gladdy.dbi.profile[path]
         if dbSpells then
             for k,v in pairs(dbSpells) do
-                if v.class == class then
+                if GetSpellInfo(k) and type(v) == "table" and v.class == class then
                     tinsert(classSpells, {
                         id = { k },
                         name = GetSpellInfo(k),
