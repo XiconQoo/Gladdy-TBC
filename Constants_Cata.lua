@@ -1443,6 +1443,7 @@ local cooldownList = {
     ["SHAMAN"] = {
         [57994] = 15, -- Wind Shear
         [51514] = 45, -- Hex
+        [8143] = 60, -- Tremor Totem
         [8177] = 25, -- Grounding Totem
         [79206] = 120, -- Spiritwalker's Grace
         [1535] = 4, -- Fire nova
