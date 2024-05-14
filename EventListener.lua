@@ -50,12 +50,13 @@ function EventListener:JOINED_ARENA()
             wipe(Gladdy.buttons["arena"..i].lastCastSpell)
         end
         if UnitExists("arena" .. i) then
-            Gladdy:SpotEnemy("arena" .. i, true)
+            Gladdy:SpotEnemy("arena" .. i, true, true)
         end
         if UnitExists("arenapet" .. i) then
             Gladdy:SendMessage("PET_SPOTTED", "arenapet" .. i)
         end
     end
+    self.bombExpireTime = {}
     self:SetScript("OnEvent", EventListener.OnEvent)
 end
 
@@ -63,9 +64,10 @@ function EventListener:Reset()
     self:UnregisterAllEvents()
     self:SetScript("OnEvent", nil)
     self.friendlyUnits = {}
+    self.bombExpireTime = {}
 end
 
-function Gladdy:SpotEnemy(unit, auraScan)
+function Gladdy:SpotEnemy(unit, auraScan, report)
     local button = self.buttons[unit]
     if not unit or not button then
         return
@@ -78,7 +80,7 @@ function Gladdy:SpotEnemy(unit, auraScan)
         button.name = UnitName(unit)
         Gladdy.guids[UnitGUID(unit)] = unit
     end
-    if button.class and button.race then
+    if button.class and button.race and report then
         Gladdy:SendMessage("ENEMY_SPOTTED", unit)
     end
     if auraScan and not button.spec then
@@ -140,8 +142,6 @@ function EventListener:CooldownCheck(eventType, srcUnit, spellName, spellID)
     end
 end
 
-local bombExpireTime = {}
-
 function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
     -- timestamp,eventType,hideCaster,sourceGUID,sourceName,sourceFlags,sourceRaidFlags,destGUID,destName,destFlags,destRaidFlags,spellId,spellName,spellSchool
     local _,eventType,_,sourceGUID,_,_,_,destGUID,_,_,_,spellID,spellName,spellSchool,extraSpellId,extraSpellName,extraSpellSchool = CombatLogGetCurrentEventInfo()
@@ -157,10 +157,10 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
     -- smoke bomb
     if (eventType == "SPELL_CAST_SUCCESS" or eventType == "SPELL_AURA_APPLIED") and spellID == 76577 then
         local now = GetTime()
-        if (bombExpireTime[sourceGUID] and now >= bombExpireTime[sourceGUID]) or eventType == "SPELL_CAST_SUCCESS" then
-            bombExpireTime[sourceGUID] = now + 6
-        elseif not bombExpireTime[sourceGUID] then
-            bombExpireTime[sourceGUID] = now + 6
+        if (self.bombExpireTime[sourceGUID] and now >= self.bombExpireTime[sourceGUID]) or eventType == "SPELL_CAST_SUCCESS" then
+            self.bombExpireTime[sourceGUID] = now + 6
+        elseif not self.bombExpireTime[sourceGUID] then
+            self.bombExpireTime[sourceGUID] = now + 6
         end
     end
     if destUnit then
@@ -187,7 +187,7 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
         end
         -- spec detection
         if Gladdy.buttons[destUnit] and (not Gladdy.buttons[destUnit].class or not Gladdy.buttons[destUnit].race) then
-            Gladdy:SpotEnemy(destUnit, true)
+            Gladdy:SpotEnemy(destUnit, true, true)
         end
         --interrupt detection
         if Gladdy.buttons[destUnit] then
@@ -210,7 +210,7 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
             return
         end
         if not Gladdy.buttons[srcUnit].class or not Gladdy.buttons[srcUnit].race then
-            Gladdy:SpotEnemy(srcUnit, true)
+            Gladdy:SpotEnemy(srcUnit, true, true)
         end
         if not Gladdy.buttons[srcUnit].spec then
             self:DetectSpec(srcUnit, Gladdy.specSpells[spellName])
@@ -260,7 +260,7 @@ function EventListener:ARENA_OPPONENT_UPDATE(unit, updateReason)
                 button.stealthed = false
                 Gladdy:SendMessage("ENEMY_STEALTH", unit, false)
                 if not button.class or not button.race then
-                    Gladdy:SpotEnemy(unit, true)
+                    Gladdy:SpotEnemy(unit, true, true)
                 end
             end
             if pet then
@@ -339,7 +339,7 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
                         for arenaUnit,v in pairs(Gladdy.buttons) do
                             if (UnitIsUnit(arenaUnit, unitCaster)) then
                                 if not v.class then
-                                    Gladdy:SpotEnemy(arenaUnit, false)
+                                    Gladdy:SpotEnemy(arenaUnit, false, true)
                                 end
                                 if not v.class and Gladdy.expansion == "Wrath" then
                                     Gladdy.buttons[arenaUnit].class = Gladdy.cooldownBuffs[spellName].class
@@ -368,23 +368,20 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
     Gladdy:SendMessage("AURA_FADE", unit, AURA_TYPE_DEBUFF)
     for i = 1, 2 do
         if not Gladdy.buttons[unit].class or not Gladdy.buttons[unit].race then
-            Gladdy:SpotEnemy(unit, false)
+            Gladdy:SpotEnemy(unit, false, true)
         end
         local filter = (i == 1 and "HELPFUL" or "HARMFUL")
         local auraType = i == 1 and AURA_TYPE_BUFF or AURA_TYPE_DEBUFF
         for n = 1, 30 do
+            local auraTypeTemp = auraType
             local spellName, texture, count, dispelType, duration, expirationTime, unitCaster, _, shouldConsolidate, spellID = UnitAura(unit, n, filter)
             if ( not spellID ) then
                 Gladdy:SendMessage("AURA_GAIN_LIMIT", unit, auraType, n - 1)
                 break
             end
-            local sourceGUID = UnitGUID(unitCaster)
+
             if Gladdy.exceptionNames[spellID] then
                 spellName = Gladdy.exceptionNames[spellID]
-            end
-            if spellID == 88611 and bombExpireTime[sourceGUID] then
-                duration = 6
-                expirationTime = bombExpireTime[sourceGUID]
             end
             button.auras[spellID] = { auraType, spellID, spellName, texture, duration, expirationTime, count, dispelType }
             if not button.spec and Gladdy.specSpells[spellName] and unitCaster then
@@ -404,8 +401,13 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
             if Gladdy.cooldownBuffs.racials[spellName] then
                 Gladdy:SendMessage("RACIAL_USED", unit, spellName, Gladdy.cooldownBuffs.racials[spellName].cd(expirationTime - GetTime()), spellName)
             end
-            --Gladdy:Debug("INFO", "AURA_GAIN", unit, auraType, spellName)
-            Gladdy:SendMessage("AURA_GAIN", unit, auraType, spellID, spellName, texture, duration, expirationTime, count, dispelType, i, unitCaster)
+            local sourceGUID = UnitGUID(unitCaster)
+            if spellID == 88611 and self.bombExpireTime[sourceGUID] then
+                duration = 6
+                expirationTime = self.bombExpireTime[sourceGUID]
+                auraTypeTemp = Gladdy.guids[sourceGUID] and AURA_TYPE_BUFF or AURA_TYPE_DEBUFF
+            end
+            Gladdy:SendMessage("AURA_GAIN", unit, auraTypeTemp, spellID, spellName, texture, duration, expirationTime, count, dispelType, i, unitCaster)
         end
     end
     -- check auras
@@ -521,7 +523,7 @@ function EventListener:Test(unit)
     local button = Gladdy.buttons[unit]
     if (button and Gladdy.testData[unit].testSpec) then
         button.spec = nil
-        Gladdy:SpotEnemy(unit, false)
+        Gladdy:SpotEnemy(unit, false, true)
         self:DetectSpec(unit, button.testSpec)
     end
 end
