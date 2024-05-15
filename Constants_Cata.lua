@@ -1012,6 +1012,7 @@ local importantAuras = {
     [89485] = { -- Inner Focus
         track = AURA_TYPE_BUFF,
         priority = 20,
+        duration = 0,
         spellIDs = { 89485 },
     },
     [46946] = { -- Safeguard
@@ -1118,6 +1119,11 @@ local importantAuras = {
         track = AURA_TYPE_BUFF,
         priority = 9,
         spellIDs = { 12472 },
+    },
+    [3045] = { -- Rapid Fire
+        track = AURA_TYPE_BUFF,
+        priority = 9,
+        spellIDs = { 3045 },
     },
 
     --- Turtling abilities
