@@ -84,37 +84,7 @@ function Gladdy:SpotEnemy(unit, auraScan, report)
         Gladdy:SendMessage("ENEMY_SPOTTED", unit)
     end
     if auraScan and not button.spec then
-        Gladdy:SendMessage("AURA_FADE", unit, "HELPFUL")
-        for n = 1, 30 do
-            local spellName, texture, count, dispelType, duration, expirationTime, unitCaster, _, _, spellID = UnitAura(unit, n, "HELPFUL")
-            if ( not spellName ) then
-                Gladdy:SendMessage("AURA_GAIN_LIMIT", unit, AURA_TYPE_BUFF, n - 1)
-                break
-            end
-
-            if Gladdy.exceptionNames[spellID] then
-                spellName = Gladdy.exceptionNames[spellID]
-            end
-
-            if Gladdy.specSpells[spellName] and unitCaster then -- Check for auras that detect a spec
-                local unitPet = string_gsub(unit, "%d$", "pet%1")
-                if UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster) then
-                    EventListener:DetectSpec(unit, Gladdy.specSpells[spellName])
-                end
-            end
-            if Gladdy.cooldownBuffs[spellName] and unitCaster then -- Check for auras that detect used CDs (like Fear Ward)
-                for arenaUnit,v in pairs(self.buttons) do
-                    if (UnitIsUnit(arenaUnit, unitCaster)) then
-                        Cooldowns:CooldownUsed(arenaUnit, v.class, Gladdy.cooldownBuffs[spellName].spellId, Gladdy.cooldownBuffs[spellName].cd(expirationTime - GetTime()))
-                        -- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena5", "PRIEST", 6346, 10)
-                    end
-                end
-            end
-            if Gladdy.cooldownBuffs.racials[spellName] and Gladdy.cooldownBuffs.racials[spellName] then
-                Gladdy:SendMessage("RACIAL_USED", unit, spellName, Gladdy.cooldownBuffs.racials[spellName].cd(expirationTime - GetTime()), spellName)
-            end
-            Gladdy:SendMessage("AURA_GAIN", unit, AURA_TYPE_BUFF, spellID, spellName, texture, duration, expirationTime, count, dispelType, n, unitCaster)
-        end
+        EventListener:ScanAuras(unit)
     end
 end
 
@@ -356,6 +326,15 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
         end
         return
     end
+    EventListener:ScanAuras(unit)
+end
+
+function EventListener:ScanAuras(unit)
+    local button = Gladdy.buttons[unit]
+    if not button then
+        return
+    end
+
     if not button.auras then
         button.auras = {}
     end
@@ -363,7 +342,9 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
     if not button.lastAuras then
         button.lastAuras = {}
     end
-    --Gladdy:Debug("INFO", "AURA_FADE", unit, AURA_TYPE_BUFF, AURA_TYPE_DEBUFF)
+
+    local unitPet = string_gsub(unit, "%d$", "pet%1")
+
     Gladdy:SendMessage("AURA_FADE", unit, AURA_TYPE_BUFF)
     Gladdy:SendMessage("AURA_FADE", unit, AURA_TYPE_DEBUFF)
     for i = 1, 2 do
@@ -385,7 +366,6 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
             end
             button.auras[spellID] = { auraType, spellID, spellName, texture, duration, expirationTime, count, dispelType }
             if not button.spec and Gladdy.specSpells[spellName] and unitCaster then
-                local unitPet = string_gsub(unit, "%d$", "pet%1")
                 if unitCaster and (UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster)) then
                     self:DetectSpec(unit, Gladdy.specSpells[spellName])
                 end
@@ -401,7 +381,7 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
             if Gladdy.cooldownBuffs.racials[spellName] then
                 Gladdy:SendMessage("RACIAL_USED", unit, spellName, Gladdy.cooldownBuffs.racials[spellName].cd(expirationTime - GetTime()), spellName)
             end
-            local sourceGUID = UnitGUID(unitCaster)
+            local sourceGUID = unitCaster and UnitGUID(unitCaster)
             if spellID == 88611 and self.bombExpireTime[sourceGUID] then
                 duration = 6
                 expirationTime = self.bombExpireTime[sourceGUID]
@@ -410,11 +390,12 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
             Gladdy:SendMessage("AURA_GAIN", unit, auraTypeTemp, spellID, spellName, texture, duration, expirationTime, count, dispelType, i, unitCaster)
         end
     end
-    -- check auras
+    -- check lastAuras for Cooldown detection of spells that trigger cd if buff fades
     for spellID,v in pairs(button.lastAuras) do
         if not button.auras[spellID] then
-            if Gladdy.db.cooldown and Cooldowns.cooldownSpells[v[3]] then
-                local spellId = Cooldowns.cooldownSpells[v[3]] -- don't use spellId from combatlog, in case of different spellrank
+            local spellName = v[3]
+            if Gladdy.db.cooldown and Cooldowns.cooldownSpells[spellName] then
+                local spellId = Cooldowns.cooldownSpells[spellName] -- don't use spellId from combatlog, in case of different spellrank
                 if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
                     spellId = spellID
                 end
@@ -464,7 +445,7 @@ function EventListener:UNIT_SPELLCAST_SUCCEEDED(...)
     local button = Gladdy.buttons[unit]
     if button then
         if not button.class or not button.race then
-            self:SpotEnemy()
+            self:SpotEnemy(unit, false, true)
         end
         local spellName = GetSpellInfo(spellID)
         local unitRace = button.race
@@ -496,21 +477,22 @@ function EventListener:UNIT_SPELLCAST_SUCCEEDED(...)
     end
 end
 
+local specCheck = {
+    ["PALADIN"] = function(spec) return Gladdy:contains(spec, {L["Holy"], L["Retribution"], L["Protection"]}) end,
+    ["SHAMAN"] = function(spec) return Gladdy:contains(spec, {L["Restoration"], L["Enhancement"], L["Elemental"]}) end,
+    ["ROGUE"] = function(spec) return Gladdy:contains(spec, {L["Subtlety"], L["Assassination"], L["Combat"]}) end,
+    ["WARLOCK"] = function(spec) return Gladdy:contains(spec, {L["Demonology"], L["Destruction"], L["Affliction"]}) end,
+    ["PRIEST"] = function(spec) return Gladdy:contains(spec, {L["Shadow"], L["Discipline"], L["Holy"]}) end,
+    ["MAGE"] = function(spec) return Gladdy:contains(spec, {L["Frost"], L["Fire"], L["Arcane"]}) end,
+    ["DRUID"] = function(spec) return Gladdy:contains(spec, {L["Restoration"], L["Feral"], L["Balance"]}) end,
+    ["HUNTER"] = function(spec) return Gladdy:contains(spec, {L["Beast Mastery"], L["Marksmanship"], L["Survival"]}) end,
+    ["WARRIOR"] = function(spec) return Gladdy:contains(spec, {L["Arms"], L["Protection"], L["Fury"]}) end,
+    ["DEATHKNIGHT"] = function(spec) return Gladdy:contains(spec, {L["Unholy"], L["Blood"], L["Frost"]}) end,
+}
+
 function EventListener:DetectSpec(unit, spec)
     local button = Gladdy.buttons[unit]
-    if (not button or not spec or button.spec) then
-        return
-    end
-    if button.class == "PALADIN" and not Gladdy:contains(spec, {L["Holy"], L["Retribution"], L["Protection"]})
-            or button.class == "SHAMAN" and not Gladdy:contains(spec, {L["Restoration"], L["Enhancement"], L["Elemental"]})
-            or button.class == "ROGUE" and not Gladdy:contains(spec, {L["Subtlety"], L["Assassination"], L["Combat"]})
-            or button.class == "WARLOCK" and not Gladdy:contains(spec, {L["Demonology"], L["Destruction"], L["Affliction"]})
-            or button.class == "PRIEST" and not Gladdy:contains(spec, {L["Shadow"], L["Discipline"], L["Holy"]})
-            or button.class == "MAGE" and not Gladdy:contains(spec, {L["Frost"], L["Fire"], L["Arcane"]})
-            or button.class == "DRUID" and not Gladdy:contains(spec, {L["Restoration"], L["Feral"], L["Balance"]})
-            or button.class == "HUNTER" and not Gladdy:contains(spec, {L["Beast Mastery"], L["Marksmanship"], L["Survival"]})
-            or button.class == "WARRIOR" and not Gladdy:contains(spec, {L["Arms"], L["Protection"], L["Fury"]})
-            or button.class == "DEATHKNIGHT" and not Gladdy:contains(spec, {L["Unholy"], L["Blood"], L["Frost"]}) then
+    if (not button or not spec or button.spec or button.class and not specCheck[button.class](spec)) then
         return
     end
     if not button.spec then
