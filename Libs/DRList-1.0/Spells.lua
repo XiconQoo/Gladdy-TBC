@@ -1,4 +1,4 @@
-local MAJOR, MINOR = "DRList-1.0", 65 -- Don't forget to change this in DRList-1.0.lua aswell!
+local MAJOR, MINOR = "DRList-1.0", 66 -- Don't forget to change this in DRList-1.0.lua aswell!
 local Lib = LibStub(MAJOR)
 if Lib.spellListVersion and Lib.spellListVersion >= MINOR then
     return
@@ -793,6 +793,7 @@ elseif Lib.gameExpansion == "cata" then
         [64058] = "disarm", -- Psychic Horror Disarm Effect
         [51722] = "disarm", -- Dismantle
         [676]   = "disarm", -- Disarm
+        [64346] = "disarm", -- Fiery Payback
 
         -- *** Silence Effects ***
         [47476] = "silence", -- Strangulate

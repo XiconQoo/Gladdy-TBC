@@ -7,18 +7,14 @@ local CreateFrame = CreateFrame
 local GetTime = GetTime
 
 local Gladdy = LibStub("Gladdy")
-local DRData = LibStub("DRList-1.0")
+local DRList = LibStub("DRList-1.0")
 local L = Gladdy.L
 local function defaultCategories()
     local categories = {}
     local indexList = {}
-    for k,v in pairs(DRData:GetSpells()) do
-        if type(v) == "table" then
-            for _,category in ipairs(v) do
-                tinsert(indexList, {spellID = k, category = category})
-            end
-        else
-            tinsert(indexList, {spellID = k, category = v})
+    for cat in pairs(DRList:GetCategories()) do
+        for spellID in DRList:IterateSpellsByCategory(cat) do
+            tinsert(indexList, {spellID = spellID, category = cat})
         end
     end
     tbl_sort(indexList, function(a, b) return a.spellID < b.spellID end)
@@ -374,11 +370,9 @@ function Diminishings:Test(unit)
             if (val.enabled) then
                 tinsert(enabledCategories, {cat = cat , spellIDs = {}})
                 enabledCategories[cat] = #enabledCategories
-            end
-        end
-        for spellId,cat in pairs(DRData:GetSpells()) do
-            if enabledCategories[cat] then
-                tinsert(enabledCategories[enabledCategories[cat]].spellIDs, spellId)
+                for spellID in DRList:IterateSpellsByCategory(cat) do
+                    tinsert(enabledCategories[enabledCategories[cat]].spellIDs, spellID)
+                end
             end
         end
 
@@ -390,7 +384,7 @@ function Diminishings:Test(unit)
 
         --execute test
         local index, amount = 0,0
-        for i=1, (#enabledCategories < 4 and #enabledCategories) or 4 do
+        for i=1, (#enabledCategories < 4 and #enabledCategories or 4) do
             amount = rand(1,3)
             index = rand(1, #enabledCategories[i].spellIDs)
             for _=1, amount do
@@ -503,9 +497,9 @@ end
 function Diminishings:AuraGainCheck(unit, spellID, drFrame, drCat)
     -- due to dynamic DR we reset the DR here if dr == 0
     if not drFrame.tracked[drCat] or drFrame.tracked[drCat] == 0 then
-        drFrame.tracked[drCat] = DRData:NextDR(1)
+        drFrame.tracked[drCat] = DRList:NextDR(1)
     else
-        drFrame.tracked[drCat] = DRData:NextDR(drFrame.tracked[drCat] == 0.5 and 2 or 3)
+        drFrame.tracked[drCat] = DRList:NextDR(drFrame.tracked[drCat] == 0.5 and 2 or 3)
     end
 
     if Gladdy.db.drShowIconOnAuraApplied then
@@ -515,7 +509,7 @@ end
 
 function Diminishings:AuraGain(unit, spellID)
     local drFrame = self.frames[unit]
-    local drCat, drCategories = DRData:GetSpellCategory(spellID)
+    local drCat, drCategories = DRList:GetSpellCategory(spellID)
     if (not drFrame or not drCat) then
         return
     end
@@ -533,7 +527,7 @@ end
 
 function Diminishings:AuraFade(unit, spellID)
     local drFrame = self.frames[unit]
-    local drCat, drCategories = DRData:GetSpellCategory(spellID)
+    local drCat, drCategories = DRList:GetSpellCategory(spellID)
     if (not drFrame or not drCat) then
         return
     end
@@ -1108,14 +1102,14 @@ function Diminishings:CategoryOptions()
         },
     }
     local indexList = {}
-    for k,_ in pairs(DRData:GetCategories()) do
+    for k,_ in pairs(DRList:GetCategories()) do
         tinsert(indexList, k)
     end
     tbl_sort(indexList)
     for i,k in ipairs(indexList) do
         categories[k] = {
             type = "group",
-            name = L[DRData:GetCategoryName(k)],
+            name = L[DRList:GetCategoryName(k)],
             order = i,
             icon = Gladdy.db.drCategories[k].icon,
             args = {
@@ -1163,29 +1157,10 @@ end
 
 function Diminishings:GetDRIcons(category)
     local icons = {}
-    for k,v in pairs(DRData:GetSpells()) do
-        local name, _, texture = GetSpellInfo(k)
-        if  name and texture then
-            if type(v) == "table" then
-                for _,cat in ipairs(v) do
-                    if cat == category then
-                        icons[texture] = format("|T%s:20|t %s", texture, name)
-                    end
-                end
-            else
-                if v == category then
-                    icons[texture] = format("|T%s:20|t %s", texture, name)
-                end
-            end
-        end
-    end
-
-    for k,v in pairs(DRData:GetSpells()) do
-        if v == category then
-            local name, _, texture = GetSpellInfo(k)
-            if name then
-                icons[texture] = format("|T%s:20|t %s", texture, name)
-            end
+    for spellID in DRList:IterateSpellsByCategory(category) do
+        local name, _, texture = GetSpellInfo(spellID)
+        if name then
+            icons[texture] = format("|T%s:20|t %s", texture, name)
         end
     end
     return icons
