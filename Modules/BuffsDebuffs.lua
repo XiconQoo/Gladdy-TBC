@@ -2,6 +2,7 @@ local GetSpellInfo = GetSpellInfo
 local CreateFrame = CreateFrame
 local GetTime = GetTime
 local select, lower, ceil, tremove, tinsert, pairs, ipairs, tostring, random = select, string.lower, ceil, tremove, tinsert, pairs, ipairs, tostring, math.random
+local type = type
 local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
 local auraTypes = {AURA_TYPE_BUFF, AURA_TYPE_DEBUFF}
 
@@ -100,12 +101,14 @@ function BuffsDebuffs:UpdateTrackedBuffs(trackedDbKey)
     for libSpellId,tbl in pairs(Gladdy.db[trackedDbKey]) do
         if type(tbl) == "table" and tbl.active or type(tbl) == "boolean" and tbl then
             self[trackedDbKey][libSpellId] = GetSpellInfo(libSpellId)
-            if tbl.ids and not tbl.id then
+            if type(tbl) == "table" and tbl.ids and not tbl.id then
                 tbl.id = tbl.ids
                 Gladdy.db[trackedDbKey][libSpellId].id = tbl.ids
             end
-            for _,spellID in pairs(tbl.id) do
-                self[trackedDbKey][spellID] = GetSpellInfo(spellID)
+            if type(tbl) == "table" then
+                for _,spellID in pairs(tbl.id) do
+                    self[trackedDbKey][spellID] = GetSpellInfo(spellID)
+                end
             end
         end
     end
