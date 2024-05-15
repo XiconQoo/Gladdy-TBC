@@ -964,6 +964,16 @@ local importantAuras = {
     },
 
     --- Buffs
+    [44544] = { -- Fingers of Frost
+        track = AURA_TYPE_BUFF,
+        priority = 35,
+        spellIDs = { 44544 },
+    },
+    [69369] = { -- Predator's Swiftness
+        track = AURA_TYPE_BUFF,
+        priority = 35,
+        spellIDs = { 69369 },
+    },
     [22812] = { -- Barkskin
         track = AURA_TYPE_BUFF,
         priority = 25,
@@ -1127,7 +1137,7 @@ local importantAuras = {
     },
 
     --- Turtling abilities
-    [88611] = { -- Smoke Bommb
+    [88611] = { -- Smoke Bomb
         track = AURA_TYPE_DEBUFF,
         priority = 25,
         spellIDs = { 88611, 76577 },
