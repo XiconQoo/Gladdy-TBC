@@ -3,6 +3,7 @@ local type = type
 local tostring = tostring
 local select = select
 local pairs = pairs
+local ipairs = ipairs
 local tinsert = table.insert
 local tsort = table.sort
 local str_lower = string.lower
@@ -41,6 +42,7 @@ Gladdy.debug = false
 LibStub("AceTimer-3.0"):Embed(Gladdy)
 LibStub("AceComm-3.0"):Embed(Gladdy)
 Gladdy.modules = {}
+Gladdy.indexedModules = {}
 setmetatable(Gladdy, {
     __tostring = function()
         return MAJOR
@@ -121,30 +123,6 @@ end
 
 ---------------------------
 
-local function pairsByPrio(t)
-    local a = {}
-    for k, v in pairs(t) do
-        tinsert(a, { k, v.priority })
-    end
-    tsort(a, function(x, y)
-        return x[2] > y[2]
-    end)
-
-    local i = 0
-    return function()
-        i = i + 1
-
-        if (a[i] ~= nil) then
-            return a[i][1], t[a[i][1]]
-        else
-            return nil
-        end
-    end
-end
-function Gladdy:IterModules()
-    return pairsByPrio(self.modules)
-end
-
 function Gladdy:Call(module, func, ...)
     if (type(module) == "string") then
         module = self.modules[module]
@@ -155,7 +133,7 @@ function Gladdy:Call(module, func, ...)
     end
 end
 function Gladdy:SendMessage(message, ...)
-    for _, module in self:IterModules() do
+    for _, module in ipairs(self.indexedModules) do
         self:Call(module, module.messages[message], ...)
     end
 end
@@ -202,6 +180,11 @@ function Gladdy:NewModule(name, priority, defaults)
     end
 
     self.modules[name] = module
+
+    tinsert(self.indexedModules, module)
+    tsort(self.indexedModules, function(x, y)
+        return x.priority > y.priority
+    end)
 
     return module
 end
@@ -297,8 +280,8 @@ function Gladdy:OnInitialize()
 
     self:SetupOptions()
 
-    for _, module in self:IterModules() do
-        self:Call(module, "Initialize") -- B.E > A.E :D
+    for _, module in ipairs(self.indexedModules) do
+        self:Call(module, "Initialize")
     end
     if self.db.hideBlizzard == "always" then
         self:BlizzArenaSetAlpha(0)
@@ -392,13 +375,13 @@ function Gladdy:Test()
                 button[k] = v
             end
 
-            for _, module in self:IterModules() do
+            for _, module in ipairs(self.indexedModules) do
                 self:Call(module, "Test", unit)
             end
 
             button:SetAlpha(1)
         end
-        for _, module in self:IterModules() do
+        for _, module in ipairs(self.indexedModules) do
             self:Call(module, "TestOnce")
         end
     end
@@ -464,7 +447,7 @@ function Gladdy:Reset()
     self.curBracket = nil
     self.curUnit = 1
 
-    for _, module in self:IterModules() do
+    for _, module in ipairs(self.indexedModules) do
         self:Call(module, "Reset")
     end
 
@@ -485,7 +468,7 @@ function Gladdy:ResetUnit(unit)
     button:SetAlpha(0)
     self:ResetButton(unit)
 
-    for _, module in self:IterModules() do
+    for _, module in ipairs(self.indexedModules) do
         self:Call(module, "ResetUnit", unit)
     end
 end
@@ -611,7 +594,7 @@ function Gladdy:SMFetch(lsmType, key)
     if (smMediaType == nil and Gladdy.db[key] ~= "None") then
         if not lastWarning[key] or GetTime() - lastWarning[key] > 120 then
             lastWarning[key] = GetTime()
-            Gladdy:Warn("Could not find", "\"" .. lsmType .. "\" \"", Gladdy.db[key], " \" for", "\"" .. key .. "\"", "- setting it to", "\"" .. defaults[lsmType] .. "\"")
+            Gladdy:Debug("WARN", "Could not find", "\"" .. lsmType .. "\" \"", Gladdy.db[key], " \" for", "\"" .. key .. "\"", "- setting it to", "\"" .. defaults[lsmType] .. "\"")
         end
         return self.LSM:Fetch(lsmType, defaults[lsmType])
     end
