@@ -23,54 +23,54 @@ local Classicon = Gladdy:NewModule("Class Icon", 81, {
 local specIcons = {
     --DRUID
     ["DRUID"] = {
-        [L["Balance"]] = select(3, GetSpellInfo(8921)), -- Moonfire
-        [L["Feral"]] = select(3, GetSpellInfo(27545)), -- Cat Form
-        [L["Restoration"]] = select(3, GetSpellInfo(5185)), -- Healing Touch
+        [L["Balance"]] = 136096, -- Moonfire
+        [L["Feral"]] = 132276, -- Cat Form
+        [L["Restoration"]] = 136041, -- Healing Touch
     },
     ["DEATHKNIGHT"] = {
-        [L["Unholy"]] = select(3, GetSpellInfo(48265)), -- Unholy Presence
-        [L["Blood"]] = select(3, GetSpellInfo(48266)), -- Blood Presence
-        [L["Frost"]] = select(3, GetSpellInfo(48263)), -- Frost Presence
+        [L["Unholy"]] = 135775, -- Unholy Presence
+        [L["Blood"]] = 135773, -- Blood Presence
+        [L["Frost"]] = 135770, -- Frost Presence
     },
     ["HUNTER"] = {
-        [L["Beast Mastery"]] = select(3, GetSpellInfo(1515)), -- Tame Beast
-        [L["Marksmanship"]] = select(3, GetSpellInfo(42243)), -- Volley
-        [L["Survival"]] = select(3, GetSpellInfo(1495)), -- Mongoose Bite
+        [L["Beast Mastery"]] = 132164, -- Tame Beast
+        [L["Marksmanship"]] = 236179, -- Focused Aim
+        [L["Survival"]] = 461113, -- Mongoose Bite or Camouflage
     },
     ["MAGE"] = {
-        [L["Arcane"]] = select(3, GetSpellInfo(1459)), -- Arcane Intellect
-        [L["Fire"]] = select(3, GetSpellInfo(133)), -- Fireball
-        [L["Frost"]] = select(3, GetSpellInfo(116)), -- Frostbolt
+        [L["Arcane"]] = 135932, -- Arcane Intellect
+        [L["Fire"]] = 135812, -- Fireball
+        [L["Frost"]] = 135846, -- Frostbolt
     },
     ["PALADIN"] = {
-        [L["Holy"]] = select(3, GetSpellInfo(635)), -- Holy Light
-        [L["Retribution"]] = select(3, GetSpellInfo(7294)), -- Retribution Aura
-        [L["Protection"]] = select(3, GetSpellInfo(32828)), -- Protection Aura
+        [L["Holy"]] = 135920, -- Holy Light
+        [L["Retribution"]] = 135873, -- Retribution Aura
+        [L["Protection"]] = 236264, -- Ability_paladin_shieldofthetemplar
     },
     ["PRIEST"] = {
-        [L["Discipline"]] = select(3, GetSpellInfo(1243)), -- Power Word: Fortitude
-        [L["Shadow"]] = select(3, GetSpellInfo(589)), -- Shadow Word: Pain
-        [L["Holy"]] = select(3, GetSpellInfo(635)), -- Holy Light
+        [L["Discipline"]] = 135987, -- Power Word: Fortitude
+        [L["Shadow"]] = 136207, -- Shadow Word: Pain
+        [L["Holy"]] = 135920, -- Holy Light
     },
     ["ROGUE"] = {
-        [L["Assassination"]] = select(3, GetSpellInfo(1329)), -- Mutilate (Eviscerate? 2098)
-        [L["Combat"]] = select(3, GetSpellInfo(53)), -- Backstab
-        [L["Subtlety"]] = select(3, GetSpellInfo(1784)), -- Stealth
+        [L["Assassination"]] = 132304, -- Mutilate (Eviscerate? 2098)
+        [L["Combat"]] = 132090, -- Backstab
+        [L["Subtlety"]] = 132320, -- Stealth
     },
     ["SHAMAN"] = {
-        [L["Elemental"]] = select(3, GetSpellInfo(403)), -- Lightning Bolt
-        [L["Enhancement"]] = select(3, GetSpellInfo(324)), -- Lightning Shield
-        [L["Restoration"]] = select(3, GetSpellInfo(331)), -- Healing Wave
+        [L["Elemental"]] = 136048, -- Lightning Bolt
+        [L["Enhancement"]] = 136051, -- Lightning Shield
+        [L["Restoration"]] = 136052, -- Healing Wave
     },
     ["WARLOCK"] = {
-        [L["Affliction"]] = select(3, GetSpellInfo(6789)), -- Affliction
-        [L["Demonology"]] = select(3, GetSpellInfo(5500)), -- Sense Demons
-        [L["Destruction"]] = select(3, GetSpellInfo(5740)), -- Rain of Fire
+        [L["Affliction"]] = 136145, -- Affliction
+        [L["Demonology"]] = 136172, -- Sense Demons
+        [L["Destruction"]] = 136186, -- Rain of Fire
     },
     ["WARRIOR"] = {
-        [L["Arms"]] = select(3, GetSpellInfo(12294)), -- Mortal Strike
-        [L["Fury"]] = select(3, GetSpellInfo(12325)), -- Inner Rage
-        [L["Protection"]] = select(3, GetSpellInfo(71)), -- Defensive Stance
+        [L["Arms"]] = 132355, -- Mortal Strike
+        [L["Fury"]] = 132347, -- Inner Rage
+        [L["Protection"]] = 132341, -- Defensive Stance
     },
 }
 
