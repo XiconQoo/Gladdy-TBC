@@ -23,15 +23,15 @@ end
 
 local function defaultSpells(auraType)
     local spells = {}
-    for k,v in pairs(Gladdy:GetImportantAuras()) do
+    for spellID,v in pairs(Gladdy:GetImportantAuras()) do
         if not auraType or auraType == v.track then
-            spells[tostring(k)] = {
+            spells[tostring(spellID)] = {
                 enabled = true,
                 track = v.track,
                 priority = v.priority,
                 spellIDs = v.spellIDs,
-                texture = v.texture or select(3, GetSpellInfo(k)),
-                textureSpell = v.textureSpell or k
+                texture = v.texture or select(3, GetSpellInfo(spellID)),
+                textureSpell = v.textureSpell or spellID,
             }
         end
     end
@@ -42,12 +42,13 @@ Gladdy.enabledAuras = {
     [AURA_TYPE_BUFF] = {}, [AURA_TYPE_DEBUFF] = {}
 }
 local function updateEnabledAuras()
-    for _,v in pairs(Gladdy.db.auraListDefault) do
+    for k,v in pairs(Gladdy.db.auraListDefault) do
         for _,spellID in ipairs(v.spellIDs) do
             if v.enabled then
                 Gladdy.enabledAuras[v.track][spellID] = {
                     texture = v.texture,
-                    priority = v.priority
+                    priority = v.priority,
+                    duration = Gladdy:GetImportantAuras()[tonumber(k)] and Gladdy:GetImportantAuras()[tonumber(k)].duration
                 }
             else
                 Gladdy.enabledAuras[v.track][spellID] = nil
@@ -162,7 +163,7 @@ function Auras:CreateFrame(unit)
             if (self.timeLeft <= 0) then
                 Auras:AURA_FADE(self.unit, self.track, true)
             else
-                if self.spellID == 8178 then
+                if self.noDuration then
                     self.text:SetText("")
                 else
                     Gladdy:FormatTimer(self.text, self.timeLeft, self.timeLeft < 10)
@@ -634,28 +635,36 @@ function Auras:JOINED_ARENA()
         self.frames[unit]:Show()
         self.frames[unit].interruptFrame:Show()
     end
+    updateEnabledAuras()
 end
 
-function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, expirationTime, count, debuffType)
+function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, expirationTime, count, dispelType, n, unitCaster)
     local auraFrame = self.frames[unit]
     if (not auraFrame) then
         return
     end
 
-    if not Gladdy.enabledAuras[auraType][spellID] then
+    local auraData = Gladdy.enabledAuras[auraType][spellID]
+
+    if not auraData then
         return
     end
 
-    if (auraFrame.priority and auraFrame.priority > Gladdy.enabledAuras[auraType][spellID].priority) then
+    if (auraFrame.priority and auraFrame.priority > auraData.priority) then
         return
+    end
+    if auraData.duration then
+        auraFrame.noDuration = true
+    else
+        auraFrame.noDuration = false
     end
     auraFrame.startTime = expirationTime - duration
     auraFrame.endTime = expirationTime
     auraFrame.name = spellName
     auraFrame.spellID = spellID
-    auraFrame.timeLeft = spellID == 8178 and 45 or expirationTime - GetTime()
-    auraFrame.priority = Gladdy.enabledAuras[auraType][spellID].priority
-    auraFrame.icon:SetTexture(Gladdy.enabledAuras[auraType][spellID].texture or icon)
+    auraFrame.timeLeft = auraData.duration == 0 and 999 or expirationTime - GetTime()
+    auraFrame.priority = auraData.priority
+    auraFrame.icon:SetTexture(auraData.texture or icon)
     auraFrame.track = auraType
     auraFrame.active = true
     auraFrame.icon.overlay:Show()
@@ -667,9 +676,9 @@ function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, exp
     else
         auraFrame.icon.overlay:SetVertexColor(Gladdy.db.frameBorderColor.r, Gladdy.db.frameBorderColor.g, Gladdy.db.frameBorderColor.b, Gladdy.db.frameBorderColor.a)
     end
-    if spellID ~= 8178 then --grounding totem effect
+    if not auraFrame.noDuration then
         auraFrame.cooldown:SetCooldown(auraFrame.startTime, duration)
-    else
+    else -- no duration spell
         auraFrame.cooldown:Clear()
     end
 end
