@@ -13,7 +13,13 @@ local function defaultCategories()
     local categories = {}
     local indexList = {}
     for k,v in pairs(DRData:GetSpells()) do
-        tinsert(indexList, {spellID = k, category = v})
+        if type(v) == "table" then
+            for _,category in ipairs(v) do
+                tinsert(indexList, {spellID = k, category = category})
+            end
+        else
+            tinsert(indexList, {spellID = k, category = v})
+        end
     end
     tbl_sort(indexList, function(a, b) return a.spellID < b.spellID end)
     for _,v in ipairs(indexList) do
@@ -475,16 +481,26 @@ function Diminishings:PrepareIcon(unit, lastIcon, drCat, spellID)
     lastIcon:Show()
 end
 
-function Diminishings:AuraGain(unit, spellID)
-    local drFrame = self.frames[unit]
-    local drCat = DRData:GetSpellCategory(spellID)
-    if (not drFrame or not drCat) then
-        return
-    end
-    if not Gladdy.db.drCategories[drCat].enabled then
-        return
-    end
+function Diminishings:TriggerDR(unit, spellID, drCat, noTimer)
+    local lastIcon = Diminishings:FindLastIcon(unit, drCat)
+    if not lastIcon then return end
 
+    Diminishings:PrepareIcon(unit, lastIcon, drCat, spellID)
+
+    if noTimer then
+        lastIcon.cooldown:Hide()
+        lastIcon.cooldown:SetCooldown(0, 0)
+        lastIcon.timeText:SetText("")
+        lastIcon.running = false
+    else
+        lastIcon.timeLeft = Gladdy.db.drDuration
+        lastIcon.cooldown:Show()
+        lastIcon.cooldown:SetCooldown(GetTime(), Gladdy.db.drDuration)
+        lastIcon.running = true
+    end
+end
+
+function Diminishings:AuraGainCheck(unit, spellID, drFrame, drCat)
     -- due to dynamic DR we reset the DR here if dr == 0
     if not drFrame.tracked[drCat] or drFrame.tracked[drCat] == 0 then
         drFrame.tracked[drCat] = DRData:NextDR(1)
@@ -492,40 +508,45 @@ function Diminishings:AuraGain(unit, spellID)
         drFrame.tracked[drCat] = DRData:NextDR(drFrame.tracked[drCat] == 0.5 and 2 or 3)
     end
 
-    -- add icon with no timer
     if Gladdy.db.drShowIconOnAuraApplied then
-        local lastIcon = Diminishings:FindLastIcon(unit, drCat)
-        if not lastIcon then return end
+        self:TriggerDR(unit, spellID, drCat, true)
+    end
+end
 
-        Diminishings:PrepareIcon(unit, lastIcon, drCat, spellID)
+function Diminishings:AuraGain(unit, spellID)
+    local drFrame = self.frames[unit]
+    local drCat, drCategories = DRData:GetSpellCategory(spellID)
+    if (not drFrame or not drCat) then
+        return
+    end
 
-        lastIcon.running = false
-        lastIcon.cooldown:Hide()
-        lastIcon.cooldown:SetCooldown(0, 0)
-        lastIcon.timeText:SetText("")
+    if drCategories then
+        for _, cat in ipairs(drCategories) do
+            if Gladdy.db.drCategories[cat].enabled then
+                Diminishings:AuraGainCheck(unit, spellID, drFrame, cat)
+            end
+        end
+    elseif Gladdy.db.drCategories[drCat].enabled then
+        Diminishings:AuraGainCheck(unit, spellID, drFrame, drCat)
     end
 end
 
 function Diminishings:AuraFade(unit, spellID)
     local drFrame = self.frames[unit]
-    local drCat = DRData:GetSpellCategory(spellID)
+    local drCat, drCategories = DRData:GetSpellCategory(spellID)
     if (not drFrame or not drCat) then
         return
     end
-    if not Gladdy.db.drCategories[drCat].enabled then
-        return
+
+    if drCategories then
+        for _, cat in ipairs(drCategories) do
+            if Gladdy.db.drCategories[cat].enabled then
+                self:TriggerDR(unit, spellID, cat, false)
+            end
+        end
+    elseif Gladdy.db.drCategories[drCat].enabled then
+        self:TriggerDR(unit, spellID, drCat, false)
     end
-
-    -- find icon and start timer
-    local lastIcon = Diminishings:FindLastIcon(unit, drCat)
-    if not lastIcon then return end
-
-    Diminishings:PrepareIcon(unit, lastIcon, drCat, spellID)
-
-    lastIcon.timeLeft = Gladdy.db.drDuration
-    lastIcon.cooldown:Show()
-    lastIcon.cooldown:SetCooldown(GetTime(), Gladdy.db.drDuration)
-    lastIcon.running = true
 end
 
 function Diminishings:Positionate(unit)
@@ -1142,6 +1163,23 @@ end
 
 function Diminishings:GetDRIcons(category)
     local icons = {}
+    for k,v in pairs(DRData:GetSpells()) do
+        local name, _, texture = GetSpellInfo(k)
+        if  name and texture then
+            if type(v) == "table" then
+                for _,cat in ipairs(v) do
+                    if cat == category then
+                        icons[texture] = format("|T%s:20|t %s", texture, name)
+                    end
+                end
+            else
+                if v == category then
+                    icons[texture] = format("|T%s:20|t %s", texture, name)
+                end
+            end
+        end
+    end
+
     for k,v in pairs(DRData:GetSpells()) do
         if v == category then
             local name, _, texture = GetSpellInfo(k)
