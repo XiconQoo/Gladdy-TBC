@@ -6,3 +6,4 @@
 ## X-Curse-Project-ID: 482332
 ## X-WoWI-ID: 26350
 ## Notes: Gladdy only supports Classic TBC and Classic WotLK.
+## SavedVariables: GladdyXZ
