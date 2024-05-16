@@ -331,6 +331,17 @@ function Gladdy:CreateButton(i)
     --button.texture:SetTexture("Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp")
 
     local secure = CreateFrame("Button", "GladdyButton" .. i, button, "SecureActionButtonTemplate, SecureHandlerEnterLeaveTemplate")
+    secure.unit = "arena" .. i
+    secure:HookScript("OnEnter", function(self)
+        if (Gladdy.db.highlight) then
+            Gladdy.modules["Highlight"]:Toggle(self.unit, nil, true, true)
+        end
+    end)
+    secure:HookScript("OnLeave", function(self)
+        if (Gladdy.db.highlight) then
+            Gladdy.modules["Highlight"]:Toggle(self.unit, nil, false, true)
+        end
+    end)
     secure:RegisterForClicks("AnyUp")
     secure:RegisterForClicks("AnyDown")
 
