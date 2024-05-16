@@ -105,7 +105,7 @@ function EventListener:CooldownCheck(eventType, srcUnit, spellName, spellID)
                 unitClass = Gladdy.buttons[srcUnit].race
             end
             --TODO find a better solution
-            if spellID ~= 16188 and spellID ~= 17116 and spellID ~= 16166 and spellID ~= 12043 and spellID ~= 5384 then -- Nature's Swiftness CD starts when buff fades
+            if spellID ~= 16188 and spellID ~= 17116 and spellID ~= 16166 and spellID ~= 12043 and spellID ~= 5384 or spellID == 14751 or spellID == 89485 then -- Nature's Swiftness CD starts when buff fades
                 Gladdy:Debug("INFO", eventType, "- CooldownUsed", srcUnit, "spellID:", spellID)
                 Cooldowns:CooldownUsed(srcUnit, unitClass, spellId)
             end
@@ -200,7 +200,7 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
             EventListener:CooldownCheck(eventType, srcUnit, spellName, spellID)
         end
         --TODO find a better solution
-        if (eventType == "SPELL_AURA_REMOVED" and (spellID == 16188 or spellID == 17116 or spellID == 16166 or spellID == 12043) and Gladdy.buttons[srcUnit].class) then
+        if (eventType == "SPELL_AURA_REMOVED" and (spellID == 16188 or spellID == 17116 or spellID == 16166 or spellID == 12043 or spellID == 14751 or spellID == 89485) and Gladdy.buttons[srcUnit].class) then
             Gladdy:Debug("INFO", "SPELL_AURA_REMOVED - CooldownUsed", srcUnit, "spellID:", spellID)
             Cooldowns:CooldownUsed(srcUnit, Gladdy.buttons[srcUnit].class, spellID)
         end
@@ -212,7 +212,7 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
             end
             if unit then
                 --Gladdy:Debug("INFO", "EL:CL:SPELL_AURA_REMOVED (srcUnit)", "Cooldowns:AURA_FADE", unit, spellId)
-                Cooldowns:AURA_FADE(unit, spellId)
+                Cooldowns:AURA_FADE(unit, spellId, spellName)
             end
         end
     end
@@ -402,7 +402,7 @@ function EventListener:ScanAuras(unit)
                     spellId = spellID
                 end
                 --Gladdy:Debug("INFO", "EL:UNIT_AURA Cooldowns:AURA_FADE", unit, spellId)
-                Cooldowns:AURA_FADE(unit, spellId)
+                Cooldowns:AURA_FADE(unit, spellId, spellName)
                 if spellID == 5384 then -- Feign Death CD Detection needs this
                     Cooldowns:CooldownUsed(unit, Gladdy.buttons[unit].class, 5384)
                 end

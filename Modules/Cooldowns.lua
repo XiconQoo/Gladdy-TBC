@@ -451,13 +451,14 @@ function Cooldowns:AURA_GAIN(_, auraType, spellID, spellName, _, duration, _, _,
     end
 end
 
-function Cooldowns:AURA_FADE(unit, spellID)
+function Cooldowns:AURA_FADE(unit, spellID, spellName)
     if not Gladdy.buttons[unit] or Gladdy.buttons[unit].stealthed then
         return
     end
+    local spellId = Cooldowns.cooldownSpells[spellName] -- don't use spellId from combatlog, in case of different spellrank
     local cooldownFrame = Gladdy.buttons[unit].spellCooldownFrame
     for _,icon in pairs(cooldownFrame.icons) do
-        if (icon.spellId == spellID) then
+        if (icon.spellId == spellId) then
             Gladdy:Debug("INFO", "Cooldowns:AURA_FADE", "LCG.ButtonGlow_Stop")
             if icon.timer then
                 icon.timer:Cancel()
