@@ -639,6 +639,7 @@ function Auras:JOINED_ARENA()
 end
 
 function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, expirationTime, count, dispelType, n, unitCaster)
+    Gladdy:Debug("INFO", "Auras:AURA_GAIN", unit, auraType, spellID, spellName, icon, duration, expirationTime, count, dispelType, n, unitCaster)
     local auraFrame = self.frames[unit]
     if (not auraFrame) then
         return
@@ -653,7 +654,7 @@ function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, exp
     if (auraFrame.priority and auraFrame.priority > auraData.priority) then
         return
     end
-    if auraData.duration then
+    if duration == 0 then
         auraFrame.noDuration = true
     else
         auraFrame.noDuration = false
@@ -662,7 +663,7 @@ function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, exp
     auraFrame.endTime = expirationTime
     auraFrame.name = spellName
     auraFrame.spellID = spellID
-    auraFrame.timeLeft = auraData.duration == 0 and 999 or expirationTime - GetTime()
+    auraFrame.timeLeft = auraFrame.noDuration and 999 or expirationTime - GetTime()
     auraFrame.priority = auraData.priority
     auraFrame.icon:SetTexture(auraData.texture or icon)
     auraFrame.track = auraType
