@@ -1090,6 +1090,11 @@ local importantAuras = {
         priority = 15,
         spellIDs = { 54428 },
     },
+    [85696] = { -- Zealotry
+        track = AURA_TYPE_BUFF,
+        priority = 9,
+        spellIDs = { 85696 },
+    },
     [31821] = { -- Aura mastery
         track = AURA_TYPE_BUFF,
         priority = 21,
@@ -1341,7 +1346,7 @@ local cooldownList = {
     -- Mage
     ["MAGE"] = {
         [1953] = 15, -- Blink
-        [82731] = 60, -- Fire Orb
+        [82731] = 60, -- Flame Orb
         [543] = 30, -- Mage Ward
         [80353] = 300, -- Time Warp
         [2139] = 24, -- Counterspell
@@ -1475,31 +1480,23 @@ local cooldownList = {
 
     -- Paladin
     ["PALADIN"] = {
-        [1022] = 300, -- Hand of Protection
+        [1022] = { cd = 300, [L["Retribution"]] = 180}, -- Hand of Protection
         [1044] = 25, -- Hand of Freedom
-        [54428] = 60, -- Divine Plea
+        [54428] = 120, -- Divine Plea
         [6940] = 120, -- Hand of Sacrifice
         [2812] = 15, -- Holy Wrath
         [85673] = 20, -- World of Glory
         [64205] = 120, -- Divine Sacrifice
+        [498] = { cd = 60, [L["Holy"]] = 30 }, -- Divine Protection
         [853] = 40, -- Hammer of Justice
         [81650] = 300, -- Guardian of the Ancient Kings
-        [642] = { cd = 300, -- Divine Shield
-                  sharedCD = {
-                      cd = 30,
-                      [31884] = true,
-                  },
-        },
-        [31884] = { cd = 180, -- Avenging Wrath
-                    sharedCD = {
-                        cd = 30,
-                        [642] = true,
-                    },
-        },
+        [642] = 300, -- Divine Shield
+        [31884] = 120,-- Avenging Wrath
         [31821] = { cd = 120, spec = L["Holy"], }, -- Aura Mastery
         [31842] = { cd = 180, spec = L["Holy"], }, -- Divine Favor
         [20473] = { cd = 6, spec = L["Holy"], }, -- Holy Shock
         [20066] = { cd = 60, spec = L["Retribution"], }, -- Repentance
+        [85696] = { cd = 120, spec = L["Retribution"], }, -- Zealotry
         [31935] = { cd = 15, spec = L["Protection"], }, -- Avengers Shield
         [31850] = { cd = 180, spec = L["Protection"], }, -- Ardent Defender
         [70940] = { cd = 180, spec = L["Protection"], }, -- Divine Guardian
