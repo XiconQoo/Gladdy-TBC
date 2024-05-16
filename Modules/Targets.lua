@@ -79,8 +79,8 @@ function Targets:JOINED_ARENA()
         self:SetScript("OnEvent", Targets.OnEvent)
     end
 
-    for _,v in pairs(self.frames) do
-        v:SetAlpha(0)
+    for i=1, Gladdy.curBracket do
+        self:ENEMY_SPOTTED("arena" .. i)
     end
 end
 
@@ -113,6 +113,7 @@ function Targets:ENEMY_SPOTTED(unit)
             self:HealthCheck(unit)
             self:SetHealthText(button.healthBar, health, healthMax)
             self:SetText(unit)
+            button:SetAlpha(1)
         else
             button.unitGUID = nil
             button:SetAlpha(0)
