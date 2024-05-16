@@ -16,6 +16,7 @@ local IsAddOnLoaded = IsAddOnLoaded
 local GetBattlefieldStatus = GetBattlefieldStatus
 local IsInInstance = IsInInstance
 local GetNumArenaOpponents = GetNumArenaOpponents
+local EventRegistry = EventRegistry
 local RELEASE_TYPES = { alpha = "Alpha", beta = "Beta", release = "Release"}
 local PREFIX = "Gladdy v"
 local VERSION_REGEX = PREFIX .. "(%d+%.%d+)%-(%a)"
@@ -37,6 +38,8 @@ Gladdy.version_releaseType = RELEASE_TYPES.beta
 Gladdy.version = PREFIX .. string.format("%.2f", Gladdy.version_num) .. "-" .. Gladdy.version_releaseType
 Gladdy.VERSION_REGEX = VERSION_REGEX
 
+local GLADDY_COLORED = "|cff0384fcGladdy|r:"
+
 Gladdy.debug = false
 
 LibStub("AceTimer-3.0"):Embed(Gladdy)
@@ -50,7 +53,7 @@ setmetatable(Gladdy, {
 })
 
 function Gladdy:Print(...)
-    local text = "|cff0384fcGladdy|r:"
+    local text = GLADDY_COLORED
     local val
     for i = 1, select("#", ...) do
         val = select(i, ...)
@@ -67,10 +70,13 @@ function Gladdy:Debug(lvl, ...)
     if Gladdy.debug then
         if lvl == "INFO" then
             self:Print(self.INFO, ...)
+            EventRegistry:TriggerEvent(GLADDY_COLORED, self.INFO, ...)
         elseif lvl == "WARN" then
             self:Print(self.WARN, ...)
+            EventRegistry:TriggerEvent(GLADDY_COLORED, self.WARN, ...)
         elseif lvl == "ERROR" then
             self:Print(self.ERROR, ...)
+            EventRegistry:TriggerEvent(GLADDY_COLORED, self.ERROR, ...)
         end
     end
 end
@@ -133,6 +139,7 @@ function Gladdy:Call(module, func, ...)
     end
 end
 function Gladdy:SendMessage(message, ...)
+    Gladdy:Debug("INFO", "Gladdy:SendMessage", message, ...)
     for _, module in ipairs(self.indexedModules) do
         self:Call(module, module.messages[message], ...)
     end
