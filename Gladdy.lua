@@ -40,7 +40,7 @@ Gladdy.VERSION_REGEX = VERSION_REGEX
 
 local GLADDY_COLORED = "|cff0384fcGladdy|r:"
 
-Gladdy.debug = false
+Gladdy.debug = true
 
 LibStub("AceTimer-3.0"):Embed(Gladdy)
 LibStub("AceComm-3.0"):Embed(Gladdy)
@@ -203,10 +203,61 @@ end
 ---------------------------
 
 local ignoredOptions = {
-    ["auraListDefault"] = true,
-    ["trackedDebuffs"] = true,
-    ["trackedBuffs"] = true
+    ["auraListDefault"] = {
+        ["enabled"] = true,
+        ["track"] = "string",
+        ["priority"] = 1,
+        ["spellIDs"] = { 1 },
+        ["texture"] = 1234,
+        ["textureSpell"] = 1234,
+    },
+    ["trackedDebuffs"] = {
+        id = { 1 },
+        class = "str",
+        active = true,
+    },
+    ["trackedBuffs"] = { -- ["trackedBuffs"]["123123"] =
+        id = { 1 },
+        class = "str",
+        active = true,
+    }
 }
+
+function Gladdy:CleanupIgnoredOptions(tbl, refTbl, str, refOptionStruct)
+    if type(tbl) == "table" then
+        for k,v in pairs(tbl) do
+            --self:Debug("INFO", "DeleteUnknownOptions:", str .. "." .. k, "evaluating")
+            if type(tbl[k]) ~= type(refOptionStruct) then
+                if refTbl[k] then
+                    self:Debug("INFO", "SavedVariable reset:", str .. "." .. k, "invalid Format \"" .. type(tbl[k]) .. "\" - setting default \"" .. type(refOptionStruct) .. "\"")
+                    tbl[k] = refTbl[k]
+                else
+                    self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, "invalid Format \"" .. type(tbl[k]) .. "\" - deleting")
+                    tbl[k] = nil
+                    break
+                end
+            else--is table, go over items
+                for sk,sv in pairs(tbl[k]) do
+                    if refOptionStruct[sk] == nil then --does not exist
+                        self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k .. "." .. sk, "does not exist")
+                        tbl[k][sk] = nil
+                    elseif type(tbl[k][sk]) ~= type(refOptionStruct[sk]) then --wrong type
+                        if refTbl[k] and refTbl[k][sk] then
+                            self:Debug("INFO", "SavedVariable reset:", str .. "." .. k .. "." .. sk, "invalid Format \"" .. type(tbl[k][sk]) .. "\" - setting default \"" .. type(refOptionStruct[sk]) .. "\"")
+                            tbl[k][sk] = refTbl[k][sk]
+                        else
+                            self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k .. "." .. sk, "invalid Format \"" .. type(tbl[k][sk]) .. "\" - deleting does not exist in ref table")
+                            tbl[k][sk] = nil
+                        end
+                    end
+                end
+            end
+        end
+    else
+        self:Debug("INFO", "SavedVariable deleted:", str, "not a table - deleting")
+        tbl = nil
+    end
+end
 
 function Gladdy:DeleteUnknownOptions(tbl, refTbl, str)
     if str == nil then
@@ -218,8 +269,11 @@ function Gladdy:DeleteUnknownOptions(tbl, refTbl, str)
             tbl[k] = nil
         else
             if type(v) ~= type(refTbl[k]) then
-                self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, "type error!", "Expected", type(refTbl[k]), "but found", type(v))
-                tbl[k] = nil
+                self:Debug("INFO", "SavedVariable reset:", str .. "." .. k, "type error!", "Expected", type(refTbl[k]), "but found", type(v))
+                tbl[k] = refTbl[k]
+            elseif ignoredOptions[k] then --iterate to keep options in default format
+                self:Debug("INFO", "Ignored Saved variables:", str .. "." .. k, "evaluating")
+                self:CleanupIgnoredOptions(v, refTbl[k], str .. "." .. k, ignoredOptions[k])
             elseif type(v) == "table" and (not ignoredOptions[k] or self.db.version and self.db.version < 2.23) then
                 self:DeleteUnknownOptions(v, refTbl[k], str .. "." .. k)
             end
@@ -250,6 +304,7 @@ function Gladdy:OnInitialize()
     self.dbi.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
     self.dbi.RegisterCallback(self, "OnProfileReset", "OnProfileReset")
     self.db = self.dbi.profile
+    self:DeleteUnknownOptions(self.db, self.defaults.profile)
 
     self.LSM = LibStub("LibSharedMedia-3.0")
     self.LSM:Register("statusbar", "Gloss", "Interface\\AddOns\\Gladdy\\Images\\Gloss")
