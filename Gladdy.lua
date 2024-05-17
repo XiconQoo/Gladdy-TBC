@@ -226,35 +226,43 @@ local ignoredOptions = {
 function Gladdy:CleanupIgnoredOptions(tbl, refTbl, str, refOptionStruct)
     if type(tbl) == "table" then
         for k,v in pairs(tbl) do
-            --self:Debug("INFO", "DeleteUnknownOptions:", str .. "." .. k, "evaluating")
-            if type(tbl[k]) ~= type(refOptionStruct) then
+            if type(tbl[k]) ~= type(refOptionStruct) then -- not even same type: reset or delete
                 if refTbl[k] then
-                    self:Debug("INFO", "SavedVariable reset:", str .. "." .. k, "invalid Format \"" .. type(tbl[k]) .. "\" - setting default \"" .. type(refOptionStruct) .. "\"")
+                    self:Debug("INFO", "SavedVariable reset:", str .. "." .. k, " - invalid Format \"" .. type(tbl[k]) .. "\" - setting default \"" .. type(refOptionStruct) .. "\"")
                     tbl[k] = refTbl[k]
                 else
-                    self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, "invalid Format \"" .. type(tbl[k]) .. "\" - deleting")
+                    self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, " - invalid Format \"" .. type(tbl[k]) .. "\" - deleting")
                     tbl[k] = nil
-                    break
                 end
-            else--is table, go over items
-                for sk,sv in pairs(tbl[k]) do
-                    if refOptionStruct[sk] == nil then --does not exist
-                        self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k .. "." .. sk, "does not exist")
-                        tbl[k][sk] = nil
-                    elseif type(tbl[k][sk]) ~= type(refOptionStruct[sk]) then --wrong type
-                        if refTbl[k] and refTbl[k][sk] then
-                            self:Debug("INFO", "SavedVariable reset:", str .. "." .. k .. "." .. sk, "invalid Format \"" .. type(tbl[k][sk]) .. "\" - setting default \"" .. type(refOptionStruct[sk]) .. "\"")
-                            tbl[k][sk] = refTbl[k][sk]
-                        else
-                            self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k .. "." .. sk, "invalid Format \"" .. type(tbl[k][sk]) .. "\" - deleting does not exist in ref table")
+            elseif type(tbl[k]) == "table" then--is table, go over items
+                if not refTbl[k] then -- all options must be present because not default option
+                    for refKey, refValue in pairs(refOptionStruct) do
+                        if tbl[k][refKey] == nil or type(tbl[k][refKey]) ~= type(refValue) then -- should have this option .. delete tbl[k]
+                            self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, " - should have the option", refKey)
+                            tbl[k] = nil
+                        end
+                    end
+                end
+                if tbl[k] then
+                    for sk,sv in pairs(tbl[k]) do
+                        if refOptionStruct[sk] == nil then --option key does not exist
+                            self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k .. "." .. sk, " - does not exist")
                             tbl[k][sk] = nil
+                        elseif type(tbl[k][sk]) ~= type(refOptionStruct[sk]) then --wrong type
+                            if refTbl[k] and refTbl[k][sk] then
+                                self:Debug("INFO", "SavedVariable reset:", str .. "." .. k .. "." .. sk, " - invalid Format \"" .. type(tbl[k][sk]) .. "\" - setting default \"" .. type(refOptionStruct[sk]) .. "\"")
+                                tbl[k][sk] = refTbl[k][sk]
+                            else
+                                self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k .. "." .. sk, " - invalid Format \"" .. type(tbl[k][sk]) .. "\" - deleting does not exist in ref table")
+                                tbl[k][sk] = nil
+                            end
                         end
                     end
                 end
             end
         end
     else
-        self:Debug("INFO", "SavedVariable deleted:", str, "not a table - deleting")
+        self:Debug("INFO", "SavedVariable deleted:", str, " - not a table - deleting")
         tbl = nil
     end
 end
