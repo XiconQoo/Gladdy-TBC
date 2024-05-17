@@ -555,6 +555,7 @@ local importantAuras = {
         priority = 40,
         spellIDs = { 118, 61305, 61780, 61721, 28271, 28272 },
         texture = 136071,
+        textureSpell = 118,
     },
     [51514] = { -- Hex
         track = AURA_TYPE_DEBUFF,
@@ -831,13 +832,15 @@ local importantAuras = {
         track = AURA_TYPE_DEBUFF,
         priority = 40,
         spellIDs = { 7922 },
-        texture = 135860
+        texture = 132337,
+        textureSpell = 100,
     },
     [20253] = { -- Intercept Stun
         track = AURA_TYPE_DEBUFF,
         priority = 40,
         spellIDs = { 20253 },
-        texture = 135860
+        texture = 132307,
+        textureSpell = 20252,
     },
     [12809] = { -- Concussion Blow
         track = AURA_TYPE_DEBUFF,
