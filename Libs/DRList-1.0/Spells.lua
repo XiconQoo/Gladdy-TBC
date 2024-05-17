@@ -793,7 +793,6 @@ elseif Lib.gameExpansion == "cata" then
         [64058] = "disarm", -- Psychic Horror Disarm Effect
         [51722] = "disarm", -- Dismantle
         [676]   = "disarm", -- Disarm
-        [64346] = "disarm", -- Fiery Payback
 
         -- *** Silence Effects ***
         [47476] = "silence", -- Strangulate
@@ -807,8 +806,6 @@ elseif Lib.gameExpansion == "cata" then
         [18425] = "silence", -- Silenced - Improved Kick
         [86759] = "silence", -- Silenced - Improved Kick (Rank 2)
         [24259] = "silence", -- Spell Lock
-        [31117] = "silence", -- Silenced - Unstable Affliction (Rank 1)
-        [43523] = "silence", -- Silenced - Unstable Affliction (Rank 2)
         [18498] = "silence", -- Silenced - Gag Order
         [50613] = "silence", -- Arcane Torrent (Racial, Runic Power)
         [28730] = "silence", -- Arcane Torrent (Racial, Mana)
