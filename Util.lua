@@ -8,7 +8,7 @@ local debugprofilestop = debugprofilestop
 local geterrorhandler = geterrorhandler
 local debugstack = debugstack
 local next = next
-local str_find, str_gsub, str_sub, str_format, str_match = string.find, string.gsub, string.sub, string.format, string.match
+local str_find, str_gsub, str_sub, str_format, str_match, str_gmatch = string.find, string.gsub, string.sub, string.format, string.match, string.gmatch
 local tinsert = table.insert
 local pcall = pcall
 local Gladdy = LibStub("Gladdy")
@@ -25,64 +25,49 @@ local GetSpellDescription = GetSpellDescription
 
 ---------------------------
 
-local tags = {
-    ["current"] = true,
-    ["max"] = true,
-    ["percent"] = true,
-    ["race"] = "race",
-    ["class"] = "class",
-    ["arena"] = true,
-    ["name"] = "name",
-    ["status"] = true,
-    ["spec"] = "spec",
+local tagsFunctions = {
+    ["percent"] = function(current, max, status, name, class, race, spec, arena) return current and max and floor(current * 100 / max) .. "%%" or "" end,
+    ["max"] = function(current, max, status, name, class, race, spec, arena) return max and max > 999 and ("%.1fk"):format(max / 1000) or max or "" end,
+    ["status"] = function(current, max, status, name, class, race, spec, arena) return status or "" end,
+    ["name"] = function(current, max, status, name, class, race, spec, arena) return name or "" end,
+    ["class"] = function(current, max, status, name, class, race, spec, arena) return class or "" end,
+    ["race"] = function(current, max, status, name, class, race, spec, arena) return race or "" end,
+    ["current"] = function(current, max, status, name, class, race, spec, arena) return current and max > 999 and ("%.1fk"):format(current / 1000) or current or "" end,
+    ["arena"] = function(current, max, status, name, class, race, spec, arena) return arena or "" end,
+    ["spec"] = function(current, max, status, name, class, race, spec, arena) return spec or "" end,
 }
 
-local function str_extract(s, pattern)
-    local t = {} -- table to store the indices
-    local i, j = 0,0
-    while true do
-        i, j = str_find(s, pattern, i+1) -- find 'next' occurrence
-        if i == nil then break end
-        tinsert(t, str_sub(s, i, j))
-    end
-    return t
+local function escapePattern(pattern)
+    local specialCharacters = "()%-.%+%*?[%]%^$"
+    return pattern:gsub("([%" .. specialCharacters .. "])", "%%%1")
 end
 
---TODO optimize this function as it's being called often!
-local function getTagText(unit, tag, current, max, status)
+local function getTag(tag, unit, current, max, status)
     local button = Gladdy.buttons[unit]
     if not button then
         return
     end
-
-    if str_find(tag, "percent") then
-        return current and max and floor(current * 100 / max) .. "%%" or ""
-    elseif str_find(tag, "current") then
-        return current and max > 999 and ("%.1fk"):format(current / 1000) or current or ""
-    elseif str_find(tag, "max") then
-        return max and max > 999 and ("%.1fk"):format(max / 1000) or max or ""
-    elseif str_find(tag, "status") then
-        if str_find(tag, "%|") and status == nil then
-            return nil
-        else
-            return status or ""
-        end
-    elseif str_find(tag, "name") then
-        return button.name or ""
-    elseif str_find(tag, "class") then
-        return button.classLoc or ""
-    elseif str_find(tag, "race") then
-        return button.raceLoc or ""
-    elseif str_find(tag, "arena") then
-        local str,found = str_gsub(unit, "arena", "")
-        return found == 1 and str or ""
-    elseif str_find(tag, "spec") then
-        if str_find(tag, "%|") and button.spec == nil then
-            return nil
-        else
-            return button.spec or ""
+    local returnStr = tag
+    local class = button.classLoc
+    local spec = button.spec
+    local name = button.name
+    local race = button.raceLoc
+    local arenaNumber,found = str_gsub(unit, "arena", "")
+    local arena = found == 1 and arenaNumber or ""
+    if str_find(tag, "%[[%w|%|]+%]") then
+        for block in str_gmatch(tag, "%[[%w|%|]+%]") do
+            local replace = block
+            for tagOption in str_gmatch(block, "%w+") do
+                if tagsFunctions[tagOption] then
+                    local tagStr = tagsFunctions[tagOption](current, max, status, name, class, race, spec, arena)
+                    replace =  replace == block and tagStr or tagStr ~= "" and tagStr or replace
+                end
+            end
+            local pattern = escapePattern(block)
+            returnStr = returnStr:gsub(pattern, replace)
         end
     end
+    return returnStr
 end
 
 function Gladdy:SetTag(unit, tagOption, current, max, status)
@@ -91,30 +76,9 @@ function Gladdy:SetTag(unit, tagOption, current, max, status)
         return
     end
 
-    local returnStr = tagOption
+    return getTag(tagOption, unit, current, max, status)
 
-    local t = str_extract(returnStr, "%[[^%[].-%]")
-    for _, tag in ipairs(t) do
-        local replace
-        if str_find(tag, "|") then -- or operator
-            local indicators = str_extract(tag, "[%[|%|]%a+[%||%]]")
-            local replaces = {}
-            for _, indicator in ipairs(indicators) do
-                tinsert(replaces, getTagText(unit, indicator, current, max, status))
-            end
-            replace = replaces[#replaces]
-        else
-            replace = getTagText(unit, tag, current, max, status)
-        end
 
-        if replace then
-            local find = str_gsub(tag, "%[", "%%[")
-            find = str_gsub(find, "%]", "%%]")
-            find = str_gsub(find, "%|", "%%|")
-            returnStr = str_gsub(returnStr, find, replace)
-        end
-    end
-    return returnStr
 end
 
 function Gladdy:GetTagOption(name, order, enabledOption, func, toggle)
@@ -227,6 +191,14 @@ function Gladdy:AddEntriesToTable(table, entries)
     for k,v in pairs(entries) do
         if not table[k] then
             table[k] = v
+        end
+    end
+end
+
+function Gladdy:RemoveEntriesFromTable(table, entries)
+    for _,v in pairs(entries) do
+        if table[v] then
+            table[v] = nil
         end
     end
 end
