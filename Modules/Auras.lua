@@ -2,6 +2,7 @@ local pairs, ipairs, select, tinsert, tbl_sort, tostring, tonumber, rand = pairs
 local str_gsub, str_match, str_gmatch = string.gsub, string.match, string.gmatch
 local GetSpellInfo = GetSpellInfo
 local CreateFrame, GetTime = CreateFrame, GetTime
+local UnitGUID = UnitGUID
 local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
 
 local Gladdy = LibStub("Gladdy")
@@ -645,6 +646,17 @@ function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, exp
         return
     end
 
+    local auraTypeTemp = auraType
+
+    if spellID == 88611 then
+        auraType = AURA_TYPE_DEBUFF
+        local sourceGUID = unitCaster and UnitGUID(unitCaster)
+        if Gladdy.bombExpireTime[sourceGUID] then
+            Gladdy:Debug("INFO", "Auras:AURA_GAIN", unit, auraType, spellID, Gladdy.bombExpireTime[sourceGUID])
+            auraTypeTemp = Gladdy.guids[sourceGUID] and AURA_TYPE_BUFF or AURA_TYPE_DEBUFF
+        end
+    end
+
     local auraData = Gladdy.enabledAuras[auraType][spellID]
 
     if not auraData then
@@ -670,9 +682,9 @@ function Auras:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration, exp
     auraFrame.active = true
     auraFrame.icon.overlay:Show()
     auraFrame.cooldownFrame:Show()
-    if auraType == AURA_TYPE_DEBUFF then
+    if auraTypeTemp == AURA_TYPE_DEBUFF then
         auraFrame.icon.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.auraDebuffBorderColor))
-    elseif auraType == AURA_TYPE_BUFF then
+    elseif auraTypeTemp == AURA_TYPE_BUFF then
         auraFrame.icon.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.auraBuffBorderColor))
     else
         auraFrame.icon.overlay:SetVertexColor(Gladdy.db.frameBorderColor.r, Gladdy.db.frameBorderColor.g, Gladdy.db.frameBorderColor.b, Gladdy.db.frameBorderColor.a)

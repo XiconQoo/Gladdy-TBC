@@ -56,7 +56,7 @@ function EventListener:JOINED_ARENA()
             Gladdy:SendMessage("PET_SPOTTED", "arenapet" .. i)
         end
     end
-    self.bombExpireTime = {}
+    Gladdy.bombExpireTime = {}
     self:SetScript("OnEvent", EventListener.OnEvent)
 end
 
@@ -64,7 +64,7 @@ function EventListener:Reset()
     self:UnregisterAllEvents()
     self:SetScript("OnEvent", nil)
     self.friendlyUnits = {}
-    self.bombExpireTime = {}
+    Gladdy.bombExpireTime = {}
 end
 
 function Gladdy:SpotEnemy(unit, auraScan, report)
@@ -128,10 +128,10 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
     -- smoke bomb
     if (eventType == "SPELL_CAST_SUCCESS" or eventType == "SPELL_AURA_APPLIED") and spellID == 76577 then
         local now = GetTime()
-        if (self.bombExpireTime[sourceGUID] and now >= self.bombExpireTime[sourceGUID]) or eventType == "SPELL_CAST_SUCCESS" then
-            self.bombExpireTime[sourceGUID] = now + 6
-        elseif not self.bombExpireTime[sourceGUID] then
-            self.bombExpireTime[sourceGUID] = now + 6
+        if (Gladdy.bombExpireTime[sourceGUID] and now >= Gladdy.bombExpireTime[sourceGUID]) or eventType == "SPELL_CAST_SUCCESS" then
+            Gladdy.bombExpireTime[sourceGUID] = now + 6
+        elseif not Gladdy.bombExpireTime[sourceGUID] then
+            Gladdy.bombExpireTime[sourceGUID] = now + 6
         end
     end
     if destUnit then
@@ -384,12 +384,11 @@ function EventListener:ScanAuras(unit)
                 Gladdy:SendMessage("RACIAL_USED", unit, spellName, Gladdy.cooldownBuffs.racials[spellName].cd(expirationTime - GetTime()), spellName)
             end
             local sourceGUID = unitCaster and UnitGUID(unitCaster)
-            if spellID == 88611 and self.bombExpireTime[sourceGUID] then
+            if spellID == 88611 and Gladdy.bombExpireTime[sourceGUID] then
                 duration = 6
-                expirationTime = self.bombExpireTime[sourceGUID]
-                auraTypeTemp = Gladdy.guids[sourceGUID] and AURA_TYPE_BUFF or AURA_TYPE_DEBUFF
+                expirationTime = Gladdy.bombExpireTime[sourceGUID]
             end
-            Gladdy:SendMessage("AURA_GAIN", unit, auraTypeTemp, spellID, spellName, texture, duration, expirationTime, count, dispelType, i, unitCaster)
+            Gladdy:SendMessage("AURA_GAIN", unit, auraType, spellID, spellName, texture, duration, expirationTime, count, dispelType, i, unitCaster)
         end
     end
     -- check lastAuras for Cooldown detection of spells that trigger cd if buff fades
