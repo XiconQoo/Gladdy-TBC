@@ -6,6 +6,7 @@ local GetSpellInfo = GetSpellInfo
 local UnitChannelInfo = UnitChannelInfo
 local UnitCastingInfo = UnitCastingInfo
 local GetTime = GetTime
+local GetBuildInfo = GetBuildInfo
 local CASTING_BAR_ALPHA_STEP = CASTING_BAR_ALPHA_STEP
 local BackdropTemplateMixin = BackdropTemplateMixin
 
@@ -26,7 +27,7 @@ local Castbar = Gladdy:NewModule("Cast Bar", 70, {
     castBarIconZoomed = false,
     castBarBorderSize = 8,
     castBarFontSize = 12,
-    castBarFontOutline = false,
+    castBarFontOutline = "NONE",
     castBarTexture = "Smooth",
     castBarIconStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     castBarBorderStyle = "Gladdy Tooltip round",
@@ -42,6 +43,8 @@ local Castbar = Gladdy:NewModule("Cast Bar", 70, {
     castBarIconPos = "LEFT",
     castBarFont = "DorisPP",
     castBarTimerFormat = "LEFT",
+    castBarTimerShow = true,
+    castBarSpellNameShow = true,
     castBarSparkEnabled = true,
     castBarSparkColor = { r = 1, g = 1, b = 1, a = 1 },
     castBarFrameStrata = "MEDIUM",
@@ -53,6 +56,9 @@ function Castbar:Initialize()
     if Gladdy.db.castBarEnabled then
         self:RegisterMessage("UNIT_DEATH")
         self:RegisterMessage("JOINED_ARENA")
+    end
+    if type(Gladdy.db.castBarFontOutline) ~= "string" then
+        Gladdy.db.castBarFontOutline = Gladdy.db.castBarFontOutline and "OUTLINE" or "NONE"
     end
 end
 
@@ -102,15 +108,20 @@ function Castbar:CreateFrame(unit)
     castBar.icon = CreateFrame("Frame", nil, castBar)
     castBar.icon:SetFrameStrata(Gladdy.db.castBarFrameStrata)
     castBar.icon:SetFrameLevel(Gladdy.db.castBarFrameLevel)
-    castBar.icon.texture = castBar.icon:CreateTexture(nil, "BACKGROUND")
+    castBar.icon.texture = castBar.icon:CreateTexture(nil, "BORDER")
     castBar.icon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
     castBar.icon.texture:SetAllPoints(castBar.icon)
     castBar.icon.texture.masked = true
-    castBar.icon.texture.overlay = castBar.icon:CreateTexture(nil, "BORDER")
+    castBar.icon.texture.overlay = castBar.icon:CreateTexture(nil, "ARTWORK")
     castBar.icon.texture.overlay:SetAllPoints(castBar.icon.texture)
     castBar.icon.texture.overlay:SetTexture(Gladdy.db.castBarIconStyle)
 
-    castBar.shield = castBar.icon:CreateTexture(nil, "OVERLAY")
+    castBar.shield = castBar.icon:CreateTexture(nil, "BACKGROUND")
+    --[[
+    bar.Shield:SetTexture("Interface\\CastingBar\\UI-CastingBar-Small-Shield")
+	bar.Shield:SetTexCoord(0, 36/256, 0, 1)
+    --]]
+    --castBar.shield:SetTexture("Interface\\AddOns\\Gladdy\\Images\\castbar-shield")
     castBar.shield:SetTexture("Interface\\AddOns\\Gladdy\\Images\\castbar-shield")
     castBar.shield:SetHeight(80)
     castBar.shield:SetWidth(80)
@@ -124,7 +135,7 @@ function Castbar:CreateFrame(unit)
     end
 
     castBar.spellText = castBar:CreateFontString(nil, "OVERLAY")
-    castBar.spellText:SetFont(Gladdy:SMFetch("font", "auraFont"), Gladdy.db.castBarFontSize, Gladdy.db.castBarFontOutline and "OUTLINE")
+    castBar.spellText:SetFont(Gladdy:SMFetch("font", "auraFont"), Gladdy.db.castBarFontSize, Gladdy.db.castBarFontOutline)
     castBar.spellText:SetTextColor(Gladdy:SetColor(Gladdy.db.castBarFontColor))
     castBar.spellText:SetShadowOffset(1, -1)
     castBar.spellText:SetShadowColor(0, 0, 0, 1)
@@ -132,7 +143,7 @@ function Castbar:CreateFrame(unit)
     castBar.spellText:SetPoint("LEFT", 10, 0) -- Text of the spell
 
     castBar.timeText = castBar:CreateFontString(nil, "OVERLAY")
-    castBar.timeText:SetFont(Gladdy:SMFetch("font", "auraFont"), Gladdy.db.castBarFontSize, Gladdy.db.castBarFontOutline and "OUTLINE")
+    castBar.timeText:SetFont(Gladdy:SMFetch("font", "auraFont"), Gladdy.db.castBarFontSize, Gladdy.db.castBarFontOutline)
     castBar.timeText:SetTextColor(Gladdy:SetColor(Gladdy.db.castBarFontColor))
     castBar.timeText:SetShadowOffset(1, -1)
     castBar.timeText:SetShadowColor(0, 0, 0, 1)
@@ -173,7 +184,7 @@ function Castbar:UpdateFrame(unit)
     castBar:SetWidth(Gladdy.db.castBarWidth)
     castBar:SetHeight(Gladdy.db.castBarHeight)
     castBar.backdrop:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "castBarBorderStyle"),
-                                 edgeSize = Gladdy.db.castBarBorderSize })
+                                   edgeSize = Gladdy.db.castBarBorderSize })
     castBar.backdrop:SetBackdropBorderColor(Gladdy:SetColor(Gladdy.db.castBarBorderColor))
 
     castBar.bar:SetStatusBarTexture(Gladdy:SMFetch("statusbar", "castBarTexture"))
@@ -214,8 +225,8 @@ function Castbar:UpdateFrame(unit)
     end
     castBar.icon:ClearAllPoints()
 
-    castBar.shield:SetWidth(Gladdy.db.castBarIconSize * 3.2)
-    castBar.shield:SetHeight(Gladdy.db.castBarIconSize * 3.2)
+    castBar.shield:SetWidth(Gladdy.db.castBarIconSize * 2.4)
+    castBar.shield:SetHeight(Gladdy.db.castBarIconSize * 2.4)
 
     local rightMargin = 0
     local leftMargin = 0
@@ -229,11 +240,23 @@ function Castbar:UpdateFrame(unit)
 
     Gladdy:SetPosition(castBar, unit, "castBarXOffset", "castBarYOffset", Castbar:LegacySetPosition(castBar, unit, leftMargin, rightMargin), Castbar)
 
-    castBar.spellText:SetFont(Gladdy:SMFetch("font", "castBarFont"), Gladdy.db.castBarFontSize, Gladdy.db.castBarFontOutline and "OUTLINE")
+    castBar.spellText:SetFont(Gladdy:SMFetch("font", "castBarFont"), Gladdy.db.castBarFontSize, Gladdy.db.castBarFontOutline)
     castBar.spellText:SetTextColor(Gladdy:SetColor(Gladdy.db.castBarFontColor))
 
-    castBar.timeText:SetFont(Gladdy:SMFetch("font", "castBarFont"), Gladdy.db.castBarFontSize, Gladdy.db.castBarFontOutline and "OUTLINE")
+    if Gladdy.db.castBarSpellNameShow then
+        castBar.spellText:Show()
+    else
+        castBar.spellText:Hide()
+    end
+
+    castBar.timeText:SetFont(Gladdy:SMFetch("font", "castBarFont"), Gladdy.db.castBarFontSize, Gladdy.db.castBarFontOutline)
     castBar.timeText:SetTextColor(Gladdy:SetColor(Gladdy.db.castBarFontColor))
+
+    if Gladdy.db.castBarTimerShow then
+        castBar.timeText:Show()
+    else
+        castBar.timeText:Hide()
+    end
 
     castBar.icon.texture.overlay:SetTexture(Gladdy.db.castBarIconStyle)
     castBar.icon.texture.overlay:SetVertexColor(Gladdy:SetColor(Gladdy.db.castBarIconColor))
@@ -331,7 +354,7 @@ Castbar.CastEventsFunc["UNIT_SPELLCAST_START"] = function(castBar, event, ...)
     castBar.castID = castID
     castBar.channeling = nil
     castBar.fadeOut = nil
-    Castbar:CAST_START(castBar.unit, name, texture, castBar.value, castBar.maxValue)
+    Castbar:CAST_START(castBar.unit, name, texture, castBar.value, castBar.maxValue, notInterruptible)
 end
 Castbar.CastEventsFunc["UNIT_SPELLCAST_SUCCEEDED"] = function(castBar, event, ...)
     if (castBar.casting and event == "UNIT_SPELLCAST_SUCCEEDED" and select(2, ...) == castBar.castID) then
@@ -426,20 +449,33 @@ Castbar.CastEventsFunc["UNIT_SPELLCAST_CHANNEL_START"] = function(castBar, event
     castBar.casting = nil
     castBar.channeling = true
     castBar.fadeOut = nil
-    Castbar:CAST_START(castBar.unit, name, texture, castBar.value, castBar.maxValue)
+    Castbar:CAST_START(castBar.unit, name, texture, castBar.value, castBar.maxValue, notInterruptible)
 end
 Castbar.CastEventsFunc["UNIT_SPELLCAST_CHANNEL_UPDATE"] = function(castBar, event, ...)
     if ( castBar:IsShown() ) then
-        local name, text, texture, startTime, endTime, isTradeSkill = UnitChannelInfo(castBar.unit)
+        local name, text, texture, startTime, endTime, isTradeSkill, nonInterruptable = UnitChannelInfo(castBar.unit)
         if ( not name or (not castBar.showTradeSkills and isTradeSkill)) then
             castBar:SetAlpha(0)
             return
         end
         castBar.value = ((endTime / 1000) - GetTime())
         castBar.maxValue = (endTime - startTime) / 1000
-        Castbar:CAST_START(castBar.unit, name, texture, castBar.value, castBar.maxValue)
+        Castbar:CAST_START(castBar.unit, name, texture, castBar.value, castBar.maxValue, nonInterruptable)
     end
 end
+
+Castbar.CastEventsFunc["UNIT_SPELLCAST_INTERRUPTIBLE"] = function(castBar, event, ...)
+    if ( castBar:IsShown() ) then
+        if event == "UNIT_SPELLCAST_NOT_INTERRUPTIBLE" then
+            castBar.bar:SetStatusBarColor(.8,.8,.8,1)
+            castBar.shield:Show()
+        else
+            castBar.bar:SetStatusBarColor(Gladdy:SetColor(Gladdy.db.castBarColor))
+            castBar.shield:Hide()
+        end
+    end
+end
+Castbar.CastEventsFunc["UNIT_SPELLCAST_CHANNEL_UPDATE"] = Castbar.CastEventsFunc["UNIT_SPELLCAST_INTERRUPTIBLE"]
 
 function Castbar.OnEvent(self, event, ...)
     local unit = ...
@@ -463,8 +499,10 @@ function Castbar:CAST_START(unit, spell, icon, value, maxValue, notInterruptible
 
     if notInterruptible then
         castBar.bar:SetStatusBarColor(.8,.8,.8,1)
+        castBar.shield:Show()
     else
         castBar.bar:SetStatusBarColor(Gladdy:SetColor(Gladdy.db.castBarColor))
+        castBar.shield:Hide()
     end
 
     castBar.value = value
@@ -479,11 +517,6 @@ function Castbar:CAST_START(unit, spell, icon, value, maxValue, notInterruptible
     castBar.backdrop:Show()
     if Gladdy.db.castBarSparkEnabled then
         castBar.spark:Show()
-    end
-    if notInterruptible then
-        castBar.shield:Show()
-    else
-        castBar.shield:Hide()
     end
     castBar:SetAlpha(1)
     if Gladdy.db.castBarIconEnabled then
@@ -538,11 +571,15 @@ function Castbar:JOINED_ARENA()
             castBar:RegisterUnitEvent("UNIT_SPELLCAST_STOP", unit)
             castBar:RegisterUnitEvent("UNIT_SPELLCAST_FAILED", unit)
             castBar:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", unit)
+            local _, _, _, nr = GetBuildInfo()
+            if nr >= 30402 then
+                castBar:RegisterUnitEvent("UNIT_SPELLCAST_INTERRUPTIBLE", unit)
+                castBar:RegisterUnitEvent("UNIT_SPELLCAST_NOT_INTERRUPTIBLE", unit)
+            end
             castBar:SetScript("OnEvent", Castbar.OnEvent)
             castBar:SetScript("OnUpdate", Castbar.OnUpdate)
             castBar.fadeOut = nil
             self:CAST_STOP(unit)
-            --Castbar.OnEvent(castBar, "PLAYER_ENTERING_WORLD")
         end
     end
 end
@@ -568,21 +605,22 @@ end
 
 function Castbar:Test(unit)
     self.test = true
+
     if Gladdy.db.castBarEnabled then
         local spell, _, icon, value, maxValue, event, endTime, startTime
 
         if (unit == "arena2") then
-            spell, _, icon = GetSpellInfo(27072)
+            spell, _, icon = GetSpellInfo(116)
             value, maxValue, event = 0, 40, "cast"
         elseif (unit == "arena1") then
-            spell, _, icon = GetSpellInfo(27220)
+            spell, _, icon = GetSpellInfo(689)
             endTime = GetTime() * 1000 + 60*1000
             startTime = GetTime() * 1000
             value = (endTime / 1000) - GetTime()
             maxValue = (endTime - startTime) / 1000
             event = "channel"
         else
-            spell, _, icon = GetSpellInfo(20770)
+            spell, _, icon = GetSpellInfo(2006)
             value, maxValue, event = 0, 60, "cast"
         end
 
@@ -806,6 +844,49 @@ function Castbar:GetOptions()
                         }),
                     },
                 },
+                text = {
+                    type = "group",
+                    name = L["Text"],
+                    order = 3,
+                    args = {
+                        header = {
+                            type = "header",
+                            name = L["Text"],
+                            order = 1,
+                        },
+                        castBarSpellNameShow = Gladdy:option({
+                            order = 2,
+                            type = "toggle",
+                            name = L["Show Spell Name"]
+                        }),
+                        castBarTimerShow = Gladdy:option({
+                            order = 3,
+                            type = "toggle",
+                            name = L["Show Time"]
+                        }),
+                        headerFormat = {
+                            type = "header",
+                            name = L["Format"],
+                            order = 10,
+                            hidden = function()
+                                return not Gladdy.db.castBarTimerShow
+                            end,
+                        },
+                        castBarTimerFormat = option({
+                            type = "select",
+                            name = L["Timer Format"],
+                            order = 11,
+                            hidden = function()
+                                return not Gladdy.db.castBarTimerShow
+                            end,
+                            values = {
+                                ["LEFT"] = L["Remaining"],
+                                ["TOTAL"] = L["Total"],
+                                ["BOTH"] = L["Both"],
+                            },
+                        }),
+                    }
+                },
                 font = {
                     type = "group",
                     name = L["Font"],
@@ -837,29 +918,15 @@ function Castbar:GetOptions()
                             desc = L["Size of the text"],
                             order = 4,
                             min = 1,
-                            max = 20,
+                            max = 50,
                             width = "full",
                         }),
-                        castBarFontOutline = option({
-                            type = "toggle",
-                            name = L["Outline"],
-                            order = 5,
-                            width = "full",
-                        }),
-                        headerFormat = {
-                            type = "header",
-                            name = L["Format"],
-                            order = 10,
-                        },
-                        castBarTimerFormat = option({
+                        castBarFontOutline = Gladdy:option({
                             type = "select",
-                            name = L["Timer Format"],
-                            order = 11,
-                            values = {
-                                ["LEFT"] = L["Remaining"],
-                                ["TOTAL"] = L["Total"],
-                                ["BOTH"] = L["Both"],
-                            },
+                            name = L["Font Outline"],
+                            order = 7,
+                            values = Gladdy.fontOutline,
+                            width = "full",
                         }),
                     }
                 },

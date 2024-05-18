@@ -1,6 +1,6 @@
 ## Interface: 30402
 ## Title: Gladdy - WotLK
-## Version: 2.27-Release
+## Version: 2.32-Beta
 ## Notes: The most powerful arena AddOn for WoW 3.4.2
 ## Author: XiconQoo, DnB_Junkee, Knall
 ## X-Email: contact me on discord Knall#1751
@@ -38,6 +38,7 @@ Modules\ArenaCountDown.lua
 Modules\BuffsDebuffs.lua
 Modules\VersionCheck.lua
 Modules\XiconProfiles.lua
+Modules\Targets.lua
 Modules\Pets.lua
 Modules\ExportImport.lua
 Modules\CombatIndicator.lua

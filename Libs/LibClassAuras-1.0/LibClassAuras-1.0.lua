@@ -78,7 +78,7 @@ LibClassAuras.Buff = Buff
 local function getClassDebuffs(class)
     local classSpells = {}
     for name, spells in pairs(LibClassAuras.debuffToId) do
-        for _, spellInfo in ipairs(spells) do
+        for _, spellInfo in pairs(spells) do
             if spellInfo.class == class then
                 tinsert(classSpells, {name = name, id = spellInfo.id})
             end
@@ -91,7 +91,7 @@ LibClassAuras.GetClassDebuffs = getClassDebuffs
 local function getClassBuffs(class)
     local classSpells = {}
     for name, spells in pairs(LibClassAuras.buffToId) do
-        for _, spellInfo in ipairs(spells) do
+        for _, spellInfo in pairs(spells) do
             if spellInfo.class == class then
                 tinsert(classSpells, {name = name, id = spellInfo.id})
             end

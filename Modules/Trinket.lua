@@ -1,5 +1,6 @@
 local ceil, str_gsub = ceil, string.gsub
 local C_PvP = C_PvP
+local GetItemIcon = GetItemIcon
 
 local CreateFrame = CreateFrame
 local GetTime = GetTime
@@ -14,6 +15,7 @@ local Trinket = Gladdy:NewModule("Trinket", 80, {
     trinketSize = 60 + 20 + 1,
     trinketWidthFactor = 0.9,
     trinketIconZoomed = false,
+    trinketIconDynamic = false,
     trinketBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     trinketBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     trinketDisableCircle = false,
@@ -65,25 +67,26 @@ local function iconTimer(self, elapsed)
             self.timeLeft = self.timeLeft - elapsed
         end
 
-        local timeLeft = ceil(self.timeLeft)
-
-        if timeLeft >= 60 then
-            self.cooldownFont:SetTextColor(1, 1, 0, Gladdy.db.trinketCooldownNumberAlpha)
-            self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 0.15*self:GetWidth()) * Gladdy.db.trinketFontScale, "OUTLINE")
-        elseif timeLeft < 60 and timeLeft >= 30 then
-            self.cooldownFont:SetTextColor(1, 1, 0, Gladdy.db.trinketCooldownNumberAlpha)
-            self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
-        elseif timeLeft < 30 and timeLeft >= 11 then
-            self.cooldownFont:SetTextColor(1, 0.7, 0, Gladdy.db.trinketCooldownNumberAlpha)
-            self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
-        elseif timeLeft <= 10 and timeLeft >= 5 then
-            self.cooldownFont:SetTextColor(1, 0.7, 0, Gladdy.db.trinketCooldownNumberAlpha)
-            self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
-        elseif timeLeft < 5 and timeLeft > 0 then
-            self.cooldownFont:SetTextColor(1, 0, 0, Gladdy.db.trinketCooldownNumberAlpha)
-            self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
-        end
-        if Gladdy.db.trinketFontEnabled then
+        if Gladdy.db.trinketFontEnabled and not Gladdy.db.useOmnicc then
+            local timeLeft = ceil(self.timeLeft)
+            local fontSizeAboveOneMin = (self:GetWidth()/2 - 0.15*self:GetWidth()) * Gladdy.db.trinketFontScale
+            local fontSizeBelowOneMin = (self:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale
+            if timeLeft >= 60 then
+                self.cooldownFont:SetTextColor(1, 1, 0, Gladdy.db.trinketCooldownNumberAlpha)
+                self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), fontSizeAboveOneMin > 0 and fontSizeAboveOneMin or 0.01, "OUTLINE")
+            elseif timeLeft < 60 and timeLeft >= 30 then
+                self.cooldownFont:SetTextColor(1, 1, 0, Gladdy.db.trinketCooldownNumberAlpha)
+                self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), fontSizeBelowOneMin > 0 and fontSizeBelowOneMin or 0.01, "OUTLINE")
+            elseif timeLeft < 30 and timeLeft >= 11 then
+                self.cooldownFont:SetTextColor(1, 0.7, 0, Gladdy.db.trinketCooldownNumberAlpha)
+                self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), fontSizeBelowOneMin > 0 and fontSizeBelowOneMin or 0.01, "OUTLINE")
+            elseif timeLeft <= 10 and timeLeft >= 5 then
+                self.cooldownFont:SetTextColor(1, 0.7, 0, Gladdy.db.trinketCooldownNumberAlpha)
+                self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), fontSizeBelowOneMin > 0 and fontSizeBelowOneMin or 0.01, "OUTLINE")
+            elseif timeLeft < 5 and timeLeft > 0 then
+                self.cooldownFont:SetTextColor(1, 0, 0, Gladdy.db.trinketCooldownNumberAlpha)
+                self.cooldownFont:SetFont(Gladdy:SMFetch("font", "trinketFont"), fontSizeBelowOneMin > 0 and fontSizeBelowOneMin or 0.01, "OUTLINE")
+            end
             Gladdy:FormatTimer(self.cooldownFont, self.timeLeft, self.timeLeft < 10, true)
         else
             self.cooldownFont:SetText("")
@@ -240,9 +243,14 @@ function Trinket:UpdateFrame(unit)
     trinket.cooldown:SetAlpha(Gladdy.db.trinketCooldownAlpha)
 
     if Gladdy.db.trinketDisableCircle then
-        trinket.cooldown:Hide()
+        trinket.cooldown:SetAlpha(0)
+    end
+
+    trinket.cooldown.noCooldownCount = not Gladdy.db.useOmnicc
+    if Gladdy.db.useOmnicc then
+        trinket.cooldownFont:Hide()
     else
-        trinket.cooldown:Show()
+        trinket.cooldownFont:Show()
     end
 
     if (not Gladdy.db.trinketEnabled) then
@@ -299,7 +307,7 @@ function Trinket:ARENA_CROWD_CONTROL_SPELL_UPDATE(...)
     Gladdy:Debug("INFO", "Trinket:ARENA_CROWD_CONTROL_SPELL_UPDATE", unitID, spellID, itemID)
     if Gladdy.buttons[unitID] and Gladdy:GetPvpTrinkets()[itemID] then
         Gladdy.buttons[unitID].trinket.itemID = itemID
-        if not Gladdy.db.trinketColored then
+        if not Gladdy.db.trinketColored and Gladdy.db.trinketIconDynamic then
             self.frames[unitID].texture:SetTexture(GetItemIcon(itemID))
         end
     end
@@ -335,7 +343,7 @@ function Trinket:ARENA_COOLDOWNS_UPDATE()
         local spellID, itemID, startTime, duration = C_PvP.GetArenaCrowdControlInfo(unitID)
         if (spellID) then
             Gladdy:Debug("INFO", "Trinket:ARENA_COOLDOWNS_UPDATE", spellID, itemID, startTime, duration)
-            if not Gladdy.db.trinketColored and Gladdy:GetPvpTrinkets()[itemID] then
+            if not Gladdy.db.trinketColored and Gladdy.db.trinketIconDynamic and Gladdy:GetPvpTrinkets()[itemID] then
                 self.frames[unitID].texture:SetTexture(GetItemIcon(itemID))
             end
             if (startTime ~= 0 and duration ~= 0) then
@@ -350,14 +358,12 @@ function Trinket:Used(unit, startTime, duration)
     if (not trinket or not Gladdy.db.trinketEnabled) then
         return
     end
-    --if not trinket.active then
-        trinket.timeLeft = (startTime/1000.0 + duration/1000.0) - GetTime()
-        if not Gladdy.db.trinketDisableCircle then trinket.cooldown:SetCooldown(startTime/1000.0, duration/1000.0) end
-        trinket.active = true
-        if Gladdy.db.trinketColored then
-            trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredCd))
-        end
-    --end
+    trinket.timeLeft = (startTime/1000.0 + duration/1000.0) - GetTime()
+    trinket.cooldown:SetCooldown(startTime/1000.0, duration/1000.0)
+    trinket.active = true
+    if Gladdy.db.trinketColored then
+        trinket:SetBackdropColor(Gladdy:SetColor(Gladdy.db.trinketColoredCd))
+    end
 end
 
 function Trinket:GetOptions()
@@ -440,6 +446,13 @@ function Trinket:GetOptions()
                             order = 2,
                             width = "full",
                         }),
+                        trinketIconDynamic = Gladdy:option({
+                            type = "toggle",
+                            name = L["Dynamic Icon"],
+                            desc = L["Changes icon texture to enemy's equipped trinket icon when detected"],
+                            order = 3,
+                            width = "full",
+                        }),
                         trinketSize = Gladdy:option({
                             type = "range",
                             name = L["Size"],
@@ -500,6 +513,9 @@ function Trinket:GetOptions()
                     type = "group",
                     name = L["Font"],
                     order = 3,
+                    disabled = function()
+                        return Gladdy.db.useOmnicc
+                    end,
                     args = {
                         header = {
                             type = "header",

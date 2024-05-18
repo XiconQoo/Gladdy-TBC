@@ -3,6 +3,7 @@ local type = type
 local tostring = tostring
 local select = select
 local pairs = pairs
+local ipairs = ipairs
 local tinsert = table.insert
 local tsort = table.sort
 local str_lower = string.lower
@@ -15,6 +16,7 @@ local IsAddOnLoaded = IsAddOnLoaded
 local GetBattlefieldStatus = GetBattlefieldStatus
 local IsInInstance = IsInInstance
 local GetNumArenaOpponents = GetNumArenaOpponents
+local EventRegistry = EventRegistry
 local RELEASE_TYPES = { alpha = "Alpha", beta = "Beta", release = "Release"}
 local PREFIX = "Gladdy v"
 local VERSION_REGEX = PREFIX .. "(%d+%.%d+)%-(%a)"
@@ -30,17 +32,20 @@ local MAJOR, MINOR = "Gladdy", 15
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
 Gladdy.version_major_num = 2
-Gladdy.version_minor_num = 0.27
+Gladdy.version_minor_num = 0.40
 Gladdy.version_num = Gladdy.version_major_num + Gladdy.version_minor_num
 Gladdy.version_releaseType = RELEASE_TYPES.release
 Gladdy.version = PREFIX .. string.format("%.2f", Gladdy.version_num) .. "-" .. Gladdy.version_releaseType
 Gladdy.VERSION_REGEX = VERSION_REGEX
+
+local GLADDY_COLORED = "|cff0384fcGladdy|r:"
 
 Gladdy.debug = false
 
 LibStub("AceTimer-3.0"):Embed(Gladdy)
 LibStub("AceComm-3.0"):Embed(Gladdy)
 Gladdy.modules = {}
+Gladdy.indexedModules = {}
 setmetatable(Gladdy, {
     __tostring = function()
         return MAJOR
@@ -48,7 +53,7 @@ setmetatable(Gladdy, {
 })
 
 function Gladdy:Print(...)
-    local text = "|cff0384fcGladdy|r:"
+    local text = GLADDY_COLORED
     local val
     for i = 1, select("#", ...) do
         val = select(i, ...)
@@ -58,36 +63,20 @@ function Gladdy:Print(...)
     DEFAULT_CHAT_FRAME:AddMessage(text)
 end
 
-function Gladdy:Warn(...)
-    local text = "|cfff29f05Gladdy|r:"
-    local val
-    for i = 1, select("#", ...) do
-        val = select(i, ...)
-        if (type(val) == 'boolean') then val = val and "true" or false end
-        text = text .. " " .. tostring(val)
-    end
-    DEFAULT_CHAT_FRAME:AddMessage(text)
-end
-
-function Gladdy:Error(...)
-    local text = "|cfffc0303Gladdy|r:"
-    local val
-    for i = 1, select("#", ...) do
-        val = select(i, ...)
-        if (type(val) == 'boolean') then val = val and "true" or false end
-        text = text .. " " .. tostring(val)
-    end
-    DEFAULT_CHAT_FRAME:AddMessage(text)
-end
-
+Gladdy.INFO = "[INFO]" --Gladdy:SetRGBTextColor("[INFO]", 35, 167, 204)
+Gladdy.WARN = "[WARN]"--Gladdy:SetRGBTextColor("[WARN]", 204, 145, 35)
+Gladdy.ERROR = "[ERROR]"--Gladdy:SetRGBTextColor("[ERROR]", 196, 52, 29)
 function Gladdy:Debug(lvl, ...)
     if Gladdy.debug then
         if lvl == "INFO" then
-            Gladdy:Print("[INFO]", ...)
+            self:Print(self.INFO, ...)
+            EventRegistry:TriggerEvent(GLADDY_COLORED, self.INFO, ...)
         elseif lvl == "WARN" then
-            Gladdy:Warn("[WARN]", ...)
+            self:Print(self.WARN, ...)
+            EventRegistry:TriggerEvent(GLADDY_COLORED, self.WARN, ...)
         elseif lvl == "ERROR" then
-            Gladdy:Error("[ERROR]", ...)
+            self:Print(self.ERROR, ...)
+            EventRegistry:TriggerEvent(GLADDY_COLORED, self.ERROR, ...)
         end
     end
 end
@@ -140,30 +129,6 @@ end
 
 ---------------------------
 
-local function pairsByPrio(t)
-    local a = {}
-    for k, v in pairs(t) do
-        tinsert(a, { k, v.priority })
-    end
-    tsort(a, function(x, y)
-        return x[2] > y[2]
-    end)
-
-    local i = 0
-    return function()
-        i = i + 1
-
-        if (a[i] ~= nil) then
-            return a[i][1], t[a[i][1]]
-        else
-            return nil
-        end
-    end
-end
-function Gladdy:IterModules()
-    return pairsByPrio(self.modules)
-end
-
 function Gladdy:Call(module, func, ...)
     if (type(module) == "string") then
         module = self.modules[module]
@@ -174,7 +139,8 @@ function Gladdy:Call(module, func, ...)
     end
 end
 function Gladdy:SendMessage(message, ...)
-    for _, module in self:IterModules() do
+    Gladdy:Debug("INFO", "Gladdy:SendMessage", message, ...)
+    for _, module in ipairs(self.indexedModules) do
         self:Call(module, module.messages[message], ...)
     end
 end
@@ -222,6 +188,11 @@ function Gladdy:NewModule(name, priority, defaults)
 
     self.modules[name] = module
 
+    tinsert(self.indexedModules, module)
+    tsort(self.indexedModules, function(x, y)
+        return x.priority > y.priority
+    end)
+
     return module
 end
 
@@ -231,20 +202,88 @@ end
 
 ---------------------------
 
+local ignoredOptions = {
+    ["auraListDefault"] = {
+        ["enabled"] = true,
+        ["track"] = "string",
+        ["priority"] = 1,
+        ["spellIDs"] = { 1 },
+        ["texture"] = 1234,
+        ["textureSpell"] = 1234,
+    },
+    ["trackedDebuffs"] = {
+        id = { 1 },
+        class = "str",
+        active = true,
+    },
+    ["trackedBuffs"] = { -- ["trackedBuffs"]["123123"] =
+        id = { 1 },
+        class = "str",
+        active = true,
+    }
+}
+
+function Gladdy:CleanupIgnoredOptions(tbl, refTbl, str, refOptionStruct)
+    if type(tbl) == "table" then
+        for k,v in pairs(tbl) do
+            if type(tbl[k]) ~= type(refOptionStruct) then -- not even same type: reset or delete
+                if refTbl[k] then
+                    self:Debug("INFO", "SavedVariable reset:", str .. "." .. k, " - invalid Format \"" .. type(tbl[k]) .. "\" - setting default \"" .. type(refOptionStruct) .. "\"")
+                    tbl[k] = refTbl[k]
+                else
+                    self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, " - invalid Format \"" .. type(tbl[k]) .. "\" - deleting")
+                    tbl[k] = nil
+                end
+            elseif type(tbl[k]) == "table" then--is table, go over items
+                if not refTbl[k] then -- all options must be present because not default option
+                    for refKey, refValue in pairs(refOptionStruct) do
+                        if tbl[k][refKey] == nil or type(tbl[k][refKey]) ~= type(refValue) then -- should have this option .. delete tbl[k]
+                            self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, " - should have the option", refKey)
+                            tbl[k] = nil
+                        end
+                    end
+                end
+                if tbl[k] then
+                    for sk,sv in pairs(tbl[k]) do
+                        if refOptionStruct[sk] == nil then --option key does not exist
+                            self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k .. "." .. sk, " - does not exist")
+                            tbl[k][sk] = nil
+                        elseif type(tbl[k][sk]) ~= type(refOptionStruct[sk]) then --wrong type
+                            if refTbl[k] and refTbl[k][sk] then
+                                self:Debug("INFO", "SavedVariable reset:", str .. "." .. k .. "." .. sk, " - invalid Format \"" .. type(tbl[k][sk]) .. "\" - setting default \"" .. type(refOptionStruct[sk]) .. "\"")
+                                tbl[k][sk] = refTbl[k][sk]
+                            else
+                                self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k .. "." .. sk, " - invalid Format \"" .. type(tbl[k][sk]) .. "\" - deleting does not exist in ref table")
+                                tbl[k][sk] = nil
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    else
+        self:Debug("INFO", "SavedVariable deleted:", str, " - not a table - deleting")
+        tbl = nil
+    end
+end
+
 function Gladdy:DeleteUnknownOptions(tbl, refTbl, str)
     if str == nil then
         str = "Gladdy.db"
     end
     for k,v in pairs(tbl) do
         if refTbl[k] == nil then
-            Gladdy:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, "not found!")
+            self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, "not found!")
             tbl[k] = nil
         else
             if type(v) ~= type(refTbl[k]) then
-                Gladdy:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, "type error!", "Expected", type(refTbl[k]), "but found", type(v))
-                tbl[k] = nil
-            elseif type(v) == "table" then
-                Gladdy:DeleteUnknownOptions(v, refTbl[k], str .. "." .. k)
+                self:Debug("INFO", "SavedVariable reset:", str .. "." .. k, "type error!", "Expected", type(refTbl[k]), "but found", type(v))
+                tbl[k] = refTbl[k]
+            elseif ignoredOptions[k] then --iterate to keep options in default format
+                self:Debug("INFO", "Ignored Saved variables:", str .. "." .. k, "evaluating")
+                self:CleanupIgnoredOptions(v, refTbl[k], str .. "." .. k, ignoredOptions[k])
+            elseif type(v) == "table" and (not ignoredOptions[k] or self.db.version and self.db.version < 2.23) then
+                self:DeleteUnknownOptions(v, refTbl[k], str .. "." .. k)
             end
         end
     end
@@ -273,17 +312,23 @@ function Gladdy:OnInitialize()
     self.dbi.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
     self.dbi.RegisterCallback(self, "OnProfileReset", "OnProfileReset")
     self.db = self.dbi.profile
+    self:DeleteUnknownOptions(self.db, self.defaults.profile)
 
     self.LSM = LibStub("LibSharedMedia-3.0")
     self.LSM:Register("statusbar", "Gloss", "Interface\\AddOns\\Gladdy\\Images\\Gloss")
     self.LSM:Register("statusbar", "Smooth", "Interface\\AddOns\\Gladdy\\Images\\Smooth")
     self.LSM:Register("statusbar", "Minimalist", "Interface\\AddOns\\Gladdy\\Images\\Minimalist")
     self.LSM:Register("statusbar", "LiteStep", "Interface\\AddOns\\Gladdy\\Images\\LiteStep.tga")
+    self.LSM:Register("statusbar", "Gradient", "Interface\\AddOns\\Gladdy\\Images\\Gradient2")
     self.LSM:Register("statusbar", "Flat", "Interface\\AddOns\\Gladdy\\Images\\UI-StatusBar")
     self.LSM:Register("border", "Gladdy Tooltip round", "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round_selfmade")
     self.LSM:Register("border", "Gladdy Tooltip squared", "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_square_selfmade")
-    self.LSM:Register("font", "DorisPP", "Interface\\AddOns\\Gladdy\\Images\\DorisPP.TTF")
     self.LSM:Register("border", "Square Full White", "Interface\\AddOns\\Gladdy\\Images\\Square_FullWhite.tga")
+    self.LSM:Register("font", "DorisPP", "Interface\\AddOns\\Gladdy\\Fonts\\DorisPP.TTF")
+    --self.LSM:Register("font", "NotoSans Black", "Interface\\AddOns\\Gladdy\\Fonts\\NotoSansCJK-Black.ttf")
+    --self.LSM:Register("font", "NotoSans Bold", "Interface\\AddOns\\Gladdy\\Fonts\\NotoSansCJK-Bold.ttf")
+    --self.LSM:Register("font", "NotoSans Medium", "Interface\\AddOns\\Gladdy\\Fonts\\NotoSansCJK-Medium.ttf")
+    --self.LSM:Register("font", "NotoSans Regular", "Interface\\AddOns\\Gladdy\\Fonts\\NotoSansCJK-Regular.ttf")
 
     L = self.L
 
@@ -297,7 +342,6 @@ function Gladdy:OnInitialize()
 
     self.cooldownSpellIds = {}
     self.spellTextures = {}
-    self.specBuffs = self:GetSpecBuffs()
     self.specSpells = self:GetSpecSpells()
     self.buttons = {}
     self.guids = {}
@@ -306,11 +350,11 @@ function Gladdy:OnInitialize()
 
     self:SetupOptions()
 
-    for _, module in self:IterModules() do
-        self:Call(module, "Initialize") -- B.E > A.E :D
+    for _, module in ipairs(self.indexedModules) do
+        self:Call(module, "Initialize")
     end
-    if Gladdy.db.hideBlizzard == "always" then
-        Gladdy:BlizzArenaSetAlpha(0)
+    if self.db.hideBlizzard == "always" then
+        self:BlizzArenaSetAlpha(0)
     end
     if not self.db.newLayout then
         self:ToggleFrame(3)
@@ -320,11 +364,11 @@ end
 
 function Gladdy:OnProfileReset()
     self.db = self.dbi.profile
-    Gladdy:Debug("INFO", "OnProfileReset")
+    self:Debug("INFO", "OnProfileReset")
     self:HideFrame()
     self:ToggleFrame(3)
-    Gladdy.options.args.lock.name = Gladdy.db.locked and L["Unlock frame"] or L["Lock frame"]
-    Gladdy.options.args.showMover.name = Gladdy.db.showMover and L["Hide Mover"] or L["Show Mover"]
+    self.options.args.lock.name = self.db.locked and L["Unlock frame"] or L["Lock frame"]
+    self.options.args.showMover.name = self.db.showMover and L["Hide Mover"] or L["Show Mover"]
     LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
 end
 
@@ -332,8 +376,8 @@ function Gladdy:OnProfileChanged()
     self.db = self.dbi.profile
     self:HideFrame()
     self:ToggleFrame(3)
-    Gladdy.options.args.lock.name = Gladdy.db.locked and L["Unlock frame"] or L["Lock frame"]
-    Gladdy.options.args.showMover.name = Gladdy.db.showMover and L["Hide Mover"] or L["Show Mover"]
+    self.options.args.lock.name = self.db.locked and L["Unlock frame"] or L["Lock frame"]
+    self.options.args.showMover.name = self.db.showMover and L["Hide Mover"] or L["Show Mover"]
     LibStub("AceConfigRegistry-3.0"):NotifyChange("Gladdy")
 end
 
@@ -377,6 +421,7 @@ function Gladdy:GetIconStyles()
         ["Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp"] = L["Gladdy Tooltip round"],
         ["Interface\\AddOns\\Gladdy\\Images\\Border_squared_blp"] = L["Gladdy Tooltip squared"],
         ["Interface\\AddOns\\Gladdy\\Images\\Border_Gloss"] = L["Gloss (black border)"],
+        ["Interface\\AddOns\\Gladdy\\Images\\HabBorder1"] = L["Habborder"],
     }
 end
 
@@ -400,13 +445,13 @@ function Gladdy:Test()
                 button[k] = v
             end
 
-            for _, module in self:IterModules() do
+            for _, module in ipairs(self.indexedModules) do
                 self:Call(module, "Test", unit)
             end
 
             button:SetAlpha(1)
         end
-        for _, module in self:IterModules() do
+        for _, module in ipairs(self.indexedModules) do
             self:Call(module, "TestOnce")
         end
     end
@@ -472,7 +517,7 @@ function Gladdy:Reset()
     self.curBracket = nil
     self.curUnit = 1
 
-    for _, module in self:IterModules() do
+    for _, module in ipairs(self.indexedModules) do
         self:Call(module, "Reset")
     end
 
@@ -493,7 +538,7 @@ function Gladdy:ResetUnit(unit)
     button:SetAlpha(0)
     self:ResetButton(unit)
 
-    for _, module in self:IterModules() do
+    for _, module in ipairs(self.indexedModules) do
         self:Call(module, "ResetUnit", unit)
     end
 end
@@ -549,7 +594,7 @@ function Gladdy:InitFrames()
         self.startTest = nil
     end
     self.frame:Show()
-    self:SendMessage("JOINED_ARENA")
+    self:SendMessage("JOINED_ARENA") -- /run LibStub("Gladdy"):SendMessage("JOINED_ARENA")
 
     for i=1, self.curBracket do
         self.buttons["arena" .. i]:SetAlpha(1)
@@ -619,7 +664,7 @@ function Gladdy:SMFetch(lsmType, key)
     if (smMediaType == nil and Gladdy.db[key] ~= "None") then
         if not lastWarning[key] or GetTime() - lastWarning[key] > 120 then
             lastWarning[key] = GetTime()
-            Gladdy:Warn("Could not find", "\"" .. lsmType .. "\" \"", Gladdy.db[key], " \" for", "\"" .. key .. "\"", "- setting it to", "\"" .. defaults[lsmType] .. "\"")
+            Gladdy:Debug("WARN", "Could not find", "\"" .. lsmType .. "\" \"", Gladdy.db[key], " \" for", "\"" .. key .. "\"", "- setting it to", "\"" .. defaults[lsmType] .. "\"")
         end
         return self.LSM:Fetch(lsmType, defaults[lsmType])
     end

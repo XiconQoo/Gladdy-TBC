@@ -7,13 +7,15 @@ local CreateFrame = CreateFrame
 local GetTime = GetTime
 
 local Gladdy = LibStub("Gladdy")
-local DRData = LibStub("DRList-1.0")
+local DRList = LibStub("DRList-1.0")
 local L = Gladdy.L
 local function defaultCategories()
     local categories = {}
     local indexList = {}
-    for k,v in pairs(DRData:GetSpells()) do
-        tinsert(indexList, {spellID = k, category = v})
+    for cat in pairs(DRList:GetCategories()) do
+        for spellID in DRList:IterateSpellsByCategory(cat) do
+            tinsert(indexList, {spellID = spellID, category = cat})
+        end
     end
     tbl_sort(indexList, function(a, b) return a.spellID < b.spellID end)
     for _,v in ipairs(indexList) do
@@ -32,6 +34,9 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drFontColorsEnabled = false,
     drFontColor = { r = 1, g = 1, b = 0, a = 1 },
     drFontScale = 1,
+    drFontOutline = "OUTLINE",
+    drFontXOffset = 0,
+    drFontYOffset = 1,
     drGrowDirection = "RIGHT",
     drXOffset = 0,
     drYOffset = 0,
@@ -47,6 +52,10 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drHalfColor = {r = 1, g = 1, b = 0, a = 1 },
     drQuarterColor = {r = 1, g = 0.7, b = 0, a = 1 },
     drNullColor = {r = 1, g = 0, b = 0, a = 1 },
+    drLevelOutline = "OUTLINE",
+    drHalfText = "½", --"\u{00BD}", --½
+    drQuarterText = "¼", --"\u{00BC}", --¼
+    drNullText = "ø", --"\u{00F8}", --ø
     drLevelTextEnabled = true,
     drLevelTextFont = "DorisPP",
     drLevelTextScale = 0.8,
@@ -58,7 +67,10 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drFrameStrata = "MEDIUM",
     drFrameLevel = 3,
     drGroup = false,
-    drGroupDirection = "DOWN"
+    drGroupDirection = "DOWN",
+    drLevelTextXOffset = 0,
+    drLevelTextYOffset = 0,
+    drShowIconOnAuraApplied = false,
 })
 
 local function getDiminishColor(dr)
@@ -73,11 +85,11 @@ end
 
 local function getDiminishText(dr)
     if dr == 0.5 then
-        return "½"
+        return Gladdy.db.drHalfText
     elseif dr == 0.25 then
-        return "¼"
+        return Gladdy.db.drQuarterText
     else
-        return "ø"
+        return Gladdy.db.drNullText
     end
 end
 
@@ -118,7 +130,11 @@ function Diminishings:CreateFrame(unit)
                     Diminishings:Positionate(unit)
                 else
                     self.timeLeft = self.timeLeft - elapsed
-                    Gladdy:FormatTimer(self.timeText, self.timeLeft, self.timeLeft < 5)
+                    if not Gladdy.db.useOmnicc then
+                        Gladdy:FormatTimer(self.timeText, self.timeLeft, self.timeLeft < 5)
+                    else
+                        self.timeText:SetText("")
+                    end
                 end
             end
         end)
@@ -230,19 +246,21 @@ function Diminishings:UpdateFrame(unit)
         icon.cooldownFrame:SetFrameStrata(Gladdy.db.drFrameStrata)
         icon.cooldownFrame:SetFrameLevel(Gladdy.db.drFrameLevel + 2)
 
-        icon.timeText:SetFont(Gladdy:SMFetch("font", "drFont"), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, "OUTLINE")
+        icon.timeText:SetFont(Gladdy:SMFetch("font", "drFont"), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, Gladdy.db.drFontOutline)
         if Gladdy.db.drFontColorsEnabled then
             icon.timeText:SetTextColor(getDiminishColor(icon.diminishing))
         else
             icon.timeText:SetTextColor(Gladdy:SetColor(Gladdy.db.drFontColor))
         end
+        icon.timeText:SetPoint("CENTER", icon, "CENTER", Gladdy.db.drFontXOffset, Gladdy.db.drFontYOffset)
 
-        icon.drLevelText:SetFont(Gladdy:SMFetch("font", "drLevelTextFont"), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drLevelTextScale, "OUTLINE")
+        icon.drLevelText:SetFont(Gladdy:SMFetch("font", "drLevelTextFont"), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drLevelTextScale, Gladdy.db.drLevelOutline)
         if Gladdy.db.drLevelTextColorsEnabled then
             icon.drLevelText:SetTextColor(getDiminishColor(icon.diminishing))
         else
             icon.drLevelText:SetTextColor(Gladdy:SetColor(Gladdy.db.drLevelTextColor))
         end
+        icon.drLevelText:SetPoint("BOTTOM", icon, "BOTTOM", Gladdy.db.drLevelTextXOffset, Gladdy.db.drLevelTextYOffset)
 
         if Gladdy.db.drIconZoomed then
             icon.cooldown:SetWidth(icon:GetWidth())
@@ -309,6 +327,12 @@ function Diminishings:UpdateFrame(unit)
                 end
             end
         end
+        icon.cooldown.noCooldownCount = not Gladdy.db.useOmnicc
+        if Gladdy.db.useOmnicc then
+            icon.timeText:Hide()
+        else
+            icon.timeText:Show()
+        end
     end
     if testAgain then
         Diminishings:ResetUnit(unit)
@@ -346,11 +370,9 @@ function Diminishings:Test(unit)
             if (val.enabled) then
                 tinsert(enabledCategories, {cat = cat , spellIDs = {}})
                 enabledCategories[cat] = #enabledCategories
-            end
-        end
-        for spellId,cat in pairs(DRData:GetSpells()) do
-            if enabledCategories[cat] then
-                tinsert(enabledCategories[enabledCategories[cat]].spellIDs, spellId)
+                for spellID in DRList:IterateSpellsByCategory(cat) do
+                    tinsert(enabledCategories[enabledCategories[cat]].spellIDs, spellID)
+                end
             end
         end
 
@@ -362,7 +384,7 @@ function Diminishings:Test(unit)
 
         --execute test
         local index, amount = 0,0
-        for i=1, (#enabledCategories < 4 and #enabledCategories) or 4 do
+        for i=1, (#enabledCategories < 4 and #enabledCategories or 4) do
             amount = rand(1,3)
             index = rand(1, #enabledCategories[i].spellIDs)
             for _=1, amount do
@@ -453,56 +475,72 @@ function Diminishings:PrepareIcon(unit, lastIcon, drCat, spellID)
     lastIcon:Show()
 end
 
-function Diminishings:AuraGain(unit, spellID)
-    local drFrame = self.frames[unit]
-    local drCat = DRData:GetSpellCategory(spellID)
-    if (not drFrame or not drCat) then
-        return
-    end
-    if not Gladdy.db.drCategories[drCat].enabled then
-        return
-    end
-
-    -- due to dynamic DR we reset the DR here if dr == 0
-    if not drFrame.tracked[drCat] or drFrame.tracked[drCat] == 0 then
-        drFrame.tracked[drCat] = DRData:NextDR(1)
-    else
-        drFrame.tracked[drCat] = DRData:NextDR(drFrame.tracked[drCat] == 1.0 and 1 or drFrame.tracked[drCat] == 0.5 and 2 or 3)
-    end
-
-    -- add icon with no timer
+function Diminishings:TriggerDR(unit, spellID, drCat, noTimer)
     local lastIcon = Diminishings:FindLastIcon(unit, drCat)
     if not lastIcon then return end
 
     Diminishings:PrepareIcon(unit, lastIcon, drCat, spellID)
 
+    if noTimer then
+        lastIcon.cooldown:Hide()
+        lastIcon.cooldown:SetCooldown(0, 0)
+        lastIcon.timeText:SetText("")
+        lastIcon.running = false
+    else
+        lastIcon.timeLeft = Gladdy.db.drDuration
+        lastIcon.cooldown:Show()
+        lastIcon.cooldown:SetCooldown(GetTime(), Gladdy.db.drDuration)
+        lastIcon.running = true
+    end
+end
 
-    lastIcon.running = false
-    lastIcon.cooldown:Hide()
-    lastIcon.cooldown:SetCooldown(0, 0)
-    lastIcon.timeText:SetText("")
+function Diminishings:AuraGainCheck(unit, spellID, drFrame, drCat)
+    -- due to dynamic DR we reset the DR here if dr == 0
+    if not drFrame.tracked[drCat] or drFrame.tracked[drCat] == 0 then
+        drFrame.tracked[drCat] = DRList:NextDR(1)
+    else
+        drFrame.tracked[drCat] = DRList:NextDR(drFrame.tracked[drCat] == 0.5 and 2 or 3)
+    end
+
+    if Gladdy.db.drShowIconOnAuraApplied then
+        self:TriggerDR(unit, spellID, drCat, true)
+    end
+end
+
+function Diminishings:AuraGain(unit, spellID)
+    local drFrame = self.frames[unit]
+    local drCat, drCategories = DRList:GetSpellCategory(spellID)
+    if (not drFrame or not drCat) then
+        return
+    end
+
+    if drCategories then
+        for _, cat in ipairs(drCategories) do
+            if Gladdy.db.drCategories[cat].enabled then
+                Diminishings:AuraGainCheck(unit, spellID, drFrame, cat)
+            end
+        end
+    elseif Gladdy.db.drCategories[drCat].enabled then
+        Diminishings:AuraGainCheck(unit, spellID, drFrame, drCat)
+    end
 end
 
 function Diminishings:AuraFade(unit, spellID)
     local drFrame = self.frames[unit]
-    local drCat = DRData:GetSpellCategory(spellID)
+    local drCat, drCategories = DRList:GetSpellCategory(spellID)
     if (not drFrame or not drCat) then
         return
     end
-    if not Gladdy.db.drCategories[drCat].enabled then
-        return
+
+    if drCategories then
+        for _, cat in ipairs(drCategories) do
+            if Gladdy.db.drCategories[cat].enabled then
+                self:TriggerDR(unit, spellID, cat, false)
+            end
+        end
+    elseif Gladdy.db.drCategories[drCat].enabled then
+        self:TriggerDR(unit, spellID, drCat, false)
     end
-
-    -- find icon and start timer
-    local lastIcon = Diminishings:FindLastIcon(unit, drCat)
-    if not lastIcon then return end
-
-    Diminishings:PrepareIcon(unit, lastIcon, drCat, spellID)
-
-    lastIcon.timeLeft = Gladdy.db.drDuration
-    lastIcon.cooldown:Show()
-    lastIcon.cooldown:SetCooldown(GetTime(), Gladdy.db.drDuration)
-    lastIcon.running = true
 end
 
 function Diminishings:Positionate(unit)
@@ -562,16 +600,23 @@ function Diminishings:GetOptions()
             max = 20,
             step = .1,
         }),
+        drShowIconOnAuraApplied = Gladdy:option({
+            type = "toggle",
+            name = L["Show when Aura applied"],
+            order = 5,
+            disabled = function() return not Gladdy.db.drEnabled end,
+            width = "full"
+        }),
         drGroup = Gladdy:option({
             type = "toggle",
-            name = L["Group"] .. " " .. L["Class Icon"],
-            order = 5,
+            name = L["Group"] .. " " .. L["DR Icon"],
+            order = 6,
             disabled = function() return not Gladdy.db.drEnabled end,
         }),
         drGroupDirection = Gladdy:option({
             type = "select",
             name = L["Group direction"],
-            order = 6,
+            order = 7,
             values = {
                 ["RIGHT"] = L["Right"],
                 ["LEFT"] = L["Left"],
@@ -685,6 +730,9 @@ function Diminishings:GetOptions()
                     type = "group",
                     name = L["Cooldown Font"],
                     order = 3,
+                    disabled = function()
+                        return Gladdy.db.useOmnicc
+                    end,
                     args = {
                         headerFont = {
                             type = "header",
@@ -724,9 +772,34 @@ function Diminishings:GetOptions()
                             step = 0.1,
                             width = "full",
                         }),
+                        drFontOutline = Gladdy:option({
+                            type = "select",
+                            name = L["Font Outline"],
+                            order = 7,
+                            values = Gladdy.fontOutline,
+                            width = "full",
+                        }),
+                        drFontXOffset = Gladdy:option({
+                            type = "range",
+                            name = L["X Offset"],
+                            order = 8,
+                            min = -100,
+                            max = 100,
+                            step = 0.01,
+                            width = "full",
+                        }),
+                        drFontYOffset = Gladdy:option({
+                            type = "range",
+                            name = L["Y Offset"],
+                            order = 9,
+                            min = -100,
+                            max = 100,
+                            step = 0.01,
+                            width = "full",
+                        }),
                     }
                 },
-                levelText = {
+                levelFont = {
                     type = "group",
                     name = L["DR Font"],
                     order = 4,
@@ -760,7 +833,7 @@ function Diminishings:GetOptions()
                             order = 4,
                             hasAlpha = true,
                             disabled = function()
-                                return not Gladdy.db.drLevelTextEnabled
+                                return not Gladdy.db.drLevelTextEnabled or Gladdy.db.drLevelTextColorsEnabled
                             end,
                         }),
                         drLevelTextFont = Gladdy:option({
@@ -788,12 +861,109 @@ function Diminishings:GetOptions()
                                 return not Gladdy.db.drLevelTextEnabled
                             end,
                         }),
+                        drLevelOutline = Gladdy:option({
+                            type = "select",
+                            name = L["Font Outline"],
+                            order = 7,
+                            values = Gladdy.fontOutline,
+                            width = "full",
+                            disabled = function()
+                                return not Gladdy.db.drLevelTextEnabled
+                            end,
+                        }),
+                        drLevelTextXOffset = Gladdy:option({
+                            type = "range",
+                            name = L["X Offset"],
+                            order = 8,
+                            min = -100,
+                            max = 100,
+                            step = 0.01,
+                            width = "full",
+                            disabled = function()
+                                return not Gladdy.db.drLevelTextEnabled
+                            end,
+                        }),
+                        drLevelTextYOffset = Gladdy:option({
+                            type = "range",
+                            name = L["Y Offset"],
+                            order = 9,
+                            min = -100,
+                            max = 100,
+                            step = 0.01,
+                            width = "full",
+                            disabled = function()
+                                return not Gladdy.db.drLevelTextEnabled
+                            end,
+                        }),
                     },
+                },
+                levelColors = {
+                    type = "group",
+                    name = L["DR Colors"],
+                    order = 5,
+                    args = {
+                        headerColors = {
+                            type = "header",
+                            name = L["DR Colors"],
+                            order = 10,
+                        },
+                        drHalfColor = Gladdy:colorOption({
+                            type = "color",
+                            name = L["Half"],
+                            desc = L["Color of the border"],
+                            order = 42,
+                            hasAlpha = true,
+                        }),
+                        drQuarterColor = Gladdy:colorOption({
+                            type = "color",
+                            name = L["Quarter"],
+                            desc = L["Color of the border"],
+                            order = 43,
+                            hasAlpha = true,
+                        }),
+                        drNullColor = Gladdy:colorOption({
+                            type = "color",
+                            name = L["Immune"],
+                            desc = L["Color of the border"],
+                            order = 44,
+                            hasAlpha = true,
+                        }),
+                    },
+                },
+                levelTexts = {
+                    type = "group",
+                    name = L["DR Texts"],
+                    order = 6,
+                    args = {
+                        headerColors = {
+                            type = "header",
+                            name = L["DR Texts"],
+                            order = 10,
+                        },
+                        drHalfText = Gladdy:option({
+                            type = "input",
+                            name = L["Half"],
+                            desc = L["Text on half DR"],
+                            order = 42,
+                        }),
+                        drQuarterText = Gladdy:option({
+                            type = "input",
+                            name = L["Quarter"],
+                            desc = L["Text on quarter DR"],
+                            order = 43,
+                        }),
+                        drNullText = Gladdy:option({
+                            type = "input",
+                            name = L["Immune"],
+                            desc = L["Text on immune DR"],
+                            order = 44,
+                        }),
+                    }
                 },
                 border = {
                     type = "group",
                     name = L["Border"],
-                    order = 5,
+                    order = 7,
                     args = {
                         headerBorder = {
                             type = "header",
@@ -825,43 +995,10 @@ function Diminishings:GetOptions()
                         }),
                     }
                 },
-                levelColors = {
-                    type = "group",
-                    name = L["DR Colors"],
-                    order = 6,
-                    args = {
-                        headerColors = {
-                            type = "header",
-                            name = L["DR Colors"],
-                            order = 10,
-                        },
-                        drHalfColor = Gladdy:colorOption({
-                            type = "color",
-                            name = L["Half"],
-                            desc = L["Color of the border"],
-                            order = 42,
-                            hasAlpha = true,
-                        }),
-                        drQuarterColor = Gladdy:colorOption({
-                            type = "color",
-                            name = L["Quarter"],
-                            desc = L["Color of the border"],
-                            order = 43,
-                            hasAlpha = true,
-                        }),
-                        drNullColor = Gladdy:colorOption({
-                            type = "color",
-                            name = L["Immune"],
-                            desc = L["Color of the border"],
-                            order = 44,
-                            hasAlpha = true,
-                        }),
-                    },
-                },
                 position = {
                     type = "group",
                     name = L["Position"],
-                    order = 7,
+                    order = 8,
                     args = {
                         headerPosition = {
                             type = "header",
@@ -901,7 +1038,7 @@ function Diminishings:GetOptions()
                 frameStrata = {
                     type = "group",
                     name = L["Frame Strata and Level"],
-                    order = 8,
+                    order = 9,
                     args = {
                         headerAuraLevel = {
                             type = "header",
@@ -965,14 +1102,14 @@ function Diminishings:CategoryOptions()
         },
     }
     local indexList = {}
-    for k,_ in pairs(DRData:GetCategories()) do
+    for k,_ in pairs(DRList:GetCategories()) do
         tinsert(indexList, k)
     end
     tbl_sort(indexList)
     for i,k in ipairs(indexList) do
         categories[k] = {
             type = "group",
-            name = L[DRData:GetCategoryName(k)],
+            name = L[DRList:GetCategoryName(k)],
             order = i,
             icon = Gladdy.db.drCategories[k].icon,
             args = {
@@ -1020,9 +1157,10 @@ end
 
 function Diminishings:GetDRIcons(category)
     local icons = {}
-    for k,v in pairs(DRData:GetSpells()) do
-        if v == category then
-            icons[select(3, GetSpellInfo(k))] = format("|T%s:20|t %s", select(3, GetSpellInfo(k)), select(1, GetSpellInfo(k)))
+    for spellID in DRList:IterateSpellsByCategory(category) do
+        local name, _, texture = GetSpellInfo(spellID)
+        if name then
+            icons[texture] = format("|T%s:20|t %s", texture, name)
         end
     end
     return icons

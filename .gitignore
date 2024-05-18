@@ -1,5 +1,5 @@
 .idea
-Gladdy
+Gladdy*
 BuffLib
 *.zip
 *.psd
@@ -7,5 +7,7 @@ Ace-Libs
 Images_Raw
 Gladdy_old
 DoNotCommit
+Xyz
 untracked
 Gladdy_TW
+pack_*.sh

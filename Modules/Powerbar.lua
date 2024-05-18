@@ -452,7 +452,7 @@ function Powerbar:GetOptions()
                             order = 21,
                             step = 0.1,
                             min = 0,
-                            max = 20,
+                            max = 50,
                             width = "full",
                         }),
                         powerBarPowerFontSize = option({
@@ -462,7 +462,7 @@ function Powerbar:GetOptions()
                             order = 22,
                             step = 0.1,
                             min = 0,
-                            max = 20,
+                            max = 50,
                             width = "full",
                         }),
                         headerOffsets = {

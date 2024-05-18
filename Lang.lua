@@ -22,11 +22,13 @@ L["Human"] = C_CreatureInfo.GetRaceInfo(1).raceName
 L["Orc"] = C_CreatureInfo.GetRaceInfo(2).raceName
 L["Dwarf"] = C_CreatureInfo.GetRaceInfo(3).raceName
 L["Night Elf"] = C_CreatureInfo.GetRaceInfo(4).raceName
+L["NightElf"] = C_CreatureInfo.GetRaceInfo(4).raceName
 L["Undead"] = C_CreatureInfo.GetRaceInfo(5).raceName
 L["Tauren"] = C_CreatureInfo.GetRaceInfo(6).raceName
 L["Gnome"] = C_CreatureInfo.GetRaceInfo(7).raceName
 L["Troll"] = C_CreatureInfo.GetRaceInfo(8).raceName
 L["Blood Elf"] = C_CreatureInfo.GetRaceInfo(10).raceName
+L["BloodElf"] = C_CreatureInfo.GetRaceInfo(10).raceName
 L["Draenei"] = C_CreatureInfo.GetRaceInfo(11).raceName
 
 --Specs
@@ -1297,6 +1299,10 @@ elseif GetLocale() == "zhCN" then
     L["Color of the status bar"] = "状态条顏色"
     L["Portrait"] = "头像"
     L["Health Values"] = "生命值"
+
+    -- Targets.lua
+    L["Targets"] = "敌方目标"
+    L["Enables Targets module"] = "启用敌方目标显示模块"
 
     -- Powerbar.lua
     L["Power Bar"] = "法力/能量条"

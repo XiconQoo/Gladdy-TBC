@@ -10,6 +10,7 @@ local Pets = Gladdy:NewModule("Pets", nil, {
     petHeight = 20,
     petPortraitEnabled = true,
     petPortraitBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
+    petPortraitBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     petHealthBarFont = "DorisPP",
     petHealthBarHeight = 60,
     petHealthBarTexture = "Smooth",
@@ -97,7 +98,7 @@ function Pets:PET_SPOTTED(unit)
             Pets:SetHealthText(self, UnitHealth(unit), UnitHealthMax(unit))
         end)
     end
-    Gladdy:Print(self.frames[unit].healthBar:GetAlpha())
+    --Gladdy:Print(self.frames[unit].healthBar:GetAlpha())
 end
 
 function Pets:PET_DESTROYED(unit)
@@ -196,7 +197,7 @@ function Pets:CreateFrame(unitId)
     SetPortraitTexture(healthBar.portrait, "player")
     healthBar.portrait.border = healthBar:CreateTexture(nil, "OVERLAY")
     healthBar.portrait.border:SetAllPoints(healthBar.portrait)
-    healthBar.portrait.border:SetTexture(Gladdy.db.classIconBorderStyle)
+    healthBar.portrait.border:SetTexture(Gladdy.db.petPortraitBorderStyle)
     healthBar.portrait.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.petHealthBarBorderColor))
 
 
@@ -316,7 +317,7 @@ function Pets:UpdateFrame(unitId)
         healthBar.portrait.border:Show()
     end
     healthBar.portrait.border:SetTexture(Gladdy.db.petPortraitBorderStyle)
-    healthBar.portrait.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.petHealthBarBorderColor))
+    healthBar.portrait.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.petPortraitBorderColor))
 
     healthBar.bg:SetTexture(Gladdy:SMFetch("statusbar",  "petHealthBarTexture"))
     healthBar.bg:SetVertexColor(Gladdy:SetColor(Gladdy.db.petHealthBarBgColor))
@@ -501,7 +502,13 @@ function Pets:GetOptions()
                             order = 3,
                             values = Gladdy:GetIconStyles()
                         }),
-
+                        petPortraitBorderColor = Gladdy:colorOption({
+                            type = "color",
+                            name = L["Border color"],
+                            desc = L["Color of the border"],
+                            order = 22,
+                            hasAlpha = true,
+                        }),
                     },
                 },
                 font = {
@@ -535,7 +542,7 @@ function Pets:GetOptions()
                             desc = L["Size of the text"],
                             order = 13,
                             min = 0,
-                            max = 20,
+                            max = 50,
                             width = "full",
                         }),
                     },

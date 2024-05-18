@@ -1,10 +1,10 @@
 # Gladdy - Classic
 
-### The most powerful arena addon for WoW TBC 2.5.4 & WotLK 3.4.0
+### The most powerful arena addon for WoW TBC 2.5.4 & WotLK 3.4.0 & Cataclysm 4.4.0
 
 ---
 
-## [v2.27-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.27-Release/Gladdy_Classic_v2.27-Release.zip)
+## [v2.40-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.40-Release/Gladdy_Classic_v2.40-Release.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -33,6 +33,7 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 - **Racial** (show arena racial cooldowns)
 - **Range Check** (checks the range to a unit by a configurable spell)
 - **Shadowsight Timer** (shows a little movable frame with time left until Shadow Eyes spawn)
+- **Targets** (show arena targets)
 - **TotemPlates** (show totem icons instead of normal nameplates, compatible with **Plater, NeatPlates, KUI, ThreatPlates, ElvUI, TukUI**)
 - **TotemPulse** (shows pulse on TotemPlate icon or beneath nameplate)
 - **Trinket** (tracks trinket usage)
@@ -80,6 +81,72 @@ Thank you!
 ---
 
 ### Changes
+
+### v2.40-Release
+- **Add Auras Buffs Debuffs**
+  - input field that supports spell lookup by name or id
+- **XiconProfiles**
+  - added **Xaryu** Profile
+  - updated almost all profiles with new Targets module
+- **Cooldown Circles**
+  - support OmniCD support in General -> Cooldowns options
+- **Auras**
+  - add your own Buffs or Debuffs through UI
+  - fix auras with 0 duration
+  - DB sanity check after DB change
+  - review default spells
+- **BuffsDebuffs**
+  - add your own Buffs or Debuffs through UI
+  - DB sanity check after DB change
+- **HealthBar**
+  - fix custom tags and optimize processing
+- **Eventlistener**
+  - refactor Aura Scan
+  - Smoke Bomb expire time
+  - Smoke Bomb friendly or hostile detection
+- **Diminishings**
+  - update lib
+  - handle multiple drs per spell
+- **Cooldowns**
+  - some review, not 100% done yet
+- **Target**
+  - proper update on opponent detection
+- fix class and spec icons
+- bugfixes related to old DB migration
+
+### v2.33-Beta
+- fix for profiles not correctly loading when changing profiles
+- added tremor cd in Cooldowns
+
+### v2.32-Beta
+- some might have encountered errors when loading up Gladdy
+- bug fixes
+- smokebomb detection
+
+### v2.31-Beta
+- fixed some errors caused by incorrect DB-value interpretation causing Gladdy to not load correctly
+
+### v2.3-Beta
+- Cata support
+- new Module **Targets**
+  - bar, icon or both can be displayed and moved freely
+- **Auras** & **BuffsDebuffs**
+  - spells can be added through the UI
+  - search by spell name or spell ID
+  - there are plans to apply this to all modules on the long run
+- **TotemPlates**
+  - size by reaction (friendly/hostile)
+  - borders color by reaction (friendly/hostile)
+- **RangeCheck**
+  - adjusted some spells
+  - new option to also track melee attack and/or autoshot range
+- **Trinket**
+  - dynamic trinket icon option added
+- **Racials**
+  - can be disabled by race
+- **CombatIndicator** improved tracking
+- added lib AceGUI-3.0-GladdySearchEditBox
+- fix some taint and timer issues
 
 ### v2.27-Release
 - fix TotemPlates interfering with NeatPlates

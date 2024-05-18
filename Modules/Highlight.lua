@@ -59,13 +59,13 @@ function Highlight:CreateFrame(unit)
     local targetBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
     targetBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = Gladdy.db.highlightBorderSize })
     targetBorder:SetFrameStrata(Gladdy.db.highlightFrameStrata)
-    targetBorder:SetFrameLevel(Gladdy.db.highlightFrameLevel)
+    targetBorder:SetFrameLevel(Gladdy.db.highlightFrameLevel + 1)
     targetBorder:Hide()
 
     local focusBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
     focusBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = Gladdy.db.highlightBorderSize })
     focusBorder:SetFrameStrata(Gladdy.db.highlightFrameStrata)
-    focusBorder:SetFrameLevel(Gladdy.db.highlightFrameLevel)
+    focusBorder:SetFrameLevel(Gladdy.db.highlightFrameLevel - 1)
     focusBorder:Hide()
 
     local leaderBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
@@ -102,9 +102,9 @@ function Highlight:UpdateFrame(unit)
     local height = hpAndPowerHeight + (Gladdy.db.highlightInset and 0 or borderSize * 2)
 
     button.targetBorder:SetFrameStrata(Gladdy.db.highlightFrameStrata)
-    button.targetBorder:SetFrameLevel(Gladdy.db.highlightFrameLevel)
+    button.targetBorder:SetFrameLevel(Gladdy.db.highlightFrameLevel + 1)
     button.focusBorder:SetFrameStrata(Gladdy.db.highlightFrameStrata)
-    button.focusBorder:SetFrameLevel(Gladdy.db.highlightFrameLevel)
+    button.focusBorder:SetFrameLevel(Gladdy.db.highlightFrameLevel  - 1)
     button.leaderBorder:SetFrameStrata(Gladdy.db.highlightFrameStrata)
     button.leaderBorder:SetFrameLevel(Gladdy.db.highlightFrameLevel)
 
@@ -173,35 +173,37 @@ function Highlight:Test(unit)
     end
 end
 
-function Highlight:Toggle(unit, frame, show)
+function Highlight:Toggle(unit, frame, show, mouseover)
     local button = Gladdy.buttons[unit]
     if (not button) then
         return
     end
 
-    if (frame == "target") then
-        if (Gladdy.db.targetBorder and show) then
-            button.targetBorder:Show()
-        else
-            button.targetBorder:Hide()
-        end
-
-        if (Gladdy.db.highlight and show) then
+    if mouseover then
+        if show then
             button.highlight:Show()
         else
             button.highlight:Hide()
         end
-    elseif (frame == "focus") then
-        if (Gladdy.db.focusBorder and show) then
-            button.focusBorder:Show()
-        else
-            button.focusBorder:Hide()
-        end
-    elseif (frame == "leader") then
-        if (Gladdy.db.leaderBorder and show) then
-            button.leaderBorder:Show()
-        else
-            button.leaderBorder:Hide()
+    else
+        if (frame == "target") then
+            if (Gladdy.db.targetBorder and show) then
+                button.targetBorder:Show()
+            else
+                button.targetBorder:Hide()
+            end
+        elseif (frame == "focus") then
+            if (Gladdy.db.focusBorder and show) then
+                button.focusBorder:Show()
+            else
+                button.focusBorder:Hide()
+            end
+        elseif (frame == "leader") then
+            if (Gladdy.db.leaderBorder and show) then
+                button.leaderBorder:Show()
+            else
+                button.leaderBorder:Hide()
+            end
         end
     end
 end
@@ -237,7 +239,7 @@ function Highlight:GetOptions()
                         },
                         highlight = Gladdy:option({
                             type = "toggle",
-                            name = L["Highlight target"],
+                            name = L["Highlight mouseover"],
                             desc = L["Toggle if the selected target should be highlighted"],
                             order = 11,
                             width = "full",

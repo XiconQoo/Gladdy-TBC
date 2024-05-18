@@ -33,7 +33,7 @@ Debuff({ 64058 }, { buffType = "physical" }, "PRIEST") -- Psychic Horror Disarm
 Debuff({ 33786 }, { buffType = "immune"}, "DRUID") -- Cyclone
 Debuff({ 19675 }, { }, "DRUID") -- Feral Charge
 Debuff({ 22570, 49802}, { buffType = "physical"}, "DRUID") -- Maim
-Debuff({ 19975, 19974, 19973, 19972, 19971, 19970, 27010, 53313 }, { buffType = "magic", altName = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689))  }, "DRUID") -- Nature's Grasp root
+Debuff({ 19975, 19974, 19973, 19972, 19971, 19970, 27010, 53313 }, { buffType = "magic", altName = select(1, GetSpellInfo(19975)) .. " " .. select(1, GetSpellInfo(16689))  }, "DRUID") -- Nature's Grasp root
 Debuff({ 339, 1062, 5195, 5196, 9852, 9853, 26989 }, { buffType = "magic"}, "DRUID") -- Entangling Roots
 Debuff({ 770, 778, 9749, 9907, 26993 }, { buffType = "magic"  }, "DRUID") -- Faerie Fire
 Debuff({ 16857, 17390, 17391, 17392, 27011 }, { buffType = "magic"  }, "DRUID") -- Faerie Fire (Feral)
@@ -137,7 +137,7 @@ Debuff( { 5782, 6213, 6215 }, { buffType = "magic"}, "WARLOCK") -- Fear
 Debuff( { 5484, 17928 }, { buffType = "magic"}, "WARLOCK") -- Howl of Terror
 Debuff({ 6358 }, { buffType = "magic" }, "WARLOCK") -- Seduction
 Debuff({ 30108, 30404, 30405, 47841, 47843 }, { buffType = "magic", stacking = true, preEvent = "SPELL_CAST_START" }, "WARLOCK") -- Unstable Affliction
-Debuff({ 31117, 43523, 65813 }, { buffType = "magic", altName = select(1, GetSpellInfo(30405)) .. " Silence" }, "WARLOCK") -- Unstable Affliction Silence
+Debuff({ 31117, 43523, 65813 }, { buffType = "magic", altName = select(1, GetSpellInfo(30108)) .. " Silence" }, "WARLOCK") -- Unstable Affliction Silence
 Debuff({ 18093 } ,{ buffType = "physical" }, "WARLOCK") -- Pyroclasm
 Debuff({ 17877, 18867, 18868, 18869, 18870, 18871, 27263, 30546, 47826, 47827 }, { buffType = "physical", stacking = true, preEvent = "SPELL_CAST_SUCCESS" }, "WARLOCK") -- Shadowburn Debuff
 Debuff({ 47960, 61291 } ,{ buffType = "magic" }, "WARLOCK") -- Shadowflame dot
@@ -185,7 +185,7 @@ Debuff({ 1978, 13549, 13550, 13551, 13552, 13553, 13554, 13555, 25295, 27016, 49
 Debuff({ 34490 }, { buffType = "magic" }, "HUNTER") -- Silencing Shot
 Debuff({ 3043 }, { buffType = "poison", }, "HUNTER") -- Scorpid Sting
 Debuff({ 3034, 14279, 14280, 27018 }, { buffType = "poison", }, "HUNTER") -- Viper Sting
-Debuff({ 19386, 24132, 24133, 27068, 49011, 49012 }, { buffType = "poison", }, "HUNTER") -- Wyvern Sting
+Debuff({ 19386, 24132, 24133, 27068, 49011, 19386 }, { buffType = "poison", }, "HUNTER") -- Wyvern Sting
 Debuff({ 24131, 24134, 24135, 27069, 49009, 49010 }, { buffType = "poison", altName = select(1, GetSpellInfo(19386)) .. " Dot" }, "HUNTER") -- Wyvern Sting Dot
 Debuff({ 1513, 14326, 14327 }, { buffType = "magic"}, "HUNTER") -- Scare Beast
 Debuff({ 19229, 47168 }, { buffType = "physical", }, "HUNTER") -- Wing Clip Root

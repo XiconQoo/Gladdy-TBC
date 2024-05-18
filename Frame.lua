@@ -3,6 +3,7 @@ local UIParent = UIParent
 local InCombatLockdown = InCombatLockdown
 local math_abs = math.abs
 local pairs = pairs
+local ipairs = ipairs
 local LibStub = LibStub
 
 local Gladdy = LibStub("Gladdy")
@@ -229,12 +230,11 @@ function Gladdy:UpdateFrame()
             end
         end
 
-
-        for _, v in self:IterModules() do
+        for _, v in ipairs(self.indexedModules) do
             self:Call(v, "UpdateFrame", "arena" .. i)
         end
     end
-    for _, v in self:IterModules() do
+    for _, v in ipairs(self.indexedModules) do
         self:Call(v, "UpdateFrameOnce")
     end
     if Gladdy.db.hideBlizzard == "always" then
@@ -331,6 +331,17 @@ function Gladdy:CreateButton(i)
     --button.texture:SetTexture("Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp")
 
     local secure = CreateFrame("Button", "GladdyButton" .. i, button, "SecureActionButtonTemplate, SecureHandlerEnterLeaveTemplate")
+    secure.unit = "arena" .. i
+    secure:HookScript("OnEnter", function(self)
+        if (Gladdy.db.highlight) then
+            Gladdy.modules["Highlight"]:Toggle(self.unit, nil, true, true)
+        end
+    end)
+    secure:HookScript("OnLeave", function(self)
+        if (Gladdy.db.highlight) then
+            Gladdy.modules["Highlight"]:Toggle(self.unit, nil, false, true)
+        end
+    end)
     secure:RegisterForClicks("AnyUp")
     secure:RegisterForClicks("AnyDown")
 
@@ -358,7 +369,7 @@ function Gladdy:CreateButton(i)
 
     self.buttons["arena" .. i] = button
 
-    for _, v in self:IterModules() do
+    for _, v in ipairs(self.indexedModules) do
         self:Call(v, "CreateFrame", "arena" .. i)
     end
     self:ResetButton("arena" .. i)
