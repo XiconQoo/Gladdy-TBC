@@ -40,7 +40,7 @@ Gladdy.VERSION_REGEX = VERSION_REGEX
 
 local GLADDY_COLORED = "|cff0384fcGladdy|r:"
 
-Gladdy.debug = true
+Gladdy.debug = false
 
 LibStub("AceTimer-3.0"):Embed(Gladdy)
 LibStub("AceComm-3.0"):Embed(Gladdy)
