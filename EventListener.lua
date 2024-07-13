@@ -446,7 +446,7 @@ function EventListener:UNIT_SPELLCAST_SUCCEEDED(...)
     local button = Gladdy.buttons[unit]
     if button then
         if not button.class or not button.race then
-            self:SpotEnemy(unit, false, true)
+            Gladdy:SpotEnemy(unit, false, true)
         end
         local spellName = GetSpellInfo(spellID)
         local unitRace = button.race
