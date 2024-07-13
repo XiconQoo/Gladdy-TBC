@@ -357,12 +357,7 @@ local totemData = {
     [string_lower("Flametongue Totem")] = {id = 8227,texture = select(3, GetSpellInfo(8227)), color = {r = 0, g = 0, b = 0, a = 1}},
     [string_lower("Magma Totem")] = {id = 8190,texture = select(3, GetSpellInfo(8190)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 2},
     [string_lower("Fire Nova Totem")] = {id = 1535,texture = select(3, GetSpellInfo(1535)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = { cd = 4, once = true }},
-    --[string_lower("Totem of Wrath")] = {id = 30706,texture = select(3, GetSpellInfo(30706)), color = {r = 0, g = 0, b = 0, a = 1}},
-    [string_lower("Fire Elemental Totem")] = {id = 32982,texture = select(3, GetSpellInfo(32982)), color = {r = 0, g = 0, b = 0, a = 1}},
-    --[string_lower("Frost Resistance Totem")] = {id = 8181,texture = select(3, GetSpellInfo(8181)), color = {r = 0, g = 0, b = 0, a = 1}},
     -- Water
-    --[string_lower("Fire Resistance Totem")] = {id = 8184,texture = select(3, GetSpellInfo(8184)), color = {r = 0, g = 0, b = 0, a = 1}},
-    --[string_lower("Disease Cleansing Totem")] = {id = 8170,texture = select(3, GetSpellInfo(8170)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 5},
     [string_lower("Healing Stream Totem")] = {id = 5394,texture = select(3, GetSpellInfo(5394)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 2},
     [string_lower("Mana Tide Totem")] = {id = 16190,texture = select(3, GetSpellInfo(16190)), color = {r = 0.078, g = 0.9, b = 0.16, a = 1}, pulse = 3 },
     [string_lower("Mana Spring Totem")] = {id = 5675,texture = select(3, GetSpellInfo(5675)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 2},
@@ -371,14 +366,10 @@ local totemData = {
     [string_lower("Stoneclaw Totem")] = {id = 5730,texture = select(3, GetSpellInfo(5730)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 2},
     [string_lower("Stoneskin Totem")] = {id = 8071,texture = select(3, GetSpellInfo(8071)), color = {r = 0, g = 0, b = 0, a = 1}},
     [string_lower("Strength of Earth Totem")] = {id = 8075,texture = select(3, GetSpellInfo(8075)), color = {r = 0, g = 0, b = 0, a = 1}},
-    [string_lower("Earth Elemental Totem")] = {id = 33663,texture = select(3, GetSpellInfo(33663)), color = {r = 0, g = 0, b = 0, a = 1}},
     [string_lower("Tremor Totem")] = {id = 8143,texture = select(3, GetSpellInfo(8143)), color = {r = 1, g = 0.9, b = 0.1, a = 1}, pulse = 3},
     -- Air
     [string_lower("Grounding Totem")] = {id = 8177,texture = select(3, GetSpellInfo(8177)), color = {r = 0, g = 0.53, b = 0.92, a = 1}},
-    --[string_lower("Nature Resistance Totem")] = {id = 10595,texture = select(3, GetSpellInfo(10595)), color = {r = 0, g = 0, b = 0, a = 1}},
     [string_lower("Windfury Totem")] = {id = 8512,texture = select(3, GetSpellInfo(8512)), color = {r = 0.96, g = 0, b = 0.07, a = 1}},
-    --[string_lower("Sentry Totem")] = {id = 6495, texture = select(3, GetSpellInfo(6495)), color = {r = 0, g = 0, b = 0, a = 1}},
-    [string_lower("Wrath of Air Totem")] = {id = 3738,texture = select(3, GetSpellInfo(3738)), color = {r = 0, g = 0, b = 0, a = 1}},
 }
 
 local totemSpellIdToPulse = {
@@ -386,8 +377,6 @@ local totemSpellIdToPulse = {
     [2484] = totemData[string_lower("Earthbind Totem")].pulse,
     [GetSpellInfo(totemData[string_lower("Tremor Totem")].id)] = totemData[string_lower("Tremor Totem")].pulse,
     [8143] = totemData[string_lower("Tremor Totem")].pulse,
-    --[GetSpellInfo(totemData[string_lower("Disease Cleansing Totem")].id)] = totemData[string_lower("Disease Cleansing Totem")].pulse,
-    --[8170] = totemData[string_lower("Disease Cleansing Totem")].pulse,
     [GetSpellInfo(totemData[string_lower("Fire Nova Totem")].id)] = totemData[string_lower("Fire Nova Totem")].pulse,
     [1535] = totemData[string_lower("Fire Nova Totem")].pulse, -- Rank 1
     [8498] = totemData[string_lower("Fire Nova Totem")].pulse, -- Rank 2
@@ -427,6 +416,7 @@ local totemSpellIdToPulse = {
     [58580] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 8
     [58581] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 9
     [58582] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 10
+    [15787] = totemData[string_lower("Fire Nova Totem")].pulse,
 }
 
 local totemNpcIdsToTotemData = {
@@ -496,36 +486,6 @@ local totemNpcIdsToTotemData = {
     [24320] = totemData[string_lower("Fire Nova Totem")],
     [32775] = totemData[string_lower("Fire Nova Totem")],
     [32776] = totemData[string_lower("Fire Nova Totem")],
-
-    --[17539] = totemData[string_lower("Totem of Wrath")],
-    --[22970] = totemData[string_lower("Totem of Wrath")],
-    --[22971] = totemData[string_lower("Totem of Wrath")],
-    --[30652] = totemData[string_lower("Totem of Wrath")],
-    --[30653] = totemData[string_lower("Totem of Wrath")],
-    --[30654] = totemData[string_lower("Totem of Wrath")],
-
-    [15439] = totemData[string_lower("Fire Elemental Totem")],
-    [40830] = totemData[string_lower("Fire Elemental Totem")],
-    [41337] = totemData[string_lower("Fire Elemental Totem")],
-    [41346] = totemData[string_lower("Fire Elemental Totem")],
-    [72301] = totemData[string_lower("Fire Elemental Totem")],
-
-    --[5926] = totemData[string_lower("Frost Resistance Totem")],
-    --[7412] = totemData[string_lower("Frost Resistance Totem")],
-    --[7413] = totemData[string_lower("Frost Resistance Totem")],
-    --[15486] = totemData[string_lower("Frost Resistance Totem")],
-    --[31171] = totemData[string_lower("Frost Resistance Totem")],
-    --[31172] = totemData[string_lower("Frost Resistance Totem")],
-
-    -- Water
-    --[5927] = totemData[string_lower("Fire Resistance Totem")],
-    --[7424] = totemData[string_lower("Fire Resistance Totem")],
-    --[7425] = totemData[string_lower("Fire Resistance Totem")],
-    --[15487] = totemData[string_lower("Fire Resistance Totem")],
-    --[31169] = totemData[string_lower("Fire Resistance Totem")],
-    --[31170] = totemData[string_lower("Fire Resistance Totem")],
-
-    --[5924] = totemData[string_lower("Disease Cleansing Totem")],
 
     [3527] = totemData[string_lower("Healing Stream Totem")],
     [3906] = totemData[string_lower("Healing Stream Totem")],
@@ -617,12 +577,6 @@ local totemNpcIdsToTotemData = {
     [31129] = totemData[string_lower("Strength of Earth Totem")],
     [40266] = totemData[string_lower("Strength of Earth Totem")],
 
-    [15430] = totemData[string_lower("Earth Elemental Totem")],
-    [24649] = totemData[string_lower("Earth Elemental Totem")],
-    [39387] = totemData[string_lower("Earth Elemental Totem")],
-    [40247] = totemData[string_lower("Earth Elemental Totem")],
-    [72307] = totemData[string_lower("Earth Elemental Totem")],
-
     [5913] = totemData[string_lower("Tremor Totem")],
     [41938] = totemData[string_lower("Tremor Totem")],
     [41939] = totemData[string_lower("Tremor Totem")],
@@ -631,13 +585,6 @@ local totemNpcIdsToTotemData = {
     [5925] = totemData[string_lower("Grounding Totem")],
     [128537] = totemData[string_lower("Grounding Totem")],
     [136251] = totemData[string_lower("Grounding Totem")],
-
-    --[7467] = totemData[string_lower("Nature Resistance Totem")],
-    --[7468] = totemData[string_lower("Nature Resistance Totem")],
-    --[7469] = totemData[string_lower("Nature Resistance Totem")],
-    --[15490] = totemData[string_lower("Nature Resistance Totem")],
-    --[31173] = totemData[string_lower("Nature Resistance Totem")],
-    --[31174] = totemData[string_lower("Nature Resistance Totem")],
 
     [6112] = totemData[string_lower("Windfury Totem")],
     [7483] = totemData[string_lower("Windfury Totem")],
@@ -652,19 +599,8 @@ local totemNpcIdsToTotemData = {
     [105690] = totemData[string_lower("Windfury Totem")],
     [133684] = totemData[string_lower("Windfury Totem")],
 
-    --[3968] = totemData[string_lower("Sentry Totem")],
-    --[28938] = totemData[string_lower("Sentry Totem")],
-    --[40187] = totemData[string_lower("Sentry Totem")],
-    --[69505] = totemData[string_lower("Sentry Totem")],
-    --[70413] = totemData[string_lower("Sentry Totem")],
-    --[71145] = totemData[string_lower("Sentry Totem")],
-    --[147410] = totemData[string_lower("Sentry Totem")],
-
-    [15447] = totemData[string_lower("Wrath of Air Totem")],
-    [36556] = totemData[string_lower("Wrath of Air Totem")],
-
     --NPCs
-    [28938] = {npc = true, id = 52705,texture = select(3, GetSpellInfo(52705)), color = {r = 0, g = 0, b = 0, a = 1}, alpha = 0.6, enabled = true},
+    --[28938] = {npc = true, id = 52705,texture = select(3, GetSpellInfo(52705)), color = {r = 0, g = 0, b = 0, a = 1}, alpha = 0.6, enabled = true},
     [8179] = totemData[string_lower("Healing Stream Totem")],
     [3844] = totemData[string_lower("Healing Stream Totem")],
     [3560] = totemData[string_lower("Healing Stream Totem")],
