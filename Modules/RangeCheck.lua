@@ -203,7 +203,7 @@ end
 
 local IsItemInRange,IsCurrentSpell = IsItemInRange,IsCurrentSpell
 local UnitExists, UnitIsFriend, UnitIsDeadOrGhost = UnitExists, UnitIsFriend, UnitIsDeadOrGhost
-local AuraUtil
+local AuraUtil = AuraUtil
 local feignDeath = GetSpellInfo(5384)
 
 function RangeCheck:isAutoshotInRange(button)
