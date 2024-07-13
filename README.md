@@ -4,7 +4,7 @@
 
 ---
 
-## [v2.40-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.40-Release/Gladdy_Classic_v2.40-Release.zip)
+## [v2.41-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.41-Release/Gladdy_Classic_v2.41-Release.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -81,6 +81,11 @@ Thank you!
 ---
 
 ### Changes
+
+### v2.41-Release
+- DRList update
+- RangeCheck melee range fix
+- Howl of Terror CD set to 32s
 
 ### v2.40-Release
 - **Add Auras Buffs Debuffs**

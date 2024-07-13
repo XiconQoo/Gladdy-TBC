@@ -1509,7 +1509,7 @@ local cooldownList = {
 
     -- Warlock
     ["WARLOCK"] = {
-        [5484] = 40, -- Howl of Terror (-8 if you use Glyph, so 32?)
+        [5484] = 32, -- Howl of Terror (-8 if you use Glyph, so 32?)
         [6789] = 120, -- Death Coil
         [18708] = 180, -- Feldom
         [48020] = 30, -- Demonic Circle: Port
