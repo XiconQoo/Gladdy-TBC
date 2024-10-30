@@ -1,7 +1,7 @@
 ## Interface: 40401
 ## Title: Gladdy - Cata
 ## Version: 2.43-Release
-## Notes: The most powerful arena AddOn for WoW 4.4.0
+## Notes: The most powerful arena AddOn for WoW 4.4.1
 ## Author: XiconQoo, DnB_Junkee, Knall
 ## X-Email: contact me on discord Knall#1751
 ## X-Curse-Project-ID: 482332
