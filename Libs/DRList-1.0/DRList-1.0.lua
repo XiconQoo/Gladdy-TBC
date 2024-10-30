@@ -3,22 +3,24 @@ Name: DRList-1.0
 Description: Diminishing returns categorization. Fork of outdated DRData-1.0.
 Website: https://github.com/wardz/DRList-1.0/
 Documentation: https://wardz.github.io/DRList-1.0/
+Example Usage: https://github.com/wardz/DRList-1.0/wiki/Example-Usage
 Dependencies: LibStub
 License: MIT
 ]]
 
 --- DRList-1.0
 -- @module DRList-1.0
-local MAJOR, MINOR = "DRList-1.0", 68 -- Don't forget to change this in Spells.lua aswell!
+local MAJOR, MINOR = "DRList-1.0", 72 -- Don't forget to change this in Spells.lua aswell!
 local Lib = assert(LibStub, MAJOR .. " requires LibStub."):NewLibrary(MAJOR, MINOR)
 if not Lib then return end -- already loaded
 
 local GetSpellName = C_Spell and C_Spell.GetSpellName or GetSpellInfo
+local type = type
 
 Lib.L = {}
 
 -------------------------------------------------------------------------------
--- Please see Curseforge localization page if you'd like to help translate:
+-- See CurseForge localization page if you'd like to help translate:
 -- https://www.curseforge.com/wow/addons/drlist-1-0/localization
 local L = Lib.L
 L["DISARMS"] = "Disarms"
@@ -134,13 +136,13 @@ Lib.gameExpansion = ({
 -- How long it takes for a DR to expire, in seconds.
 Lib.resetTimes = {
     retail = {
-        ["default"] = 18.5, -- static 18 sec + 0.5 latency
-        ["npc"] = 20, -- Against mobs it seems to still be dynamic
+        ["default"] = 18.5, -- Static 18 sec (+0.5 latency) reset time for most categories
+        ["npc"] = 20, -- Against mobs it seems to still be dynamic, set it to max
         ["knockback"] = 10.5, -- Knockbacks are immediately immune and only DRs for 10s
     },
 
     classic = {
-        ["default"] = 20, -- dynamic between 15 and 20s
+        ["default"] = 20, -- Dynamic reset between 15s and 20s, set it to max
         ["npc"] = 20,
     },
 
@@ -162,6 +164,7 @@ Lib.resetTimes = {
 
 -- List of all DR categories, english -> localized.
 Lib.categoryNames = {
+    --- @table categoryNames.retail
     retail = {
         ["disorient"] = L.DISORIENTS,
         ["incapacitate"] = L.INCAPACITATES,
@@ -173,11 +176,12 @@ Lib.categoryNames = {
         ["knockback"] = L.KNOCKBACKS,
     },
 
+    --- @table categoryNames.classic
     classic = {
         ["incapacitate"] = L.INCAPACITATES,
-        ["stun"] = L.STUNS, -- controlled stun
-        ["root"] = L.ROOTS, -- controlled root
-        ["random_stun"] = L.RANDOM_STUNS, -- random proc stun, usually short (<3s)
+        ["stun"] = L.STUNS,
+        ["root"] = L.ROOTS,
+        ["random_stun"] = L.RANDOM_STUNS,
         ["random_root"] = L.RANDOM_ROOTS,
         ["fear"] = L.FEARS,
         ["mind_control"] = L.MIND_CONTROL,
@@ -185,6 +189,7 @@ Lib.categoryNames = {
         ["kidney_shot"] = L.KIDNEY_SHOT,
     },
 
+    --- @table categoryNames.tbc
     tbc = {
         ["disorient"] = L.DISORIENTS,
         ["incapacitate"] = L.INCAPACITATES,
@@ -203,6 +208,7 @@ Lib.categoryNames = {
         ["counterattack"] = L.COUNTERATTACK,
     },
 
+    --- @table categoryNames.wotlk
     wotlk = {
         ["incapacitate"] = L.INCAPACITATES,
         ["stun"] = L.STUNS,
@@ -222,6 +228,7 @@ Lib.categoryNames = {
         ["taunt"] = L.TAUNTS,
     },
 
+    --- @table categoryNames.cata
     cata = {
         ["incapacitate"] = L.INCAPACITATES,
         ["stun"] = L.STUNS,
@@ -312,6 +319,7 @@ Lib.diminishedDurations = {
 --- Get table of all spells that DRs.
 -- Key is the spellID, and value is the unlocalized DR category string.
 -- Value is instead a table of strings for spells that have shared DRs.
+-- Tables are read-only. Copy them if you need to modify data.
 -- @see GetCategoryBySpellID
 -- @treturn table {number=string|table}
 function Lib:GetSpells()
@@ -320,7 +328,8 @@ end
 
 --- Get table of all DR categories.
 -- Key is unlocalized name used for API functions, value is localized name used for UI.
--- Note: the 'taunt' category should be ignored for players, but not player pets.
+-- Tables are read-only. Copy them if you need to modify data.
+-- Note: You might want to ignore the 'taunt' category if your addon only track player DRs.
 -- @treturn table {string=string}
 function Lib:GetCategories()
     return Lib.categoryNames[Lib.gameExpansion]
@@ -328,29 +337,28 @@ end
 
 --- Get table of all categories that DRs in PvE.
 -- Key is unlocalized name used for API functions, value is localized name used for UI.
+-- Tables are read-only. Copy them if you need to modify data.
 -- Note that for retail some special mobs have DR on all categories, you need to check for this yourself;
 -- see UnitClassification() and UnitIsQuestBoss(). Player pets have DR on all categories.
--- Tip: you can combine :GetPvECategories() and :IterateSpellsByCategory() to get spellIDs only for PvE aswell.
 -- @treturn table {string=string}
 function Lib:GetPvECategories()
     return Lib.categoriesPvE[Lib.gameExpansion]
 end
 
---- Get constant for how long a DR lasts for a given category.
+--- Get the default DR reset time value or a category specific reset time.
+-- Passing in the category is now recommended as reset times may differ between categories.
+-- @usage local expirationTime = GetTime() + DRList:GetResetTime("stun") -- Compare against GetTime() later on
+-- @usage C_Timer.After(DRList:GetResetTime("stun"), function() print("DR finished") end)
 -- @tparam[opt="default"] string category Unlocalized category name, or "npc" for PvE timer.
--- @treturn number Seconds before DR resets.
+-- @treturn number Reset time in seconds
 function Lib:GetResetTime(category)
     return Lib.resetTimes[Lib.gameExpansion][category or "default"] or Lib.resetTimes[Lib.gameExpansion].default
 end
 
-local type = _G.type -- GetCategoryBySpellID() is ran frequently from the CLEU so might aswell upvalue this
-
---- Get unlocalized DR category by spell ID.
--- This is the main checker for if a spell has a DR.
--- See https://github.com/wardz/DRList-1.0/wiki/Example-Usage for full example usage.
--- Note: the 'taunt' category should be ignored for players, but not player pets.
--- @tparam number spellID
--- @treturn ?string The category name.
+--- Get DR category by spellID.
+-- This is the main checker for if a spell/debuff has a DR. See wiki for example usage.
+-- @tparam number spellID Debuff spellId
+-- @treturn ?string The unlocalized category name.
 -- @treturn ?{string,...} Read-only array with multiple categories if spellID has any shared DR categories. (Note: array includes main category too)
 function Lib:GetCategoryBySpellID(spellID)
     local category = Lib.spellList[spellID]
@@ -361,9 +369,9 @@ function Lib:GetCategoryBySpellID(spellID)
     return category
 end
 
---- Get localized category from unlocalized category name, case sensitive.
+--- Get localized category name.
 -- @tparam string category Unlocalized category name
--- @treturn ?string|nil The localized category name.
+-- @treturn ?string|nil The localized category name
 function Lib:GetCategoryLocalization(category)
     return Lib.categoryNames[Lib.gameExpansion][category]
 end
@@ -377,19 +385,47 @@ function Lib:IsPvECategory(category)
     return Lib.categoriesPvE[Lib.gameExpansion][category] and true or false -- make sure bool is always returned here
 end
 
---- Get next successive diminished duration
+--- Get a specific diminished duration value.
+-- Passing in the category is now recommended as diminished durations may differ between categories.
+-- Any unknown categories (unless omitted/nil) will always return 0 as value here unlike NextDR().
 -- @tparam number diminished How many times the DR has been applied so far
 -- @tparam[opt="default"] string category Unlocalized category name
--- @usage local reduction = DRList:GetNextDR(1) -- returns 0.50, half duration on debuff
--- @treturn number DR percentage in decimals. Returns 0 if max DR is reached or arguments are invalid.
+-- @usage local duration = DRList:GetNextDR(1, "stun") -- 0.50 (half aura duration)
+-- @usage local duration = DRList:GetNextDR(2, "stun") -- 0.25 (quarter aura duration)
+-- @usage local duration = DRList:GetNextDR(3, "stun") -- 0.00 (zero aura duration / immune)
+-- @usage local duration = DRList:GetNextDR(1, "knockback") -- 0.00 (immediately immune)
+-- @treturn number Diminished duration value or 0 for invalid arguments
 function Lib:GetNextDR(diminished, category)
     local durations = Lib.diminishedDurations[Lib.gameExpansion][category or "default"]
     if not durations and Lib.categoryNames[Lib.gameExpansion][category] then
-        -- Redirect to default when "stun", "root" etc is passed
+        -- Redirect to default only when a valid category is passed
         durations = Lib.diminishedDurations[Lib.gameExpansion]["default"]
     end
 
     return durations and durations[diminished] or 0
+end
+
+--- Get the next successive diminished duration value.
+-- Same as the DRData-1.0 version. Passing in the category is now recommended as diminished durations may differ between categories.
+-- @tparam number duration The current diminished duration value. Throws error if not a number.
+-- @tparam[opt="default"] string category Unlocalized category name
+-- @usage local duration = DRList:NextDR(0.50) -- returns 0.25 (quarter aura duration)
+-- @usage
+-- local duration = 1.0 -- initial full aura duration
+-- duration = DRList:NextDR(duration, "stun") -- 0.50 (half aura duration)
+-- duration = DRList:NextDR(duration, "stun") -- 0.25 (quarter aura duration)
+-- duration = DRList:NextDR(duration, "stun") -- 0.00 (zero aura duration / immune)
+-- @treturn number Diminished duration value
+function Lib:NextDR(duration, category)
+    local durations = Lib.diminishedDurations[Lib.gameExpansion][category or "default"] or Lib.diminishedDurations[Lib.gameExpansion].default
+
+    for i = 1, #durations do
+        if duration > durations[i] then
+            return durations[i]
+        end
+    end
+
+    return 0
 end
 
 do
@@ -397,13 +433,14 @@ do
 
     local function CategoryIterator(category, index)
         local spellList, newCategory = Lib.spellList
+
         repeat
             index, newCategory = next(spellList, index)
             if index then
                 if newCategory == category then
                     return index, category
                 elseif type(newCategory) == "table" then
-                    for i = 1, #newCategory do
+                    for i = 1, #newCategory do -- shared categories table
                         if newCategory[i] == category then
                             return index, category
                         end
@@ -414,10 +451,10 @@ do
     end
 
     --- Iterate through the spells of a given category.
-    -- Pass "nil" to iterate through all spells instead.
-    -- Note: a spell might be returned multiple times here due to spell ranks in classic, check its name to avoid duplicates.
+    -- Pass nil to iterate through all spells instead.
+    -- Note: In classic this also iterates through every single spell rank. Check the spell names if you dont want duplicates.
     -- @tparam string|nil category Unlocalized category name
-    -- @usage for spellID in DRList:IterateSpellsByCategory("root") do print(spellID) end
+    -- @usage for spellID, category in DRList:IterateSpellsByCategory("root") do print(spellID) end
     -- @return Iterator function
     function Lib:IterateSpellsByCategory(category)
         if category then
@@ -428,10 +465,9 @@ do
     end
 end
 
--- keep same API as DRData-1.0 for easier transitions
+-- Keep same API as DRData-1.0 for easier transitions
 Lib.GetCategoryName = Lib.GetCategoryLocalization
 Lib.IsPVE = Lib.IsPvECategory
-Lib.NextDR = Lib.GetNextDR
 Lib.GetSpellCategory = Lib.GetCategoryBySpellID
 Lib.IterateSpells = Lib.IterateSpellsByCategory
 --Lib.IterateProviders = Lib.IterateSpellsByCategory -- OBSOLETE

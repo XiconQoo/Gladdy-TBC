@@ -272,7 +272,7 @@ end
 local function EditBox_OnEditFocusLost(self)
 	local predictor = self.obj.predictor
 	if predictor:IsVisible() then
-		local frame = GetMouseFocus()
+		local frame = GetMouseFoci()[1]
 		if not (frame and frame.parent==predictor) then
 			predictor:Hide()
 		end

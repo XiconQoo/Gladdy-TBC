@@ -28,11 +28,11 @@ local LibStub = LibStub
 
 ---------------------------
 
-local MAJOR, MINOR = "Gladdy", 17
+local MAJOR, MINOR = "Gladdy", 18
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
 Gladdy.version_major_num = 2
-Gladdy.version_minor_num = 0.42
+Gladdy.version_minor_num = 0.43
 Gladdy.version_num = Gladdy.version_major_num + Gladdy.version_minor_num
 Gladdy.version_releaseType = RELEASE_TYPES.release
 Gladdy.version = PREFIX .. string.format("%.2f", Gladdy.version_num) .. "-" .. Gladdy.version_releaseType
@@ -86,11 +86,16 @@ Gladdy.events.registered = {}
 Gladdy.events:RegisterEvent("PLAYER_LOGIN")
 Gladdy.events:RegisterEvent("PLAYER_LOGOUT")
 Gladdy.events:RegisterEvent("CVAR_UPDATE")
-hooksecurefunc("VideoOptionsFrameOkay_OnClick", function(self, button, down, apply)
-    if (self:GetName() == "VideoOptionsFrameApply") then
-        Gladdy:PixelPerfectScale(true)
-    end
+hooksecurefunc(SettingsPanel, "Commit", function()
+    Gladdy:PixelPerfectScale(true)
 end)
+hooksecurefunc(SettingsPanel, "RevertSettings", function()
+    Gladdy:PixelPerfectScale(true)
+end)
+hooksecurefunc(SettingsPanel, "SetAllSettingsToDefaults", function()
+    Gladdy:PixelPerfectScale(true)
+end)
+
 Gladdy.events:SetScript("OnEvent", function(self, event, ...)
     if (event == "PLAYER_LOGIN") then
         Gladdy:OnInitialize()
