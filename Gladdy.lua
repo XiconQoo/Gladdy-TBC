@@ -86,11 +86,16 @@ Gladdy.events.registered = {}
 Gladdy.events:RegisterEvent("PLAYER_LOGIN")
 Gladdy.events:RegisterEvent("PLAYER_LOGOUT")
 Gladdy.events:RegisterEvent("CVAR_UPDATE")
-hooksecurefunc("VideoOptionsFrameOkay_OnClick", function(self, button, down, apply)
-    if (self:GetName() == "VideoOptionsFrameApply") then
-        Gladdy:PixelPerfectScale(true)
-    end
+hooksecurefunc(SettingsPanel, "Commit", function()
+    Gladdy:PixelPerfectScale(true)
 end)
+hooksecurefunc(SettingsPanel, "RevertSettings", function()
+    Gladdy:PixelPerfectScale(true)
+end)
+hooksecurefunc(SettingsPanel, "SetAllSettingsToDefaults", function()
+    Gladdy:PixelPerfectScale(true)
+end)
+
 Gladdy.events:SetScript("OnEvent", function(self, event, ...)
     if (event == "PLAYER_LOGIN") then
         Gladdy:OnInitialize()
