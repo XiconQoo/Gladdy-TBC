@@ -154,6 +154,9 @@ function Cooldowns:CreateIcon()
         icon.cooldownFont = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
         icon.cooldownFont:SetAllPoints(icon)
 
+        icon.charges = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
+        icon.charges:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", -1, 2)
+
         icon.glow = CreateFrame("Frame", nil, icon)
         icon.glow:SetAllPoints(icon)
 
@@ -190,6 +193,9 @@ function Cooldowns:UpdateIcon(icon)
 
     icon.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), (icon:GetWidth()/2 - 1) * Gladdy.db.cooldownFontScale, "OUTLINE")
     icon.cooldownFont:SetTextColor(Gladdy:SetColor(Gladdy.db.cooldownFontColor))
+
+    icon.charges:SetFont(Gladdy:SMFetch("font", "cooldownFont"), (icon:GetWidth()/2 - 1) * Gladdy.db.cooldownFontScale, "OUTLINE")
+    icon.charges:SetTextColor(Gladdy:SetColor(Gladdy.db.cooldownFontColor))
 
     icon.border:SetTexture(Gladdy.db.cooldownBorderStyle)
     icon.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.cooldownBorderColor))
@@ -366,6 +372,7 @@ function Cooldowns:ClearIcon(button, index, spellId, icon)
     icon.active = false
     icon.cooldown:Hide()
     icon.cooldownFont:SetText("")
+    icon.charges:SetText("")
     icon:SetScript("OnUpdate", nil)
     tinsert(self.iconCache, icon)
 end
@@ -499,6 +506,9 @@ function Cooldowns:CooldownStart(button, spellId, duration, start)
                 icon.texture:SetAlpha(Gladdy.db.cooldownIconAlphaOnCooldown)
             end
             icon:SetScript("OnUpdate", function(self, elapsed)
+                if (self.maxCharges) then
+                    --TODO self.charges:SetText(self.maxCharges)
+                end
                 self.timeLeft = self.timeLeft - elapsed
                 if not Gladdy.db.useOmnicc then
                     local timeLeft = ceil(self.timeLeft)
@@ -602,6 +612,11 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId, expirationTimeInSecond
                 end
             end
         end
+
+        -- check if there is charges
+        if (cooldown.charges) then
+
+        end
     end
 
     if (Gladdy.db.cooldown) then
@@ -649,6 +664,11 @@ function Cooldowns:AddCooldown(spellID, value, button)
         icon:Show()
         icon.spellId = spellID
         icon.texture:SetTexture(self.spellTextures[spellID])
+        if (type(value) == "table") and value.charges then
+            icon.maxCharges = value.charges
+        else
+            icon.maxCharges = nil
+        end
         tinsert(button.spellCooldownFrame.icons, icon)
         self:IconsSetPoint(button)
     end

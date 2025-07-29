@@ -497,9 +497,9 @@ end
 function Diminishings:AuraGainCheck(unit, spellID, drFrame, drCat)
     -- due to dynamic DR we reset the DR here if dr == 0
     if not drFrame.tracked[drCat] or drFrame.tracked[drCat] == 0 then
-        drFrame.tracked[drCat] = DRList:NextDR(1)
+        drFrame.tracked[drCat] = DRList:NextDR(1, drCat)
     else
-        drFrame.tracked[drCat] = DRList:NextDR(drFrame.tracked[drCat] == 0.5 and 2 or 3)
+        drFrame.tracked[drCat] = DRList:NextDR(drFrame.tracked[drCat], drCat)
     end
 
     if Gladdy.db.drShowIconOnAuraApplied then

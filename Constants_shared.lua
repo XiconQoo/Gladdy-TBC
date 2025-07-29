@@ -8,34 +8,6 @@ local L = Gladdy.L
 Gladdy.RACES = {"Scourge", "BloodElf", "Tauren", "Orc", "Troll", "NightElf", "Draenei", "Human", "Gnome", "Dwarf"}
 tbl_sort(Gladdy.RACES)
 
-local RACE_ICON_TCOORDS = {
-    ["HUMAN_MALE"] = { 0, 0.125, 0, 0.25 },
-    ["DWARF_MALE"] = { 0.125, 0.25, 0, 0.25 },
-    ["GNOME_MALE"] = { 0.25, 0.375, 0, 0.25 },
-    ["NIGHTELF_MALE"] = { 0.375, 0.5, 0, 0.25 },
-
-    ["TAUREN_MALE"] = { 0, 0.125, 0.25, 0.5 },
-    ["SCOURGE_MALE"] = { 0.125, 0.25, 0.25, 0.5 },
-    ["TROLL_MALE"] = { 0.25, 0.375, 0.25, 0.5 },
-    ["ORC_MALE"] = { 0.375, 0.5, 0.25, 0.5 },
-
-    ["HUMAN_FEMALE"] = { 0, 0.125, 0.5, 0.75 },
-    ["DWARF_FEMALE"] = { 0.125, 0.25, 0.5, 0.75 },
-    ["GNOME_FEMALE"] = { 0.25, 0.375, 0.5, 0.75 },
-    ["NIGHTELF_FEMALE"] = { 0.375, 0.5, 0.5, 0.75 },
-
-    ["TAUREN_FEMALE"] = { 0, 0.125, 0.75, 1.0 },
-    ["SCOURGE_FEMALE"] = { 0.125, 0.25, 0.75, 1.0 },
-    ["TROLL_FEMALE"] = { 0.25, 0.375, 0.75, 1.0 },
-    ["ORC_FEMALE"] = { 0.375, 0.5, 0.75, 1.0 },
-
-    ["BLOODELF_MALE"] = { 0.5, 0.625, 0.25, 0.5 },
-    ["BLOODELF_FEMALE"] = { 0.5, 0.625, 0.75, 1.0 },
-
-    ["DRAENEI_MALE"] = { 0.5, 0.625, 0, 0.25 },
-    ["DRAENEI_FEMALE"] = { 0.5, 0.625, 0.5, 0.75 },
-}
-
 local classIconPath = "Interface\\Addons\\Gladdy\\Images\\Classes\\"
 local classIcons = {
     ["DRUID"] = classIconPath .. "inv_misc_monsterclaw_04",
@@ -48,6 +20,7 @@ local classIcons = {
     ["SHAMAN"] = classIconPath .. "inv_jewelry_talisman_04",
     ["WARLOCK"] = classIconPath .. "spell_nature_drowsy",
     ["WARRIOR"] = classIconPath .. "inv_sword_27",
+    ["MONK"] = 626002,-- classicon-monk
 }
 Gladdy.classIcons = classIcons
 
@@ -354,22 +327,22 @@ end
 local totemData = {
     -- Fire
     [string_lower("Searing Totem")] = {id = 3599,texture = select(3, GetSpellInfo(3599)), color = {r = 0, g = 0, b = 0, a = 1}},
-    [string_lower("Flametongue Totem")] = {id = 8227,texture = select(3, GetSpellInfo(8227)), color = {r = 0, g = 0, b = 0, a = 1}},
+    --[string_lower("Flametongue Totem")] = {id = 8227,texture = select(3, GetSpellInfo(8227)), color = {r = 0, g = 0, b = 0, a = 1}},
     [string_lower("Magma Totem")] = {id = 8190,texture = select(3, GetSpellInfo(8190)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 2},
     [string_lower("Fire Nova Totem")] = {id = 1535,texture = select(3, GetSpellInfo(1535)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = { cd = 4, once = true }},
     -- Water
     [string_lower("Healing Stream Totem")] = {id = 5394,texture = select(3, GetSpellInfo(5394)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 2},
     [string_lower("Mana Tide Totem")] = {id = 16190,texture = select(3, GetSpellInfo(16190)), color = {r = 0.078, g = 0.9, b = 0.16, a = 1}, pulse = 3 },
-    [string_lower("Mana Spring Totem")] = {id = 5675,texture = select(3, GetSpellInfo(5675)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 2},
+    --[string_lower("Mana Spring Totem")] = {id = 5675,texture = select(3, GetSpellInfo(5675)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 2},
     -- Earth
     [string_lower("Earthbind Totem")] = {id = 2484,texture = select(3, GetSpellInfo(2484)), color = {r = 0.5, g = 0.5, b = 0.5, a = 1}, pulse = 3},
-    [string_lower("Stoneclaw Totem")] = {id = 5730,texture = select(3, GetSpellInfo(5730)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 2},
-    [string_lower("Stoneskin Totem")] = {id = 8071,texture = select(3, GetSpellInfo(8071)), color = {r = 0, g = 0, b = 0, a = 1}},
-    [string_lower("Strength of Earth Totem")] = {id = 8075,texture = select(3, GetSpellInfo(8075)), color = {r = 0, g = 0, b = 0, a = 1}},
+    --[string_lower("Stoneclaw Totem")] = {id = 5730,texture = select(3, GetSpellInfo(5730)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 2},
+    --[string_lower("Stoneskin Totem")] = {id = 8071,texture = select(3, GetSpellInfo(8071)), color = {r = 0, g = 0, b = 0, a = 1}},
+    --[string_lower("Strength of Earth Totem")] = {id = 8075,texture = select(3, GetSpellInfo(8075)), color = {r = 0, g = 0, b = 0, a = 1}},
     [string_lower("Tremor Totem")] = {id = 8143,texture = select(3, GetSpellInfo(8143)), color = {r = 1, g = 0.9, b = 0.1, a = 1}, pulse = 3},
     -- Air
     [string_lower("Grounding Totem")] = {id = 8177,texture = select(3, GetSpellInfo(8177)), color = {r = 0, g = 0.53, b = 0.92, a = 1}},
-    [string_lower("Windfury Totem")] = {id = 8512,texture = select(3, GetSpellInfo(8512)), color = {r = 0.96, g = 0, b = 0.07, a = 1}},
+    --[string_lower("Windfury Totem")] = {id = 8512,texture = select(3, GetSpellInfo(8512)), color = {r = 0.96, g = 0, b = 0.07, a = 1}},
 }
 
 local totemSpellIdToPulse = {
@@ -405,17 +378,17 @@ local totemSpellIdToPulse = {
     [58757] = totemData[string_lower("Healing Stream Totem")].pulse, -- Rank 9
     [GetSpellInfo(totemData[string_lower("Mana Tide Totem")].id)] = totemData[string_lower("Mana Tide Totem")].pulse,
     [16190] = totemData[string_lower("Mana Tide Totem")].pulse, -- Rank 1
-    [GetSpellInfo(totemData[string_lower("Stoneclaw Totem")].id)] = totemData[string_lower("Stoneclaw Totem")].pulse,
-    [5730] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 1
-    [6390] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 2
-    [6391] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 3
-    [6392] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 4
-    [10427] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 5
-    [10428] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 6
-    [25525] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 7
-    [58580] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 8
-    [58581] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 9
-    [58582] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 10
+    --[GetSpellInfo(totemData[string_lower("Stoneclaw Totem")].id)] = totemData[string_lower("Stoneclaw Totem")].pulse,
+    --[5730] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 1
+    --[6390] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 2
+    --[6391] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 3
+    --[6392] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 4
+    --[10427] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 5
+    --[10428] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 6
+    --[25525] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 7
+    --[58580] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 8
+    --[58581] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 9
+    --[58582] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 10
     [15787] = totemData[string_lower("Fire Nova Totem")].pulse,
 }
 

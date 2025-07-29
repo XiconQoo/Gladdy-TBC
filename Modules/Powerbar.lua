@@ -2,6 +2,7 @@ local pairs = pairs
 local floor = math.floor
 
 local CreateFrame, UnitPower, UnitPowerType, UnitPowerMax, UnitExists = CreateFrame, UnitPower, UnitPowerType, UnitPowerMax, UnitExists
+local PowerBarColor = PowerBarColor
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
@@ -213,18 +214,14 @@ function Powerbar:SetPower(powerBar, unit, power, powerMax, powerType, status)
     powerBar.energy.current = power
     powerBar.energy.max = powerMax
     powerBar.energy.powerType = powerType
-
-    if (powerType == 1 and powerBar.powerType ~= powerType) then
-        powerBar.energy:SetStatusBarColor(1, 0, 0, 1)
-        powerBar.powerColor = {r = 1, g = 0, b = 0}
-        powerBar.powerType = powerType
-    elseif (powerType == 3 and powerBar.powerType ~= powerType) then
-        powerBar.energy:SetStatusBarColor(1, 1, 0, 1)
-        powerBar.powerColor = {r = 1, g = 1, b = 0}
-        powerBar.powerType = powerType
-    elseif powerBar.powerType ~= powerType then
+    if (powerType == 0 and powerBar.powerType ~= powerType) then
         powerBar.energy:SetStatusBarColor(.18, .44, .75, 1)
         powerBar.powerColor = {r = .18, g = .44, b = .75}
+        powerBar.powerType = powerType
+    elseif (PowerBarColor[powerType] and powerBar.powerType ~= powerType) then
+        local info = PowerBarColor[powerType]
+        powerBar.energy:SetStatusBarColor(info.r, info.g, info.b, 1)
+        powerBar.powerColor = {r = info.r, g = info.g, b = info.b}
         powerBar.powerType = powerType
     end
 
@@ -275,6 +272,8 @@ function Powerbar:ENEMY_SPOTTED(unit)
         powerBar.energy.powerType = select(1, UnitPowerType(unit))
         powerBar.energy.current, powerBar.energy.max = UnitPower(unit, powerBar.energy.powerType, true), UnitPowerMax(unit, powerBar.energy.powerType, true)
         Powerbar:SetPower(powerBar, unit, powerBar.energy.current, powerBar.energy.max, powerBar.energy.powerType)
+    else
+        Powerbar:SetText(unit, 1, 1)
     end
 end
 

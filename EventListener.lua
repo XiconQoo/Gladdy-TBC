@@ -37,6 +37,7 @@ function EventListener:JOINED_ARENA()
     end
     self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self:RegisterEvent("ARENA_OPPONENT_UPDATE")
+    self:RegisterEvent("ARENA_PREP_OPPONENT_SPECIALIZATIONS")
     self:RegisterEvent("UNIT_AURA")
     self:RegisterEvent("UNIT_SPELLCAST_START")
     self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
@@ -58,6 +59,8 @@ function EventListener:JOINED_ARENA()
     end
     Gladdy.bombExpireTime = {}
     self:SetScript("OnEvent", EventListener.OnEvent)
+    --detect spec
+    self:ARENA_PREP_OPPONENT_SPECIALIZATIONS()
 end
 
 function EventListener:Reset()
@@ -80,7 +83,7 @@ function Gladdy:SpotEnemy(unit, auraScan, report)
         button.name = UnitName(unit)
         Gladdy.guids[UnitGUID(unit)] = unit
     end
-    if button.class and button.race and report then
+    if button.class and report then
         Gladdy:SendMessage("ENEMY_SPOTTED", unit)
     end
     if auraScan and not button.spec then
@@ -184,7 +187,7 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
             Gladdy:SpotEnemy(srcUnit, true, true)
         end
         if not Gladdy.buttons[srcUnit].spec then
-            self:DetectSpec(srcUnit, Gladdy.specSpells[spellName])
+            self:DetectSpec(srcUnit, (Gladdy.specSpells[spellID] or Gladdy.specSpells[spellName]))
         end
         if (eventType == "SPELL_CAST_SUCCESS" or eventType == "SPELL_MISSED" or eventType == "SPELL_DODGED") then
             -- caching last cast spell
@@ -257,6 +260,33 @@ function EventListener:ARENA_OPPONENT_UPDATE(unit, updateReason)
             end
         elseif updateReason == "cleared" then
             --Gladdy:Print("ARENA_OPPONENT_UPDATE", updateReason, unit)
+        end
+    end
+end
+
+function EventListener:ARENA_PREP_OPPONENT_SPECIALIZATIONS()
+    local numOpps = GetNumArenaOpponentSpecs and GetNumArenaOpponentSpecs() or 0;
+    local detectedSpecs = { num = 0 }
+    for i = 1, Gladdy.curBracket do
+        if (i <= numOpps) then
+            local specID, gender = GetArenaOpponentSpec(i)
+
+            if (specID > 0) then
+                local _, spec, _, specIcon, _, class, className = GetSpecializationInfoByID(specID, gender)
+                if (class) then
+                    detectedSpecs.num = detectedSpecs.num + 1
+                    local unit = "arena" .. i
+
+                    local button = Gladdy.buttons[unit]
+                    if button and not button.spec then
+                        button.classLoc = className
+                        button.class = class
+                        button.name = "Unknown"
+                        Gladdy:SpotEnemy(unit, false, true)
+                        self:DetectSpec(unit, spec)
+                    end
+                end
+            end
         end
     end
 end
@@ -367,9 +397,9 @@ function EventListener:ScanAuras(unit)
                 spellName = Gladdy.exceptionNames[spellID]
             end
             button.auras[spellID] = { auraType, spellID, spellName, texture, duration, expirationTime, count, dispelType }
-            if not button.spec and Gladdy.specSpells[spellName] and unitCaster then
+            if not button.spec and (Gladdy.specSpells[spellID] or Gladdy.specSpells[spellName]) and unitCaster then
                 if unitCaster and (UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster)) then
-                    self:DetectSpec(unit, Gladdy.specSpells[spellName])
+                    self:DetectSpec(unit, (Gladdy.specSpells[spellID] or Gladdy.specSpells[spellName]))
                 end
             end
             if (Gladdy.cooldownBuffs[spellName] or Gladdy.cooldownBuffs[spellID]) and unitCaster then -- Check for auras that hint used CDs (like Fear Ward)
@@ -424,18 +454,18 @@ end
 
 function EventListener:UNIT_SPELLCAST_START(unit)
     if Gladdy.buttons[unit] then
-        local spellName = UnitCastingInfo(unit)
-        if Gladdy.specSpells[spellName] and not Gladdy.buttons[unit].spec then
-            self:DetectSpec(unit, Gladdy.specSpells[spellName])
+        local spellName, _, _, _, _, _, _, spellID = UnitCastingInfo(unit)
+        if (Gladdy.specSpells[spellID] or Gladdy.specSpells[spellName]) and not Gladdy.buttons[unit].spec then
+            self:DetectSpec(unit, (Gladdy.specSpells[spellID] or Gladdy.specSpells[spellName]))
         end
     end
 end
 
 function EventListener:UNIT_SPELLCAST_CHANNEL_START(unit)
     if Gladdy.buttons[unit] then
-        local spellName = UnitChannelInfo(unit)
-        if Gladdy.specSpells[spellName] and not Gladdy.buttons[unit].spec then
-            self:DetectSpec(unit, Gladdy.specSpells[spellName])
+        local spellName, _, _, _, _, _, _, spellID = UnitChannelInfo(unit)
+        if (Gladdy.specSpells[spellID] or Gladdy.specSpells[spellName]) and not Gladdy.buttons[unit].spec then
+            self:DetectSpec(unit, (Gladdy.specSpells[spellID] or Gladdy.specSpells[spellName]))
         end
     end
 end
@@ -457,8 +487,8 @@ function EventListener:UNIT_SPELLCAST_SUCCEEDED(...)
         end
 
         -- spec detection
-        if spellName and Gladdy.specSpells[spellName] and not button.spec then
-            self:DetectSpec(unit, Gladdy.specSpells[spellName])
+        if spellName and (Gladdy.specSpells[spellID] or Gladdy.specSpells[spellName]) and not button.spec then
+            self:DetectSpec(unit, (Gladdy.specSpells[spellID] or Gladdy.specSpells[spellName]))
         end
 
         -- trinket
@@ -485,10 +515,11 @@ local specCheck = {
     ["WARLOCK"] = function(spec) return Gladdy:contains(spec, {L["Demonology"], L["Destruction"], L["Affliction"]}) end,
     ["PRIEST"] = function(spec) return Gladdy:contains(spec, {L["Shadow"], L["Discipline"], L["Holy"]}) end,
     ["MAGE"] = function(spec) return Gladdy:contains(spec, {L["Frost"], L["Fire"], L["Arcane"]}) end,
-    ["DRUID"] = function(spec) return Gladdy:contains(spec, {L["Restoration"], L["Feral"], L["Balance"]}) end,
+    ["DRUID"] = function(spec) return Gladdy:contains(spec, {L["Restoration"], L["Feral"], L["Balance"], L["Guardian"]}) end,
     ["HUNTER"] = function(spec) return Gladdy:contains(spec, {L["Beast Mastery"], L["Marksmanship"], L["Survival"]}) end,
     ["WARRIOR"] = function(spec) return Gladdy:contains(spec, {L["Arms"], L["Protection"], L["Fury"]}) end,
     ["DEATHKNIGHT"] = function(spec) return Gladdy:contains(spec, {L["Unholy"], L["Blood"], L["Frost"]}) end,
+    ["MONK"] = function(spec) return Gladdy:contains(spec, {L["Brewmaster"], L["Mistweaver"], L["Windwalker"]}) end,
 }
 
 function EventListener:DetectSpec(unit, spec)

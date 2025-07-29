@@ -21,7 +21,6 @@ local Classicon = Gladdy:NewModule("Class Icon", 81, {
 })
 
 local specIcons = {
-    --DRUID
     ["DRUID"] = {
         [L["Balance"]] = 136096, -- Moonfire
         [L["Feral"]] = 132276, -- Cat Form
@@ -33,7 +32,7 @@ local specIcons = {
         [L["Frost"]] = 135770, -- Frost Presence
     },
     ["HUNTER"] = {
-        [L["Beast Mastery"]] = 132164, -- Tame Beast
+        [L["Beast Mastery"]] = 461112, -- Tame Beast --461112
         [L["Marksmanship"]] = 236179, -- Focused Aim
         [L["Survival"]] = 461113, -- Mongoose Bite or Camouflage
     },
@@ -41,6 +40,11 @@ local specIcons = {
         [L["Arcane"]] = 135932, -- Arcane Intellect
         [L["Fire"]] = 135812, -- Fireball
         [L["Frost"]] = 135846, -- Frostbolt
+    },
+    ["MONK"] = {
+        [L["Brewmaster"]] = select(4, GetSpecializationInfoByID(268)),
+        [L["Mistweaver"]] = select(4, GetSpecializationInfoByID(270)),
+        [L["Windwalker"]] = select(4, GetSpecializationInfoByID(269)),
     },
     ["PALADIN"] = {
         [L["Holy"]] = 135920, -- Holy Light
@@ -195,9 +199,11 @@ function Classicon:ENEMY_SPOTTED(unit)
     if (not classIcon) then
         return
     end
-
-    classIcon.texture:SetTexture(Gladdy.classIcons[Gladdy.buttons[unit].class])
-    --classIcon.texture:SetTexCoord(unpack(CLASS_BUTTONS[Gladdy.buttons[unit].class]))
+    if Gladdy.db.classIconSpecIcon and Gladdy.buttons[unit].spec then
+        classIcon.texture:SetTexture(specIcons[Gladdy.buttons[unit].class][Gladdy.buttons[unit].spec])
+    else
+        classIcon.texture:SetTexture(Gladdy.classIcons[Gladdy.buttons[unit].class])
+    end
     classIcon.texture:SetAllPoints(classIcon)
 end
 

@@ -302,12 +302,13 @@ function Healthbar:ResetUnit(unit)
         return
     end
 
-    healthBar.hp:SetStatusBarColor(1, 1, 1, 1)
+    healthBar.hp:SetStatusBarColor(1, 1, 1, 0)
     healthBar.nameText:SetText("")
     healthBar.healthText:SetText("")
-    healthBar.hp:SetValue(0)
-    healthBar.hp.current = nil
-    healthBar.hp.max = nil
+    healthBar.hp:SetValue(1)
+    healthBar.hp:SetMinMaxValues(0, 1)
+    healthBar.hp.current = 1
+    healthBar.hp.max = 1
 end
 
 function Healthbar:Test(unit)
@@ -338,8 +339,7 @@ function Healthbar:UNIT_SPEC(unit)
 end
 
 function Healthbar:JOINED_ARENA()
-    for i=1,Gladdy.curBracket do
-        local unit = "arena" .. i
+    for unit, button in pairs(Gladdy.buttons) do
         self:SetText(unit, self.frames[unit].hp.current, self.frames[unit].hp.max)
     end
 end
