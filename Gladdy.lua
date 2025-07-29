@@ -21,6 +21,7 @@ local RELEASE_TYPES = { alpha = "Alpha", beta = "Beta", release = "Release"}
 local PREFIX = "Gladdy v"
 local VERSION_REGEX = PREFIX .. "(%d+%.%d+)%-(%a)"
 local LibStub = LibStub
+local GetSpellInfo = GetSpellInfo
 
 ---------------------------
 
@@ -241,10 +242,18 @@ function Gladdy:CleanupIgnoredOptions(tbl, refTbl, str, refOptionStruct)
                 end
             elseif type(tbl[k]) == "table" then--is table, go over items
                 if not refTbl[k] then -- all options must be present because not default option
-                    for refKey, refValue in pairs(refOptionStruct) do
-                        if tbl[k][refKey] == nil or type(tbl[k][refKey]) ~= type(refValue) then -- should have this option .. delete tbl[k]
-                            self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, " - should have the option", refKey)
-                            tbl[k] = nil
+                    if (str == "Gladdy.db.auraListDefault" and type(tbl[k]) == "table" and not GetSpellInfo(k)) then --potential
+                        tbl[k] = nil
+                    elseif (str == "Gladdy.db.trackedDebuffs" and not GetSpellInfo(k)) then
+                        tbl[k] = nil
+                    elseif (str == "Gladdy.db.trackedBuffs" and not GetSpellInfo(k)) then
+                        tbl[k] = nil
+                    else
+                        for refKey, refValue in pairs(refOptionStruct) do
+                            if tbl[k][refKey] == nil or type(tbl[k][refKey]) ~= type(refValue) then -- should have this option .. delete tbl[k]
+                                self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, " - should have the option", refKey)
+                                tbl[k] = nil
+                            end
                         end
                     end
                 end
