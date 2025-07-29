@@ -242,8 +242,13 @@ function Gladdy:CleanupIgnoredOptions(tbl, refTbl, str, refOptionStruct)
                 end
             elseif type(tbl[k]) == "table" then--is table, go over items
                 if not refTbl[k] then -- all options must be present because not default option
-                    if (str == "Gladdy.db.auraListDefault" and type(tbl[k]) == "table" and not GetSpellInfo(k)) then --potential
-                        tbl[k] = nil
+                    if (str == "Gladdy.db.auraListDefault" and type(tbl[k]) == "table") then --potential not in expansion
+                        if (not GetSpellInfo(k)) then -- not a spell
+                            tbl[k] = nil
+                        end
+                        if (not type(tbl[k]).spellIDs) then -- not in other expansion defaults
+                            tbl[k] = nil
+                        end
                     elseif (str == "Gladdy.db.trackedDebuffs" and not GetSpellInfo(k)) then
                         tbl[k] = nil
                     elseif (str == "Gladdy.db.trackedBuffs" and not GetSpellInfo(k)) then
