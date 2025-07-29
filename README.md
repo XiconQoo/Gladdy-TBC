@@ -1,10 +1,10 @@
 # Gladdy - Classic
 
-### The most powerful arena addon for WoW TBC 2.5.4 & WotLK 3.4.0 & Cataclysm 4.4.0
+### The most powerful arena addon for WoW TBC 2.5.4 & WotLK 3.4.0 & Cataclysm 4.4.0 & Mist of Pandaria 5.5.0
 
 ---
 
-## [v2.43-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.43-Release/Gladdy_Classic_v2.43-Release.zip)
+## [v2.50-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.50-Release/Gladdy_Classic_v2.50-Release.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -81,6 +81,10 @@ Thank you!
 ---
 
 ### Changes
+
+### v2.50-Release
+- added MoP support
+- fixed DRs not showing correct boarders and texts
 
 ### v2.43-Release
 - update libs
