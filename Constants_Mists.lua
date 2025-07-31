@@ -6,7 +6,7 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
 
-Gladdy.expansion = "Mists"
+Gladdy.expansion = "Wrath"
 Gladdy.CLASSES = { "MAGE", "PRIEST", "DRUID", "SHAMAN", "PALADIN", "WARLOCK", "WARRIOR", "HUNTER", "ROGUE", "DEATHKNIGHT", "MONK" }
 table.sort(Gladdy.CLASSES, function(a, b) return a > b end)
 tbl_sort(Gladdy.CLASSES)

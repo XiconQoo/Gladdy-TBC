@@ -85,6 +85,7 @@ function Classicon:Initialize()
         self:RegisterMessage("ENEMY_SPOTTED")
         self:RegisterMessage("UNIT_DEATH")
         self:RegisterMessage("UNIT_SPEC")
+        self:RegisterMessage("UNIT_SPEC_PREPARATION")
     end
 end
 
@@ -93,6 +94,7 @@ function Classicon:UpdateFrameOnce()
         self:RegisterMessage("ENEMY_SPOTTED")
         self:RegisterMessage("UNIT_DEATH")
         self:RegisterMessage("UNIT_SPEC")
+        self:RegisterMessage("UNIT_SPEC_PREPARATION")
     else
         self:UnregisterAllMessages()
     end
@@ -213,6 +215,10 @@ function Classicon:UNIT_SPEC(unit, spec)
         return
     end
     classIcon.texture:SetTexture(specIcons[Gladdy.buttons[unit].class][spec])
+end
+
+function Classicon:UNIT_SPEC_PREPARATION(unit, spec)
+    self:UNIT_SPEC(unit, spec)
 end
 
 function Classicon:ResetUnit(unit)

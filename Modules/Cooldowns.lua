@@ -105,6 +105,7 @@ function Cooldowns:Initialize()
     end
     self:RegisterMessage("ENEMY_SPOTTED")
     self:RegisterMessage("UNIT_SPEC")
+    self:RegisterMessage("UNIT_SPEC_PREPARATION")
     self:RegisterMessage("UNIT_DEATH")
     self:RegisterMessage("UNIT_DESTROYED")
     self:RegisterMessage("AURA_GAIN")
@@ -425,6 +426,10 @@ function Cooldowns:UNIT_SPEC(unit)
         return
     end
     self:UpdateCooldowns(Gladdy.buttons[unit])
+end
+
+function Cooldowns:UNIT_SPEC_PREPARATION(unit, spec)
+    self:UNIT_SPEC(unit)
 end
 
 function Cooldowns:UNIT_DESTROYED(unit)

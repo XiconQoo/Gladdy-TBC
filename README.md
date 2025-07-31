@@ -82,6 +82,12 @@ Thank you!
 
 ### Changes
 
+### v2.52-Release
+- fixed Arena Preparation breaking Gladdy
+
+### v2.51-Release
+- fixed migration bug from cata-data
+
 ### v2.50-Release
 - added MoP support
 - fixed DRs not showing correct boarders and texts

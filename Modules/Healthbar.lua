@@ -51,6 +51,7 @@ function Healthbar:Initialize()
     self:RegisterMessage("ENEMY_SPOTTED")
     self:RegisterMessage("ENEMY_STEALTH")
     self:RegisterMessage("UNIT_SPEC")
+    self:RegisterMessage("UNIT_SPEC_PREPARATION")
     self:RegisterMessage("UNIT_DESTROYED")
     self:RegisterMessage("UNIT_DEATH")
 end
@@ -149,7 +150,7 @@ end
 local rMax, gMax, bMax, rMid, gMid, bMid, rMin, gMin, bMin, rNow, gNow, bNow, percentage, factor, stealthAlpha
 function Healthbar:SetHealthStatusBarColor(unit, health, healthMax)
     local button = Gladdy.buttons[unit]
-    if not button or not health or not healthMax then
+    if not button then
         return
     end
 
@@ -158,8 +159,14 @@ function Healthbar:SetHealthStatusBarColor(unit, health, healthMax)
         healthBar.hp.oorFactor = 1
     end
 
-    healthBar.hp:SetMinMaxValues(0, healthMax)
-    healthBar.hp:SetValue(health)
+    if health and healthMax then
+        healthBar.hp:SetMinMaxValues(0, healthMax)
+        healthBar.hp:SetValue(health)
+    else
+        healthBar.hp:SetMinMaxValues(0, 1)
+        healthBar.hp:SetValue(1)
+    end
+
 
     if healthBar.hp.stealth then
         stealthAlpha = Gladdy.db.healthBarStealthColor.a < Gladdy.db.healthBarBgColor.a and Gladdy.db.healthBarStealthColor.a or Gladdy.db.healthBarBgColor.a
@@ -170,7 +177,7 @@ function Healthbar:SetHealthStatusBarColor(unit, health, healthMax)
         healthBar.bg:SetVertexColor(Gladdy:SetColor(Gladdy.db.healthBarBgColor))
     end
 
-    if not Gladdy.db.healthBarClassColored then
+    if not Gladdy.db.healthBarClassColored and health and healthMax then
         if Gladdy.db.healthBarColoredByCurrentHp then
             rMax, gMax, bMax = Gladdy:SetColor(Gladdy.db.healthBarStatusBarColorMax)
             rMid, gMid, bMid = Gladdy:SetColor(Gladdy.db.healthBarStatusBarColorMid)
@@ -228,7 +235,7 @@ function Healthbar:SetText(unit, health, healthMax, status)
         if Gladdy.db.healthName then
             if Gladdy.db.healthNameToArenaId then
                 button.healthBar.nameText:SetText(str_gsub(unit, "arena", ""))
-            else
+            elseif Gladdy.buttons[unit].name then
                 button.healthBar.nameText:SetText(Gladdy.buttons[unit].name)
             end
         end
@@ -307,8 +314,8 @@ function Healthbar:ResetUnit(unit)
     healthBar.healthText:SetText("")
     healthBar.hp:SetValue(1)
     healthBar.hp:SetMinMaxValues(0, 1)
-    healthBar.hp.current = 1
-    healthBar.hp.max = 1
+    healthBar.hp.current = nil
+    healthBar.hp.max = nil
 end
 
 function Healthbar:Test(unit)
@@ -335,7 +342,16 @@ function Healthbar:UNIT_SPEC(unit)
         return
     end
     self:SetText(unit, button.healthBar.hp.current, button.healthBar.hp.max)
-    --button.healthBar.nameText:SetText(Gladdy:SetTag(unit, Gladdy.db.healthTextLeft, button.health, button.healthMax))
+
+end
+
+function Healthbar:UNIT_SPEC_PREPARATION(unit)
+    local button = Gladdy.buttons[unit]
+    if not button then
+        return
+    end
+    self:SetText(unit, nil, nil)
+    self:SetHealthStatusBarColor(unit, nil, nil)
 end
 
 function Healthbar:JOINED_ARENA()

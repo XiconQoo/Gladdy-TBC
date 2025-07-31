@@ -83,7 +83,7 @@ function Gladdy:SpotEnemy(unit, auraScan, report)
         button.name = UnitName(unit)
         Gladdy.guids[UnitGUID(unit)] = unit
     end
-    if button.class and report then
+    if button.class and button.race and report then
         Gladdy:SendMessage("ENEMY_SPOTTED", unit)
     end
     if auraScan and not button.spec then
@@ -281,9 +281,8 @@ function EventListener:ARENA_PREP_OPPONENT_SPECIALIZATIONS()
                     if button and not button.spec then
                         button.classLoc = className
                         button.class = class
-                        button.name = "Unknown"
-                        Gladdy:SpotEnemy(unit, false, true)
-                        self:DetectSpec(unit, spec)
+                        button.spec = spec
+                        Gladdy:SendMessage("UNIT_SPEC_PREPARATION", unit, spec)
                     end
                 end
             end
@@ -527,7 +526,7 @@ function EventListener:DetectSpec(unit, spec)
     if (not button or not spec or button.spec or button.class and not specCheck[button.class](spec)) then
         return
     end
-    if not button.spec then
+    if not button.spec and button.race then
         button.spec = spec
         Gladdy:SendMessage("UNIT_SPEC", unit, spec)
     end

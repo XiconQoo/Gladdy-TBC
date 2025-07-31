@@ -614,7 +614,8 @@ function Gladdy:InitFrames()
         self.startTest = nil
     end
     self.frame:Show()
-    self:SendMessage("JOINED_ARENA") -- /run LibStub("Gladdy"):SendMessage("JOINED_ARENA")
+    self:SendMessage("JOINED_ARENA")
+
 
     for i=1, self.curBracket do
         self.buttons["arena" .. i]:SetAlpha(1)
@@ -623,6 +624,29 @@ function Gladdy:InitFrames()
         self:BlizzArenaSetAlpha(0)
     else
         self:BlizzArenaSetAlpha(1)
+    end
+end
+
+function Gladdy:TestGladdyPrep() --/run TestGladdyPrep()
+    Gladdy:JoinedArena()
+
+    for unit,button in pairs(Gladdy.buttons) do
+        button.classLoc = Gladdy.testData[unit].classLoc
+        button.class = Gladdy.testData[unit].class
+        button.spec = Gladdy.testData[unit].testSpec
+        Gladdy:SendMessage("UNIT_SPEC_PREPARATION", unit, Gladdy.testData[unit].testSpec)
+    end
+end
+
+function Gladdy:TestGladdyArenaStart() --/run TestGladdyArenaStart()
+    for unit,button in pairs(Gladdy.buttons) do
+        button.raceLoc = Gladdy.testData[unit].raceLoc
+        button.race = Gladdy.testData[unit].race
+        button.classLoc = Gladdy.testData[unit].classLoc
+        button.class = Gladdy.testData[unit].class
+        button.name = Gladdy.testData[unit].name
+        Gladdy.guids["123"] = unit
+        Gladdy:SendMessage("ENEMY_SPOTTED", unit)
     end
 end
 
