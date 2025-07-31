@@ -29,11 +29,11 @@ local GetSpellInfo = GetSpellInfo
 
 ---------------------------
 
-local MAJOR, MINOR = "Gladdy", 20
+local MAJOR, MINOR = "Gladdy", 21
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
 Gladdy.version_major_num = 2
-Gladdy.version_minor_num = 0.51
+Gladdy.version_minor_num = 0.52
 Gladdy.version_num = Gladdy.version_major_num + Gladdy.version_minor_num
 Gladdy.version_releaseType = RELEASE_TYPES.release
 Gladdy.version = PREFIX .. string.format("%.2f", Gladdy.version_num) .. "-" .. Gladdy.version_releaseType
