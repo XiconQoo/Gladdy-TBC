@@ -210,15 +210,11 @@ function Classicon:ENEMY_SPOTTED(unit)
 end
 
 function Classicon:UNIT_SPEC(unit, spec)
-    local classIcon = self.frames[unit]
-    if (not Gladdy.db.classIconSpecIcon or not classIcon) then
-        return
-    end
-    classIcon.texture:SetTexture(specIcons[Gladdy.buttons[unit].class][spec])
+    self:ENEMY_SPOTTED(unit)
 end
 
 function Classicon:UNIT_SPEC_PREPARATION(unit, spec)
-    self:UNIT_SPEC(unit, spec)
+    self:ENEMY_SPOTTED(unit)
 end
 
 function Classicon:ResetUnit(unit)

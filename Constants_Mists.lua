@@ -18,6 +18,21 @@ local specSpells = {
     -- spec to class
 }
 
+local classRangeSpells = {
+    ["MAGE"] = { spellID = 118, melee = false, range = false }, -- Polymorph
+    ["PRIEST"] = { spellID = 32379, melee = false, range = false }, -- Shadow Word: Death
+    ["DRUID"] = { spellID = 33786, melee = true, range = false }, -- Cyclone
+    ["SHAMAN"] = { spellID = 57994, melee = true, range = false }, -- Wind Shear
+    ["PALADIN"] = { spellID = 853, melee = true, range = false }, -- Hammer of Justice
+    ["WARLOCK"] = { spellID = 5782, melee = false, range = false }, -- Fear
+    ["WARRIOR"] = { spellID = 100, melee = true, range = false }, -- Charge
+    ["HUNTER"] = { spellID = 1978, melee = true, range = true }, -- Serpent Sting
+    ["ROGUE"] = { spellID = 2094, melee = true, range = false }, -- Blind
+    ["DEATHKNIGHT"] = { spellID = 49576, melee = true, range = false }, -- Death Grip
+    ["MONK"] = { spellID = 115078, melee = true, range = false }, --Paralysis
+}
+Gladdy.classRangeSpells = classRangeSpells
+
 function Gladdy:GetSpecSpells()
     return specSpells
 end
@@ -180,7 +195,7 @@ AddImportantAura(50541, AURA_TYPE_DEBUFF, 40, { 50541 }) -- Clench (Scorpid)
 AddImportantAura(126246, AURA_TYPE_DEBUFF, 40, { 126246 }) -- Lullaby (Crane)
 AddImportantAura(126355, AURA_TYPE_DEBUFF, 40, { 126355 }) -- Paralyzing Quill (Porcupine)
 AddImportantAura(126423, AURA_TYPE_DEBUFF, 40, { 126423 }) -- Petrifying Gaze (Basilisk)
-AddImportantAura(107570, AURA_TYPE_DEBUFF, 40, { 107570, 132169 }) -- Storm Bolt
+AddImportantAura(107570, AURA_TYPE_DEBUFF, 40, { 107570, 132169, 145585 }) -- Storm Bolt
 AddImportantAura(113953, AURA_TYPE_DEBUFF, 40, { 113953 }) -- Paralysis (Paralytic Poison)
 AddImportantAura(118271, AURA_TYPE_DEBUFF, 40, { 118271 }) -- Combustion stun
 AddImportantAura(122242, AURA_TYPE_DEBUFF, 40, { 122242, 126451 }) -- Clash
@@ -298,6 +313,10 @@ AddImportantAura(114051, AURA_TYPE_BUFF, 15, { 114051 }) -- Ascendance (Enhancem
 AddImportantAura(20707, AURA_TYPE_BUFF, 20, { 20707 }) -- Soulstone
 AddImportantAura(89751, AURA_TYPE_BUFF, 15, { 89751, 115831 }) -- Felstorm
 AddImportantAura(110913, AURA_TYPE_BUFF, 20, { 110913 }) -- Dark Bargain
+AddImportantAura(113860, AURA_TYPE_BUFF, 20, { 113860 }) -- Dark Soul: Misery
+AddImportantAura(113861, AURA_TYPE_BUFF, 20, { 113861 }) -- Dark Soul: Knowledge
+AddImportantAura(113858, AURA_TYPE_BUFF, 20, { 113858 }) -- Dark Soul: Instability
+AddImportantAura(108359, AURA_TYPE_BUFF, 20, { 108359 }) -- Dark Regeneration
 AddImportantAura(108416, AURA_TYPE_BUFF, 20, { 108416 }) -- Sacrificial Pact
 AddImportantAura(111397, AURA_TYPE_BUFF, 20, { 111397 }) -- Blood Horror
 AddImportantAura(114206, AURA_TYPE_BUFF, 15, { 114206 }) -- Skull Banner
@@ -435,479 +454,14 @@ AddInterrupt(24259, 6, 15)  -- Spell Lock
 AddInterrupt(62347, 2, 15)  -- Nether Shock (pet)
 AddInterrupt(50318, 4, 15)  -- Serenity Dust (pet)
 AddInterrupt(147362, 3, 15) -- Counter Shot (Hunter)
+AddInterrupt(113288, 4, 15) -- Solar Beam
+AddInterrupt(32747, 3, 15) -- Interrupt Deadly Throw
 
 function Gladdy:GetInterrupts()
     return interrupts
 end
 
 local cooldownList = {
-    -- Death Knight
-    ["DEATHKNIGHT"] = {
-        [46584] = 120, -- Raise Dead
-        [47528] = 15, -- Mind Freeze
-        [47476] = 60, -- Strangulate
-        [43265] = 30, -- Death and Decay
-        [48792] = 180, -- Icebound Fortitude
-        [57330] = 20, -- Horn of Winter
-        [48707] = 45, -- Anti-Magic Shell
-        [61999] = 600, -- Raise Ally
-        [47568] = 300, -- Empower Rune Weapon
-        [42650] = 600, -- Army of the Dead
-        [77575] = 60, -- Outbreak
-        [77606] = 60, -- Dark Simulacrum
-        [123693] = 25, -- Plague Leech
-        [115989] = 90, -- Unholy Blight
-        [51052] = 120, -- Anti-Magic Zone
-        [49039] = 120, -- Lichborne
-        [108194] = 30, -- Asphyxiate
-        [96268] = 30, -- Death's Advance
-        [48743] = 120, -- Death Pact
-        [108201] = 120, -- Desecrated Ground
-        [108199] = 60, -- Gorefiend's Grasp
-        [108200] = 60, -- Remorseless Winter
-        [49576] = 25, -- Death Grip
-        [55233] = { cd = 60, spec = L["Blood"], }, -- Vampiric Blood
-        [49222] = { cd = 60, spec = L["Blood"], }, -- Bone Shield
-        [49028] = { cd = 90, spec = L["Blood"], }, -- Dancing Rune Weapon
-        [48982] = { cd = 30, spec = L["Blood"], }, -- Rune Tap
-        [114866] = { cd = 6, spec = L["Blood"], }, -- Soul Reaper
-        [51271] = { cd = 60, spec = L["Frost"], }, -- Pillar of Frost
-        [49016] = { cd = 180, spec = L["Unholy"], }, -- Unholy Frenzy
-        [49206] = { cd = 180, spec = L["Unholy"], }, -- Summon Gargoyle
-        [47481] = { cd = 60, spec = L["Unholy"], }, -- Gnaw
-        [47484] = { cd = 45, spec = L["Unholy"], }, -- Huddle
-        [47482] = { cd = 30, spec = L["Unholy"], }, -- Leap
-        [91797] = { cd = 60, spec = L["Unholy"], }, -- Monstrous Blow
-    },
-
-    -- Druid
-    ["DRUID"] = {
-        [22812] = 60, -- Barkskin
-        [1850] = 180, -- Dash
-        [29166] = 180, -- Innervate
-        [106922] = 180, -- Might of Ursoc
-        [16689] = 60, -- Nature's Grasp
-        [77761] = 120, -- Stampeding Roar
-        [740] = 480, -- Tranquility
-        [102351] = 30, -- Cenarion Ward
-        [99] = 30, -- Disorienting Roar
-        [102280] = 30, -- Displacer Beast
-        [102401] = 15, -- Wild Charge
-        [106731] = 180, -- Incarnation
-        [106737] = 20, -- Force of Nature
-        [108288] = 360, -- Heart of the Wild
-        [102359] = 30, -- Mass Entanglement
-        [5211] = 50, -- Mighty Bash
-        [132158] = 60, -- Nature's Swiftness
-        [124974] = 90, -- Nature's Vigil
-        [108238] = 120, -- Renewal
-        [132469] = 30, -- Typhoon
-        [102793] = 60, -- Ursol's Vortex
-        [112071] = { cd = 180, spec = L["Balance"], }, -- Celestial Alignment
-        [61336] = { cd = 180, spec = L["Feral"], }, -- Survival Instincts
-        [61336] = { cd = 180, spec = L["Guardian"], }, -- Survival Instincts
-        [2782] = { cd = 8, spec = L["Balance"], }, -- Remove Corruption
-        [2782] = { cd = 8, spec = L["Feral"], }, -- Remove Corruption
-        [2782] = { cd = 8, spec = L["Guardian"], }, -- Remove Corruption
-        [62606] = { cd = 9, spec = L["Guardian"] }, -- Savage Defense
-        [48505] = { cd = 90, spec = L["Balance"], }, -- Starfall
-        [78675] = { cd = 60, spec = L["Balance"], }, -- Solar Beam
-        [88751] = { cd = 10, spec = L["Balance"], }, -- Wild Mushroom: Detonate
-        [5217] = { cd = 30, spec = L["Feral"], }, -- Tiger's Fury
-        [102795] = { cd = 60, spec = L["Guardian"], }, -- Bear Hug
-        [5229] = { cd = 60, spec = L["Guardian"], }, -- Enrage
-        [102342] = { cd = 30, spec = L["Restoration"], }, -- Ironbark
-        [88423] = { cd = 8, spec = L["Restoration"], }, -- Nature's Cure
-        [18562] = { cd = 13, spec = L["Restoration"], }, -- Swiftmend
-        [48438] = { cd = 8, spec = L["Restoration"], }, -- Wild Growth
-        [106951] = { cd = 180, spec = L["Feral"], }, -- Berserk
-        [106951] = { cd = 180, spec = L["Guardian"], }, -- Berserk
-        [93985] = { cd = 15, spec = L["Feral"], -- Skull Bash
-                    --resetCD = {
-                    --    [5229] = true, -- Enrage (4-set PvP: resets on successful interrupt)
-                    --},
-        },
-        [93985] = { cd = 15, spec = L["Guardian"], -- Skull Bash
-                    --resetCD = {
-                    --    [5229] = true, -- Enrage (4-set PvP: resets on successful interrupt)
-                    --},
-        },
-    },
-
-    -- Hunter
-    ["HUNTER"] = {
-        [5116] = 5, -- Concussive Shot
-        [781] = 20, -- Disengage
-        [19503] = 30, -- Scatter Shot
-        [1499] = { cd = 30, [L["Survival"]] = 24, -- Freezing Trap
-                   sharedCD = {
-                       [13809] = true, -- Ice Trap
-                       [60192] = true, -- Freezing Trap (Trap Launcher)
-                   },
-        },
-        [13813] = { cd = 30, [L["Survival"]] = 24, }, -- Explosive Trap
-        [13809] = { cd = 30, [L["Survival"]] = 24, -- Ice Trap
-                    sharedCD = {
-                        [1499] = true, -- Freezing Trap
-                        [60192] = true, -- Freezing Trap (Trap Launcher)
-                    },
-        },
-        [34600] = { cd = 30, [L["Survival"]] = 24, }, -- Snake Trap
-        [53351] = 10, -- Kill Shot
-        [1543] = 20, -- Flare
-        [3045] = { cd = 180, [L["Marksmanship"]] = 180, }, -- Rapid Fire
-        [53271] = 45, -- Master's Call
-        [19263] = { cd = 180 }, -- Deterrence
-        [51753] = 60, -- Camouflage
-        [121818] = 300, -- Stampede
-        [109248] = 45, -- Binding Shot
-        [19386] = 45, -- Wyvern Sting
-        [109304] = 120, -- Exhilaration
-        [120679] = 30, -- Dire Beast
-        [82726] = 30, -- Fervor
-        [131894] = 120, -- A Murder of Crows
-        [130392] = 20, -- Blink Strike
-        [120697] = 90, -- Lynx Rush
-        [120360] = 30, -- Barrage
-        [117050] = 15, -- Glaive Toss
-        [109259] = 45, -- Powershot
-        [19577] = 60, -- Intimidation
-        [34026] = { cd = 6, spec = L["Beast Mastery"], }, -- Kill Command
-        [19574] = { cd = 60, spec = L["Beast Mastery"], }, -- Bestial Wrath
-        [53209] = { cd = 9, spec = L["Marksmanship"], }, -- Chimera Shot
-        [34490] = { cd = 24, spec = L["Marksmanship"], }, -- Silencing Shot
-        [147362] = { cd = 24, spec = L["Beast Mastery"], }, -- Counter Shot
-        [53301] = { cd = 6, spec = L["Survival"], }, -- Explosive Shot
-        [1742] = 45, -- Cower
-        [53401] = 90, -- Rabid
-        [55709] = 480, -- Heart of the Phoenix
-        [61684] = 32, -- Dash
-        [53478] = 360, -- Last Stand
-        [61685] = 25, -- Charge
-        [63900] = 10, -- Thunderstomp
-        [53480] = 60, -- Roar of Sacrifice
-        [53490] = 180, -- Bullheaded
-        [50245] = 40, -- Pin
-        [50285] = 25, -- Dust Cloud
-        [50541] = 60, -- Clench
-        [126423] = 120, -- Petrifying Gaze
-        [137798] = 30, -- Reflective Armor Plating
-        [24844] = 30, -- Lightning Breath
-        [26064] = 60, -- Shell Shield
-        [34889] = 30, -- Fire Breath
-        [35346] = 15, -- Time Warp
-        [4167] = 40, -- Web
-        [50433] = 10, -- Ankle Crack
-        [50479] = 40, -- Nether Shock
-        [50519] = 120, -- Sonic Blast
-        [90327] = 40, -- Lock Jaw
-        [90339] = 60, -- Harden Carapace
-        [126402] = 10, -- Trample
-        [26090] = 30, -- Pummel
-        [50318] = 60, -- Serenity Dust
-        [56626] = 90, -- Sting
-        [90337] = 120, -- Bad Manner
-        [126355] = 120, -- Paralyzing Quill
-        [54706] = 40, -- Venom Web Spray
-        [91644] = 60, -- Snatch
-        [126393] = 600, -- Eternal Guardian
-        [54644] = 10, -- Frost Breath
-        [93433] = 14, -- Burrow Attack
-        [90314] = 10, -- Tailspin
-        [90355] = 360, -- Ancient Hysteria
-        [58604] = 8, -- Lava Breath
-        [96201] = 90, -- Web Wrap
-        [126246] = 120, -- Lullaby
-        [50274] = 8, -- Spore Cloud
-        [93434] = 90, -- Horn Toss
-        [90361] = 30, -- Spirit Mend
-    },
-
-    -- Mage
-    ["MAGE"] = {
-        [108978] = 90, -- Alter Time
-        [1953] = 15, -- Blink
-        [120] = 10, -- Cone of Cold
-        [2139] = 24, -- Counterspell
-        [44572] = 30, -- Deep Freeze
-        [12051] = 120, -- Evocation
-        [2136] = 8, -- Fire Blast
-        [2120] = 12, -- Flamestrike
-        [122] = 25, -- Frost Nova
-        [45438] = 300, -- Ice Block
-        [66] = 300, -- Invisibility
-        [55342] = 180, -- Mirror Image
-        [475] = 8, -- Remove Curse
-        [80353] = 300, -- Time Warp
-        [108843] = 25, -- Blazing Speed
-        [86949] = 120, -- Cauterize
-        [11958] = { cd = 180, spec = L["Frost"], -- Cold Snap
-                    resetCD = {
-                        [45438] = true, -- Ice Block
-                        [44572] = true, -- Deep Freeze
-                        [12472] = true, -- Icy Veins
-                        [31687] = true, -- Summon Water Elemental
-                        [120] = true, -- Cone of Cold
-                        [122] = true, -- Frost Nova
-                        [11426] = true, -- Ice Barrier
-                    },
-        },
-        [112948] = 10, -- Frost Bomb
-        [102051] = 20, -- Frostjaw
-        [110959] = 90, -- Greater Invisibility
-        [11426] = 25, -- Ice Barrier
-        [108839] = 20, -- Ice Floes
-        [111264] = 20, -- Ice Ward
-        [1463] = 25, -- Incanter's Ward
-        [114003] = 10, -- Invocation
-        [12043] = { cd = 90, spec = L["Arcane"], }, -- Presence of Mind
-        [113724] = 45, -- Ring of Frost
-        [115610] = 25, -- Temporal Shield
-        [12042] = { cd = 90, spec = L["Arcane"], }, -- Arcane Power
-        [11129] = { cd = 45, spec = L["Fire"], }, -- Combustion
-        [31661] = { cd = 20, spec = L["Fire"], }, -- Dragon's Breath
-        [84714] = { cd = 60, spec = L["Frost"], }, -- Frozen Orb
-        [12472] = { cd = 180, spec = L["Frost"], }, -- Icy Veins
-        [31687] = { cd = 60, spec = L["Frost"], }, -- Summon Water Elemental
-    },
-
-    -- Monk
-    ["MONK"] = {
-        [109132] = { cd = 20, charges = 2 }, -- Roll
-        [115450] = 8, -- Detox
-        [115072] = 15, -- Expel Harm
-        [115203] = 180, -- Fortifying Brew
-        [117368] = 60, -- Grapple Weapon
-        [115078] = 15, -- Paralysis
-        [116705] = 15, -- Spear Hand Strike
-        [101643] = 45, -- Transcendence
-        [119996] = 25, -- Transcendence: Transfer
-        [115176] = 180, -- Zen Meditation
-        [137562] = 120, -- Nimble Brew
-        [119392] = 30, -- Charging Ox Wave
-        [122278] = 90, -- Dampen Harm
-        [122783] = 90, -- Diffuse Magic
-        [123904] = 180, -- Invoke Xuen, the White
-        [119381] = 45, -- Leg Sweep
-        [116844] = 45, -- Ring of Peace
-        [116841] = 30, -- Tiger's Lust
-        [115213] = { cd = 180, spec = L["Brewmaster"], }, -- Avert Harm
-        [122057] = { cd = 35, spec = L["Brewmaster"], }, -- Clash
-        [115308] = { cd = 6, spec = L["Brewmaster"], }, -- Elusive Brew
-        [115295] = { cd = 30, spec = L["Brewmaster"], }, -- Guard
-        [121253] = { cd = 8, spec = L["Brewmaster"], }, -- Keg Smash
-        [115315] = { cd = 30, spec = L["Brewmaster"], }, -- Summon Black Ox
-        [115288] = { cd = 60, spec = L["Windwalker"], }, -- Energizing Brew
-        [113656] = { cd = 25, spec = L["Windwalker"], }, -- Fists of Fury
-        [101545] = { cd = 25, spec = L["Windwalker"], }, -- Flying Serpent Kick
-        [107428] = { cd = 8, spec = L["Windwalker"], }, -- Rising Sun Kick
-        [122470] = { cd = 90, spec = L["Windwalker"], }, -- Touch of Karma
-        [116849] = { cd = 120, spec = L["Mistweaver"], }, -- Life Cocoon
-        [115151] = { cd = 8, spec = L["Mistweaver"], }, -- Renewing Mist
-        [115310] = { cd = 180, spec = L["Mistweaver"], }, -- Revival
-        [115313] = { cd = 30, spec = L["Mistweaver"], }, -- Summon Jade Serpent
-        [116680] = { cd = 45, spec = L["Mistweaver"], }, -- Thunder Focus Tea
-    },
-
-    -- Paladin
-    ["PALADIN"] = {
-        [31884] = 120, -- Avenging Wrath
-        [115750] = 120, -- Blinding Light
-        [4987] = 8, -- Cleanse
-        [31821] = 180, -- Devotion Aura
-        [498] = { cd = 60, -- Divine Protection
-                  --resetCD = {
-                  --    [633] = true, -- Lay on Hands
-                  --    [642] = true, -- Divine Shield
-                  --},
-        },
-        [642] = { cd = 300, -- Divine Shield
-                  --resetCD = {
-                  --    [498] = true, -- Divine Protection
-                  --    [633] = true, -- Lay on Hands
-                  --},
-        },
-        [853] = 60, -- Hammer of Justice
-        [24275] = 6, -- Hammer of Wrath
-        [1044] = { cd = 25, -- Hand of Freedom
-                   --resetCD = {
-                   --    [1022] = true, -- Hand of Protection
-                   --},
-        },
-        [1022] = { cd = 300, -- Hand of Protection
-                   --resetCD = {
-                   --    [1044] = true, -- Hand of Freedom
-                   --},
-        },
-        [6940] = 120, -- Hand of Sacrifice
-        [20271] = 6, -- Judgement
-        [633] = { cd = 600, -- Lay on Hands
-                  --resetCD = {
-                  --    [498] = true, -- Divine Protection
-                  --    [642] = true, -- Divine Shield
-                  --},
-        },
-        [96231] = 15, -- Rebuke
-        [10326] = 15, -- Turn Evil
-        [114157] = 60, -- Execution Sentence
-        [105593] = 30, -- Fist of Justice
-        [114039] = 30, -- Hand of Purity
-        [105809] = 120, -- Holy Avenger
-        [114165] = 20, -- Holy Prism
-        [114158] = 60, -- Light's Hammer
-        [20066] = 15, -- Repentance
-        [20925] = 30, -- Sacred Shield
-        [85499] = 45, -- Speed of Light
-        [31842] = { cd = 180, spec = L["Holy"], }, -- Divine Favor
-        [54428] = { cd = 120, spec = L["Holy"], }, -- Divine Plea
-        [86669] = { cd = 180, spec = L["Holy"], }, -- Guardian of Ancient Kings (Holy)
-        [20473] = { cd = 6, spec = L["Holy"], }, -- Holy Shock
-        [31850] = { cd = 180, spec = L["Protection"], }, -- Ardent Defender
-        [31935] = { cd = 15, spec = L["Protection"], }, -- Avenger's Shield
-        [26573] = { cd = 9, spec = L["Protection"], }, -- Consecration
-        [86659] = { cd = 180, spec = L["Protection"], }, -- Guardian of Ancient Kings (Protection)
-        [53595] = { cd = 6, spec = L["Protection"], }, -- Hammer of the Righteous
-        [53600] = { cd = 6, spec = L["Protection"], }, -- Shield of the Righteous
-        --[85696] = { cd = 60, spec = L["Retribution"], }, -- Zealotry
-        [53385] = { cd = 6, spec = L["Retribution"], }, -- Divine Storm
-        [35395] = { cd = 6, spec = L["Retribution"], }, -- Crusader Strike
-        [85256] = { cd = 6, spec = L["Retribution"], }, -- Templar's Verdict
-        [86525] = { cd = 180, spec = L["Retribution"], }, -- Guardian of Ancient Kings (Retribution)
-    },
-
-    -- Priest
-    ["PRIEST"] = {
-        [8122] = { cd = 27, [L["Shadow"]] = 26, }, -- Psychic Scream
-        [34433] = { cd = 300, [L["Shadow"]] = 240, }, -- Shadowfiend
-        [15487] = { cd = 45, spec = L["Shadow"], }, -- Silence
-        [15473] = { cd = 1.5, spec = L["Shadow"], }, -- Shadowform
-        [64044] = { cd = 90, spec = L["Shadow"], }, -- Psychic Horror (+ Glyph) else 120
-        [586] = { cd = 30, [L["Shadow"]] = 15, }, -- Fade (+ Glyph) else 24
-        [33076] = 10, -- Prayer of Mending
-        [73325] = 90, -- Leap of Faith
-        [64843] = { cd = 640, [L["Holy"]] = 180, },  -- Divine Hymn
-        [64901] = 360, -- Hymn of Hope
-        [32379] = 10, -- Shadow Word: Death
-        [6346] = 180, -- Fear Ward
-        [81700] = 30, -- Archangel
-        [87153] = 90, -- Dark Archangel
-        [47585] = { cd = 75, spec = L["Shadow"], }, -- Dispersion (+ Glyph)
-        [10060] = { cd = 120, spec = L["Discipline"], }, -- Power Infusion
-        [33206] = { cd = 180, spec = L["Discipline"], }, -- Pain Suppression
-        [62618] = { cd = 180, spec = L["Discipline"], }, -- Power Word: Barrier
-        [47788] = { cd = 150, spec = L["Holy"], }, -- Guardian spirit (+ Glyph)
-        --[14751] = { cd = 30, spec = L["Holy"], }, -- Chakra
-        [724] = { cd = 180, spec = L["Holy"], }, -- Lightwell
-        [19236] = { cd = 120, spec = L["Holy"], }, -- Desperate Prayer
-    },
-
-    -- Shaman
-    ["SHAMAN"] = {
-        [57994] = 15, -- Wind Shear
-        [51514] = 45, -- Hex
-        [8143] = 60, -- Tremor Totem
-        [8177] = 25, -- Grounding Totem
-        [79206] = 120, -- Spiritwalker's Grace
-        [1535] = 4, -- Fire nova
-        [30823] = { cd = 60, spec = L["Enhancement"], }, -- Shamanistic Rage
-        [61882] = { cd = 10, spec = L["Elemental"], }, -- Earthquake
-        [16166] = { cd = 180, spec = L["Elemental"], }, -- Elemental Mastery
-        [51490] = { cd = 45, spec = L["Elemental"], }, -- Thunderstorm
-        [16188] = { cd = 120, spec = L["Restoration"], }, -- Natures Swiftness
-        [51533] = { cd = 120, spec = L["Enhancement"], }, -- Feral Spirit
-        [16190] = { cd = 180, spec = L["Restoration"], }, -- Mana Tide Totem
-        [98008] = { cd = 180, spec = L["Restoration"], }, -- Spirit Link Totem
-    },
-
-    -- Warlock
-    ["WARLOCK"] = {
-        [5484] = 32, -- Howl of Terror (-8 if you use Glyph, so 32?)
-        [6789] = 120, -- Death Coil
-        --[18708] = 180, -- Feldom
-        [48020] = 30, -- Demonic Circle: Port
-        [18540] = 600, -- Summon Doomguard
-        [74434] = 45, -- Soulburn
-        [19647] = { cd = 24, pet = true, }, -- Spell Lock
-        [19505] = { cd = 15, pet = true, },  -- Devour Magic
-        [47897] = 12,  -- Shadowflame (Shadow)
-        [30283] = { cd = 20, spec = L["Destruction"], }, -- Shadowfury
-        [17877] = { cd = 15, spec = L["Destruction"], }, -- Shadowburn
-        [17962] = { cd = 10, spec = L["Destruction"], }, -- Conflagrate
-        --[50796] = { cd = 12, spec = L["Destruction"], }, -- Chaos Bolt (with glyph 10s)
-        [91711] = { cd = 30, spec = L["Destruction"], }, -- Nether Ward
-        --[47241] = { cd = 180, spec = L["Demonology"], }, -- Metamorphosis
-        [30151] = { cd = 15, spec = L["Demonology"], pet = true }, -- Pursuit
-        [30213] = { cd = 6, spec = L["Demonology"], pet = true }, -- Legion Strike
-        [89751] = { cd = 45, spec = L["Demonology"], pet = true }, -- Felstorm
-        [89766] = { cd = 30, spec = L["Demonology"], pet = true }, -- Axe Toss
-        [1122] = { cd = 600, spec = L["Demonology"], }, -- Inferno
-        --[71521] = { cd = 12, spec = L["Demonology"], }, -- Hand of Guldan
-        --[47193] = { cd = 60, spec = L["Demonology"], }, -- Demonic Empowerment
-    },
-
-    -- Warrior
-    ["WARRIOR"] = {
-        [6552] = { cd = 10 }, -- Pummel
-        [100] = { cd = 20 }, -- Charge
-        [18499] = 30, -- Berserker Rage
-        [23920] = 10, -- Spell Reflection
-        [3411] = 30, -- Intervene
-        --[27826] = { cd = 30, [L["Arms"]] = 20, }, -- Intercept
-        [6544] = { cd = 45, [L["Arms"]] = 30, }, -- Heroic Leap
-        [676] = 60, -- Disarm
-        [5246] = 120, -- Intimidating Shout
-        [2565] = 60, -- Shield Block
-        [55694] = 180, -- Enraged Regeneration
-        --[20230] = 300, -- Retaliation
-        [1719] = 300, -- Recklessness
-        [871] = 300, -- Shield Wall
-        [64382] = 300, -- Shattering Throw
-        [86346] = 20, -- Colossus Smash
-        --[1134] = 30, -- Inner Rage
-        [97462] = 180, -- Rallying Cry
-        [12292] = { cd = 180, spec = L["Fury"], }, -- Death Wish
-        [46924] = { cd = 90, spec = L["Arms"], }, -- Bladestorm
-        --[85388] = { cd = 45, spec = L["Arms"], }, -- Throwdown
-        --[85730] = { cd = 120, spec = L["Arms"], }, -- Deadly Calm
-        [12328] = { cd = 60, spec = L["Arms"], }, -- Sweeping strikes
-        [46968] = { cd = 20, spec = L["Protection"], }, -- Shockwave
-        [12975] = { cd = 180, spec = L["Protection"], }, -- Last Stand
-        --[12809] = { cd = 30, spec = L["Protection"], }, -- Concussion Blow
-
-    },
-
-    -- Rogue
-    ["ROGUE"] = {
-        [1766] = 10, -- Kick
-        [408] = 20, -- Kidney Shot
-        [5277] = 180, -- Evasion
-        [31224] = 60, -- Cloak of Shadow
-        [1856] = 180, -- Vanish
-        [2094] = 180, -- Blind
-        [51722] = 60, -- Dismantle
-        [2983] = 60, -- Sprint
-        [76577] = 180, -- Smoke Bomb
-        [73981] = 60, -- Redirect
-        [74001] = 90, -- Combat Readiness
-        --[14177] = { cd = 120, spec = L["Assassination"], }, -- Cold Blood
-        [79140] = { cd = 120, spec = L["Assassination"], }, -- Vendetta
-        [51713] = { cd = 60, spec = L["Subtlety"], }, -- Shadow Dance
-        [13750] = { cd = 180, spec = L["Combat"], }, -- Adrenaline Rush
-        [13877] = { cd = 10, spec = L["Combat"], }, -- Blade Flurry
-        [51690] = { cd = 120, spec = L["Combat"], }, -- Killing Spree
-        [36554] = { cd = 24, spec = L["Subtlety"], }, -- Shadowstep
-        [14185] = { cd = 300, spec = L["Subtlety"], -- Preparation
-                    resetCD = {
-                        [2983] = true,
-                        [1856] = true,
-                        [1766] = true,
-                        [51722] = true,
-                        [36554] = true,
-                        [76577] = true,
-                    },
-        },
-    },
-
     ["Scourge"] = {
     },
     ["BloodElf"] = {
@@ -935,6 +489,398 @@ local cooldownList = {
     ["Pandaren"] = {
     },
 }
+local function AddCooldownEntry(class, spellId, cooldownInfo)
+    if not cooldownList[class] then
+        cooldownList[class] = {}
+    end
+    cooldownList[class][spellId] = cooldownInfo
+end
+
+-- Death Knight
+AddCooldownEntry("DEATHKNIGHT", 46584, 120) -- Raise Dead
+AddCooldownEntry("DEATHKNIGHT", 47528, 15) -- Mind Freeze
+AddCooldownEntry("DEATHKNIGHT", 47476, 60) -- Strangulate
+AddCooldownEntry("DEATHKNIGHT", 48792, 180) -- Icebound Fortitude
+AddCooldownEntry("DEATHKNIGHT", 48707, 45) -- Anti-Magic Shell
+AddCooldownEntry("DEATHKNIGHT", 61999, 600) -- Raise Ally
+AddCooldownEntry("DEATHKNIGHT", 47568, 300) -- Empower Rune Weapon
+AddCooldownEntry("DEATHKNIGHT", 42650, 600) -- Army of the Dead
+AddCooldownEntry("DEATHKNIGHT", 77575, 60) -- Outbreak
+AddCooldownEntry("DEATHKNIGHT", 77606, 60) -- Dark Simulacrum
+AddCooldownEntry("DEATHKNIGHT", 123693, 25) -- Plague Leech
+AddCooldownEntry("DEATHKNIGHT", 115989, 90) -- Unholy Blight
+AddCooldownEntry("DEATHKNIGHT", 51052, 120) -- Anti-Magic Zone
+AddCooldownEntry("DEATHKNIGHT", 49039, 120) -- Lichborne
+AddCooldownEntry("DEATHKNIGHT", 108194, 30) -- Asphyxiate
+AddCooldownEntry("DEATHKNIGHT", 96268, 30) -- Death's Advance
+AddCooldownEntry("DEATHKNIGHT", 48743, 120) -- Death Pact
+AddCooldownEntry("DEATHKNIGHT", 108201, 120) -- Desecrated Ground
+AddCooldownEntry("DEATHKNIGHT", 108199, 60) -- Gorefiend's Grasp
+AddCooldownEntry("DEATHKNIGHT", 108200, 60) -- Remorseless Winter
+AddCooldownEntry("DEATHKNIGHT", 49576, 25) -- Death Grip
+AddCooldownEntry("DEATHKNIGHT", 55233, { cd = 60, spec = L["Blood"] }) -- Vampiric Blood
+AddCooldownEntry("DEATHKNIGHT", 49222, { cd = 60, spec = L["Blood"] }) -- Bone Shield
+AddCooldownEntry("DEATHKNIGHT", 49028, { cd = 90, spec = L["Blood"] }) -- Dancing Rune Weapon
+AddCooldownEntry("DEATHKNIGHT", 48982, { cd = 30, spec = L["Blood"] }) -- Rune Tap
+AddCooldownEntry("DEATHKNIGHT", 114866, { cd = 6, spec = L["Blood"] }) -- Soul Reaper
+AddCooldownEntry("DEATHKNIGHT", 51271, { cd = 60, spec = L["Frost"] }) -- Pillar of Frost
+AddCooldownEntry("DEATHKNIGHT", 49016, { cd = 180, spec = L["Unholy"] }) -- Unholy Frenzy
+AddCooldownEntry("DEATHKNIGHT", 49206, { cd = 180, spec = L["Unholy"] }) -- Summon Gargoyle
+AddCooldownEntry("DEATHKNIGHT", 47481, { cd = 60, spec = L["Unholy"] }) -- Gnaw
+AddCooldownEntry("DEATHKNIGHT", 47484, { cd = 45, spec = L["Unholy"] }) -- Huddle
+AddCooldownEntry("DEATHKNIGHT", 47482, { cd = 30, spec = L["Unholy"] }) -- Leap
+AddCooldownEntry("DEATHKNIGHT", 91797, { cd = 60, spec = L["Unholy"] }) -- Monstrous Blow
+
+-- Druid
+AddCooldownEntry("DRUID", 22812, 60) -- Barkskin
+AddCooldownEntry("DRUID", 1850, 180) -- Dash
+AddCooldownEntry("DRUID", 29166, 180) -- Innervate
+AddCooldownEntry("DRUID", 106922, 180) -- Might of Ursoc
+AddCooldownEntry("DRUID", 16689, 60) -- Nature's Grasp
+AddCooldownEntry("DRUID", 77761, 120) -- Stampeding Roar
+AddCooldownEntry("DRUID", 740, 480) -- Tranquility
+AddCooldownEntry("DRUID", 102351, 30) -- Cenarion Ward
+AddCooldownEntry("DRUID", 99, 30) -- Disorienting Roar
+AddCooldownEntry("DRUID", 102280, 30) -- Displacer Beast
+AddCooldownEntry("DRUID", 102401, 15) -- Wild Charge
+AddCooldownEntry("DRUID", 106731, 180) -- Incarnation
+AddCooldownEntry("DRUID", 106737, 20) -- Force of Nature
+AddCooldownEntry("DRUID", 108288, 360) -- Heart of the Wild
+AddCooldownEntry("DRUID", 102359, 30) -- Mass Entanglement
+AddCooldownEntry("DRUID", 5211, 50) -- Mighty Bash
+AddCooldownEntry("DRUID", 132158, 60) -- Nature's Swiftness
+AddCooldownEntry("DRUID", 124974, 90) -- Nature's Vigil
+AddCooldownEntry("DRUID", 108238, 120) -- Renewal
+AddCooldownEntry("DRUID", 132469, 30) -- Typhoon
+AddCooldownEntry("DRUID", 102793, 60) -- Ursol's Vortex
+AddCooldownEntry("DRUID", 112071, { cd = 180, spec = L["Balance"] }) -- Celestial Alignment
+AddCooldownEntry("DRUID", 61336, { cd = 180, spec = L["Feral"] }) -- Survival Instincts
+AddCooldownEntry("DRUID", 61336, { cd = 180, spec = L["Guardian"] }) -- Survival Instincts
+AddCooldownEntry("DRUID", 2782, { cd = 8, spec = L["Balance"] }) -- Remove Corruption
+AddCooldownEntry("DRUID", 2782, { cd = 8, spec = L["Feral"] }) -- Remove Corruption
+AddCooldownEntry("DRUID", 2782, { cd = 8, spec = L["Guardian"] }) -- Remove Corruption
+AddCooldownEntry("DRUID", 62606, { cd = 9, spec = L["Guardian"] }) -- Savage Defense
+AddCooldownEntry("DRUID", 48505, { cd = 90, spec = L["Balance"] }) -- Starfall
+AddCooldownEntry("DRUID", 78675, { cd = 60, spec = L["Balance"] }) -- Solar Beam
+AddCooldownEntry("DRUID", 5217, { cd = 30, spec = L["Feral"] }) -- Tiger's Fury
+AddCooldownEntry("DRUID", 102795, { cd = 60, spec = L["Guardian"] }) -- Bear Hug
+AddCooldownEntry("DRUID", 5229, { cd = 60, spec = L["Guardian"] }) -- Enrage
+AddCooldownEntry("DRUID", 102342, { cd = 30, spec = L["Restoration"] }) -- Ironbark
+AddCooldownEntry("DRUID", 88423, { cd = 8, spec = L["Restoration"] }) -- Nature's Cure
+AddCooldownEntry("DRUID", 18562, { cd = 13, spec = L["Restoration"] }) -- Swiftmend
+AddCooldownEntry("DRUID", 106951, { cd = 180, spec = L["Feral"] }) -- Berserk
+AddCooldownEntry("DRUID", 106951, { cd = 180, spec = L["Guardian"] }) -- Berserk
+AddCooldownEntry("DRUID", 93985, { cd = 15, spec = L["Feral"] }) -- Skull Bash
+AddCooldownEntry("DRUID", 93985, { cd = 15, spec = L["Guardian"] }) -- Skull Bash
+
+-- Hunter
+AddCooldownEntry("HUNTER", 5116, 5) -- Concussive Shot
+AddCooldownEntry("HUNTER", 781, 20) -- Disengage
+AddCooldownEntry("HUNTER", 19503, 30) -- Scatter Shot
+AddCooldownEntry("HUNTER", 1499, {  -- Freezing Trap
+    cd = 30,
+    [L["Survival"]] = 24,
+    sharedCD = {
+        [13809] = true, -- Ice Trap
+        [60192] = true, -- Freezing Trap (Trap Launcher)
+    },
+})
+AddCooldownEntry("HUNTER", 13813, { cd = 30, [L["Survival"]] = 24 })
+AddCooldownEntry("HUNTER", 13809, { -- Ice Trap
+    cd = 30,
+    [L["Survival"]] = 24,
+    sharedCD = {
+        [1499] = true, -- Freezing Trap
+        [60192] = true, -- Freezing Trap (Trap Launcher)
+    },
+})
+AddCooldownEntry("HUNTER", 34600, { cd = 30, [L["Survival"]] = 24 }) -- Snake Trap
+AddCooldownEntry("HUNTER", 53351, 10) -- Kill Shot
+AddCooldownEntry("HUNTER", 1543, 20) -- Flare
+AddCooldownEntry("HUNTER", 3045, { cd = 180, [L["Marksmanship"]] = 180 }) -- Rapid Fire
+AddCooldownEntry("HUNTER", 53271, 45) -- Master's Call
+AddCooldownEntry("HUNTER", 19263, { cd = 180 }) -- Deterrence
+AddCooldownEntry("HUNTER", 51753, 60) -- Camouflage
+AddCooldownEntry("HUNTER", 121818, 300) -- Stampede
+AddCooldownEntry("HUNTER", 109248, 45) -- Binding Shot
+AddCooldownEntry("HUNTER", 19386, 45) -- Wyvern Sting
+AddCooldownEntry("HUNTER", 109304, 120) -- Exhilaration
+AddCooldownEntry("HUNTER", 120679, 30) -- Dire Beast
+AddCooldownEntry("HUNTER", 82726, 30) -- Fervor
+AddCooldownEntry("HUNTER", 131894, 120) -- A Murder of Crows
+AddCooldownEntry("HUNTER", 130392, 20) -- Blink Strike
+AddCooldownEntry("HUNTER", 120697, 90) -- Lynx Rush
+AddCooldownEntry("HUNTER", 120360, 30) -- Barrage
+AddCooldownEntry("HUNTER", 117050, 15) -- Glaive Toss
+AddCooldownEntry("HUNTER", 109259, 45) -- Powershot
+AddCooldownEntry("HUNTER", 19577, 60) -- Intimidation
+AddCooldownEntry("HUNTER", 19574, { cd = 60, spec = L["Beast Mastery"] }) -- Bestial Wrath
+AddCooldownEntry("HUNTER", 53209, { cd = 9, spec = L["Marksmanship"] }) -- Chimera Shot
+AddCooldownEntry("HUNTER", 34490, { cd = 24, spec = L["Marksmanship"] }) -- Silencing Shot
+AddCooldownEntry("HUNTER", 147362, { cd = 24, spec = L["Beast Mastery"] }) -- Counter Shot
+AddCooldownEntry("HUNTER", 53301, { cd = 6, spec = L["Survival"] }) -- Explosive Shot
+AddCooldownEntry("HUNTER", 1742, 45) -- Cower
+AddCooldownEntry("HUNTER", 53401, 90) -- Rabid
+AddCooldownEntry("HUNTER", 55709, 480) -- Heart of the Phoenix
+AddCooldownEntry("HUNTER", 61684, 32) -- Dash
+AddCooldownEntry("HUNTER", 53478, 360) -- Last Stand
+AddCooldownEntry("HUNTER", 61685, 25) -- Charge
+AddCooldownEntry("HUNTER", 63900, 10) -- Thunderstomp
+AddCooldownEntry("HUNTER", 53480, 60) -- Roar of Sacrifice
+AddCooldownEntry("HUNTER", 53490, 180) -- Bullheaded
+AddCooldownEntry("HUNTER", 50245, 40) -- Pin
+AddCooldownEntry("HUNTER", 50285, 25) -- Dust Cloud
+AddCooldownEntry("HUNTER", 50541, 60) -- Clench
+AddCooldownEntry("HUNTER", 126423, 120) -- Petrifying Gaze
+AddCooldownEntry("HUNTER", 137798, 30) -- Reflective Armor Plating
+AddCooldownEntry("HUNTER", 24844, 30) -- Lightning Breath
+AddCooldownEntry("HUNTER", 26064, 60) -- Shell Shield
+AddCooldownEntry("HUNTER", 34889, 30) -- Fire Breath
+AddCooldownEntry("HUNTER", 35346, 15) -- Time Warp
+AddCooldownEntry("HUNTER", 4167, 40) -- Web
+AddCooldownEntry("HUNTER", 50433, 10) -- Ankle Crack
+AddCooldownEntry("HUNTER", 50479, 40) -- Nether Shock
+AddCooldownEntry("HUNTER", 50519, 120) -- Sonic Blast
+AddCooldownEntry("HUNTER", 90327, 40) -- Lock Jaw
+AddCooldownEntry("HUNTER", 90339, 60) -- Harden Carapace
+AddCooldownEntry("HUNTER", 126402, 10) -- Trample
+AddCooldownEntry("HUNTER", 26090, 30) -- Pummel
+AddCooldownEntry("HUNTER", 50318, 60) -- Serenity Dust
+AddCooldownEntry("HUNTER", 56626, 90) -- Sting
+AddCooldownEntry("HUNTER", 90337, 120) -- Bad Manner
+AddCooldownEntry("HUNTER", 126355, 120) -- Paralyzing Quill
+AddCooldownEntry("HUNTER", 54706, 40) -- Venom Web Spray
+AddCooldownEntry("HUNTER", 91644, 60) -- Snatch
+AddCooldownEntry("HUNTER", 126393, 600) -- Eternal Guardian
+AddCooldownEntry("HUNTER", 54644, 10) -- Frost Breath
+AddCooldownEntry("HUNTER", 93433, 14) -- Burrow Attack
+AddCooldownEntry("HUNTER", 90314, 10) -- Tailspin
+AddCooldownEntry("HUNTER", 90355, 360) -- Ancient Hysteria
+AddCooldownEntry("HUNTER", 58604, 8) -- Lava Breath
+AddCooldownEntry("HUNTER", 96201, 90) -- Web Wrap
+AddCooldownEntry("HUNTER", 126246, 120) -- Lullaby
+AddCooldownEntry("HUNTER", 50274, 8) -- Spore Cloud
+AddCooldownEntry("HUNTER", 93434, 90) -- Horn Toss
+AddCooldownEntry("HUNTER", 90361, 30) -- Spirit Mend
+
+-- Mage
+AddCooldownEntry("MAGE", 108978, 90) -- Alter Time
+AddCooldownEntry("MAGE", 1953, 15) -- Blink
+AddCooldownEntry("MAGE", 120, 10) -- Cone of Cold
+AddCooldownEntry("MAGE", 2139, 24) -- Counterspell
+AddCooldownEntry("MAGE", 44572, 30) -- Deep Freeze
+AddCooldownEntry("MAGE", 12051, 120) -- Evocation
+AddCooldownEntry("MAGE", 122, 25) -- Frost Nova
+AddCooldownEntry("MAGE", 45438, 300) -- Ice Block
+AddCooldownEntry("MAGE", 66, 300) -- Invisibility
+AddCooldownEntry("MAGE", 55342, 180) -- Mirror Image
+AddCooldownEntry("MAGE", 475, 8) -- Remove Curse
+AddCooldownEntry("MAGE", 80353, 300) -- Time Warp
+AddCooldownEntry("MAGE", 108843, 25) -- Blazing Speed
+AddCooldownEntry("MAGE", 86949, 120) -- Cauterize
+AddCooldownEntry("MAGE", 11958, { -- Cold Snap
+    cd = 180,
+    spec = L["Frost"],
+    resetCD = {
+        [45438] = true, -- Ice Block
+        [44572] = true, -- Deep Freeze
+        [12472] = true, -- Icy Veins
+        [31687] = true, -- Summon Water Elemental
+        [120] = true, -- Cone of Cold
+        [122] = true, -- Frost Nova
+        [11426] = true, -- Ice Barrier
+    },
+})
+AddCooldownEntry("MAGE", 112948, 10) -- Frost Bomb
+AddCooldownEntry("MAGE", 102051, 20) -- Frostjaw
+AddCooldownEntry("MAGE", 110959, 90) -- Greater Invisibility
+AddCooldownEntry("MAGE", 11426, 25) -- Ice Barrier
+AddCooldownEntry("MAGE", 108839, 20) -- Ice Floes
+AddCooldownEntry("MAGE", 111264, 20) -- Ice Ward
+AddCooldownEntry("MAGE", 1463, 25) -- Incanter's Ward
+AddCooldownEntry("MAGE", 114003, 10) -- Invocation
+AddCooldownEntry("MAGE", 12043, 90) -- Presence of Mind
+AddCooldownEntry("MAGE", 113724, 45) -- Ring of Frost
+AddCooldownEntry("MAGE", 115610, 25) -- Temporal Shield
+AddCooldownEntry("MAGE", 12042, { cd = 90, spec = L["Arcane"] }) -- Arcane Power
+AddCooldownEntry("MAGE", 11129, { cd = 45, spec = L["Fire"] }) -- Combustion
+AddCooldownEntry("MAGE", 31661, { cd = 20, spec = L["Fire"] }) -- Dragon's Breath
+AddCooldownEntry("MAGE", 84714, { cd = 60, spec = L["Frost"] }) -- Frozen Orb
+AddCooldownEntry("MAGE", 12472, { cd = 180, spec = L["Frost"] }) -- Icy Veins
+AddCooldownEntry("MAGE", 31687, { cd = 60, spec = L["Frost"] }) -- Summon Water Elemental
+
+-- Monk
+AddCooldownEntry("MONK", 109132, { cd = 20, charges = 2 }) -- Roll
+AddCooldownEntry("MONK", 115450, 8) -- Detox
+AddCooldownEntry("MONK", 115072, 15) -- Expel Harm
+AddCooldownEntry("MONK", 115203, 180) -- Fortifying Brew
+AddCooldownEntry("MONK", 117368, 60) -- Grapple Weapon
+AddCooldownEntry("MONK", 115078, 15) -- Paralysis
+AddCooldownEntry("MONK", 116705, 15) -- Spear Hand Strike
+--AddCooldownEntry("MONK", 101643, 45) -- Transcendence
+AddCooldownEntry("MONK", 119996, 25) -- Transcendence: Transfer
+AddCooldownEntry("MONK", 115176, 180) -- Zen Meditation
+AddCooldownEntry("MONK", 137562, 120) -- Nimble Brew
+AddCooldownEntry("MONK", 119392, 30) -- Charging Ox Wave
+AddCooldownEntry("MONK", 122278, 90) -- Dampen Harm
+AddCooldownEntry("MONK", 122783, 90) -- Diffuse Magic
+AddCooldownEntry("MONK", 123904, 180) -- Invoke Xuen, the White
+AddCooldownEntry("MONK", 119381, 45) -- Leg Sweep
+AddCooldownEntry("MONK", 116844, 45) -- Ring of Peace
+AddCooldownEntry("MONK", 116841, 30) -- Tiger's Lust
+AddCooldownEntry("MONK", 115213, { cd = 180, spec = L["Brewmaster"] }) -- Avert Harm
+AddCooldownEntry("MONK", 122057, { cd = 35, spec = L["Brewmaster"] }) -- Clash
+AddCooldownEntry("MONK", 115308, { cd = 6, spec = L["Brewmaster"] }) -- Elusive Brew
+AddCooldownEntry("MONK", 115295, { cd = 30, spec = L["Brewmaster"] }) -- Guard
+--AddCooldownEntry("MONK", 121253, { cd = 8, spec = L["Brewmaster"] }) -- Keg Smash
+AddCooldownEntry("MONK", 115315, { cd = 30, spec = L["Brewmaster"] }) -- Summon Black Ox
+AddCooldownEntry("MONK", 115288, { cd = 60, spec = L["Windwalker"] }) -- Energizing Brew
+AddCooldownEntry("MONK", 113656, { cd = 25, spec = L["Windwalker"] }) -- Fists of Fury
+AddCooldownEntry("MONK", 101545, { cd = 25, spec = L["Windwalker"] }) -- Flying Serpent Kick
+AddCooldownEntry("MONK", 122470, { cd = 90, spec = L["Windwalker"] }) -- Touch of Karma
+AddCooldownEntry("MONK", 116849, { cd = 120, spec = L["Mistweaver"] }) -- Life Cocoon
+--AddCooldownEntry("MONK", 115151, { cd = 8, spec = L["Mistweaver"] }) -- Renewing Mist
+AddCooldownEntry("MONK", 115310, { cd = 180, spec = L["Mistweaver"] }) -- Revival
+AddCooldownEntry("MONK", 115313, { cd = 30, spec = L["Mistweaver"] }) -- Summon Jade Serpent
+AddCooldownEntry("MONK", 116680, { cd = 45, spec = L["Mistweaver"] }) -- Thunder Focus Tea
+
+-- Paladin
+AddCooldownEntry("PALADIN", 31884, 120) -- Avenging Wrath
+AddCooldownEntry("PALADIN", 115750, 120) -- Blinding Light
+AddCooldownEntry("PALADIN", 4987, 8) -- Cleanse
+AddCooldownEntry("PALADIN", 31821, 180)  -- Devotion Aura
+AddCooldownEntry("PALADIN", 498, 60) -- Divine Protection
+AddCooldownEntry("PALADIN", 642, 300) -- Divine Shield
+AddCooldownEntry("PALADIN", 853, 60) -- Hammer of Justice
+AddCooldownEntry("PALADIN", 1044, 25) -- Hand of Freedom
+AddCooldownEntry("PALADIN", 1022, 300) -- Hand of Protection
+AddCooldownEntry("PALADIN", 6940, 120) -- Hand of Sacrifice
+AddCooldownEntry("PALADIN", 96231, 15) -- Rebuke
+AddCooldownEntry("PALADIN", 10326, 15) -- Turn Evil
+AddCooldownEntry("PALADIN", 114157, 60) -- Execution Sentence
+AddCooldownEntry("PALADIN", 105593, 30) -- Fist of Justice
+AddCooldownEntry("PALADIN", 114039, 30) -- Hand of Purity
+AddCooldownEntry("PALADIN", 105809, 120) -- Holy Avenger
+AddCooldownEntry("PALADIN", 114165, 20) -- Holy Prism
+AddCooldownEntry("PALADIN", 114158, 60) -- Light's Hammer
+AddCooldownEntry("PALADIN", 20066, 15) -- Repentance
+AddCooldownEntry("PALADIN", 20925, 6) -- Sacred Shield
+AddCooldownEntry("PALADIN", 85499, 45) -- Speed of Light
+AddCooldownEntry("PALADIN", 31842, { cd = 180, spec = L["Holy"] }) -- Divine Favor
+AddCooldownEntry("PALADIN", 54428, { cd = 120, spec = L["Holy"] }) -- Divine Plea
+AddCooldownEntry("PALADIN", 86669, { cd = 180, spec = L["Holy"] }) -- Guardian of Ancient Kings (Holy)
+AddCooldownEntry("PALADIN", 20473, { cd = 6, spec = L["Holy"] }) -- Holy Shock
+AddCooldownEntry("PALADIN", 31850, { cd = 180, spec = L["Protection"] }) -- Ardent Defender
+AddCooldownEntry("PALADIN", 31935, { cd = 15, spec = L["Protection"] }) -- Avenger's Shield
+AddCooldownEntry("PALADIN", 86659, { cd = 180, spec = L["Protection"] }) -- Guardian of Ancient Kings (Protection)
+AddCooldownEntry("PALADIN", 86525, { cd = 180, spec = L["Retribution"] }) -- Guardian of Ancient Kings (Retribution)
+
+-- Priest
+AddCooldownEntry("PRIEST", 8122, { cd = 27, [L["Shadow"]] = 26 }) -- Psychic Scream
+AddCooldownEntry("PRIEST", 34433, { cd = 300, [L["Shadow"]] = 240 }) -- Shadowfiend
+AddCooldownEntry("PRIEST", 15487, { cd = 45, spec = L["Shadow"] }) -- Silence
+AddCooldownEntry("PRIEST", 64044, { cd = 90, spec = L["Shadow"] }) -- Psychic Horror (+ Glyph) else 120
+AddCooldownEntry("PRIEST", 586, { cd = 30, [L["Shadow"]] = 15 }) -- Fade (+ Glyph) else 24
+AddCooldownEntry("PRIEST", 33076, 10) -- Prayer of Mending
+AddCooldownEntry("PRIEST", 73325, 90) -- Leap of Faith
+AddCooldownEntry("PRIEST", 64843, { cd = 180, spec = L["Holy"] }) -- Divine Hymn
+AddCooldownEntry("PRIEST", 64901, 360) -- Hymn of Hope
+AddCooldownEntry("PRIEST", 32379, 10) -- Shadow Word: Death
+AddCooldownEntry("PRIEST", 6346, 180) -- Fear Ward
+AddCooldownEntry("PRIEST", 81700, 30) -- Archangel
+AddCooldownEntry("PRIEST", 87153, 90) -- Dark Archangel
+AddCooldownEntry("PRIEST", 47585, { cd = 75, spec = L["Shadow"] }) -- Dispersion (+ Glyph)
+AddCooldownEntry("PRIEST", 10060, { cd = 120, spec = L["Discipline"] }) -- Power Infusion
+AddCooldownEntry("PRIEST", 33206, { cd = 180, spec = L["Discipline"] }) -- Pain Suppression
+AddCooldownEntry("PRIEST", 62618, { cd = 180, spec = L["Discipline"] }) -- Power Word: Barrier
+AddCooldownEntry("PRIEST", 47788, { cd = 150, spec = L["Holy"] }) -- Guardian spirit (+ Glyph)
+AddCooldownEntry("PRIEST", 724, { cd = 180, spec = L["Holy"] }) -- Lightwell
+AddCooldownEntry("PRIEST", 19236, { cd = 120, spec = L["Holy"] }) -- Desperate Prayer
+
+-- Shaman
+AddCooldownEntry("SHAMAN", 57994, 15) -- Wind Shear
+AddCooldownEntry("SHAMAN", 51514, 45) -- Hex
+AddCooldownEntry("SHAMAN", 8143, 60) -- Tremor Totem
+AddCooldownEntry("SHAMAN", 8177, 25) -- Grounding Totem
+AddCooldownEntry("SHAMAN", 79206, 120) -- Spiritwalker's Grace
+AddCooldownEntry("SHAMAN", 30823, { cd = 60, spec = L["Enhancement"] }) -- Shamanistic Rage
+AddCooldownEntry("SHAMAN", 61882, { cd = 10, spec = L["Elemental"] }) -- Earthquake
+AddCooldownEntry("SHAMAN", 16166, { cd = 180, spec = L["Elemental"] }) -- Elemental Mastery
+AddCooldownEntry("SHAMAN", 51490, { cd = 45, spec = L["Elemental"] }) -- Thunderstorm
+AddCooldownEntry("SHAMAN", 16188, { cd = 120, spec = L["Restoration"] }) -- Natures Swiftness
+AddCooldownEntry("SHAMAN", 51533, { cd = 120, spec = L["Enhancement"] }) -- Feral Spirit
+AddCooldownEntry("SHAMAN", 16190, { cd = 180, spec = L["Restoration"] }) -- Mana Tide Totem
+AddCooldownEntry("SHAMAN", 98008, { cd = 180, spec = L["Restoration"] }) -- Spirit Link Totem
+
+-- Warlock
+AddCooldownEntry("WARLOCK", 5484, 40) -- Howl of Terror
+AddCooldownEntry("WARLOCK", 6789, 120) -- Death Coil
+AddCooldownEntry("WARLOCK", 48020, 30) -- Demonic Circle: Port
+AddCooldownEntry("WARLOCK", 19647, { cd = 24, pet = true }) -- Spell Lock
+AddCooldownEntry("WARLOCK", 19505, { cd = 15, pet = true }) -- Devour Magic
+AddCooldownEntry("WARLOCK", 110913, 180) -- Dark Bargain
+AddCooldownEntry("WARLOCK", 30283, { cd = 20, spec = L["Destruction"] }) -- Shadowfury
+AddCooldownEntry("WARLOCK", 91711, { cd = 30, spec = L["Destruction"] }) -- Nether Ward
+AddCooldownEntry("WARLOCK", 89766, { cd = 30, spec = L["Demonology"], pet = true }) -- Axe Toss
+AddCooldownEntry("WARLOCK", 113860, { cd = 120, spec = L["Affliction"] }) -- Dark Soul: Misery
+AddCooldownEntry("WARLOCK", 113861, { cd = 120, spec = L["Demonology"] }) -- Dark Soul: Knowledge
+AddCooldownEntry("WARLOCK", 113858, { cd = 120, spec = L["Destruction"] }) -- Dark Soul: Instability
+AddCooldownEntry("WARLOCK", 108359, 120) -- Dark Regeneration
+
+-- Warrior
+AddCooldownEntry("WARRIOR", 6552, { cd = 10 }) -- Pummel
+AddCooldownEntry("WARRIOR", 107570, { cd = 30 }) -- Storm Bolt
+AddCooldownEntry("WARRIOR", 46968, { cd = 40 }) -- Shockwave
+AddCooldownEntry("WARRIOR", 100, { cd = 20 }) -- Charge
+AddCooldownEntry("WARRIOR", 18499, 30) -- Berserker Rage
+AddCooldownEntry("WARRIOR", 23920, 10) -- Spell Reflection
+AddCooldownEntry("WARRIOR", 3411, 30) -- Intervene
+AddCooldownEntry("WARRIOR", 6544, { cd = 45, [L["Arms"]] = 30 }) -- Heroic Leap
+AddCooldownEntry("WARRIOR", 676, 60) -- Disarm
+AddCooldownEntry("WARRIOR", 5246, 120) -- Intimidating Shout
+AddCooldownEntry("WARRIOR", 2565, 60) -- Shield Block
+AddCooldownEntry("WARRIOR", 55694, 180) -- Enraged Regeneration
+AddCooldownEntry("WARRIOR", 1719, 300) -- Recklessness
+AddCooldownEntry("WARRIOR", 871, 300) -- Shield Wall
+AddCooldownEntry("WARRIOR", 64382, 300) -- Shattering Throw
+--AddCooldownEntry("WARRIOR", 86346, 20) -- Colossus Smash
+AddCooldownEntry("WARRIOR", 97462, 180) -- Rallying Cry
+AddCooldownEntry("WARRIOR", 12292, { cd = 180, spec = L["Fury"] }) -- Death Wish
+AddCooldownEntry("WARRIOR", 46924, { cd = 90, spec = L["Arms"] }) -- Bladestorm
+AddCooldownEntry("WARRIOR", 12328, { cd = 60, spec = L["Arms"] }) -- Sweeping strikes
+AddCooldownEntry("WARRIOR", 12975, { cd = 180, spec = L["Protection"] }) -- Last Stand
+
+-- Rogue
+AddCooldownEntry("ROGUE", 1766, 10) -- Kick with glyph -4s and -6 when successful kick (so 15-4 or 15-6)
+AddCooldownEntry("ROGUE", 408, 20) -- Kidney Shot
+AddCooldownEntry("ROGUE", 5277, 180) -- Evasion
+AddCooldownEntry("ROGUE", 31224, 60) -- Cloak of Shadow
+AddCooldownEntry("ROGUE", 1856, 180) -- Vanish
+AddCooldownEntry("ROGUE", 2094, 180) -- Blind
+AddCooldownEntry("ROGUE", 51722, 60) -- Dismantle
+AddCooldownEntry("ROGUE", 2983, 60) -- Sprint
+AddCooldownEntry("ROGUE", 76577, 180) -- Smoke Bomb
+AddCooldownEntry("ROGUE", 73981, 60) -- Redirect
+AddCooldownEntry("ROGUE", 74001, 90) -- Combat Readiness
+AddCooldownEntry("ROGUE", 79140, { cd = 120, spec = L["Assassination"] }) -- Vendetta
+AddCooldownEntry("ROGUE", 51713, { cd = 60, spec = L["Subtlety"] }) -- Shadow Dance
+AddCooldownEntry("ROGUE", 13750, { cd = 180, spec = L["Combat"] }) -- Adrenaline Rush
+AddCooldownEntry("ROGUE", 13877, { cd = 10, spec = L["Combat"] }) -- Blade Flurry
+AddCooldownEntry("ROGUE", 51690, { cd = 120, spec = L["Combat"] }) -- Killing Spree
+AddCooldownEntry("ROGUE", 36554, { cd = 24, spec = L["Subtlety"] }) -- Shadowstep
+AddCooldownEntry("ROGUE", 14185, { -- Preparation
+    cd = 300,
+    spec = L["Subtlety"],
+    resetCD = {
+        [2983] = true,
+        [1856] = true,
+        [1766] = true,
+        [51722] = true,
+        [36554] = true,
+        [76577] = true,
+    },
+})
+
 function Gladdy:GetCooldownList()
     return cooldownList
 end
@@ -1050,6 +996,88 @@ for k,v in pairs(racials) do
         end
     end
 end
+
+---------------------
+-- DISPEL ICONS
+---------------------
+
+--[[
+Holy Pala
+Cleanse
+ID: 4987
+Icon ID: 135949
+
+Shadow Priest:
+Mass Dispel
+ID: 32375
+Icon ID: 135739
+
+Holy / Disc Priest:
+Purify
+ID: 527
+Icon ID: 135894
+
+Elem/Enchance Shaman
+Cleanse Spirit
+ID: 51886
+Icon ID:236288
+
+Resto Shaman
+Purify Spirit
+ID: 77130
+Icon ID:236288
+
+Mage
+Remove Curse
+ID: 475
+Icon ID: 136082
+
+Lock
+Devour Magic
+ID: 19505
+Icon ID: 136075
+
+Monk
+Detox
+ID: 115450
+Icon ID: 135894
+
+Druid
+Nature's Cure (Resto druid)
+ID 88423
+Icon ID: 236288
+
+Druid:
+Remove Corruption (non resto, I think)
+ID: 2782
+Icon ID: 135952
+
+Druid:
+Symbiosis from priest: Mass Dispel
+ID:110707
+Icon ID: 135739
+
+Druid:
+Symbiosis from pala: Cleanse
+ID:122288
+
+]]
+
+
+local dispelIcons = {
+    ["DRUID"] = { [L["Restoration"]] = 88423}, -- 88423 Nature's Cure
+    ["DEATHKNIGHT"] = { },
+    ["HUNTER"] = { },
+    ["MAGE"] = { [L["Frost"]] = 475, [L["Arcane"]] = 475, [L["Fire"]] = 475 }, -- 475 Remove Curse
+    ["PALADIN"] = { [L["Holy"]] = 527, [L["Discipline"]] = 527 , [L["Shadow"]] = 32375 }, -- 4987 Cleanse
+    ["PRIEST"] = { [L["Holy"]] = 527, [L["Discipline"]] = 527 , [L["Shadow"]] = 32375 }, -- 527 Purify
+    ["ROGUE"] = { },
+    ["SHAMAN"] = { [L["Elemental"]] = 51886, [L["Enhancement"]] = 51886 , [L["Restoration"]] = 77130 },
+    ["WARLOCK"] = { },
+    ["WARRIOR"] = { },
+    ["MONK"] = { [L["Mistweaver"]] = 51886 },-- classicon-monk
+}
+Gladdy.dispelIcons = dispelIcons
 
 
 ---------------------

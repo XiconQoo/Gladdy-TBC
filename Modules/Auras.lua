@@ -726,6 +726,8 @@ function Auras:GetInterruptColor(extraSpellSchool)
     end
 end
 
+local interfaceVersion = select(4, GetBuildInfo())
+interfaceVersion = tonumber(interfaceVersion)
 function Auras:SPELL_INTERRUPT(unit,spellID,spellName,spellSchool,extraSpellId,extraSpellName,extraSpellSchool)
     local auraFrame = self.frames[unit]
     local interruptFrame = auraFrame ~= nil and auraFrame.interruptFrame
@@ -740,7 +742,10 @@ function Auras:SPELL_INTERRUPT(unit,spellID,spellName,spellSchool,extraSpellId,e
     if (interruptFrame.priority and interruptFrame.priority > dbEntry.priority) then
         return
     end
-    local multiplier = ((button.spec == L["Restoration"] and button.class == "SHAMAN") or (button.spec == L["Holy"] and button.class == "PALADIN")) and 0.7 or 1
+    local multiplier = 1
+    if interfaceVersion < 50000 then
+        multiplier = ((button.spec == L["Restoration"] and button.class == "SHAMAN") or (button.spec == L["Holy"] and button.class == "PALADIN")) and 0.7 or 1
+    end
 
     local duration = Gladdy:GetInterrupts()[spellID].duration * multiplier
 

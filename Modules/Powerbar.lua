@@ -216,7 +216,7 @@ function Powerbar:SetPower(powerBar, unit, power, powerMax, powerType, status)
     powerBar.energy.current = power
     powerBar.energy.max = powerMax
 
-    if (powerType and powerType == 0 and powerBar.energy.powerType ~= powerType) then
+    if (powerType and powerType == 0 and powerBar.powerType ~= powerType) then
         powerBar.energy:SetStatusBarColor(.18, .44, .75, 1)
         powerBar.powerColor = {r = .18, g = .44, b = .75}
         powerBar.energy.powerType = powerType
@@ -246,6 +246,7 @@ function Powerbar:ResetUnit(unit)
     powerBar.energy.current = 0
     powerBar.energy.max = 1
     powerBar.energy.powerType = ""
+    powerBar.powerType = ""
     powerBar.powerColor = {r = 1, g = 1, b = 1}
 end
 

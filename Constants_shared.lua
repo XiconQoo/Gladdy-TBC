@@ -24,6 +24,21 @@ local classIcons = {
 }
 Gladdy.classIcons = classIcons
 
+local classRangeSpells = {
+    ["MAGE"] = { spellID = 118, melee = false, range = false },
+    ["PRIEST"] = { spellID = 32379, melee = false, range = false },
+    ["DRUID"] = { spellID = 33786, melee = true, range = false },
+    ["SHAMAN"] = { spellID = 8042, melee = true, range = false },
+    ["PALADIN"] = { spellID = 853, melee = true, range = false },
+    ["WARLOCK"] = { spellID = 5782, melee = false, range = false },
+    ["WARRIOR"] = { spellID = 20252, melee = true, range = false },
+    ["HUNTER"] = { spellID = 1978, melee = true, range = true },
+    ["ROGUE"] = { spellID = 36554, melee = true, range = false },
+    ["DEATHKNIGHT"] = { spellID = 49576, melee = true, range = false },
+    ["MONK"] = { spellID = 117952, melee = true, range = false },
+}
+Gladdy.classRangeSpells = classRangeSpells
+
 local arenaTimer = {
     ["default"] = {
         [60] = "One minute until the Arena battle begins!",

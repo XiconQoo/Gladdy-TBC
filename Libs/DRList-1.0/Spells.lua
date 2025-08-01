@@ -931,6 +931,8 @@ elseif Lib.gameExpansion == "mop" then
         [30283]  = "stun", -- Shadowfury
         [132168] = "stun", -- Shockwave
         [107570] = "stun", -- Storm Bolt
+        [132169] = "stun", -- Storm Bolt
+        [145585] = "stun", -- Storm Bolt
         [20549]  = "stun", -- War Stomp (Racial)
 
         -- *** Non-controlled Stun Effects ***
@@ -961,6 +963,9 @@ elseif Lib.gameExpansion == "mop" then
         -- *** Controlled Root Effects ***
         [96294]  = "root", -- Chains of Ice (Chilblains Root)
         [339]    = "root", -- Entangling Roots
+        [19975]  = "root", -- Entangling Roots
+        [102359] = "root", -- Entangling Roots
+        [113770] = "root", -- Entangling Roots Treants
         [113275] = "root", -- Entangling Roots (Symbiosis)
         [102359] = "root", -- Mass Entanglement
         [19975]  = "root", -- Nature's Grasp
