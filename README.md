@@ -4,7 +4,7 @@
 
 ---
 
-## [v2.52-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.52-Release/Gladdy_Classic_v2.52-Release.zip)
+## [v2.53-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.53-Release/Gladdy_Classic_v2.53-Release.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -81,6 +81,14 @@ Thank you!
 ---
 
 ### Changes
+
+### v2.53-Release
+- added/deleted some CDs and Auras (still WIP)
+- Balance Druid Treant roots and more storm bolt spells now tracked in DRs
+- removed spellschool lockdown duration reduction for holy paladins or resto shamans
+- reverted mana bar color to previous state
+- fixed some Range Check default spells
+- updated Mir Profile to latest submitted profile
 
 ### v2.52-Release
 - fixed Arena Preparation breaking Gladdy

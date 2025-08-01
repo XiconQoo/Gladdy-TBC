@@ -1,6 +1,6 @@
 ## Interface: 50500
 ## Title: Gladdy - MoP
-## Version: 2.52-Release
+## Version: 2.53-Release
 ## Notes: The most powerful arena AddOn for WoW 4.4.1
 ## Author: XiconQoo, DnB_Junkee, Knall
 ## X-Email: contact me on discord Knall#1751
