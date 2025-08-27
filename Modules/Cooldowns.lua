@@ -374,6 +374,7 @@ function Cooldowns:ClearIcon(button, index, spellId, icon)
     icon.cooldown:Hide()
     icon.cooldownFont:SetText("")
     icon.charges:SetText("")
+    icon.rechargeEndTimes = nil
     icon:SetScript("OnUpdate", nil)
     tinsert(self.iconCache, icon)
 end
@@ -384,6 +385,12 @@ end
 
 -- /run LibStub("Gladdy").modules["Cooldowns"]:AURA_GAIN(_, AURA_TYPE_BUFF, 22812, "Barkskin", _, 20, _, _, _, _, "arena1", true)
 -- /run LibStub("Gladdy").modules["Cooldowns"]:AURA_FADE("arena1", 22812)
+-- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 1953)
+
+-- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 45438)
+-- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 120)
+-- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 122)
+-- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 11958)
 function Cooldowns:Test(unit)
     if Gladdy.frame.testing then
         self:UpdateTestCooldowns(unit)
@@ -498,43 +505,93 @@ function Cooldowns:CooldownStart(button, spellId, duration, start)
     end
     for _,icon in pairs(button.spellCooldownFrame.icons) do
         if (icon.spellId == spellId) then
-            if not start and icon.active and icon.timeLeft > cooldown/2 then
-                return -- do not trigger cooldown again YES TRIGGER CD when charges or maxCharges
-            end
-            icon.active = true
-            icon.timeLeft = start and start - GetTime() + duration or duration
-            if (not Gladdy.db.cooldownDisableCircle) then icon.cooldown:SetCooldown(start or GetTime(), duration) end
-            if Gladdy.db.cooldownIconDesaturateOnCooldown then
-                icon.texture:SetDesaturated(true)
-            end
-            if Gladdy.db.cooldownIconAlphaOnCooldown < 1 then
-                icon.texture:SetAlpha(Gladdy.db.cooldownIconAlphaOnCooldown)
-            end
-            icon:SetScript("OnUpdate", function(self, elapsed)
-                if (self.maxCharges) then
-                    --TODO self.charges:SetText(self.maxCharges)
+            -- Charge-style cooldown handling
+            if icon.maxCharges then
+                -- dynamic chargeMod: if we detect a second use while on cooldown and a modifier exists, raise max charges
+                local cdEntry = Gladdy:GetCooldownList()[button.class][spellId]
+                if type(cdEntry) == "table" and cdEntry.chargeMod and (icon.active or (icon.rechargeEndTimes and #icon.rechargeEndTimes > 0)) and (not icon.maxCharges or icon.maxCharges < cdEntry.chargeMod) then
+                    icon.maxCharges = cdEntry.chargeMod
                 end
-                self.timeLeft = self.timeLeft - elapsed
-                if not Gladdy.db.useOmnicc then
-                    local timeLeft = ceil(self.timeLeft)
-                    if timeLeft >= 540 then
-                        self.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), Gladdy.db.cooldownSize / 3.1 * Gladdy.db.cooldownFontScale, "OUTLINE")
-                    elseif timeLeft < 540 and timeLeft >= 60 then
-                        self.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), Gladdy.db.cooldownSize / 2.15 * Gladdy.db.cooldownFontScale, "OUTLINE")
-                    elseif timeLeft < 60 and timeLeft > 0 then
-                        self.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), Gladdy.db.cooldownSize / 2.15 * Gladdy.db.cooldownFontScale, "OUTLINE")
+
+                icon.rechargeEndTimes = icon.rechargeEndTimes or {}
+                local now = GetTime()
+                local endTime = (start and start or now) + duration
+                tinsert(icon.rechargeEndTimes, endTime)
+                tbl_sort(icon.rechargeEndTimes, function(a, b) return a < b end)
+
+                icon.active = #icon.rechargeEndTimes > 0
+                local chargesAvailable = (icon.maxCharges or 0) - #icon.rechargeEndTimes
+                if chargesAvailable < 0 then chargesAvailable = 0 end
+                icon.charges:SetText((icon.maxCharges and icon.maxCharges > 1) and tostring(chargesAvailable) or "")
+
+                if (not Gladdy.db.cooldownDisableCircle) then
+                    local nextReady = icon.rechargeEndTimes[1]
+                    icon.cooldown:SetCooldown(now, nextReady - now)
+                end
+                if Gladdy.db.cooldownIconDesaturateOnCooldown then
+                    icon.texture:SetDesaturated(true)
+                end
+                if Gladdy.db.cooldownIconAlphaOnCooldown < 1 then
+                    icon.texture:SetAlpha(Gladdy.db.cooldownIconAlphaOnCooldown)
+                end
+
+                icon:SetScript("OnUpdate", function(self, elapsed)
+                    local current = GetTime()
+                    if self.rechargeEndTimes then
+                        local changed = false
+                        -- remove finished recharges
+                        while #self.rechargeEndTimes > 0 and self.rechargeEndTimes[1] <= current do
+                            tremove(self.rechargeEndTimes, 1)
+                            changed = true
+                        end
+                        local remaining = #self.rechargeEndTimes
+                        local available = (self.maxCharges or 0) - remaining
+                        if available < 0 then available = 0 end
+                        self.charges:SetText((self.maxCharges and self.maxCharges > 1) and tostring(available) or "")
+
+                        if remaining == 0 then
+                            Cooldowns:CooldownReady(button, spellId, self)
+                            return
+                        end
+
+                        if changed and (not Gladdy.db.cooldownDisableCircle) then
+                            local nextReady = self.rechargeEndTimes[1]
+                            self.cooldown:SetCooldown(current, nextReady - current)
+                        end
+
+                        if not Gladdy.db.useOmnicc then
+                            Gladdy:FormatTimer(self.cooldownFont, self.rechargeEndTimes[1] - current, (self.rechargeEndTimes[1] - current) < 0)
+                        else
+                            self.cooldownFont:SetText("")
+                        end
                     end
-                    Gladdy:FormatTimer(self.cooldownFont, self.timeLeft, self.timeLeft < 0)
-                else
-                    self.cooldownFont:SetText("")
+                end)
+            else
+                -- Single-charge (normal) cooldown handling
+                if not start and icon.active and icon.timeLeft > cooldown/2 then
+                    return
                 end
-                if (self.timeLeft <= 0) then
-                    Cooldowns:CooldownReady(button, spellId, icon)
+                icon.active = true
+                icon.timeLeft = start and start - GetTime() + duration or duration
+                if (not Gladdy.db.cooldownDisableCircle) then icon.cooldown:SetCooldown(start or GetTime(), duration) end
+                if Gladdy.db.cooldownIconDesaturateOnCooldown then
+                    icon.texture:SetDesaturated(true)
                 end
-                if (self.timeLeft <= 0) then
-                    Cooldowns:CooldownReady(button, spellId, icon)
+                if Gladdy.db.cooldownIconAlphaOnCooldown < 1 then
+                    icon.texture:SetAlpha(Gladdy.db.cooldownIconAlphaOnCooldown)
                 end
-            end)
+                icon:SetScript("OnUpdate", function(self, elapsed)
+                    self.timeLeft = self.timeLeft - elapsed
+                    if not Gladdy.db.useOmnicc then
+                        Gladdy:FormatTimer(self.cooldownFont, self.timeLeft, self.timeLeft < 0)
+                    else
+                        self.cooldownFont:SetText("")
+                    end
+                    if (self.timeLeft <= 0) then
+                        Cooldowns:CooldownReady(button, spellId, icon)
+                    end
+                end)
+            end
             break
             --C_VoiceChat.SpeakText(2, GetSpellInfo(spellId), 3, 4, 100)
         end
@@ -551,6 +608,12 @@ local function resetIcon(icon)
     icon.active = false
     icon.cooldown:Hide()
     icon.cooldownFont:SetText("")
+    if icon.rechargeEndTimes then
+        icon.rechargeEndTimes = {}
+    end
+    if icon.maxCharges then
+        icon.charges:SetText((icon.maxCharges and icon.maxCharges > 1) and tostring(icon.maxCharges) or "")
+    end
     icon:SetScript("OnUpdate", nil)
     if icon.timer then
         icon.timer:Cancel()
@@ -590,23 +653,28 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId, expirationTimeInSecond
 
         --[[
                 {
-                    cd = {cd},
+                    cd = 60,
                     resetCD = {[1499] = true, [9] = true},
                     sharedCD = {[1499] = true, [9] = true},
-                    spec = {spec_str},
-                    talent = {talent_str},
-                    charges = {charges_str},
-                    replaces = {replaces_str}
+                    spec = L["Affliction"],
+                    talent = 1,
+                    charges = 2,
+                    replaces = 12354,
+                    L["Affliction"] = 45,
+                    chargeMod = 3,
+                    enabled = nil
                  }
                 - cd = number
-                - sharedCD = table or nil
-                - resetCD = table or nil
-                - spec = str or nil
+                - sharedCD = table of ids or nil
+                - resetCD = table of ids or nil
+                - spec = table or str or nil
                 - notSpec = str
                 - talent = number or nil -- represents row .. all talents in one row can only appear once
-                - charges = number or nil
-                - replaces = number or nil
-                -"Afflict... =  number or nil -- is cd of spec
+                - charges = number or nil -- need to show charges and track cd of x charges
+                - replaces = spellid or nil -- replaces the spellid cd
+                - e.g L["Affliction"] =  number or nil -- is cd of a specific spec
+                - enabled = boolean or nil -- should the spell be enabled by default, when nil it implies it is enabled
+                - chargeMod = number or nil -- a cd with possible charges. Will initially show with 1 stack, updated to 2 stacks if used when cd has not elapsed
         ]]
 
 
@@ -701,11 +769,19 @@ function Cooldowns:AddCooldown(spellID, value, button)
         icon:Show()
         icon.spellId = spellID
         icon.texture:SetTexture(self.spellTextures[spellID])
-        if (type(value) == "table") and value.charges then
-            icon.maxCharges = value.charges
+        if (type(value) == "table") then
+            if value.charges then
+                icon.maxCharges = value.charges
+            elseif value.chargeMod then
+                icon.maxCharges = 1 -- discover additional charges dynamically on use
+            else
+                icon.maxCharges = nil
+            end
         else
             icon.maxCharges = nil
         end
+        icon.rechargeEndTimes = nil
+        icon.charges:SetText((icon.maxCharges and icon.maxCharges > 1) and tostring(icon.maxCharges) or "")
         tinsert(button.spellCooldownFrame.icons, icon)
         self:IconsSetPoint(button)
     end
@@ -719,20 +795,48 @@ function Cooldowns:UpdateCooldowns(button)
         return
     end
 
+    -- Precompute replaced spells and enforce talent row exclusivity
+    local replaced = {}
+    local talentRowShown = {}
+    for spellId, data in pairs(Gladdy:GetCooldownList()[class]) do
+        if type(data) == "table" and data.replaces then
+            replaced[data.replaces] = true
+        end
+    end
     for k, v in pairs(Gladdy:GetCooldownList()[class]) do
         if Gladdy.db.cooldownCooldowns[tostring(k)] then
-            if (type(v) ~= "table" or (type(v) == "table" and v.spec == nil)) then
-                Cooldowns:AddCooldown(k, v, button)
-            end
-            if (type(v) == "table" and v.spec ~= nil) then
-                if type(v.spec) == "table" then
-                    for _,specialization in pairs(v.spec) do
-                        if spec == specialization then
-                            Cooldowns:AddCooldown(k, v, button)
-                            break
+            if replaced[k] then
+                -- Skip base spell when there is a replacement
+            else
+                local add = false
+                if type(v) ~= "table" then
+                    add = true
+                else
+                    -- spec gating
+                    if v.notSpec and spec == v.notSpec then
+                        add = false
+                    elseif not v.spec then
+                        add = true
+                    elseif type(v.spec) == "table" then
+                        for _,specialization in pairs(v.spec) do
+                            if spec == specialization then
+                                add = true
+                                break
+                            end
+                        end
+                    else
+                        add = (v.spec == spec)
+                    end
+                    -- talent row exclusivity
+                    if add and v.talent then
+                        if talentRowShown[v.talent] then
+                            add = false
+                        else
+                            talentRowShown[v.talent] = true
                         end
                     end
-                elseif v.spec == spec then
+                end
+                if add then
                     Cooldowns:AddCooldown(k, v, button)
                 end
             end
