@@ -456,6 +456,7 @@ function Gladdy:SetupOptions()
                                                 Gladdy.db.drDisableCircle,
                                                 Gladdy.db.racialDisableCircle,
                                                 Gladdy.db.trinketDisableCircle,
+                                                Gladdy.db.dispelIconDisableCircle,
                                             })
                                             if isAllSameValue then
                                                 return Gladdy.db.auraDisableCircle
@@ -470,6 +471,7 @@ function Gladdy:SetupOptions()
                                             Gladdy.db.drDisableCircle = value
                                             Gladdy.db.racialDisableCircle = value
                                             Gladdy.db.trinketDisableCircle = value
+                                            Gladdy.db.dispelIconDisableCircle = value
                                             Gladdy:UpdateFrame()
                                         end,
                                         width= "full",
@@ -493,6 +495,7 @@ function Gladdy:SetupOptions()
                                                 Gladdy.db.racialCooldownAlpha,
                                                 Gladdy.db.totemPulseCooldownAlpha,
                                                 Gladdy.db.trinketCooldownAlpha,
+                                                Gladdy.db.dispelIconCooldownAlpha,
                                             })
                                         end,
                                         set = function(info, value)
@@ -503,6 +506,7 @@ function Gladdy:SetupOptions()
                                             Gladdy.db.racialCooldownAlpha = value
                                             Gladdy.db.totemPulseCooldownAlpha = value
                                             Gladdy.db.trinketCooldownAlpha = value
+                                            Gladdy.db.dispelIconCooldownAlpha = value
                                             Gladdy:UpdateFrame()
                                         end
                                     },
@@ -655,6 +659,7 @@ function Gladdy:SetupOptions()
                                                 Gladdy.db.targetPortraitBorderStyle,
                                                 Gladdy.db.npTotemPlatesBorderStyle,
                                                 Gladdy.db.trinketBorderStyle,
+                                                Gladdy.db.dispelIconBorderStyle,
                                             })
                                         end,
                                         set = function(info, value)
@@ -671,6 +676,7 @@ function Gladdy:SetupOptions()
                                                 targetPortraitBorderStyle = true,
                                                 npTotemPlatesBorderStyle = true,
                                                 trinketBorderStyle = true,
+                                                dispelIconBorderStyle = true,
                                             })
                                         end,
                                     },
@@ -692,6 +698,7 @@ function Gladdy:SetupOptions()
                                                 Gladdy.db.racialBorderColor,
                                                 Gladdy.db.targetPortraitBorderColor,
                                                 Gladdy.db.trinketBorderColor,
+                                                Gladdy.db.dispelIconBorderColor,
                                             })
                                         end,
                                         set = function(info, r, g, b, a)
@@ -707,6 +714,7 @@ function Gladdy:SetupOptions()
                                                 racialBorderColor = true,
                                                 targetPortraitBorderColor = true,
                                                 trinketBorderColor = true,
+                                                dispelIconBorderColor = true,
                                             })
                                         end,
                                     },

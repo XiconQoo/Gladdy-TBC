@@ -24,6 +24,130 @@ local classIcons = {
 }
 Gladdy.classIcons = classIcons
 
+local specIcons = {
+    ["DRUID"] = {
+        [L["Balance"]] = 136096, -- Moonfire
+        [L["Feral"]] = 132115, -- Cat Form
+        [L["Restoration"]] = 136041, -- Healing Touch
+        [L["Guardian"]] = 132276, -- Bear Form
+    },
+    ["DEATHKNIGHT"] = {
+        [L["Unholy"]] = 135775, -- Unholy Presence
+        [L["Frost"]] = 135773, -- Frost Presence
+        [L["Blood"]] = 135770, -- Blood Presence
+    },
+    ["HUNTER"] = {
+        [L["Beast Mastery"]] = 461112, -- Tame Beast --461112
+        [L["Marksmanship"]] = 236179, -- Focused Aim
+        [L["Survival"]] = 461113, -- Mongoose Bite or Camouflage
+    },
+    ["MAGE"] = {
+        [L["Arcane"]] = 135932, -- Arcane Intellect
+        [L["Fire"]] = 135812, -- Fireball
+        [L["Frost"]] = 135846, -- Frostbolt
+    },
+    ["MONK"] = {
+        [L["Brewmaster"]] = 608951,
+        [L["Mistweaver"]] = 608952,
+        [L["Windwalker"]] = 608953,
+    },
+    ["PALADIN"] = {
+        [L["Holy"]] = 135920, -- Holy Light
+        [L["Retribution"]] = 135873, -- Retribution Aura
+        [L["Protection"]] = 236264, -- Ability_paladin_shieldofthetemplar
+    },
+    ["PRIEST"] = {
+        [L["Discipline"]] = 135940, -- Power Word: Shield
+        [L["Shadow"]] = 136207, -- Shadow Word: Pain
+        [L["Holy"]] = 237542, -- Guardian Spirit
+    },
+    ["ROGUE"] = {
+        [L["Assassination"]] = 132292, -- Eviscerate
+        [L["Combat"]] = 132090, -- Backstab
+        [L["Subtlety"]] = 132320, -- Stealth
+    },
+    ["SHAMAN"] = {
+        [L["Elemental"]] = 136048, -- Lightning Bolt
+        [L["Enhancement"]] = 237581, -- Unleash Elements
+        [L["Restoration"]] = 136052, -- Healing Wave
+    },
+    ["WARLOCK"] = {
+        [L["Affliction"]] = 136145, -- Affliction
+        [L["Demonology"]] = 136172, -- Sense Demons
+        [L["Destruction"]] = 136186, -- Rain of Fire
+    },
+    ["WARRIOR"] = {
+        [L["Arms"]] = 132355, -- Mortal Strike
+        [L["Fury"]] = 132347, -- Inner Rage
+        [L["Protection"]] = 132341, -- Defensive Stance
+    },
+}
+function Gladdy:GetSpecIcons()
+    return specIcons
+end
+
+local specColors = {
+    ["DEATHKNIGHT"] = {
+        [L["Blood"]] = { r = 0.796, g = 0.333, b = 0.333, hex = "cb5555", color = CreateColor(0.796,0.333,0.333,1) },
+        [L["Frost"]] = { r = 0.580, g = 0.580, b = 0.737, hex = "9494bc", color = CreateColor(0.580,0.580,0.737,1) },
+        [L["Unholy"]] = { r = 0.565, g = 0.796, b = 0.333, hex = "90cb55", color = CreateColor(0.565,0.796,0.333,1) },
+    },
+    ["DRUID"] = {
+        [L["Balance"]] = { r = 0.322, g = 0.322, b = 0.620, hex = "52529e", color = CreateColor(0.322,0.322,0.620,1) },
+        [L["Feral"]] = { r = 0.000, g = 0.376, b = 0.565, hex = "006090", color = CreateColor(0.000,0.376,0.565,1) },
+        [L["Guardian"]] = { r = 0.075, g = 0.376, b = 0.678, hex = "1360ad", color = CreateColor(0.075,0.376,0.678,1) },
+        [L["Restoration"]] = { r = 0.655, g = 0.851, b = 0.753, hex = "a7d9c0", color = CreateColor(0.655,0.851,0.753,1) },
+    },
+    ["HUNTER"] = {
+        [L["Beast Mastery"]] = { r = 0.620, g = 0.620, b = 0.322, hex = "9e9e52", color = CreateColor(0.620,0.620,0.322,1) },
+        [L["Marksmanship"]] = { r = 0.851, g = 0.753, b = 0.655, hex = "d9c0a7", color = CreateColor(0.851,0.753,0.655,1) },
+        [L["Survival"]] = { r = 0.376, g = 0.678, b = 0.075, hex = "60ad13", color = CreateColor(0.376,0.678,0.075,1) },
+    },
+    ["MAGE"] = {
+        [L["Arcane"]] = { r = 0.129, g = 0.565, b = 1.000, hex = "2190ff", color = CreateColor(0.129,0.565,1.000,1) },
+        [L["Fire"]] = { r = 0.894, g = 0.580, b = 0.424, hex = "e4946c", color = CreateColor(0.894,0.580,0.424,1) },
+        [L["Frost"]] = { r = 0.322, g = 0.322, b = 0.620, hex = "52529e", color = CreateColor(0.322,0.322,0.620,1) },
+    },
+    ["MONK"] = {
+        [L["Brewmaster"]] = { r = 0.678, g = 0.376, b = 0.075, hex = "ad6013", color = CreateColor(0.678,0.376,0.075,1) },
+        [L["Mistweaver"]] = { r = 0.020, g = 0.922, b = 0.322, hex = "05eb52", color = CreateColor(0.020,0.922,0.322,1) },
+        [L["Windwalker"]] = { r = 0.322, g = 0.620, b = 0.620, hex = "529e9e", color = CreateColor(0.322,0.620,0.620,1) },
+    },
+    ["PALADIN"] = {
+        [L["Holy"]] = { r = 1.000, g = 0.941, b = 0.882, hex = "fff0e1", color = CreateColor(1.000,0.941,0.882,1) },
+        [L["Protection"]] = { r = 0.796, g = 0.796, b = 0.333, hex = "cbcb55", color = CreateColor(0.796,0.796,0.333,1) },
+        [L["Retribution"]] = { r = 0.737, g = 0.580, b = 0.737, hex = "bc94bc", color = CreateColor(0.737,0.580,0.737,1) },
+    },
+    ["PRIEST"] = {
+        [L["Discipline"]] = { r = 1.000, g = 1.000, b = 1.000, hex = "ffffff", color = CreateColor(1.000,1.000,1.000,1) },
+        [L["Holy"]] = { r = 0.655, g = 0.753, b = 0.851, hex = "a7c0d9", color = CreateColor(0.655,0.753,0.851,1) },
+        [L["Shadow"]] = { r = 1.000, g = 0.565, b = 0.129, hex = "ff9021", color = CreateColor(1.000,0.565,0.129,1) },
+    },
+    ["ROGUE"] = {
+        [L["Assassination"]] = { r = 0.796, g = 0.333, b = 0.333, hex = "cb5555", color = CreateColor(0.796,0.333,0.333,1) },
+        [L["Combat"]] = { r = 0.678, g = 0.376, b = 0.075, hex = "ad6013", color = CreateColor(0.678,0.376,0.075,1) },
+        [L["Subtlety"]] = { r = 0.376, g = 0.376, b = 0.376, hex = "606060", color = CreateColor(0.376,0.376,0.376,1) },
+    },
+    ["SHAMAN"] = {
+        [L["Elemental"]] = { r = 0.168, g = 0.251, b = 1, hex = "2b40ff", color = CreateColor(0.168,0.250,1,1) },
+        [L["Enhancement"]] = { r = 0.737, g = 0.580, b = 0.580, hex = "bc9494", color = CreateColor(0.737,0.580,0.580,1) },
+        [L["Restoration"]] = { r = 0.322, g = 0.620, b = 0.322, hex = "529e52", color = CreateColor(0.322,0.620,0.322,1) },
+    },
+    ["WARLOCK"] = {
+        [L["Affliction"]] = { r = 0.376, g = 0.678, b = 0.075, hex = "60ad13", color = CreateColor(0.376,0.678,0.075,1) },
+        [L["Demonology"]] = { r = 0.431, g = 0.133, b = 0.431, hex = "6e226e", color = CreateColor(0.431,0.133,0.431,1) },
+        [L["Destruction"]] = { r = 0.922, g = 0.322, b = 0.020, hex = "eb5205", color = CreateColor(0.922,0.322,0.020,1) },
+    },
+    ["WARRIOR"] = {
+        [L["Arms"]] = { r = 0.580, g = 0.580, b = 0.737, hex = "9494bc", color = CreateColor(0.580,0.580,0.737,1) },
+        [L["Fury"]] = { r = 0.753, g = 0.376, b = 0.000, hex = "c06000", color = CreateColor(0.753,0.376,0.000,1) },
+        [L["Protection"]] = { r = 0.565, g = 0.565, b = 0.565, hex = "909090", color = CreateColor(0.565,0.565,0.565,1) },
+    },
+}
+function Gladdy:GetSpecColors()
+    return specColors
+end
+
 local classRangeSpells = {
     ["MAGE"] = { spellID = 118, melee = false, range = false },
     ["PRIEST"] = { spellID = 32379, melee = false, range = false },

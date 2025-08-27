@@ -65,13 +65,13 @@ function Healthbar:CreateFrame(unit)
                                    edgeSize = Gladdy.db.healthBarBorderSize })
     healthBar:SetBackdropBorderColor(Gladdy:SetColor(Gladdy.db.healthBarBorderColor))
     healthBar:SetFrameStrata(Gladdy.db.healthFrameStrata)
-    healthBar:SetFrameLevel(Gladdy.db.healthFrameLevel)
+    healthBar:SetFrameLevel(Gladdy.db.healthFrameLevel + 2)
 
     healthBar.hp = CreateFrame("StatusBar", nil, healthBar)
     healthBar.hp:SetStatusBarTexture(Gladdy:SMFetch("statusbar", "healthBarTexture"))
     healthBar.hp:SetMinMaxValues(0, 100)
     healthBar.hp:SetFrameStrata(Gladdy.db.healthFrameStrata)
-    healthBar.hp:SetFrameLevel(Gladdy.db.healthFrameLevel - 1)
+    healthBar.hp:SetFrameLevel(Gladdy.db.healthFrameLevel + 1)
 
     healthBar.bg = healthBar.hp:CreateTexture(nil, "BACKGROUND")
     healthBar.bg:SetTexture(Gladdy:SMFetch("statusbar", "healthBarTexture"))
@@ -115,12 +115,56 @@ function Healthbar:CreateFrame(unit)
     healthBar:RegisterUnitEvent("UNIT_HEALTH_FREQUENT", unit)
     healthBar:RegisterUnitEvent("UNIT_MAXHEALTH", unit)
     healthBar:RegisterUnitEvent("UNIT_NAME_UPDATE", unit)
+    healthBar:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", unit)
     healthBar:SetScript("OnEvent", Healthbar.OnEvent)
+
+    --absorb
+    healthBar.totalAbsorb = healthBar:CreateTexture(nil, "BORDER", "TotalAbsorbBarTemplate", 5)
+    healthBar.absorbOverlay = healthBar:CreateTexture(nil, "BORDER", "TotalAbsorbBarOverlayTemplate", 6)
+    healthBar.overAbsorbGlow = healthBar:CreateTexture(nil, "ARTWORK", "OverAbsorbGlowTemplate", 2)
+
+    healthBar.totalAbsorb:ClearAllPoints()
+    healthBar.totalAbsorb:SetTexture("Interface\\RaidFrame\\Shield-Fill")
+    healthBar.totalAbsorb.overlay = healthBar.absorbOverlay
+    healthBar.absorbOverlay:SetTexture("Interface\\RaidFrame\\Shield-Overlay", true, true)    --Tile both vertically and horizontally
+    healthBar.absorbOverlay:SetAllPoints(healthBar.totalAbsorb)
+    healthBar.absorbOverlay.tileSize = 32
+    healthBar.overAbsorbGlow:ClearAllPoints()
+    healthBar.overAbsorbGlow:SetTexture("Interface\\RaidFrame\\Shield-Overshield")
+    healthBar.overAbsorbGlow:SetBlendMode("ADD")
+    healthBar.overAbsorbGlow:SetPoint("BOTTOMLEFT", healthBar.hp, "BOTTOMRIGHT", -7, 0)
+    healthBar.overAbsorbGlow:SetPoint("TOPLEFT", healthBar.hp, "TOPRIGHT", -7, 0)
+    healthBar.overAbsorbGlow:SetWidth(16)
+    healthBar.overAbsorbGlow:Show()
+end
+
+local min, max = math.min, math.max
+function Healthbar:UpdateAbsorb(healthBar)
+    local totalAbsorb = Gladdy.frame.testing and 1000 or UnitGetTotalAbsorbs(healthBar.unit) or 0
+    if totalAbsorb > 0 then
+        if healthBar.totalAbsorb:IsShown() then
+            healthBar.absorbOverlay:SetPoint("TOPRIGHT", healthBar.totalAbsorb, "TOPRIGHT", 0, 0)
+            healthBar.absorbOverlay:SetPoint("BOTTOMRIGHT", healthBar.totalAbsorb, "BOTTOMRIGHT", 0, 0)
+        else
+            healthBar.absorbOverlay:SetPoint("TOPRIGHT", healthBar, "TOPRIGHT", 0, 0)
+            healthBar.absorbOverlay:SetPoint("BOTTOMRIGHT", healthBar, "BOTTOMRIGHT", 0, 0)
+        end
+
+        local totalWidth, totalHeight = healthBar.hp:GetSize()
+        local barSize = healthBar.hp.max and totalAbsorb / healthBar.hp.max * totalWidth or 0
+        local minX, maxX, minY, maxY = 0, min(max(barSize / healthBar.absorbOverlay.tileSize, 0), 1), 0, min(max(totalHeight / healthBar.absorbOverlay.tileSize, 0), 1)
+
+        print(totalWidth, totalHeight, barSize, healthBar.hp.max, minX, maxX, minY, maxY)
+
+        healthBar.absorbOverlay:SetWidth(barSize)
+        healthBar.absorbOverlay:SetTexCoord(minX, maxX, minY, maxY)
+        healthBar.absorbOverlay:Show()
+    end
 end
 
 function Healthbar.OnEvent(self, event, unit)
     local isDead = UnitExists(unit) and UnitIsDeadOrGhost(unit) and not Gladdy:isFeignDeath(unit)
-    if event == "UNIT_HEALTH_FREQUENT" or event == "UNIT_MAXHEALTH" then
+    if event == "UNIT_HEALTH_FREQUENT" or event == "UNIT_MAXHEALTH" or  event == "UNIT_NAME_UPDATE" then
         if isDead then
             Gladdy:SendMessage("UNIT_DEATH", unit)
             return
@@ -137,6 +181,8 @@ function Healthbar.OnEvent(self, event, unit)
         local name = UnitName(unit)
         Gladdy.buttons[unit].name = name
         Healthbar:SetText(unit, self.hp.current, self.hp.max)
+    elseif event == "UNIT_ABSORB_AMOUNT_CHANGED" then
+        Healthbar:UpdateAbsorb(self)
     end
     if not Gladdy.buttons[unit].class then
         Gladdy:SpotEnemy(unit, true)
@@ -331,6 +377,10 @@ function Healthbar:Test(unit)
     self:ENEMY_SPOTTED(unit)
     self:SetText(unit, button.health, button.healthMax)
     healthBar.hp:SetValue(button.health)
+    Healthbar:UpdateAbsorb(healthBar)
+    --healthBar.hp.absorb:UpdateHealthMinMax()
+    --healthBar.hp.absorb:UpdateLossAnimation(button.health)
+    --healthBar.hp.absorb:BeginAnimation(button.health, button.health + 50);
     if unit == "arena1" then
         self:UNIT_DEATH(unit)
     end
@@ -342,7 +392,6 @@ function Healthbar:UNIT_SPEC(unit)
         return
     end
     self:SetText(unit, button.healthBar.hp.current, button.healthBar.hp.max)
-
 end
 
 function Healthbar:UNIT_SPEC_PREPARATION(unit)

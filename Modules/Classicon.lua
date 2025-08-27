@@ -2,7 +2,6 @@ local select, str_gsub = select, string.gsub
 
 local Gladdy = LibStub("Gladdy")
 local CreateFrame = CreateFrame
-local GetSpellInfo = GetSpellInfo
 local L = Gladdy.L
 local Classicon = Gladdy:NewModule("Class Icon", 81, {
     classIconEnabled = true,
@@ -20,63 +19,7 @@ local Classicon = Gladdy:NewModule("Class Icon", 81, {
     classIconGroupDirection = "DOWN"
 })
 
-local specIcons = {
-    ["DRUID"] = {
-        [L["Balance"]] = 136096, -- Moonfire
-        [L["Feral"]] = 132276, -- Cat Form
-        [L["Restoration"]] = 136041, -- Healing Touch
-    },
-    ["DEATHKNIGHT"] = {
-        [L["Unholy"]] = 135775, -- Unholy Presence
-        [L["Blood"]] = 135773, -- Blood Presence
-        [L["Frost"]] = 135770, -- Frost Presence
-    },
-    ["HUNTER"] = {
-        [L["Beast Mastery"]] = 461112, -- Tame Beast --461112
-        [L["Marksmanship"]] = 236179, -- Focused Aim
-        [L["Survival"]] = 461113, -- Mongoose Bite or Camouflage
-    },
-    ["MAGE"] = {
-        [L["Arcane"]] = 135932, -- Arcane Intellect
-        [L["Fire"]] = 135812, -- Fireball
-        [L["Frost"]] = 135846, -- Frostbolt
-    },
-    ["MONK"] = {
-        [L["Brewmaster"]] = select(4, GetSpecializationInfoByID(268)),
-        [L["Mistweaver"]] = select(4, GetSpecializationInfoByID(270)),
-        [L["Windwalker"]] = select(4, GetSpecializationInfoByID(269)),
-    },
-    ["PALADIN"] = {
-        [L["Holy"]] = 135920, -- Holy Light
-        [L["Retribution"]] = 135873, -- Retribution Aura
-        [L["Protection"]] = 236264, -- Ability_paladin_shieldofthetemplar
-    },
-    ["PRIEST"] = {
-        [L["Discipline"]] = 135987, -- Power Word: Fortitude
-        [L["Shadow"]] = 136207, -- Shadow Word: Pain
-        [L["Holy"]] = 135920, -- Holy Light
-    },
-    ["ROGUE"] = {
-        [L["Assassination"]] = 132304, -- Mutilate (Eviscerate? 2098)
-        [L["Combat"]] = 132090, -- Backstab
-        [L["Subtlety"]] = 132320, -- Stealth
-    },
-    ["SHAMAN"] = {
-        [L["Elemental"]] = 136048, -- Lightning Bolt
-        [L["Enhancement"]] = 136051, -- Lightning Shield
-        [L["Restoration"]] = 136052, -- Healing Wave
-    },
-    ["WARLOCK"] = {
-        [L["Affliction"]] = 136145, -- Affliction
-        [L["Demonology"]] = 136172, -- Sense Demons
-        [L["Destruction"]] = 136186, -- Rain of Fire
-    },
-    ["WARRIOR"] = {
-        [L["Arms"]] = 132355, -- Mortal Strike
-        [L["Fury"]] = 132347, -- Inner Rage
-        [L["Protection"]] = 132341, -- Defensive Stance
-    },
-}
+local specIcons = Gladdy:GetSpecIcons()
 
 function Classicon:Initialize()
     self.frames = {}

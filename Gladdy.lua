@@ -656,41 +656,31 @@ end
 
 ---------------------------
 
+local function FrameSetAlpha(frame, alpha)
+    if frame and frame.SetAlpha then
+        frame:SetAlpha(alpha)
+    end
+end
 function Gladdy:BlizzArenaSetAlpha(alpha)
     if IsAddOnLoaded("Blizzard_ArenaUI") then
-        if (ArenaEnemyFrames) then
-            ArenaEnemyFrames:SetAlpha(alpha)
-        end
-        if ArenaEnemyFrame1 then
-            ArenaEnemyFrame1:SetAlpha(alpha)
-        end
-        if ArenaEnemyFrame1PetFrame then
-            ArenaEnemyFrame1PetFrame:SetAlpha(alpha)
-        end
-        if ArenaEnemyFrame2 then
-            ArenaEnemyFrame2:SetAlpha(alpha)
-        end
-        if ArenaEnemyFrame2PetFrame then
-            ArenaEnemyFrame2PetFrame:SetAlpha(alpha)
-        end
-        if ArenaEnemyFrame3 then
-            ArenaEnemyFrame3:SetAlpha(alpha)
-        end
-        if ArenaEnemyFrame3PetFrame then
-            ArenaEnemyFrame3PetFrame:SetAlpha(alpha)
-        end
-        if ArenaEnemyFrame4 then
-            ArenaEnemyFrame4:SetAlpha(alpha)
-        end
-        if ArenaEnemyFrame4PetFrame then
-            ArenaEnemyFrame4PetFrame:SetAlpha(alpha)
-        end
-        if ArenaEnemyFrame5 then
-            ArenaEnemyFrame5:SetAlpha(alpha)
-        end
-        if ArenaEnemyFrame5PetFrame then
-            ArenaEnemyFrame5PetFrame:SetAlpha(alpha)
-        end
+        FrameSetAlpha(ArenaEnemyFrames, alpha)
+        FrameSetAlpha(ArenaEnemyFrame1, alpha)
+        FrameSetAlpha(ArenaEnemyFrame1PetFrame, alpha)
+        FrameSetAlpha(ArenaEnemyFrame2, alpha)
+        FrameSetAlpha(ArenaEnemyFrame2PetFrame, alpha)
+        FrameSetAlpha(ArenaEnemyFrame3, alpha)
+        FrameSetAlpha(ArenaEnemyFrame3PetFrame, alpha)
+        FrameSetAlpha(ArenaEnemyFrame4, alpha)
+        FrameSetAlpha(ArenaEnemyFrame4PetFrame, alpha)
+        FrameSetAlpha(ArenaEnemyFrame5, alpha)
+        FrameSetAlpha(ArenaEnemyFrame5PetFrame, alpha)
+
+        FrameSetAlpha(ArenaPrepFrames, alpha)
+        FrameSetAlpha(ArenaPrepFrame1, alpha)
+        FrameSetAlpha(ArenaPrepFrame2, alpha)
+        FrameSetAlpha(ArenaPrepFrame3, alpha)
+        FrameSetAlpha(ArenaPrepFrame4, alpha)
+        FrameSetAlpha(ArenaPrepFrame5, alpha)
     end
 end
 

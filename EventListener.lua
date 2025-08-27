@@ -95,6 +95,9 @@ function EventListener:CooldownCheck(eventType, srcUnit, spellName, spellID)
     if not Gladdy.buttons[srcUnit] or not spellName or not spellID then
         return
     end
+    if eventType == "SPELL_DISPEL" and Gladdy.db.dispelIconEnabled and Gladdy.dispelIcons[spellID] then
+        Gladdy:SendMessage("DISPEL_USED", srcUnit, spellID)
+    end
     if Gladdy.db.cooldown and Cooldowns.cooldownSpells[spellName] then
         local unitClass
         local spellId = Cooldowns.cooldownSpells[spellName] -- don't use spellId from combatlog, in case of different spellrank
@@ -283,6 +286,8 @@ function EventListener:ARENA_PREP_OPPONENT_SPECIALIZATIONS()
                         button.class = class
                         button.spec = spec
                         Gladdy:SendMessage("UNIT_SPEC_PREPARATION", unit, spec)
+                        button.stealthed = true
+                        Gladdy:SendMessage("ENEMY_STEALTH", unit, true)
                     end
                 end
             end

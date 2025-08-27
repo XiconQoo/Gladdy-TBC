@@ -265,14 +265,23 @@ function Gladdy:GetSpellDescription(spellID, cooldown) -- GetSpellPowerCost(5105
 
             local spec = cooldown.spec or cooldown.notSpec
             if spec and not cooldown.sharedCD then
-                str = str .. ((cooldown.spec and "") or (cooldown.notSpec and "NOT ")) .. (cooldown.spec or cooldown.notSpec) .. " : " .. defaultCD
+                if type(spec) == "table" then
+                    for _,specialization in ipairs(spec) do
+                        str = str .. (specialization) .. " : " .. (cooldown[specialization] or defaultCD)
+                    end
+                else
+                    str = str .. ((cooldown.spec and "") or (cooldown.notSpec and "NOT ")) .. (cooldown.spec or cooldown.notSpec) .. " : " .. defaultCD
+                end
             else
                 str = str .. defaultCD
                 for k,v in pairs(cooldown) do
-                    if k ~= "cd" and k ~= "pet" and k ~= "sharedCD" and k ~= "notSpec" then
-                        str = str .. k .. " : " .. v .. "s" .. " cd" .. "\n"
+                    if k ~= "cd" and k ~= "pet" and k ~= "sharedCD" and k ~= "notSpec" and k ~= "resetCD" and k ~= "talent" and k ~= "enabled" then
+                        str = str .. k .. " : " .. tostring(v) .. "s" .. " cd" .. "\n"
                     end
                 end
+            end
+            if cooldown.talent then
+                str = str .. "talent" .. " row " .. cooldown.talent+1 .. "\n"
             end
             str = str .. "\n"
         else
