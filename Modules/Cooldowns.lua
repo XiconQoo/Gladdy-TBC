@@ -192,6 +192,8 @@ function Cooldowns:UpdateIcon(icon)
     icon.cooldown:SetPoint("CENTER", icon, "CENTER")
     icon.cooldown:SetAlpha(Gladdy.db.cooldownCooldownAlpha)
 
+    if (Gladdy.db.cooldownDisableCircle) then icon.cooldown:SetAlpha(0) end
+
     icon.cooldownFont:SetFont(Gladdy:SMFetch("font", "cooldownFont"), (icon:GetWidth()/2 - 1) * Gladdy.db.cooldownFontScale, "OUTLINE")
     icon.cooldownFont:SetTextColor(Gladdy:SetColor(Gladdy.db.cooldownFontColor))
 
@@ -391,6 +393,7 @@ end
 -- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 120)
 -- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 122)
 -- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 11958)
+-- /run LibStub("Gladdy").modules["Cooldowns"]:UpdateTestCooldowns("arena2")
 function Cooldowns:Test(unit)
     if Gladdy.frame.testing then
         self:UpdateTestCooldowns(unit)
@@ -413,7 +416,21 @@ function Cooldowns:UpdateTestCooldowns(unit)
         if icon.timer then
             icon.timer:Cancel()
         end
-        self:CooldownUsed(unit, button.class, icon.spellId)
+    end
+    local talents = {}
+    for spellID,cooldown in pairs(Gladdy:GetCooldownList()[button.class]) do
+        if Gladdy.db.cooldownCooldowns[tostring(spellID)] then
+            if cooldown.talent then
+                --print(button.class, spellID, cooldown.talent)
+                if not talents[cooldown.talent] then
+                    print("CooldownUsed")
+                    self:CooldownUsed(unit, button.class, spellID)
+                    talents[cooldown.talent] = true
+                end
+            else
+                self:CooldownUsed(unit, button.class, spellID)
+            end
+        end
     end
 end
 
@@ -639,6 +656,10 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId, expirationTimeInSecond
         return
     end
 
+    if not Gladdy.db.cooldownCooldowns[tostring(spellId)] then
+        return
+    end
+
     local cooldown = Gladdy:GetCooldownList()[unitClass][spellId]
     local cd = cooldown
     if (type(cooldown) == "table") then
@@ -677,6 +698,23 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId, expirationTimeInSecond
                 - chargeMod = number or nil -- a cd with possible charges. Will initially show with 1 stack, updated to 2 stacks if used when cd has not elapsed
         ]]
 
+        if (cooldown.spec and button.spec) then
+            if type(cooldown.spec) == "table" then
+                local found
+                for _,spec in ipairs(cooldown.spec) do
+                    if button.spec == spec then
+                        found = true
+                    end
+                end
+                if not found then
+                    return
+                end
+            else
+                if cooldown.spec ~= button.spec then
+                    return
+                end
+            end
+        end
 
 
         -- return if the spec doesn't have a cooldown for this spell
@@ -698,7 +736,19 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId, expirationTimeInSecond
             cd = cooldown.cd
         end
 
-        -- check if there is a shared cooldown with an other spell
+        -- ensure icon exists for this spell (talents may not be pre-populated)
+        local hasIcon = false
+        for _,icon in pairs(button.spellCooldownFrame.icons) do
+            if (icon.spellId == spellId) then
+                hasIcon = true
+                break
+            end
+        end
+        if not hasIcon then
+            self:AddCooldown(spellId, cooldown, button)
+        end
+
+        -- check if there is a shared cooldown with another spell
         if (cooldown.sharedCD ~= nil) then
             local sharedCD = cooldown.sharedCD.cd and cooldown.sharedCD.cd or cd
 
@@ -712,6 +762,20 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId, expirationTimeInSecond
                         end
                     end
                     if not skip then
+                        -- ensure shared cooldown icon exists as well
+                        local sharedHasIcon = false
+                        for _,icon in pairs(button.spellCooldownFrame.icons) do
+                            if (icon.spellId == spellID) then
+                                sharedHasIcon = true
+                                break
+                            end
+                        end
+                        if not sharedHasIcon then
+                            local value = Gladdy:GetCooldownList()[unitClass][spellID]
+                            if value then
+                                self:AddCooldown(spellID, value, button)
+                            end
+                        end
                         self:CooldownStart(button, spellID, sharedCD)
                     end
                 end
@@ -827,13 +891,9 @@ function Cooldowns:UpdateCooldowns(button)
                     else
                         add = (v.spec == spec)
                     end
-                    -- talent row exclusivity
+                    -- hide talent rows until used (they will be added dynamically on first use)
                     if add and v.talent then
-                        if talentRowShown[v.talent] then
-                            add = false
-                        else
-                            talentRowShown[v.talent] = true
-                        end
+                        add = false
                     end
                 end
                 if add then
@@ -1361,7 +1421,7 @@ function Cooldowns:GetCooldownOptions()
                             for unit in pairs(Gladdy.buttons) do
                                 Cooldowns:ResetUnit(unit)
                                 Cooldowns:UpdateCooldowns(Gladdy.buttons[unit])
-                                --Cooldowns:Test(unit)
+                                Cooldowns:Test(unit)
                             end
                         end
                     },
