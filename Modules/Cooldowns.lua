@@ -5,6 +5,7 @@ local GetTime = GetTime
 local CreateFrame = CreateFrame
 local GetSpellInfo = GetSpellInfo
 local AURA_TYPE_BUFF = AURA_TYPE_BUFF
+local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 
 local Gladdy = LibStub("Gladdy")
 local LCG = LibStub("LibCustomGlow-1.0")
@@ -161,6 +162,107 @@ function Cooldowns:CreateIcon()
 
         icon.glow = CreateFrame("Frame", nil, icon)
         icon.glow:SetAllPoints(icon)
+
+        -- Activation and Flash textures (hidden by default)
+        icon.activationTexture = icon.cooldownFrame:CreateTexture(nil, "OVERLAY")
+        icon.activationTexture:SetAllPoints(icon)
+        if icon.activationTexture.SetAtlas then
+            icon.activationTexture:SetAtlas("bags-innerglow", true)
+        else
+            icon.activationTexture:SetTexture("Interface\\Buttons\\CheckButtonHilight")
+        end
+        icon.activationTexture:SetBlendMode("ADD")
+        icon.activationTexture:SetAlpha(0)
+        icon.activationTexture:Hide()
+
+        icon.flash = icon.cooldownFrame:CreateTexture(nil, "OVERLAY")
+        icon.flash:SetAllPoints(icon)
+        if icon.flash.SetAtlas then
+            icon.flash:SetAtlas("bags-glow-flash", true)
+        else
+            icon.flash:SetTexture("Interface\\Buttons\\WHITE8x8")
+        end
+        icon.flash:SetBlendMode("ADD")
+        icon.flash:SetAlpha(0)
+        icon.flash:Hide()
+
+        -- Activation animation group (Alpha ping then fade out)
+        icon.ActivationAnimation = icon:CreateAnimationGroup()
+        icon.ActivationAnimation:SetToFinalAlpha(true)
+        icon.ActivationAnimation:SetScript("OnPlay", function(self)
+            local i = self:GetParent()
+            i.activationTexture:SetAlpha(1)
+            i.activationTexture:Show()
+        end)
+        icon.ActivationAnimation:SetScript("OnFinished", function(self)
+            local i = self:GetParent()
+            i.activationTexture:Hide()
+            i.activationTexture:SetAlpha(0)
+        end)
+        do
+            local a1 = icon.ActivationAnimation:CreateAnimation("Alpha")
+            a1:SetTarget(icon.activationTexture)
+            a1:SetSmoothing("NONE")
+            a1:SetOrder(1)
+            a1:SetFromAlpha(0.8)
+            a1:SetToAlpha(1)
+            a1:SetDuration(0.2)
+
+            local a2 = icon.ActivationAnimation:CreateAnimation("Alpha")
+            a2:SetTarget(icon.activationTexture)
+            a2:SetSmoothing("NONE")
+            a2:SetOrder(2)
+            a2:SetFromAlpha(1)
+            a2:SetToAlpha(1)
+            a2:SetDuration(0.4)
+
+            local a3 = icon.ActivationAnimation:CreateAnimation("Alpha")
+            a3:SetTarget(icon.activationTexture)
+            a3:SetSmoothing("NONE")
+            a3:SetOrder(2)
+            a3:SetFromAlpha(1)
+            a3:SetToAlpha(0)
+            a3:SetDuration(0.6)
+        end
+
+        -- Flash animation group (quick flash fade out)
+        icon.FlashAnimation = icon:CreateAnimationGroup()
+        icon.FlashAnimation:SetToFinalAlpha(true)
+        icon.FlashAnimation:SetScript("OnPlay", function(self)
+            local i = self:GetParent()
+            i.flash:SetAlpha(1)
+            i.flash:Show()
+        end)
+        icon.FlashAnimation:SetScript("OnFinished", function(self)
+            local i = self:GetParent()
+            i.flash:Hide()
+            i.flash:SetAlpha(0)
+        end)
+        do
+            local f1 = icon.FlashAnimation:CreateAnimation("Alpha")
+            f1:SetTarget(icon.flash)
+            f1:SetSmoothing("NONE")
+            f1:SetOrder(2)
+            f1:SetFromAlpha(1)
+            f1:SetToAlpha(0)
+            f1:SetDuration(0.6)
+
+            local f2 = icon.FlashAnimation:CreateAnimation("Alpha")
+            f2:SetTarget(icon.flash)
+            f2:SetSmoothing("NONE")
+            f2:SetOrder(3)
+            f2:SetFromAlpha(0)
+            f2:SetToAlpha(1)
+            f2:SetDuration(0.6)
+
+            local f3 = icon.FlashAnimation:CreateAnimation("Scale")
+            f3:SetTarget(icon.flash)
+            f3:SetSmoothing("NONE")
+            f3:SetOrder(1)
+            f3:SetScaleFrom(1,1)
+            f3:SetScaleTo(1.4, 1.4)
+            f3:SetDuration(0.8)
+        end
 
         self:UpdateIcon(icon)
     end
@@ -639,6 +741,11 @@ function Cooldowns:CooldownStart(button, spellId, duration, start)
     end
     for _,icon in pairs(button.spellCooldownFrame.icons) do
         if (icon.spellId == spellId) then
+            -- brief activation on cooldown start
+            if icon.ActivationAnimation then
+                if icon.ActivationAnimation:IsPlaying() then icon.ActivationAnimation:Stop() end
+                icon.ActivationAnimation:Play()
+            end
             -- Charge-style cooldown handling
             if icon.maxCharges then
                 -- dynamic chargeMod: if we detect a second use while on cooldown and a modifier exists, raise max charges
@@ -683,7 +790,7 @@ function Cooldowns:CooldownStart(button, spellId, duration, start)
                         if available < 0 then available = 0 end
                         self.charges:SetText((self.maxCharges and self.maxCharges > 1) and tostring(available) or "")
 
-                        if remaining == 0 then
+                        if remaining <= 0 then
                             Cooldowns:CooldownReady(button, spellId, self)
                             return
                         end
@@ -748,6 +855,10 @@ local function resetIcon(icon)
     if icon.maxCharges then
         icon.charges:SetText((icon.maxCharges and icon.maxCharges > 1) and tostring(icon.maxCharges) or "")
     end
+    --if icon.FlashAnimation and icon.FlashAnimation:IsPlaying() then icon.FlashAnimation:Stop() end
+    --if icon.ActivationAnimation and icon.ActivationAnimation:IsPlaying() then icon.ActivationAnimation:Stop() end
+    --if icon.activationTexture then icon.activationTexture:SetAlpha(0); icon.activationTexture:Hide() end
+    --if icon.flash then icon.flash:SetAlpha(0); icon.flash:Hide() end
     icon:SetScript("OnUpdate", nil)
     if icon.timer then
         icon.timer:Cancel()
@@ -759,10 +870,18 @@ function Cooldowns:CooldownReady(button, spellId, frame)
     if (frame == false) then
         for _,icon in pairs(button.spellCooldownFrame.icons) do
             if (icon.spellId == spellId) then
+                if icon.FlashAnimation then
+                    if icon.FlashAnimation:IsPlaying() then icon.FlashAnimation:Stop() end
+                    icon.FlashAnimation:Play()
+                end
                 resetIcon(icon)
             end
         end
     else
+        if frame and frame.FlashAnimation then
+            if frame.FlashAnimation:IsPlaying() then frame.FlashAnimation:Stop() end
+            frame.FlashAnimation:Play()
+        end
         resetIcon(frame)
     end
 end
@@ -975,6 +1094,20 @@ function Cooldowns:AddCooldown(spellID, value, button)
         icon:Show()
         icon.spellId = spellID
         icon.texture:SetTexture(self.spellTextures[spellID])
+        if button.class then
+            icon.activationTexture:SetVertexColor(
+                    RAID_CLASS_COLORS[button.class].r,
+                    RAID_CLASS_COLORS[button.class].g,
+                    RAID_CLASS_COLORS[button.class].b, 1)
+            icon.flash:SetVertexColor(
+                    RAID_CLASS_COLORS[button.class].r,
+                    RAID_CLASS_COLORS[button.class].g,
+                    RAID_CLASS_COLORS[button.class].b, 1)
+        else
+            icon.activationTexture:SetVertexColor(1,1,1,1)
+            icon.flash:SetVertexColor(1,1,1,1)
+        end
+
         if (type(value) == "table") then
             if value.charges then
                 icon.maxCharges = value.charges
