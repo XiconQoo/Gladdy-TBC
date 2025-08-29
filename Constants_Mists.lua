@@ -626,7 +626,7 @@ AddCooldownEntry("MAGE", 120, { cd = 10, enabled = false }) -- Cone of Cold
 AddCooldownEntry("MAGE", 2139, { cd = 24 }) -- Counterspell
 AddCooldownEntry("MAGE", 44572, { cd = 30 }) -- Deep Freeze
 AddCooldownEntry("MAGE", 12051, { cd = 120 }) -- Evocation
-AddCooldownEntry("MAGE", 116011, { cd = 0, spec = nil, talent = nil, replaces = 12051, enabled = false }) -- Rune of Power
+AddCooldownEntry("MAGE", 116011, { cd = 0, spec = nil, talent = 5, replaces = 12051, enabled = false }) -- Rune of Power
 AddCooldownEntry("MAGE", 2136, { cd = 8, enabled = false }) -- Fire Blast
 AddCooldownEntry("MAGE", 2120, { cd = 12, enabled = false }) -- Flamestrike
 AddCooldownEntry("MAGE", 122, { cd = 25, [L["Frost"]] = 20, enabled = false }) -- Frost Nova (modified by Glyph of Frost Nova 56376)

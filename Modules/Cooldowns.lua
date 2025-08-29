@@ -332,7 +332,7 @@ function Cooldowns:UpdateFrame(unit)
         Cooldowns:ResetUnit(unit)
         Cooldowns:ENEMY_SPOTTED(unit)
         Cooldowns:UNIT_SPEC(unit)
-        Cooldowns:Test(unit)
+        Cooldowns:Test(unit, true)
     end
 end
 
@@ -350,18 +350,24 @@ function Cooldowns:ClearIcon(button, index, spellId, icon)
     if index then
         icon = tremove(button.spellCooldownFrame.icons, index)
     else
-        for i=#button.spellCooldownFrame.icons,1,-1 do
-            if icon then
+        if icon then
+            for i=#button.spellCooldownFrame.icons,1,-1 do
                 if button.spellCooldownFrame.icons[i] == icon then
-                    icon = tremove(button.spellCooldownFrame.icons, index)
+                    icon = tremove(button.spellCooldownFrame.icons, i)
+                    break
                 end
             end
-            if not icon and spellId then
+        elseif spellId then
+            for i=#button.spellCooldownFrame.icons,1,-1 do
                 if button.spellCooldownFrame.icons[i].spellId == spellId then
-                    icon = tremove(button.spellCooldownFrame.icons, index)
+                    icon = tremove(button.spellCooldownFrame.icons, i)
+                    break
                 end
             end
         end
+    end
+    if not icon then
+        return
     end
     icon:Show()
     LCG.PixelGlow_Stop(icon.glow)
@@ -393,15 +399,18 @@ end
 -- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 120)
 -- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 122)
 -- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 11958)
--- /run LibStub("Gladdy").modules["Cooldowns"]:UpdateTestCooldowns("arena2")
-function Cooldowns:Test(unit)
+
+-- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 116011)
+-- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 102051)
+-- /run local G=LibStub("Gladdy") G.buttons["arena2"].spellCooldownFrame.icons modules["Cooldowns"]:UpdateTestCooldowns("arena2")
+function Cooldowns:Test(unit, showTalents)
     if Gladdy.frame.testing then
-        self:UpdateTestCooldowns(unit)
+        self:UpdateTestCooldowns(unit, showTalents == nil or showTalents)
     end
     Cooldowns:AURA_GAIN(_, AURA_TYPE_BUFF, 22812, "Barkskin", _, 20, _, _, _, _, unit, true)
 end
 
-function Cooldowns:UpdateTestCooldowns(unit)
+function Cooldowns:UpdateTestCooldowns(unit, showTalents)
     local button = Gladdy.buttons[unit]
     local orderedIcons = {}
 
@@ -422,8 +431,8 @@ function Cooldowns:UpdateTestCooldowns(unit)
         if Gladdy.db.cooldownCooldowns[tostring(spellID)] then
             if cooldown.talent then
                 --print(button.class, spellID, cooldown.talent)
-                if not talents[cooldown.talent] then
-                    print("CooldownUsed")
+                if not talents[cooldown.talent] and showTalents then
+                    --print("CooldownUsed")
                     self:CooldownUsed(unit, button.class, spellID)
                     talents[cooldown.talent] = true
                 end
@@ -656,9 +665,7 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId, expirationTimeInSecond
         return
     end
 
-    if not Gladdy.db.cooldownCooldowns[tostring(spellId)] then
-        return
-    end
+    -- Always react to used spells (even if disabled in options) so replacements and talents work on use
 
     local cooldown = Gladdy:GetCooldownList()[unitClass][spellId]
     local cd = cooldown
@@ -745,7 +752,34 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId, expirationTimeInSecond
             end
         end
         if not hasIcon then
-            self:AddCooldown(spellId, cooldown, button)
+            -- if this spell replaces another, remove the replaced icon first to avoid ordering glitches
+            if cooldown.replaces then
+                self:ClearIcon(button, nil, cooldown.replaces)
+            end
+            if Gladdy.db.cooldownCooldowns[tostring(spellId)] then
+                self:AddCooldown(spellId, cooldown, button)
+            end
+            self:IconsSetPoint(button)
+        end
+
+        -- enforce talent row exclusivity dynamically: remove any other talent from the same row
+        if cooldown.talent then
+            for i = #button.spellCooldownFrame.icons, 1, -1 do
+                local icon = button.spellCooldownFrame.icons[i]
+                if icon.spellId ~= spellId then
+                    local other = Gladdy:GetCooldownList()[unitClass][icon.spellId]
+                    if type(other) == "table" and other.talent and other.talent == cooldown.talent then
+                        self:ClearIcon(button, nil, nil, icon)
+                    end
+                end
+            end
+            self:IconsSetPoint(button)
+        end
+
+        -- handle replacements: remove the base spell icon if this spell replaces another
+        if cooldown.replaces then
+            self:ClearIcon(button, nil, cooldown.replaces)
+            self:IconsSetPoint(button)
         end
 
         -- check if there is a shared cooldown with another spell
@@ -772,7 +806,7 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellId, expirationTimeInSecond
                         end
                         if not sharedHasIcon then
                             local value = Gladdy:GetCooldownList()[unitClass][spellID]
-                            if value then
+                            if value and Gladdy.db.cooldownCooldowns[tostring(spellID)] then
                                 self:AddCooldown(spellID, value, button)
                             end
                         end
@@ -946,12 +980,40 @@ function Cooldowns:GetOptions()
             order = 3,
             disabled = function() return not Gladdy.db.cooldown end,
         }),
+        testSpec = {
+            type = "execute",
+            order = 4,
+            width = "0.7",
+            name = L["Test Without Talents"],
+            func = function()
+                for unit in pairs(Gladdy.buttons) do
+                    Cooldowns:ResetUnit(unit)
+                    Cooldowns:UpdateCooldowns(Gladdy.buttons[unit])
+                    Cooldowns:Test(unit, false)
+                end
+            end,
+            disabled = function() return not Gladdy.db.cooldown end,
+        },
+        testTalents = {
+            type = "execute",
+            order = 4,
+            width = "0.7",
+            name = L["Test With Talents"],
+            func = function()
+                for unit in pairs(Gladdy.buttons) do
+                    Cooldowns:ResetUnit(unit)
+                    Cooldowns:UpdateCooldowns(Gladdy.buttons[unit])
+                    Cooldowns:Test(unit, true)
+                end
+            end,
+            disabled = function() return not Gladdy.db.cooldown end,
+        },
         group = {
             type = "group",
             childGroups = "tree",
             name = L["Frame"],
             width = 2.0,
-            order = 3,
+            order = 5,
             disabled = function() return not Gladdy.db.cooldown end,
             args = {
                 icon = {
@@ -1402,7 +1464,7 @@ function Cooldowns:GetCooldownOptions()
                             for unit in pairs(Gladdy.buttons) do
                                 Cooldowns:ResetUnit(unit)
                                 Cooldowns:UpdateCooldowns(Gladdy.buttons[unit])
-                                --Cooldowns:Test(unit)
+                                --Cooldowns:Test(unit, true)
                             end
                         end,
                     },
@@ -1421,7 +1483,7 @@ function Cooldowns:GetCooldownOptions()
                             for unit in pairs(Gladdy.buttons) do
                                 Cooldowns:ResetUnit(unit)
                                 Cooldowns:UpdateCooldowns(Gladdy.buttons[unit])
-                                Cooldowns:Test(unit)
+                                Cooldowns:Test(unit, true)
                             end
                         end
                     },
