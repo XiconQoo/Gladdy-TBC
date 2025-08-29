@@ -299,19 +299,61 @@ function Cooldowns:LayoutGroupedIcons()
             b.spellCooldownFrame:Show()
         end
     end
+    local units = {}
     for i=1, Gladdy.curBracket do
         local unit = "arena" .. i
-        local b = Gladdy.buttons[unit]
-        if b and b.spellCooldownFrame and b.spellCooldownFrame.icons then
+        if Gladdy.buttons[unit] and Gladdy.buttons[unit].spellCooldownFrame then
+            tinsert(units, unit)
+        end
+    end
+
+    if Gladdy.db.cooldownGroupMode == "ORDER" then
+        -- Interleave by order index across all arenas
+        local perUnits = {}
+        local maxLen = 0
+        for _,unit in ipairs(units) do
+            local b = Gladdy.buttons[unit]
             local perUnit = {}
-            for _,icon in pairs(b.spellCooldownFrame.icons) do
-                tinsert(perUnit, icon)
+            if b and b.spellCooldownFrame and b.spellCooldownFrame.icons then
+                for _,icon in pairs(b.spellCooldownFrame.icons) do
+                    tinsert(perUnit, icon)
+                end
+                tbl_sort(perUnit, function(a, other)
+                    local orderTbl = Gladdy.db.cooldownCooldownsOrder[b.class]
+                    local ao = orderTbl and orderTbl[tostring(a.spellId)] or 9999
+                    local bo = orderTbl and orderTbl[tostring(other.spellId)] or 9999
+                    return ao < bo
+                end)
             end
-            tbl_sort(perUnit, function(a, other)
-                return Gladdy.db.cooldownCooldownsOrder[b.class][tostring(a.spellId)] < Gladdy.db.cooldownCooldownsOrder[b.class][tostring(other.spellId)]
-            end)
-            for _,icon in ipairs(perUnit) do
-                tinsert(allIcons, icon)
+            perUnits[unit] = perUnit
+            if #perUnit > maxLen then maxLen = #perUnit end
+        end
+        for idx=1, maxLen do
+            for _,unit in ipairs(units) do
+                local icon = perUnits[unit][idx]
+                if icon then
+                    tinsert(allIcons, icon)
+                end
+            end
+        end
+    else
+        -- ARENA mode: concatenate all icons by arena sequentially
+        for _,unit in ipairs(units) do
+            local b = Gladdy.buttons[unit]
+            if b and b.spellCooldownFrame and b.spellCooldownFrame.icons then
+                local perUnit = {}
+                for _,icon in pairs(b.spellCooldownFrame.icons) do
+                    tinsert(perUnit, icon)
+                end
+                tbl_sort(perUnit, function(a, other)
+                    local orderTbl = Gladdy.db.cooldownCooldownsOrder[b.class]
+                    local ao = orderTbl and orderTbl[tostring(a.spellId)] or 9999
+                    local bo = orderTbl and orderTbl[tostring(other.spellId)] or 9999
+                    return ao < bo
+                end)
+                for _,icon in ipairs(perUnit) do
+                    tinsert(allIcons, icon)
+                end
             end
         end
     end
