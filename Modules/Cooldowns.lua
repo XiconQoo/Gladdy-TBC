@@ -557,17 +557,16 @@ function Cooldowns:ClearIcon(button, index, spellId, icon)
     if index then
         icon = tremove(button.spellCooldownFrame.icons, index)
     else
-        if icon then
-            for i=#button.spellCooldownFrame.icons,1,-1 do
+        for i=#button.spellCooldownFrame.icons,1,-1 do
+            if icon then
                 if button.spellCooldownFrame.icons[i] == icon then
-                    icon = tremove(button.spellCooldownFrame.icons, i)
+                    icon = tremove(button.spellCooldownFrame.icons, index)
                     break
                 end
             end
-        elseif spellId then
-            for i=#button.spellCooldownFrame.icons,1,-1 do
+            if not icon and spellId then
                 if button.spellCooldownFrame.icons[i].spellId == spellId then
-                    icon = tremove(button.spellCooldownFrame.icons, i)
+                    icon = tremove(button.spellCooldownFrame.icons, index)
                     break
                 end
             end
