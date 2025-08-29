@@ -242,9 +242,6 @@ end
 
 function Cooldowns:IconsSetPoint(button)
     if Gladdy.db.cooldownGroup then
-        if button.unit ~= "arena1" then
-            return
-        end
         self:LayoutGroupedIcons()
         return
     end
@@ -294,6 +291,14 @@ function Cooldowns:LayoutGroupedIcons()
     local anchorFrame = anchorButton.spellCooldownFrame
 
     local allIcons = {}
+    -- ensure all unit frames are visible and icons are attached for layout source
+    for i=1, Gladdy.curBracket do
+        local unit = "arena" .. i
+        local b = Gladdy.buttons[unit]
+        if b and b.spellCooldownFrame then
+            b.spellCooldownFrame:Show()
+        end
+    end
     for i=1, Gladdy.curBracket do
         local unit = "arena" .. i
         local b = Gladdy.buttons[unit]
@@ -316,7 +321,10 @@ function Cooldowns:LayoutGroupedIcons()
     local yPad = Gladdy.db.cooldownIconPadding
 
     for idx,icon in ipairs(allIcons) do
-        icon:SetParent(anchorFrame)
+        -- reparent once to anchor cluster
+        if icon:GetParent() ~= anchorFrame then
+            icon:SetParent(anchorFrame)
+        end
         icon:ClearAllPoints()
         local row = math.floor((idx-1) / cols)
         local col = (idx-1) % cols
@@ -352,7 +360,6 @@ function Cooldowns:UpdateFrameOnce()
 end
 
 function Cooldowns:UpdateFrame(unit)
-    print("UpdateFrame", unit)
     local button = Gladdy.buttons[unit]
     local testAgain = false
     if (Gladdy.db.cooldown) then
@@ -460,8 +467,7 @@ end
 -- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 102051)
 -- /run local G=LibStub("Gladdy") G.buttons["arena2"].spellCooldownFrame.icons modules["Cooldowns"]:UpdateTestCooldowns("arena2")
 function Cooldowns:Test(unit, showTalents)
-    print("TEST", unit, Gladdy.frame.testing, showTalents)
-    if Gladdy.frame.testing then
+    if Gladdy.frame.testing and Gladdy.buttons[unit] then
         self:ResetUnit(unit)
         self:UpdateCooldowns(Gladdy.buttons[unit])
         self:UpdateTestCooldowns(unit, showTalents == nil or showTalents)
@@ -471,6 +477,9 @@ end
 
 function Cooldowns:UpdateTestCooldowns(unit, showTalents)
     local button = Gladdy.buttons[unit]
+    if not button or not button.class then
+        return
+    end
     local orderedIcons = {}
 
     for _,icon in pairs(button.spellCooldownFrame.icons) do
@@ -489,9 +498,7 @@ function Cooldowns:UpdateTestCooldowns(unit, showTalents)
     for spellID,cooldown in pairs(Gladdy:GetCooldownList()[button.class]) do
         if Gladdy.db.cooldownCooldowns[tostring(spellID)] then
             if cooldown.talent then
-                --print(button.class, spellID, cooldown.talent)
                 if not talents[cooldown.talent] and showTalents then
-                    --print("CooldownUsed")
                     self:CooldownUsed(unit, button.class, spellID)
                     talents[cooldown.talent] = true
                 end
@@ -945,6 +952,9 @@ function Cooldowns:AddCooldown(spellID, value, button)
 end
 
 function Cooldowns:UpdateCooldowns(button)
+    if not button then
+        return
+    end
     local class = button.class
     local race = button.race
     local spec = button.spec
@@ -1522,7 +1532,6 @@ function Cooldowns:GetCooldownOptions()
                         width = 0.2,
                         order = 1,
                         get = function()
-                            --print(class, spellId, Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)])
                             return tostring(Gladdy.db.cooldownCooldownsOrder[class][tostring(spellId)])
                         end,
                         dialogControl = "NumericInputBox",
@@ -1533,7 +1542,7 @@ function Cooldowns:GetCooldownOptions()
                             for unit in pairs(Gladdy.buttons) do
                                 Cooldowns:ResetUnit(unit)
                                 Cooldowns:UpdateCooldowns(Gladdy.buttons[unit])
-                                --Cooldowns:Test(unit, true)
+                                Cooldowns:Test(unit, true)
                             end
                         end,
                     },
