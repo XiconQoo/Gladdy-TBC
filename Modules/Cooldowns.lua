@@ -76,7 +76,8 @@ local Cooldowns = Gladdy:NewModule("Cooldowns", nil, {
     cooldownFrameStrata = "MEDIUM",
     cooldownFrameLevel = 3,
     cooldownGroup = false,
-    cooldownGroupDirection = "DOWN"
+    cooldownGroupDirection = "DOWN",
+    cooldownGroupMode = "ARENA", -- ARENA or ORDER
 })
 
 function Cooldowns:Initialize()
@@ -240,6 +241,13 @@ function Cooldowns:UpdateIcon(icon)
 end
 
 function Cooldowns:IconsSetPoint(button)
+    if Gladdy.db.cooldownGroup then
+        if button.unit ~= "arena1" then
+            return
+        end
+        self:LayoutGroupedIcons()
+        return
+    end
     local orderedIcons = {}
     for _,icon in pairs(button.spellCooldownFrame.icons) do
         tinsert(orderedIcons, icon)
@@ -280,6 +288,62 @@ function Cooldowns:IconsSetPoint(button)
     end
 end
 
+function Cooldowns:LayoutGroupedIcons()
+    local anchorButton = Gladdy.buttons["arena1"]
+    if not anchorButton then return end
+    local anchorFrame = anchorButton.spellCooldownFrame
+
+    local allIcons = {}
+    for i=1, Gladdy.curBracket do
+        local unit = "arena" .. i
+        local b = Gladdy.buttons[unit]
+        if b and b.spellCooldownFrame and b.spellCooldownFrame.icons then
+            local perUnit = {}
+            for _,icon in pairs(b.spellCooldownFrame.icons) do
+                tinsert(perUnit, icon)
+            end
+            tbl_sort(perUnit, function(a, other)
+                return Gladdy.db.cooldownCooldownsOrder[b.class][tostring(a.spellId)] < Gladdy.db.cooldownCooldownsOrder[b.class][tostring(other.spellId)]
+            end)
+            for _,icon in ipairs(perUnit) do
+                tinsert(allIcons, icon)
+            end
+        end
+    end
+
+    local cols = Gladdy.db.cooldownMaxIconsPerLine
+    local xPad = Gladdy.db.cooldownIconPadding
+    local yPad = Gladdy.db.cooldownIconPadding
+
+    for idx,icon in ipairs(allIcons) do
+        icon:SetParent(anchorFrame)
+        icon:ClearAllPoints()
+        local row = math.floor((idx-1) / cols)
+        local col = (idx-1) % cols
+        if Gladdy.db.cooldownXGrowDirection == "LEFT" then
+            if col == 0 then
+                if row == 0 then
+                    icon:SetPoint("LEFT", anchorFrame, "LEFT", 0, 0)
+                else
+                    icon:SetPoint(Gladdy.db.cooldownYGrowDirection == "DOWN" and "TOP" or "BOTTOM", allIcons[idx - cols], Gladdy.db.cooldownYGrowDirection == "DOWN" and "BOTTOM" or "TOP", 0, Gladdy.db.cooldownYGrowDirection == "DOWN" and -yPad or yPad)
+                end
+            else
+                icon:SetPoint("RIGHT", allIcons[idx-1], "LEFT", -xPad, 0)
+            end
+        else
+            if col == 0 then
+                if row == 0 then
+                    icon:SetPoint("LEFT", anchorFrame, "LEFT", 0, 0)
+                else
+                    icon:SetPoint(Gladdy.db.cooldownYGrowDirection == "DOWN" and "TOP" or "BOTTOM", allIcons[idx - cols], Gladdy.db.cooldownYGrowDirection == "DOWN" and "BOTTOM" or "TOP", 0, Gladdy.db.cooldownYGrowDirection == "DOWN" and -yPad or yPad)
+                end
+            else
+                icon:SetPoint("LEFT", allIcons[idx-1], "RIGHT", xPad, 0)
+            end
+        end
+    end
+end
+
 function Cooldowns:UpdateFrameOnce()
     for _,icon in ipairs(self.iconCache) do
         self:UpdateIcon(icon)
@@ -288,6 +352,7 @@ function Cooldowns:UpdateFrameOnce()
 end
 
 function Cooldowns:UpdateFrame(unit)
+    print("UpdateFrame", unit)
     local button = Gladdy.buttons[unit]
     local testAgain = false
     if (Gladdy.db.cooldown) then
@@ -302,15 +367,6 @@ function Cooldowns:UpdateFrame(unit)
             Gladdy:CreateMover(button.spellCooldownFrame,"cooldownXOffset", "cooldownYOffset", L["Cooldown"],
                     {"TOPLEFT", "TOPLEFT"},
                     Gladdy.db.cooldownSize * Gladdy.db.cooldownWidthFactor, Gladdy.db.cooldownSize, 0, 0, "cooldown")
-        end
-
-        if (Gladdy.db.cooldownGroup) then
-            --TODO fix overlapping
-            if (unit ~= "arena1") then
-                local previousUnit = "arena" .. string.gsub(unit, "arena", "") - 1
-                self.frames[unit]:ClearAllPoints()
-                self.frames[unit]:SetPoint("TOP", self.frames[previousUnit], "BOTTOM", 0, -Gladdy.db.cooldownIconPadding)
-            end
         end
 
         -- Update each cooldown icon
@@ -404,7 +460,10 @@ end
 -- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 102051)
 -- /run local G=LibStub("Gladdy") G.buttons["arena2"].spellCooldownFrame.icons modules["Cooldowns"]:UpdateTestCooldowns("arena2")
 function Cooldowns:Test(unit, showTalents)
+    print("TEST", unit, Gladdy.frame.testing, showTalents)
     if Gladdy.frame.testing then
+        self:ResetUnit(unit)
+        self:UpdateCooldowns(Gladdy.buttons[unit])
         self:UpdateTestCooldowns(unit, showTalents == nil or showTalents)
     end
     Cooldowns:AURA_GAIN(_, AURA_TYPE_BUFF, 22812, "Barkskin", _, 20, _, _, _, _, unit, true)
@@ -979,6 +1038,16 @@ function Cooldowns:GetOptions()
             name = L["Group"] .. " " .. L["Cooldown"],
             order = 3,
             disabled = function() return not Gladdy.db.cooldown end,
+        }),
+        cooldownGroupMode = Gladdy:option({
+            type = "select",
+            name = L["Group Mode"],
+            order = 4,
+            values = {
+                ["ARENA"] = L["By Arena"],
+                ["ORDER"] = L["By Order"],
+            },
+            disabled = function() return not Gladdy.db.cooldown or not Gladdy.db.cooldownGroup end,
         }),
         testSpec = {
             type = "execute",
