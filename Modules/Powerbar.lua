@@ -324,7 +324,7 @@ function Powerbar:UNIT_DESTROYED(unit)
     if (not powerBar) then
         return
     end
-    Powerbar:SetPower(powerBar, unit, 0, powerBar.energy.max, powerBar.energy.powerType, L["LEAVE"])
+    Powerbar:SetPower(powerBar, unit, 0, powerBar.energy.max or 1, powerBar.energy.powerType, L["LEAVE"])
 end
 
 local function option(params)

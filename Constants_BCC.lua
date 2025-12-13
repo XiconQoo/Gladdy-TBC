@@ -174,872 +174,307 @@ local specSpells = {
 function Gladdy:GetSpecSpells()
     return specSpells
 end
+local importantAuras = {}
 
-local importantAuras = {
-    -- Cyclone
-    [GetSpellInfo(33786)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 6,
-        priority = 40,
-        spellID = 33786,
-    },
-    -- Hibernate
-    [GetSpellInfo(18658)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 10,
-        priority = 40,
-        magic = true,
-        spellID = 18658,
-    },
-    -- Entangling Roots
-    [GetSpellInfo(26989)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 10,
-        priority = 30,
-        onDamage = true,
-        magic = true,
-        root = true,
-        spellID = 26989,
-    },
-    [select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689))] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 10,
-        priority = 30,
-        spellID = 27010,
-        altName = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)),
-    },
-    -- Feral Charge
-    [GetSpellInfo(16979)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 4,
-        priority = 30,
-        root = true,
-        spellID = 16979,
-    },
-    -- Bash
-    [GetSpellInfo(8983)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 4,
-        priority = 30,
-        spellID = 8983,
-    },
-    -- Pounce
-    [GetSpellInfo(9005)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 3,
-        priority = 40,
-        spellID = 9005,
-    },
-    -- Maim
-    [GetSpellInfo(22570)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 6,
-        priority = 40,
-        incapacite = true,
-        spellID = 22570,
-    },
-    -- Innervate
-    [GetSpellInfo(29166)] = {
-        track = AURA_TYPE_BUFF,
-        duration = 20,
-        priority = 10,
-        spellID = 29166,
-    },
-    -- Imp Starfire Stun
-    [GetSpellInfo(16922)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 3,
-        priority = 40,
-        spellSchool = "physical",
-        spellID = 16922,
-    },
+local function AddImportantAura(spellID, track, priority, spellIDs, options)
+    options = options or {}
+    local name, _, texture = GetSpellInfo(spellID)
+    if name then
+        importantAuras[spellID] = {
+            track = track,
+            priority = priority,
+            spellIDs = spellIDs or { spellID },
+            texture = options.texture or texture or GetSpellTexture(spellID),
+            textureSpell = options.textureSpell or spellID,
+            altName = options.altName,
+            duration = options.duration or 0,
+            magic = options.magic
+        }
+    end
+end
+-- DRUID
+AddImportantAura(33786, AURA_TYPE_DEBUFF, 40, { 33786 }, { duration = 6 }) -- Cyclone
+AddImportantAura(18658, AURA_TYPE_DEBUFF, 40, { 18658 }, { duration = 10, magic = true }) -- Hibernate
+AddImportantAura(26989, AURA_TYPE_DEBUFF, 30, { 26989 }, { duration = 10, magic = true }) -- Entangling Roots
+AddImportantAura(27010, AURA_TYPE_DEBUFF, 30, { 27010 }, { duration = 10, altName = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)) }) -- Entangling Roots (Nature's Grasp)
+AddImportantAura(16979, AURA_TYPE_DEBUFF, 30, { 16979 }, { duration = 4 }) -- Feral Charge
+AddImportantAura(8983, AURA_TYPE_DEBUFF, 30, { 8983 }, { duration = 4 }) -- Bash
+AddImportantAura(9005, AURA_TYPE_DEBUFF, 40, { 9005 }, { duration = 3 }) -- Pounce
+AddImportantAura(22570, AURA_TYPE_DEBUFF, 40, { 22570 }, { duration = 6 }) -- Maim
+AddImportantAura(29166, AURA_TYPE_BUFF, 10, { 29166 }, { duration = 20 }) -- Innervate
+AddImportantAura(16922, AURA_TYPE_DEBUFF, 40, { 16922 }, { duration = 3 }) -- Imp Starfire Stun
 
+-- HUNTER
+AddImportantAura(14309, AURA_TYPE_DEBUFF, 40, { 14309 }, { duration = 10, magic = true }) -- Freezing Trap Effect
+AddImportantAura(19386, AURA_TYPE_DEBUFF, 40, { 19386 }, { duration = 10 }) -- Wyvern Sting
+AddImportantAura(19503, AURA_TYPE_DEBUFF, 40, { 19503 }, { duration = 4 }) -- Scatter Shot
+AddImportantAura(14327, AURA_TYPE_DEBUFF, 40, { 14327 }, { duration = 8, magic = true }) -- Scare Beast
+AddImportantAura(34490, AURA_TYPE_DEBUFF, 15, { 34490 }, { duration = 3, magic = true }) -- Silencing Shot
+AddImportantAura(19577, AURA_TYPE_DEBUFF, 40, { 19577 }, { duration = 2 }) -- Intimidation
+AddImportantAura(34471, AURA_TYPE_BUFF, 20, { 34471 }, { duration = 18 }) -- The Beast Within
 
-    -- Freezing Trap Effect
-    [GetSpellInfo(14309)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 10,
-        priority = 40,
-        onDamage = true,
-        magic = true,
-        spellID = 14309,
-    },
-    -- Wyvern Sting
-    [GetSpellInfo(19386)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 10,
-        priority = 40,
-        onDamage = true,
-        poison = true,
-        sleep = true,
-        spellID = 19386,
-    },
-    -- Scatter Shot
-    [GetSpellInfo(19503)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 4,
-        priority = 40,
-        onDamage = true,
-        spellID = 19503,
-    },
-    -- Scare Beast
-    [GetSpellInfo(14327)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 8,
-        priority = 40,
-        onDamage = true,
-        fear = true,
-        magic = true,
-        spellID = 14327,
-    },
-    -- Silencing Shot
-    [GetSpellInfo(34490)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 3,
-        priority = 15,
-        magic = true,
-        spellID = 34490,
-    },
-    -- Intimidation
-    [GetSpellInfo(19577)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 2,
-        priority = 40,
-        spellID = 19577,
-    },
-    -- The Beast Within
-    [GetSpellInfo(34471)] = {
-        track = AURA_TYPE_BUFF,
-        duration = 18,
-        priority = 20,
-        spellID = 34471,
-    },
+-- MAGE
+AddImportantAura(12826, AURA_TYPE_DEBUFF, 40, { 12826 }, { duration = 10, magic = true }) -- Polymorph
+AddImportantAura(31661, AURA_TYPE_DEBUFF, 40, { 31661 }, { duration = 3, magic = true }) -- Dragon's Breath
+AddImportantAura(27088, AURA_TYPE_DEBUFF, 30, { 27088 }, { duration = 8, magic = true }) -- Frost Nova
+AddImportantAura(33395, AURA_TYPE_DEBUFF, 30, { 33395 }, { duration = 8, magic = true }) -- Freeze (Water Elemental)
+AddImportantAura(18469, AURA_TYPE_DEBUFF, 15, { 18469 }, { duration = 4, magic = true }) -- Counterspell - Silence
+AddImportantAura(45438, AURA_TYPE_BUFF, 20, { 45438 }, { duration = 10 }) -- Ice Block
+AddImportantAura(41425, AURA_TYPE_DEBUFF, 8, { 41425 }) -- Hypothermia
+AddImportantAura(12355, AURA_TYPE_DEBUFF, 40, { 12355 }, { duration = 2 }) -- Impact
 
+-- PALADIN
+AddImportantAura(10308, AURA_TYPE_DEBUFF, 40, { 10308 }, { duration = 6, magic = true }) -- Hammer of Justice
+AddImportantAura(20066, AURA_TYPE_DEBUFF, 40, { 20066 }, { duration = 6, magic = true }) -- Repentance
+AddImportantAura(10278, AURA_TYPE_BUFF, 10, { 10278 }, { duration = 10 }) -- Blessing of Protection
+AddImportantAura(1044, AURA_TYPE_BUFF, 10, { 1044 }, { duration = 14 }) -- Blessing of Freedom
+AddImportantAura(6940, AURA_TYPE_BUFF, 12, { 6940 }, { duration = 30 }) -- Blessing of Sacrifice
+AddImportantAura(642, AURA_TYPE_BUFF, 20, { 642 }, { duration = 12 }) -- Divine Shield
 
-    -- Polymorph
-    [GetSpellInfo(12826)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 10,
-        priority = 40,
-        onDamage = true,
-        magic = true,
-        spellID = 12826,
-    },
-    -- Dragon's Breath
-    [GetSpellInfo(31661)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 3,
-        priority = 40,
-        onDamage = true,
-        magic = true,
-        spellID = 31661,
-    },
-    -- Frost Nova
-    [GetSpellInfo(27088)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 8,
-        priority = 30,
-        onDamage = true,
-        magic = true,
-        root = true,
-        spellID = 27088,
-    },
-    -- Freeze (Water Elemental)
-    [GetSpellInfo(33395)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 8,
-        priority = 30,
-        onDamage = true,
-        magic = true,
-        root = true,
-        spellID = 33395,
-    },
-    -- Counterspell - Silence
-    [GetSpellInfo(18469)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 4,
-        priority = 15,
-        magic = true,
-        spellID = 18469,
-    },
-    -- Ice Block
-    [GetSpellInfo(45438)] = {
-        track = AURA_TYPE_BUFF,
-        duration = 10,
-        priority = 20,
-        spellID = 45438,
-    },
-    [GetSpellInfo(41425)] = { -- Hypothermia (Ice Block Immune
-        track = AURA_TYPE_DEBUFF,
-        priority = 8,
-        spellID = 41425,
-    },
-    -- Impact
-    [GetSpellInfo(12355)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 2,
-        priority = 40,
-        spellID = 12355,
-    },
+-- PRIEST
+AddImportantAura(8122, AURA_TYPE_DEBUFF, 40, { 8122 }, { duration = 8, magic = true }) -- Psychic Scream
+AddImportantAura(44047, AURA_TYPE_DEBUFF, 30, { 44047 }, { duration = 8 }) -- Chastise
+AddImportantAura(605, AURA_TYPE_DEBUFF, 40, { 605 }, { duration = 10, magic = true }) -- Mind Control
+AddImportantAura(15269, AURA_TYPE_DEBUFF, 40, { 15269 }, { duration = 3 }) -- Blackout Stun
+AddImportantAura(15487, AURA_TYPE_DEBUFF, 15, { 15487 }, { duration = 5, magic = true }) -- Silence
+AddImportantAura(33206, AURA_TYPE_BUFF, 10, { 33206 }, { duration = 8 }) -- Pain Suppression
+AddImportantAura(6346, AURA_TYPE_BUFF, 9, { 6346 }, { duration = 180 }) -- Fear Ward
 
-    -- Hammer of Justice
-    [GetSpellInfo(10308)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 6,
-        priority = 40,
-        magic = true,
-        spellID = 10308,
-    },
-    -- Repentance
-    [GetSpellInfo(20066)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 6,
-        priority = 40,
-        onDamage = true,
-        magic = true,
-        incapacite = true,
-        spellID = 20066,
-    },
-    -- Blessing of Protection
-    [GetSpellInfo(10278)] = {
-        track = AURA_TYPE_BUFF,
-        duration = 10,
-        priority = 10,
-        spellID = 10278,
-    },
-    -- Blessing of Freedom
-    [GetSpellInfo(1044)] = {
-        track = AURA_TYPE_BUFF,
-        duration = 14,
-        priority = 10,
-        spellID = 1044,
-    },
-    -- Blessing of Sacrifice
-    [GetSpellInfo(6940)] = {
-        track = AURA_TYPE_BUFF,
-        duration = 30,
-        priority = 12,
-        spellID = 6940,
-    },
-    -- Divine Shield
-    [GetSpellInfo(642)] = {
-        track = AURA_TYPE_BUFF,
-        duration = 12,
-        priority = 20,
-        spellID = 642,
-    },
+-- ROGUE
+AddImportantAura(6770, AURA_TYPE_DEBUFF, 40, { 6770 }, { duration = 10 }) -- Sap
+AddImportantAura(2094, AURA_TYPE_DEBUFF, 40, { 2094 }, { duration = 10 }) -- Blind
+AddImportantAura(1833, AURA_TYPE_DEBUFF, 40, { 1833 }, { duration = 4 }) -- Cheap Shot
+AddImportantAura(8643, AURA_TYPE_DEBUFF, 40, { 8643 }, { duration = 6 }) -- Kidney Shot
+AddImportantAura(1776, AURA_TYPE_DEBUFF, 40, { 1776 }, { duration = 4 }) -- Gouge
+AddImportantAura(18425, AURA_TYPE_DEBUFF, 15, { 18425 }, { duration = 2 }) -- Kick - Silence
+AddImportantAura(1330, AURA_TYPE_DEBUFF, 15, { 1330 }, { duration = 3 }) -- Garrote - Silence
+AddImportantAura(31224, AURA_TYPE_BUFF, 20, { 31224 }, { duration = 5 }) -- Cloak of Shadows
+AddImportantAura(26669, AURA_TYPE_BUFF, 10, { 26669 }, { duration = 15 }) -- Evasion
+AddImportantAura(14251, AURA_TYPE_DEBUFF, 20, { 14251 }, { duration = 6 }) -- Riposte
 
+-- WARLOCK
+AddImportantAura(5782, AURA_TYPE_DEBUFF, 40, { 5782 }, { duration = 10, magic = true }) -- Fear
+AddImportantAura(27223, AURA_TYPE_DEBUFF, 40, { 27223 }, { duration = 3 }) -- Death Coil
+AddImportantAura(710, AURA_TYPE_DEBUFF, 40, { 710 }, { duration = 10 }) -- Banish
+AddImportantAura(30283, AURA_TYPE_DEBUFF, 40, { 30283 }, { duration = 2, magic = true }) -- Shadowfury
+AddImportantAura(6358, AURA_TYPE_DEBUFF, 40, { 6358 }, { duration = 10, magic = true }) -- Seduction (Succubus)
+AddImportantAura(5484, AURA_TYPE_DEBUFF, 40, { 5484 }, { duration = 8, magic = true }) -- Howl of Terror
+AddImportantAura(24259, AURA_TYPE_DEBUFF, 15, { 24259 }, { duration = 3, magic = true }) -- Spell Lock (Felhunter)
+AddImportantAura(31117, AURA_TYPE_DEBUFF, 15, { 31117 }, { duration = 5, magic = true, altName = select(1, GetSpellInfo(31117)) .. " Silence" }) -- Unstable Affliction Silence
 
-    -- Psychic Scream
-    [GetSpellInfo(8122)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 8,
-        priority = 40,
-        onDamage = true,
-        fear = true,
-        magic = true,
-        spellID = 8122,
-    },
-    -- Chastise
-    [GetSpellInfo(44047)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 8,
-        priority = 30,
-        root = true,
-        spellID = 44047,
-    },
-    -- Mind Control
-    [GetSpellInfo(605)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 10,
-        priority = 40,
-        magic = true,
-        spellID = 605,
-    },
-    --Blackout Stun 15269
-    [GetSpellInfo(15269)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 3,
-        priority = 40,
-        spellSchool = "magic",
-        spellID = 15269,
-    },
-    -- Silence
-    [GetSpellInfo(15487)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 5,
-        priority = 15,
-        magic = true,
-        spellID = 15487,
-    },
-    -- Pain Suppression
-    [GetSpellInfo(33206)] = {
-        track = AURA_TYPE_BUFF,
-        duration = 8,
-        priority = 10,
-        spellID = 33206,
-    },
-    -- Fear Ward
-    [GetSpellInfo(6346)] = {
-        track = AURA_TYPE_BUFF,
-        duration = 180,
-        priority = 9,
-        spellID = 6346,
-    },
+-- WARRIOR
+AddImportantAura(5246, AURA_TYPE_DEBUFF, 15, { 5246 }, { duration = 8 }) -- Intimidating Shout
+AddImportantAura(12809, AURA_TYPE_DEBUFF, 40, { 12809 }, { duration = 5 }) -- Concussion Blow
+AddImportantAura(25274, AURA_TYPE_DEBUFF, 40, { 25274 }, { duration = 3, texture = select(3, GetSpellInfo(25272)) }) -- Intercept Stun
+AddImportantAura(7922, AURA_TYPE_DEBUFF, 40, { 7922 }, { duration = 1, texture = select(3, GetSpellInfo(100)) }) -- Charge Stun
+AddImportantAura(23920, AURA_TYPE_BUFF, 50, { 23920 }, { duration = 5 }) -- Spell Reflection
+AddImportantAura(18498, AURA_TYPE_DEBUFF, 15, { 18498 }, { duration = 3 }) -- Shield Bash - Silenced
+AddImportantAura(12292, AURA_TYPE_BUFF, 15, { 12292 }, { duration = 3 }) -- Death Wish
+AddImportantAura(676, AURA_TYPE_DEBUFF, 20, { 676 }, { duration = 10 }) -- Disarm
 
-
-    -- Sap
-    [GetSpellInfo(6770)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 10,
-        priority = 40,
-        onDamage = true,
-        incapacite = true,
-        spellID = 6770,
-    },
-    -- Blind
-    [GetSpellInfo(2094)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 10,
-        priority = 40,
-        onDamage = true,
-        spellID = 2094,
-    },
-    -- Cheap Shot
-    [GetSpellInfo(1833)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 4,
-        priority = 40,
-        spellID = 1833,
-    },
-    -- Kidney Shot
-    [GetSpellInfo(8643)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 6,
-        priority = 40,
-        spellID = 8643,
-    },
-    -- Gouge
-    [GetSpellInfo(1776)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 4,
-        priority = 40,
-        onDamage = true,
-        incapacite = true,
-        spellID = 1776,
-    },
-    -- Kick - Silence
-    [GetSpellInfo(18425)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 2,
-        priority = 15,
-        spellID = 18425,
-    },
-    -- Garrote - Silence
-    [GetSpellInfo(1330)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 3,
-        priority = 15,
-        spellID = 1330,
-    },
-    -- Cloak of Shadows
-    [GetSpellInfo(31224)] = {
-        track = AURA_TYPE_BUFF,
-        duration = 5,
-        priority = 20,
-        spellID = 31224,
-    },
-    -- Evasion
-    [GetSpellInfo(26669)] = {
-        track = AURA_TYPE_BUFF,
-        duration = 15,
-        priority = 10,
-        spellID = 26669,
-    },
-    -- Riposte
-    [GetSpellInfo(14251)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 6,
-        priority = 20,
-        spellID = 14251,
-    },
-
-    -- Fear
-    [GetSpellInfo(5782)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 10,
-        priority = 40,
-        onDamage = true,
-        fear = true,
-        magic = true,
-        spellID = 5782,
-    },
-    -- Death Coil
-    [GetSpellInfo(27223)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 3,
-        priority = 40,
-        spellID = 27223,
-    },
-    --Banish
-    [GetSpellInfo(710)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 10,
-        priority = 40,
-        spellID = 710,
-    },
-    -- Shadowfury
-    [GetSpellInfo(30283)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 2,
-        priority = 40,
-        magic = true,
-        spellID = 30283,
-    },
-    -- Seduction (Succubus)
-    [GetSpellInfo(6358)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 10,
-        priority = 40,
-        onDamage = true,
-        fear = true,
-        magic = true,
-        spellID = 6358,
-    },
-    -- Howl of Terror
-    [GetSpellInfo(5484)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 8,
-        priority = 40,
-        onDamage = true,
-        fear = true,
-        magic = true,
-        spellID = 5484,
-        texture = select(3, GetSpellInfo(5484))
-    },
-    -- Spell Lock (Felhunter)
-    [GetSpellInfo(24259)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 3,
-        priority = 15,
-        magic = true,
-        spellID = 24259,
-    },
-    -- Unstable Affliction Silence
-    [select(1, GetSpellInfo(31117)) .. " Silence"] = { -- GetSpellInfo returns "Unstable Affliction"
-        track = AURA_TYPE_DEBUFF,
-        altName = select(1, GetSpellInfo(31117)) .. " Silence",
-        duration = 5,
-        priority = 15,
-        magic = true,
-        spellID = 31117,
-    },
-
-
-    -- Intimidating Shout
-    [GetSpellInfo(5246)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 8,
-        priority = 15,
-        onDamage = true,
-        fear = true,
-        spellID = 5246,
-    },
-    -- Concussion Blow
-    [GetSpellInfo(12809)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 5,
-        priority = 40,
-        spellID = 12809,
-    },
-    -- Intercept Stun
-    [GetSpellInfo(25274)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 3,
-        priority = 40,
-        spellID = 25274,
-        texture = select(3, GetSpellInfo(25272))
-    },
-    -- Charge Stun
-    [GetSpellInfo(7922)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 1,
-        priority = 40,
-        spellID = 7922,
-        texture = select(3, GetSpellInfo(100))
-    },
-    -- Spell Reflection
-    [GetSpellInfo(23920)] = {
-        track = AURA_TYPE_BUFF,
-        duration = 5,
-        priority = 50,
-        spellID = 23920,
-    },
-    -- Shield Bash - Silenced
-    [GetSpellInfo(18498)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 3,
-        priority = 15,
-        spellSchool = "magic",
-        spellID = 18498,
-    },
-    -- Death Wish
-    [GetSpellInfo(12292)] = {
-        track = AURA_TYPE_BUFF,
-        duration = 3,
-        priority = 15,
-        spellSchool = "magic",
-        spellID = 12292,
-    },
-    --Disarm
-    [GetSpellInfo(676)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 10,
-        priority = 20,
-        spellID = 676,
-    },
-
-    -- Grounding Totem Effect
-    [GetSpellInfo(8178)] = {
-        track = AURA_TYPE_BUFF,
-        duration = 0,
-        priority = 20,
-        spellID = 8178
-    },
-    --Intervene
-    [GetSpellInfo(3411)] = {
-        track = AURA_TYPE_BUFF,
-        duration = 10,
-        priority = 10,
-        spellSchool = "physical",
-        spellID = 3411,
-    },
-    --Improved Hamstring
-    [GetSpellInfo(23694)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 5,
-        priority = 40,
-        spellSchool = "physical",
-        spellID = 23694,
-    },
-
-    -- Mace Stun Effect
-    [GetSpellInfo(5530)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 3,
-        priority = 40,
-        spellSchool = "physical",
-        texture = select(3, GetSpellInfo(12284)),
-        spellID = 5530,
-    },
-
-    -- Storm Herald Stun effect
-    [GetSpellInfo(34510)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 4,
-        priority = 40,
-        spellSchool = "physical",
-        spellID = 34510,
-    },
-
-    -- War Stomp
-    [GetSpellInfo(20549)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 2,
-        priority = 40,
-        spellID = 20549,
-    },
-    -- Arcane Torrent
-    [GetSpellInfo(28730)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 2,
-        priority = 15,
-        magic = true,
-        spellID = 28730,
-    },
-    -- Shadowsight Buff
-    [GetSpellInfo(34709)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 15,
-        priority = 9,
-        magic = true,
-        spellID = 34709,
-    },
-    -- Net-o-Matic
-    [GetSpellInfo(13120)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 10,
-        priority = 30,
-        spellID = 13120,
-    },
-    -- Nigh Invulnerability Shield
-    [GetSpellInfo(30458)] = {
-        track = AURA_TYPE_BUFF,
-        duration = 8,
-        priority = 15,
-        spellID = 30458,
-        texture = select(10, GetItemInfo(23825))
-    },
-    -- Nigh Invulnerability Belt Backfire
-    [GetSpellInfo(30457)] = {
-        track = AURA_TYPE_DEBUFF,
-        duration = 8,
-        priority = 15,
-        spellID = 30457,
-    },
-    -- Flee (Skull of impending Doom) -- 5024
-    [GetSpellInfo(5024)] = {
-        track = AURA_TYPE_BUFF,
-        duration = 8,
-        priority = 15,
-        spellID = 5024,
-        altName = select(1, GetSpellInfo(5024)) .. " - " .. (select(1, GetItemInfo(4984)) or "Skull of Impending Doom"),
-    },
-    -- Will of the Forsaken
-    [GetSpellInfo(7744)] = {
-        track = AURA_TYPE_BUFF,
-        duration = 5,
-        priority = 15,
-        spellID = 7744,
-    },
-}
+-- MISC / ITEMS / RACIALS
+AddImportantAura(8178, AURA_TYPE_BUFF, 20, { 8178 }, { duration = 0 }) -- Grounding Totem Effect
+AddImportantAura(3411, AURA_TYPE_BUFF, 10, { 3411 }, { duration = 10 }) -- Intervene
+AddImportantAura(23694, AURA_TYPE_DEBUFF, 40, { 23694 }, { duration = 5 }) -- Improved Hamstring
+AddImportantAura(5530, AURA_TYPE_DEBUFF, 40, { 5530 }, { duration = 3, texture = select(3, GetSpellInfo(12284)) }) -- Mace Stun Effect
+AddImportantAura(34510, AURA_TYPE_DEBUFF, 40, { 34510 }, { duration = 4 }) -- Storm Herald Stun effect
+AddImportantAura(20549, AURA_TYPE_DEBUFF, 40, { 20549 }, { duration = 2 }) -- War Stomp
+AddImportantAura(28730, AURA_TYPE_DEBUFF, 15, { 28730 }, { duration = 2, magic = true }) -- Arcane Torrent
+AddImportantAura(34709, AURA_TYPE_DEBUFF, 9, { 34709 }, { duration = 15, magic = true }) -- Shadowsight Buff
+AddImportantAura(13120, AURA_TYPE_DEBUFF, 30, { 13120 }, { duration = 10 }) -- Net-o-Matic
+AddImportantAura(30458, AURA_TYPE_BUFF, 15, { 30458 }, { duration = 8, texture = select(10, GetItemInfo(23825)) }) -- Nigh Invulnerability Shield
+AddImportantAura(30457, AURA_TYPE_DEBUFF, 15, { 30457 }, { duration = 8 }) -- Nigh Invulnerability Belt Backfire
+AddImportantAura(5024, AURA_TYPE_BUFF, 15, { 5024 }, { duration = 8, altName = (select(1, GetSpellInfo(5024)) or "Flee") .. " - " .. (select(1, GetItemInfo(4984)) or "Skull of Impending Doom") }) -- Skull of Impending Doom
+AddImportantAura(7744, AURA_TYPE_BUFF, 15, { 7744 }, { duration = 5 }) -- Will of the Forsaken
 function Gladdy:GetImportantAuras()
     return importantAuras
 end
 
-local interrupts = {
-    [GetSpellInfo(19675)] = {duration = 4, spellID = 19675, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(19675)), priority = 15}, -- Feral Charge Effect (Druid)
-    [GetSpellInfo(2139)] = {duration = 8, spellID = 2139, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(2139)), priority = 15}, -- Counterspell (Mage)
-    [GetSpellInfo(1766)] = {duration = 5, spellID = 1766, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(1766)), priority = 15}, -- Kick (Rogue)
-    [GetSpellInfo(6552)] = {duration = 4, spellID = 6552, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(6552)), priority = 15}, -- Pummel (Warrior)
-    [GetSpellInfo(72)] = {duration = 6, spellID = 72, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(72)), priority = 15}, -- Shield Bash (Warrior)
-    [GetSpellInfo(8042)] = {duration = 2, spellID = 8042, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(8042)), priority = 15}, -- Earth Shock (Shaman)
-    [GetSpellInfo(19244)] = {duration = 5, spellID = 19244, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(19244)), priority = 15}, -- Spell Lock (Warlock
-    [GetSpellInfo(32747)] = {duration = 3, spellID = 32747, track = AURA_TYPE_DEBUFF, texture = select(3, GetSpellInfo(32747)), priority = 15}, -- Deadly Throw Interrupt
-}
+local interrupts = {}
+
+local function AddInterrupt(spellID, duration, priority)
+    local name, _, texture = GetSpellInfo(spellID)
+    if name then
+        interrupts[spellID] = {
+            duration = duration,
+            spellID = spellID,
+            track = AURA_TYPE_DEBUFF,
+            texture = texture or GetSpellTexture(spellID),
+            priority = priority
+        }
+    end
+end
+
+AddInterrupt(19675, 4, 15)   -- Feral Charge Effect (Druid)
+AddInterrupt(2139, 8, 15)   -- Counterspell (Mage)
+AddInterrupt(1766, 5, 15)   -- Kick (Rogue)
+AddInterrupt(6552, 4, 15)   -- Pummel (Warrior)
+AddInterrupt(72, 6, 15)   -- Shield Bash (Warrior)
+AddInterrupt(8042, 2, 15)   -- Earth Shock (Shaman)
+AddInterrupt(19244, 5, 15)   -- Spell Lock (Warlock)
+AddInterrupt(32747, 3, 15)   -- Deadly Throw Interrupt
+
 function Gladdy:GetInterrupts()
     return interrupts
 end
 
-local cooldownList = {
-    -- Spell Name			   Cooldown[, Spec]
-    -- Mage
-    ["MAGE"] = {
-        [1953] = 15, -- Blink
-        --[122] 	= 22,    -- Frost Nova
-        [12051] = 480, --Evocation
-        [2139] = 24, -- Counterspell
-        [45438] = { cd = 300, [L["Frost"]] = 240, }, -- Ice Block
-        [12472] = { cd = 180, spec = L["Frost"], }, -- Icy Veins
-        [31687] = { cd = 180, spec = L["Frost"], }, -- Summon Water Elemental
-        [12043] = { cd = 180, spec = L["Arcane"], }, -- Presence of Mind
-        [11129] = { cd = 180, spec = L["Fire"] }, -- Combustion
-        [120] = { cd = 10,
-                  sharedCD = {
-                      [31661] = true, -- Cone of Cold
-                  }, spec = L["Fire"] }, -- Dragon's Breath
-        [31661] = { cd = 20,
-                    sharedCD = {
-                        [120] = true, -- Cone of Cold
-                    }, spec = L["Fire"] }, -- Dragon's Breath
-        [12042] = { cd = 180, spec = L["Arcane"], }, -- Arcane Power
-        [11958] = { cd = 384, spec = L["Frost"], -- Coldsnap
-                    resetCD = {
-                        [12472] = true,
-                        [45438] = true,
-                        [31687] = true,
-                    },
-        },
+Gladdy.cooldownBuffs = {
+    [GetSpellInfo(6346)] = { cd = function(expTime) -- 180s uptime == cd
+        return expTime
+    end, spellId = 6346 }, -- Fear Ward
+    [GetSpellInfo(11305)] = { cd = function(expTime) -- 15s uptime
+        return 60 - (8 - expTime)
+    end, spellId = 11305, class = "ROGUE" }, -- Sprint
+    [36554] = { cd = function(expTime) -- 3s uptime
+        return 30 - (3 - expTime)
+    end, spellId = 36554, class = "ROGUE" }, -- Shadowstep speed buff
+    [36563] = { cd = function(expTime) -- 10s uptime
+        return 30 - (10 - expTime)
+    end, spellId = 36554 }, -- Shadowstep dmg buff
+    [GetSpellInfo(1856)] = { cd = function(expTime) -- 3s uptime
+        return 180 - (3 - expTime)
+    end, spellId = 1856, class = "ROGUE" }, -- Vanish
+    racials = {
+        --[[[GetSpellInfo(20600)] = { cd = function(expTime) -- 20s uptime
+            return GetTime() - (20 - expTime)
+        end, spellId = 20600 }, -- Perception]]
     },
-
-    -- Priest
-    ["PRIEST"] = {
-        [10890] = { cd = 27, [L["Shadow"]] = 23, }, -- Psychic Scream
-        [15487] = { cd = 45, spec = L["Shadow"], }, -- Silence
-        [10060] = { cd = 180, spec = L["Discipline"], }, -- Power Infusion
-        [33206] = { cd = 120, spec = L["Discipline"], }, -- Pain Suppression
-        [34433] = 300, -- Shadowfiend
-        [32379] = 12, -- Shadow Word: Death
-        [6346] = 180, -- Fear Ward
-    },
-
-    -- Druid
-    ["DRUID"] = {
-        [22812] = 60, -- Barkskin
-        [29166] = 360, -- Innervate
-        [8983] = 60, -- Bash
-        [16689] = 60, -- Natures Grasp
-        [18562] = { cd = 15, spec = L["Restoration"], }, -- Swiftmend
-        [17116] = { cd = 180, spec = L["Restoration"], }, -- Natures Swiftness
-        [33831] = { cd = 180, spec = L["Balance"], }, -- Force of Nature
-    },
-
-    -- Shaman
-    ["SHAMAN"] = {
-        [8042] = { cd = 6, -- Earth Shock
-                   sharedCD = {
-                       [8056] = true, -- Frost Shock
-                       [8050] = true, -- Flame Shock
-                   },
-        },
-        [30823] = { cd = 120, spec = L["Enhancement"], }, -- Shamanistic Rage
-        [16166] = { cd = 180, spec = L["Elemental"], }, -- Elemental Mastery
-        [16188] = { cd = 180, spec = L["Restoration"], }, -- Natures Swiftness
-        [16190] = { cd = 300, spec = L["Restoration"], }, -- Mana Tide Totem
-        [8177] = 15, -- Grounding Totem
-    },
-
-    -- Paladin
-    ["PALADIN"] = {
-        [10278] = 180, -- Blessing of Protection
-        [1044] = 25, -- Blessing of Freedom
-        [10308] = { cd = 60, [L["Retribution"]] = 40, }, -- Hammer of Justice
-        [642] = { cd = 300, -- Divine Shield
-                  sharedCD = {
-                      cd = 60, -- no actual shared CD but debuff
-                      [31884] = true,
-                  },
-        },
-        [31884] = { cd = 180, spec = L["Retribution"], -- Avenging Wrath
-                    sharedCD = {
-                        cd = 60,
-                        [642] = true,
-                    },
-        },
-        [20066] = { cd = 60, spec = L["Retribution"], }, -- Repentance
-        [31842] = { cd = 180, spec = L["Holy"], }, -- Divine Illumination
-        [31935] = { cd = 30, spec = L["Protection"], }, -- Avengers Shield
-
-    },
-
-    -- Warlock
-    ["WARLOCK"] = {
-        [17928] = 40, -- Howl of Terror
-        [27223] = 120, -- Death Coil
-        [19647] = 24,	-- Spell Lock
-        [27277] = 8,	-- Devour Magic
-        [30414] = { cd = 20, spec = L["Destruction"], }, -- Shadowfury
-        [17877] = { cd = 15, spec = L["Destruction"], }, -- Shadowburn
-        [30912] = { cd = 10, spec = L["Destruction"], }, -- Conflagrate
-        [18708] = { cd = 900, spec = L["Demonology"], }, -- Feldom
-    },
-
-    -- Warrior
-    ["WARRIOR"] = {
-        [6552] 	= { cd = 10,                              -- Pummel
-           sharedCD = {
-              [72] = true,
-           },
-        },
-        --[[72] 	   = { cd = 12,                              -- Shield Bash
-           sharedCD = {
-              [6552] = true,
-           },
-        }, ]]
-        --[23920] 	= 10,    -- Spell Reflection
-        [3411] = 30, -- Intervene
-        [676] = 60, -- Disarm
-        [5246] = 180, -- Intimidating Shout
-        [18499] = 30, -- Berserker Rage
-        --[2565] 	= 60,    -- Shield Block
-        [12292] = { cd = 180, spec = L["Arms"], }, -- Death Wish
-        [20252] = { cd = 25, [L["Arms"]] = 15 }, -- Intercept
-        [12975] = { cd = 180, spec = L["Protection"], }, -- Last Stand
-        [12809] = { cd = 30, spec = L["Protection"], }, -- Concussion Blow
-
-    },
-
-    -- Hunter
-    ["HUNTER"] = {
-        [19503] = 30, -- Scatter Shot
-        [14327] = 30, -- Scare Beast
-        [19263] = 300, -- Deterrence; not on BM but can't do 2 specs
-
-
-        [13809] = { cd = 30, -- Frost Trap
-                    sharedCD = {
-                        [14311] = true, -- Freezing Trap
-                        [34600] = true, -- Snake Trap
-                    },
-                    icon = select(3, GetSpellInfo(14311)),
-        },
-        [14311] = { cd = 30, -- Freezing Trap
-                    sharedCD = {
-                        [13809] = true, -- Frost Trap
-                        [34600] = true, -- Snake Trap
-                    },
-                    icon = select(3, GetSpellInfo(14311)),
-        },
-        [34600] = { cd = 30, -- Snake Trap
-                    sharedCD = {
-                        [14311] = true, -- Freezing Trap
-                        [13809] = true, -- Frost Trap
-                    },
-                    icon = select(3, GetSpellInfo(14311)),
-        },
-        [34490] = { cd = 20, spec = L["Marksmanship"], }, -- Silencing Shot
-        [19386] = { cd = 120, spec = L["Survival"], }, -- Wyvern Sting
-        [19577] = { cd = 60, spec = L["Beast Mastery"], }, -- Intimidation
-        [34471] = { cd = 120, spec = L["Beast Mastery"], }, -- The Beast Within
-        [5384] = 30, -- Feign Death
-        [3034] = 15, -- Viper Sting
-        [1543] = 20, -- Flare
-    },
-
-    -- Rogue
-    ["ROGUE"] = {
-        [1766] 	= 10,    -- Kick
-        [8643] 	= 20,    -- Kidney Shot
-        [31224] = 60, -- Cloak of Shadow
-        [26889] = { cd = 300, [L["Subtlety"]] = 180, }, -- Vanish
-        [2094] = { cd = 180, [L["Subtlety"]] = 90, }, -- Blind
-        [11305] = { cd = 300, [L["Combat"]] = 180, }, -- Sprint
-        [26669] = { cd = 300, [L["Combat"]] = 180, }, -- Evasion
-        [14177] = { cd = 180, spec = L["Assassination"], }, -- Cold Blood
-        [13750] = { cd = 300, spec = L["Combat"], }, -- Adrenaline Rush
-        [13877] = { cd = 120, spec = L["Combat"], }, -- Blade Flurry
-        [36554] = { cd = 30, spec = L["Subtlety"], }, -- Shadowstep
-        [14185] = { cd = 600, spec = L["Subtlety"], -- Preparation
-                    resetCD = {
-                        [26669] = true,
-                        [11305] = true,
-                        [26889] = true,
-                        [14177] = true,
-                        [36554] = true,
-                    },
-        },
-    },
-    ["Scourge"] = {
-
-    },
-    ["BloodElf"] = {
-
-    },
-    ["Tauren"] = {
-
-    },
-    ["Orc"] = {
-
-    },
-    ["Troll"] = {
-
-    },
-    ["NightElf"] = {
-        [2651] = { cd = 180, spec = L["Discipline"], class = "PRIEST"}, -- Elune's Grace
-        [10797] = { cd = 30, spec = L["Discipline"], class = "PRIEST"}, -- Star Shards
-    },
-    ["Draenei"] = {
-        [32548] = { cd = 300, spec = L["Discipline"], class = "PRIEST"}, -- Hymn of Hope
-    },
-    ["Human"] = {
-        [13908] = { cd = 600, spec = L["Discipline"], class = "PRIEST"}, -- Desperate Prayer
-    },
-    ["Gnome"] = {
-    },
-    ["Dwarf"] = {
-        [13908] = { cd = 600, spec = L["Discipline"], class = "PRIEST"}, -- Desperate Prayer
-    },
+    [GetSpellInfo(31224)] = { cd = function(expTime) -- 180s uptime == cd
+        return 60 - (5 - expTime)
+    end, spellId = 31224, class = "ROGUE" }, -- Cloak of Shadows
+    [GetSpellInfo(2094)] = { cd = function(expTime) -- 180s uptime == cd
+        return 120 - (10 - expTime)
+    end, spellId = 2094, class = "ROGUE" }, -- Blind
 }
+
+local cooldownList = {}
+
+local function AddCooldownEntry(class, spellId, cooldownInfo)
+    if not cooldownList[class] then
+        cooldownList[class] = {}
+    end
+    if spellId then
+        cooldownList[class][spellId] = cooldownInfo
+    end
+end
+
+-- Mage
+AddCooldownEntry("MAGE", 1953, { cd = 15 }) -- Blink
+AddCooldownEntry("MAGE", 122, { cd = 22 }) -- Frost Nova
+AddCooldownEntry("MAGE", 12051, { cd = 480 }) -- Evocation
+AddCooldownEntry("MAGE", 2139, { cd = 24 }) -- Counterspell
+AddCooldownEntry("MAGE", 45438, { cd = 300, [L["Frost"]] = 240 }) -- Ice Block
+AddCooldownEntry("MAGE", 12472, { cd = 180, spec = L["Frost"] }) -- Icy Veins
+AddCooldownEntry("MAGE", 31687, { cd = 180, spec = L["Frost"] }) -- Summon Water Elemental
+AddCooldownEntry("MAGE", 12043, { cd = 180, spec = L["Arcane"] }) -- Presence of Mind
+AddCooldownEntry("MAGE", 11129, { cd = 180, spec = L["Fire"] }) -- Combustion
+AddCooldownEntry("MAGE", 120, { cd = 10, sharedCD = { [31661] = true } }) -- Cone of Cold
+AddCooldownEntry("MAGE", 31661, { cd = 20, sharedCD = { [120] = true }, spec = L["Fire"] }) -- Dragon's Breath
+AddCooldownEntry("MAGE", 12042, { cd = 180, spec = L["Arcane"] }) -- Arcane Power
+AddCooldownEntry("MAGE", 11958, { cd = 384, spec = L["Frost"], resetCD = { [12472] = true, [45438] = true, [31687] = true } }) -- Coldsnap
+
+-- Priest
+AddCooldownEntry("PRIEST", 10890, { cd = 27, [L["Shadow"]] = 23 }) -- Psychic Scream
+AddCooldownEntry("PRIEST", 15487, { cd = 45, spec = L["Shadow"] }) -- Silence
+AddCooldownEntry("PRIEST", 10060, { cd = 180, spec = L["Discipline"] }) -- Power Infusion
+AddCooldownEntry("PRIEST", 33206, { cd = 120, spec = L["Discipline"] }) -- Pain Suppression
+AddCooldownEntry("PRIEST", 34433, { cd = 300 }) -- Shadowfiend
+AddCooldownEntry("PRIEST", 32379, { cd = 12 }) -- Shadow Word: Death
+AddCooldownEntry("PRIEST", 6346, { cd = 180 }) -- Fear Ward
+
+-- Druid
+AddCooldownEntry("DRUID", 22812, { cd = 60 }) -- Barkskin
+AddCooldownEntry("DRUID", 29166, { cd = 360 }) -- Innervate
+AddCooldownEntry("DRUID", 8983, { cd = 60 }) -- Bash
+AddCooldownEntry("DRUID", 16689, { cd = 60 }) -- Natures Grasp
+AddCooldownEntry("DRUID", 18562, { cd = 15, spec = L["Restoration"] }) -- Swiftmend
+AddCooldownEntry("DRUID", 17116, { cd = 180, spec = L["Restoration"] }) -- Natures Swiftness
+AddCooldownEntry("DRUID", 33831, { cd = 180, spec = L["Balance"] }) -- Force of Nature
+
+-- Shaman
+AddCooldownEntry("SHAMAN", 8042, { cd = 6, sharedCD = { [8056] = true, [8050] = true } }) -- Earth Shock
+AddCooldownEntry("SHAMAN", 30823, { cd = 120, spec = L["Enhancement"] }) -- Shamanistic Rage
+AddCooldownEntry("SHAMAN", 16166, { cd = 180, spec = L["Elemental"] }) -- Elemental Mastery
+AddCooldownEntry("SHAMAN", 16188, { cd = 180, spec = L["Restoration"] }) -- Natures Swiftness
+AddCooldownEntry("SHAMAN", 16190, { cd = 300, spec = L["Restoration"] }) -- Mana Tide Totem
+AddCooldownEntry("SHAMAN", 8177, { cd = 15 }) -- Grounding Totem
+
+-- Paladin
+AddCooldownEntry("PALADIN", 10278, { cd = 180 }) -- Blessing of Protection
+AddCooldownEntry("PALADIN", 1044, { cd = 25 }) -- Blessing of Freedom
+AddCooldownEntry("PALADIN", 10308, { cd = 60, [L["Retribution"]] = 40 }) -- Hammer of Justice
+AddCooldownEntry("PALADIN", 642, { cd = 300, sharedCD = { cd = 60, [31884] = true } }) -- Divine Shield
+AddCooldownEntry("PALADIN", 31884, { cd = 180, spec = L["Retribution"], sharedCD = { cd = 60, [642] = true } }) -- Avenging Wrath
+AddCooldownEntry("PALADIN", 20066, { cd = 60, spec = L["Retribution"] }) -- Repentance
+AddCooldownEntry("PALADIN", 31842, { cd = 180, spec = L["Holy"] }) -- Divine Illumination
+AddCooldownEntry("PALADIN", 31935, { cd = 30, spec = L["Protection"] }) -- Avengers Shield
+
+-- Warlock
+AddCooldownEntry("WARLOCK", 17928, { cd = 40 }) -- Howl of Terror
+AddCooldownEntry("WARLOCK", 27223, { cd = 120 }) -- Death Coil
+AddCooldownEntry("WARLOCK", 19647, { cd = 24 }) -- Spell Lock
+AddCooldownEntry("WARLOCK", 27277, { cd = 8 }) -- Devour Magic
+AddCooldownEntry("WARLOCK", 30414, { cd = 20, spec = L["Destruction"] }) -- Shadowfury
+AddCooldownEntry("WARLOCK", 17877, { cd = 15, spec = L["Destruction"] }) -- Shadowburn
+AddCooldownEntry("WARLOCK", 30912, { cd = 10, spec = L["Destruction"] }) -- Conflagrate
+AddCooldownEntry("WARLOCK", 18708, { cd = 900, spec = L["Demonology"] }) -- Feldom
+
+-- Warrior
+AddCooldownEntry("WARRIOR", 6552, { cd = 10, sharedCD = { [72] = true } }) -- Pummel
+AddCooldownEntry("WARRIOR", 72, { cd = 12, sharedCD = { [6552] = true } }) -- Shield Bash
+AddCooldownEntry("WARRIOR", 23920, { cd = 10 }) -- Spell Reflection
+AddCooldownEntry("WARRIOR", 3411, { cd = 30 }) -- Intervene
+AddCooldownEntry("WARRIOR", 676, { cd = 60 }) -- Disarm
+AddCooldownEntry("WARRIOR", 5246, { cd = 180 }) -- Intimidating Shout
+AddCooldownEntry("WARRIOR", 18499, { cd = 30 }) -- Berserker Rage
+AddCooldownEntry("WARRIOR", 2565, { cd = 60 }) -- Shield Block
+AddCooldownEntry("WARRIOR", 12292, { cd = 180, spec = L["Arms"] }) -- Death Wish
+AddCooldownEntry("WARRIOR", 20252, { cd = 25, [L["Arms"]] = 15 }) -- Intercept
+AddCooldownEntry("WARRIOR", 12975, { cd = 180, spec = L["Protection"] }) -- Last Stand
+AddCooldownEntry("WARRIOR", 12809, { cd = 30, spec = L["Protection"] }) -- Concussion Blow
+
+-- Hunter
+AddCooldownEntry("HUNTER", 19503, { cd = 30 }) -- Scatter Shot
+AddCooldownEntry("HUNTER", 14327, { cd = 30 }) -- Scare Beast
+AddCooldownEntry("HUNTER", 19263, { cd = 300, spec = { L["Marksmanship"], L["Survival"] } }) -- Deterrence; not on BM but can't do 2 specs
+AddCooldownEntry("HUNTER", 13809, { cd = 30, sharedCD = { [14311] = true, [34600] = true }, icon = select(3, GetSpellInfo(14311)) }) -- Frost Trap
+AddCooldownEntry("HUNTER", 14311, { cd = 30, sharedCD = { [13809] = true, [34600] = true }, icon = select(3, GetSpellInfo(14311)) }) -- Freezing Trap
+AddCooldownEntry("HUNTER", 34600, { cd = 30, sharedCD = { [14311] = true, [13809] = true }, icon = select(3, GetSpellInfo(14311)) }) -- Snake Trap
+AddCooldownEntry("HUNTER", 34490, { cd = 20, spec = L["Marksmanship"] }) -- Silencing Shot
+AddCooldownEntry("HUNTER", 19386, { cd = 120, spec = L["Survival"] }) -- Wyvern Sting
+AddCooldownEntry("HUNTER", 19577, { cd = 60, spec = L["Beast Mastery"] }) -- Intimidation
+AddCooldownEntry("HUNTER", 34471, { cd = 120, spec = L["Beast Mastery"] }) -- The Beast Within
+AddCooldownEntry("HUNTER", 5384, { cd = 30 }) -- Feign Death
+AddCooldownEntry("HUNTER", 3034, { cd = 15 }) -- Viper Sting
+AddCooldownEntry("HUNTER", 1543, { cd = 20 }) -- Flare
+
+-- Rogue
+AddCooldownEntry("ROGUE", 1766, { cd = 10 }) -- Kick
+AddCooldownEntry("ROGUE", 8643, { cd = 20 }) -- Kidney Shot
+AddCooldownEntry("ROGUE", 31224, { cd = 60 }) -- Cloak of Shadow
+AddCooldownEntry("ROGUE", 26889, { cd = 300, [L["Subtlety"]] = 180 }) -- Vanish
+AddCooldownEntry("ROGUE", 2094, { cd = 180, [L["Subtlety"]] = 90 }) -- Blind
+AddCooldownEntry("ROGUE", 11305, { cd = 300, [L["Combat"]] = 180 }) -- Sprint
+AddCooldownEntry("ROGUE", 26669, { cd = 300, [L["Combat"]] = 180 }) -- Evasion
+AddCooldownEntry("ROGUE", 14177, { cd = 180, spec = L["Assassination"] }) -- Cold Blood
+AddCooldownEntry("ROGUE", 13750, { cd = 300, spec = L["Combat"] }) -- Adrenaline Rush
+AddCooldownEntry("ROGUE", 13877, { cd = 120, spec = L["Combat"] }) -- Blade Flurry
+AddCooldownEntry("ROGUE", 36554, { cd = 30, spec = L["Subtlety"] }) -- Shadowstep
+AddCooldownEntry("ROGUE", 14185, { cd = 600, spec = L["Subtlety"], resetCD = { [26669] = true, [11305] = true, [26889] = true, [14177] = true, [36554] = true } }) -- Preparation
+
+-- Races
+AddCooldownEntry("NightElf", 2651, { cd = 180, spec = L["Discipline"], class = "PRIEST" }) -- Elune's Grace
+AddCooldownEntry("NightElf", 10797, { cd = 30, spec = L["Discipline"], class = "PRIEST" }) -- Star Shards
+AddCooldownEntry("Draenei", 32548, { cd = 300, spec = L["Discipline"], class = "PRIEST" }) -- Hymn of Hope
+AddCooldownEntry("Human", 13908, { cd = 600, spec = L["Discipline"], class = "PRIEST" }) -- Desperate Prayer
+AddCooldownEntry("Dwarf", 13908, { cd = 600, spec = L["Discipline"], class = "PRIEST" }) -- Desperate Prayer
+AddCooldownEntry("Scourge", nil, nil) -- nil
+AddCooldownEntry("BloodElf", nil, nil) -- nil
+AddCooldownEntry("Tauren", nil, nil) -- nil
+AddCooldownEntry("Orc", nil, nil) -- nil
+AddCooldownEntry("Troll", nil, nil) -- nil
+AddCooldownEntry("Gnome", nil, nil) -- nil
+
 function Gladdy:GetCooldownList()
     return cooldownList
 end

@@ -95,8 +95,19 @@ function EventListener:CooldownCheck(eventType, srcUnit, spellName, spellID)
     if not Gladdy.buttons[srcUnit] or not spellName or not spellID then
         return
     end
-    if eventType == "SPELL_DISPEL" and Gladdy.db.dispelIconEnabled and Gladdy.dispelIcons[spellID] then
+    --TODO incorperate all spellranks
+    -- spellID = Cooldowns.cooldownSpells[spellName]
+    local cooldown = Gladdy:GetCooldownList()[Gladdy.buttons[srcUnit].class][spellID]
+
+    if not cooldown then
+        return
+    end
+    if eventType ~= "SPELL_DISPEL" and cooldown.dispel then
+        return
+    end
+    if eventType == "SPELL_DISPEL" then
         Gladdy:SendMessage("DISPEL_USED", srcUnit, spellID)
+        return
     end
     if Gladdy.db.cooldown and Cooldowns.cooldownSpells[spellName] then
         local unitClass
@@ -105,13 +116,13 @@ function EventListener:CooldownCheck(eventType, srcUnit, spellName, spellID)
             spellId = spellID
         end
         if Gladdy.db.cooldownCooldowns[tostring(spellId)] then
-            if (Gladdy:GetCooldownList()[Gladdy.buttons[srcUnit].class][spellId]) then
+            if (cooldown) then
                 unitClass = Gladdy.buttons[srcUnit].class
             else
                 unitClass = Gladdy.buttons[srcUnit].race
             end
             --TODO find a better solution
-            if spellID ~= 16188 and spellID ~= 17116 and spellID ~= 16166 and spellID ~= 12043 and spellID ~= 5384 or spellID == 14751 or spellID == 89485 then -- Nature's Swiftness CD starts when buff fades
+            if spellID ~= 16188 and spellID ~= 17116 and spellID ~= 16166 and spellID ~= 12043 and spellID ~= 5384 and spellID ~= 132158 or spellID == 14751 or spellID == 89485 then -- Nature's Swiftness CD starts when buff fades
                 Gladdy:Debug("INFO", eventType, "- CooldownUsed", srcUnit, "spellID:", spellID)
                 Cooldowns:CooldownUsed(srcUnit, unitClass, spellId)
             end
@@ -192,6 +203,9 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
         if not Gladdy.buttons[srcUnit].spec then
             self:DetectSpec(srcUnit, (Gladdy.specSpells[spellID] or Gladdy.specSpells[spellName]))
         end
+        if (eventType == "SPELL_DISPEL") then
+            EventListener:CooldownCheck(eventType, srcUnit, spellName, spellID)
+        end
         if (eventType == "SPELL_CAST_SUCCESS" or eventType == "SPELL_MISSED" or eventType == "SPELL_DODGED") then
             -- caching last cast spell
             if not Gladdy.buttons[srcUnit].lastCastSpell then
@@ -206,7 +220,7 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
             EventListener:CooldownCheck(eventType, srcUnit, spellName, spellID)
         end
         --TODO find a better solution
-        if (eventType == "SPELL_AURA_REMOVED" and (spellID == 16188 or spellID == 17116 or spellID == 16166 or spellID == 12043 or spellID == 14751 or spellID == 89485) and Gladdy.buttons[srcUnit].class) then
+        if (eventType == "SPELL_AURA_REMOVED" and (spellID == 16188 or spellID == 17116 or spellID == 16166 or spellID == 12043 or spellID == 14751 or spellID == 89485 or spellID == 132158) and Gladdy.buttons[srcUnit].class) then
             Gladdy:Debug("INFO", "SPELL_AURA_REMOVED - CooldownUsed", srcUnit, "spellID:", spellID)
             Cooldowns:CooldownUsed(srcUnit, Gladdy.buttons[srcUnit].class, spellID)
         end
@@ -286,8 +300,10 @@ function EventListener:ARENA_PREP_OPPONENT_SPECIALIZATIONS()
                         button.class = class
                         button.spec = spec
                         Gladdy:SendMessage("UNIT_SPEC_PREPARATION", unit, spec)
-                        button.stealthed = true
-                        Gladdy:SendMessage("ENEMY_STEALTH", unit, true)
+                        if not UnitExists(unit) then
+                            button.stealthed = true
+                            Gladdy:SendMessage("ENEMY_STEALTH", unit, true)
+                        end
                     end
                 end
             end
@@ -295,34 +311,6 @@ function EventListener:ARENA_PREP_OPPONENT_SPECIALIZATIONS()
     end
 end
 
-Gladdy.cooldownBuffs = {
-    [GetSpellInfo(6346)] = { cd = function(expTime) -- 180s uptime == cd
-        return expTime
-    end, spellId = 6346 }, -- Fear Ward
-    [GetSpellInfo(2983)] = { cd = function(expTime) -- 15s uptime
-        return 60 - (8 - expTime)
-    end, spellId = 2983, class = "ROGUE" }, -- Sprint
-    [36554] = { cd = function(expTime) -- 3s uptime
-        return 30 - (3 - expTime)
-    end, spellId = 36554, class = "ROGUE" }, -- Shadowstep speed buff
-    [36563] = { cd = function(expTime) -- 10s uptime
-        return 30 - (10 - expTime)
-    end, spellId = 36554 }, -- Shadowstep dmg buff
-    [GetSpellInfo(1856)] = { cd = function(expTime) -- 3s uptime
-        return 180 - (3 - expTime)
-    end, spellId = 1856, class = "ROGUE" }, -- Vanish
-    racials = {
-        --[[[GetSpellInfo(20600)] = { cd = function(expTime) -- 20s uptime
-            return GetTime() - (20 - expTime)
-        end, spellId = 20600 }, -- Perception]]
-    },
-    [GetSpellInfo(31224)] = { cd = function(expTime) -- 180s uptime == cd
-        return 60 - (5 - expTime)
-    end, spellId = 31224, class = "ROGUE" }, -- Cloak of Shadows
-    [GetSpellInfo(2094)] = { cd = function(expTime) -- 180s uptime == cd
-        return 120 - (10 - expTime)
-    end, spellId = 2094, class = "ROGUE" }, -- Blind
-}
 --[[
 /run local f,sn,dt for i=1,2 do f=(i==1 and "HELPFUL"or"HARMFUL")for n=1,30 do sn,_,_,dt=UnitAura("player",n,f) if(not sn)then break end print(sn,dt,dt and dt:len())end end
 --]]

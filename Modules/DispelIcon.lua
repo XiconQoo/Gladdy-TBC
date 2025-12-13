@@ -291,7 +291,7 @@ function DispelIcon:Test(unit)
 end
 
 function DispelIcon:LegacySetPosition(unit, unitId)
-    return Gladdy.db.newLayout
+    return true
 end
 
 function DispelIcon:GetOptions()

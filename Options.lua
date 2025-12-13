@@ -80,7 +80,7 @@ SlashCmdList["GLADDY"] = function(msg)
     end
 end
 
-function Gladdy:option(params)
+function Gladdy:option(params, func)
     local defaults = {
         get = function(info)
             local key = info.arg or info[#info]
@@ -89,6 +89,9 @@ function Gladdy:option(params)
         set = function(info, value)
             local key = info.arg or info[#info]
             Gladdy.dbi.profile[key] = value
+            if func then
+                func()
+            end
             Gladdy:UpdateFrame()
         end,
     }
@@ -854,6 +857,7 @@ function Gladdy:SetupOptions()
     self.options.plugins.profiles = { profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.dbi) }
     LibStub("AceConfig-3.0"):RegisterOptionsTable("Gladdy_blizz", options)
     LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Gladdy_blizz", "Gladdy")
+    LibStub("AceConfigDialog-3.0"):SetDefaultSize("Gladdy", 800, 650)
     LibStub("AceConfig-3.0"):RegisterOptionsTable("Gladdy", self.options)
 
 end

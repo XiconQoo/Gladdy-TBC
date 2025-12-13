@@ -19,7 +19,7 @@ local specSpells = {
 }
 
 local classRangeSpells = {
-    ["MAGE"] = { spellID = 118, melee = false, range = false }, -- Polymorph
+    ["MAGE"] = { spellID = 2139, melee = false, range = false }, -- Fireblast 30y (same as Polymorph, but does not bug IsSpellInRange API)
     ["PRIEST"] = { spellID = 32379, melee = false, range = false }, -- Shadow Word: Death
     ["DRUID"] = { spellID = 33786, melee = true, range = false }, -- Cyclone
     ["SHAMAN"] = { spellID = 57994, melee = true, range = false }, -- Wind Shear
@@ -520,7 +520,7 @@ AddCooldownEntry("DRUID", 102795, { cd = 60, spec = L["Guardian"], enabled = fal
 AddCooldownEntry("DRUID", 5229, { cd = 60, spec = L["Guardian"], enabled = false }) -- Enrage
 AddCooldownEntry("DRUID", 62606, { cd = 9, spec = L["Guardian"], charges = 3, enabled = false }) -- Savage Defense
 AddCooldownEntry("DRUID", 102342, { cd = 60, spec = L["Restoration"] }) -- Ironbark
-AddCooldownEntry("DRUID", 88423, { cd = 8, spec = L["Restoration"] }) -- Nature's Cure
+AddCooldownEntry("DRUID", 88423, { cd = 8, spec = L["Restoration"], dispel = true }) -- Nature's Cure
 AddCooldownEntry("DRUID", 18562, { cd = 15, spec = L["Restoration"], enabled = false }) -- Swiftmend
 AddCooldownEntry("DRUID", 102560, { cd = 180, talent = 3, spec = L["Balance"], enabled = false }) -- Incarnation: Chosen of Elune (talent 106731)
 AddCooldownEntry("DRUID", 102543, { cd = 180, talent = 3, spec = L["Feral"], enabled = false }) -- Incarnation: King of the Jungle (talent 106731)
@@ -663,7 +663,7 @@ AddCooldownEntry("MONK", 122278, { cd = 90, talent = 4 }) -- Dampen Harm
 AddCooldownEntry("MONK", 122783, { cd = 90, talent = 4 }) -- Diffuse Magic
 AddCooldownEntry("MONK", 123904, { cd = 180, talent = 5 }) -- Invoke Xuen, the White Tiger
 AddCooldownEntry("MONK", 116847, { cd = 6, talent = 5, replaces = 101546 }) -- Rushing Jade Wind (replaces Spinning Crane Kick)
-AddCooldownEntry("MONK", 115450, { cd = 8 }) -- Detox
+AddCooldownEntry("MONK", 115450, { cd = 8, dispel = true }) -- Detox
 AddCooldownEntry("MONK", 115072, { cd = 15 }) -- Expel Harm
 AddCooldownEntry("MONK", 115203, { cd = 180 }) -- Fortifying Brew
 AddCooldownEntry("MONK", 117368, { cd = 60 }) -- Grapple Weapon
@@ -705,7 +705,7 @@ AddCooldownEntry("PALADIN", 114165, { cd = 20, talent = 5 }) -- Holy Prism
 AddCooldownEntry("PALADIN", 114158, { cd = 60, talent = 5 }) -- Light's Hammer
 AddCooldownEntry("PALADIN", 31884, { cd = 180 }) -- Avenging Wrath
 AddCooldownEntry("PALADIN", 115750, { cd = 120 }) -- Blinding Light
-AddCooldownEntry("PALADIN", 4987, { cd = 8 }) -- Cleanse
+AddCooldownEntry("PALADIN", 4987, { cd = 8, dispel = true }) -- Cleanse
 AddCooldownEntry("PALADIN", 35395, { cd = 4 }) -- Crusader Strike
 AddCooldownEntry("PALADIN", 31821, { cd = 180 }) -- Devotion Aura
 AddCooldownEntry("PALADIN", 498, { cd = 60, [L["Holy"]] = 30 }) -- Divine Protection (modified by Unbreakable Spirit 114154)
@@ -729,7 +729,7 @@ AddCooldownEntry("PRIEST", 89485, { cd = 45, spec = L["Discipline"] }) -- Inner 
 AddCooldownEntry("PRIEST", 33206, { cd = 180, spec = L["Discipline"] }) -- Pain Suppression
 AddCooldownEntry("PRIEST", 47540, { cd = 9, spec = L["Discipline"] }) -- Penance
 AddCooldownEntry("PRIEST", 62618, { cd = 180, spec = L["Discipline"] }) -- Power Word: Barrier
-AddCooldownEntry("PRIEST", 527, { cd = 8, spec = L["Discipline"] }) -- Purify
+AddCooldownEntry("PRIEST", 527, { cd = 8, spec = { L["Discipline"], L["Holy"] }, dispel = true }) -- Purify
 AddCooldownEntry("PRIEST", 109964, { cd = 60, spec = L["Discipline"] }) -- Spirit Shell
 AddCooldownEntry("PRIEST", 108968, { cd = 300, spec = L["Discipline"] }) -- Void Shift
 AddCooldownEntry("PRIEST", 81209, { cd = 30, spec = L["Holy"] }) -- Chakra: Chastise
@@ -741,7 +741,6 @@ AddCooldownEntry("PRIEST", 47788, { cd = 180, spec = L["Holy"] }) -- Guardian Sp
 AddCooldownEntry("PRIEST", 14914, { cd = 10, spec = L["Holy"] }) -- Holy Fire
 AddCooldownEntry("PRIEST", 88625, { cd = 30, spec = L["Holy"] }) -- Holy Word: Chastise
 AddCooldownEntry("PRIEST", 126135, { cd = 180, spec = L["Holy"] }) -- Lightwell
-AddCooldownEntry("PRIEST", 527, { cd = 8, spec = L["Holy"] }) -- Purify
 AddCooldownEntry("PRIEST", 108968, { cd = 300, spec = L["Holy"] }) -- Void Shift
 AddCooldownEntry("PRIEST", 47585, { cd = 120, spec = L["Shadow"] }) -- Dispersion
 AddCooldownEntry("PRIEST", 8092, { cd = 8, spec = L["Shadow"] }) -- Mind Blast
@@ -816,7 +815,7 @@ AddCooldownEntry("SHAMAN", 58875, { cd = 60, spec = L["Enhancement"] }) -- Spiri
 AddCooldownEntry("SHAMAN", 17364, { cd = 8, spec = L["Enhancement"] }) -- Stormstrike
 AddCooldownEntry("SHAMAN", 51505, { cd = 8, spec = L["Restoration"] }) -- Lava Burst
 AddCooldownEntry("SHAMAN", 16190, { cd = 180, spec = L["Restoration"] }) -- Mana Tide Totem
-AddCooldownEntry("SHAMAN", 77130, { cd = 8, spec = L["Restoration"] }) -- Purify Spirit
+AddCooldownEntry("SHAMAN", 77130, { cd = 8, spec = L["Restoration"], dispel = true }) -- Purify Spirit
 AddCooldownEntry("SHAMAN", 61295, { cd = 6, spec = L["Restoration"] }) -- Riptide
 AddCooldownEntry("SHAMAN", 98008, { cd = 180, spec = L["Restoration"] }) -- Spirit Link Totem
 AddCooldownEntry("SHAMAN", 108271, { cd = 90, talent = 0 }) -- Astral Shift
