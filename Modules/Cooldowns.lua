@@ -612,12 +612,15 @@ end
 -- Test
 ---------------------
 
+-- /run for k,v in pairs(LibStub("Gladdy").buttons["arena2"].spellCooldownFrame.icons) do print(v.spellId) end
+
 -- /run LibStub("Gladdy").modules["Cooldowns"]:AURA_GAIN(_, AURA_TYPE_BUFF, 22812, "Barkskin", _, 20, _, _, _, _, "arena1", true)
 -- /run LibStub("Gladdy").modules["Cooldowns"]:AURA_FADE("arena1", 22812)
 -- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 1953)
 
 -- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 45438)
 -- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 120)
+-- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 10160)
 -- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 31661)
 -- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 122)
 -- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 11958)
@@ -928,7 +931,6 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellID, expirationTimeInSecond
     -- Use canonical spellID for consistency
     local spellId = Cooldowns:GetCanonicalSpellID(spellID)
 
-    print(unit, unitClass, spellId)
     local cooldown = Gladdy:GetCooldownList()[unitClass][spellId]
     local cd = cooldown
     if (type(cooldown) == "table") then
@@ -967,8 +969,6 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellID, expirationTimeInSecond
                 - chargeMod = number or nil -- a cd with possible charges. Will initially show with 1 stack, updated to 2 stacks if used when cd has not elapsed
         ]]
 
-        print("probe1")
-
         if (cooldown.spec and button.spec) then
             if type(cooldown.spec) == "table" then
                 local found
@@ -987,8 +987,6 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellID, expirationTimeInSecond
             end
         end
 
-
-        print("probe2")
 
         -- return if the spec doesn't have a cooldown for this spell
         if (button.spec ~= nil and cooldown.notSpec ~= nil and button.spec == cooldown.notSpec) then
@@ -1088,7 +1086,6 @@ function Cooldowns:CooldownUsed(unit, unitClass, spellID, expirationTimeInSecond
         end
     end
 
-    print("CooldownStart", unit, unitClass, spellId)
 
     if (Gladdy.db.cooldown) then
         -- start cooldown
