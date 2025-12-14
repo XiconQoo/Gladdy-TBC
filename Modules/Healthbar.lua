@@ -136,11 +136,16 @@ function Healthbar:CreateFrame(unit)
     healthBar.overAbsorbGlow:SetPoint("TOPLEFT", healthBar.hp, "TOPRIGHT", -7, 0)
     healthBar.overAbsorbGlow:SetWidth(16)
     healthBar.overAbsorbGlow:Show()
+
+    healthBar.totalAbsorb:Hide()
+    healthBar.absorbOverlay:Hide()
+    healthBar.overAbsorbGlow:Hide()
 end
 
 local min, max = math.min, math.max
 function Healthbar:UpdateAbsorb(healthBar)
     local totalAbsorb = Gladdy.frame.testing and 1000 or UnitGetTotalAbsorbs(healthBar.unit) or 0
+    print(totalAbsorb)
     if totalAbsorb > 0 then
         if healthBar.totalAbsorb:IsShown() then
             healthBar.absorbOverlay:SetPoint("TOPRIGHT", healthBar.totalAbsorb, "TOPRIGHT", 0, 0)
@@ -157,6 +162,10 @@ function Healthbar:UpdateAbsorb(healthBar)
         healthBar.absorbOverlay:SetWidth(barSize)
         healthBar.absorbOverlay:SetTexCoord(minX, maxX, minY, maxY)
         healthBar.absorbOverlay:Show()
+    else
+        healthBar.totalAbsorb:Hide()
+        healthBar.absorbOverlay:Hide()
+        healthBar.overAbsorbGlow:Hide()
     end
 end
 
@@ -180,6 +189,7 @@ function Healthbar.OnEvent(self, event, unit)
         Gladdy.buttons[unit].name = name
         Healthbar:SetText(unit, self.hp.current, self.hp.max)
     elseif event == "UNIT_ABSORB_AMOUNT_CHANGED" then
+        print("UNIT_ABSORB_AMOUNT_CHANGED")
         Healthbar:UpdateAbsorb(self)
     end
     if not Gladdy.buttons[unit].class then
