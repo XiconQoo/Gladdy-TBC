@@ -230,6 +230,7 @@ AddImportantAura(18469, AURA_TYPE_DEBUFF, 15, { 18469 }, { duration = 4, magic =
 AddImportantAura(45438, AURA_TYPE_BUFF, 20, { 45438 }, { duration = 10 }) -- Ice Block
 AddImportantAura(41425, AURA_TYPE_DEBUFF, 8, { 41425 }) -- Hypothermia
 AddImportantAura(12355, AURA_TYPE_DEBUFF, 40, { 11103, 12355, 12357, 12358, 12359, 12360 }, { duration = 2 }) -- Impact
+AddImportantAura(31642, AURA_TYPE_BUFF, 10, { 31642, 31641, 31643 }, { duration = 8 }) -- Blazing Speed
 
 -- PALADIN
 AddImportantAura(10308, AURA_TYPE_DEBUFF, 40, { 853, 5588, 5589, 10308 }, { duration = 6, magic = true }) -- Hammer of Justice
