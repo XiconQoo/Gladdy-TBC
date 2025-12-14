@@ -2,6 +2,7 @@ local pairs = pairs
 local floor = math.floor
 
 local CreateFrame, UnitPower, UnitPowerType, UnitPowerMax, UnitExists = CreateFrame, UnitPower, UnitPowerType, UnitPowerMax, UnitExists
+local PowerBarColor = PowerBarColor
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
@@ -42,6 +43,7 @@ function Powerbar:Initialize()
     if Gladdy.db.powerBarEnabled then
         self:RegisterMessage("ENEMY_SPOTTED")
         self:RegisterMessage("UNIT_SPEC")
+        self:RegisterMessage("UNIT_SPEC_PREPARATION")
         self:RegisterMessage("UNIT_DEATH")
         self:RegisterMessage("UNIT_DESTROYED")
     end
@@ -51,6 +53,7 @@ function Powerbar:UpdateFrameOnce()
     if Gladdy.db.powerBarEnabled then
         self:RegisterMessage("ENEMY_SPOTTED")
         self:RegisterMessage("UNIT_SPEC")
+        self:RegisterMessage("UNIT_SPEC_PREPARATION")
         self:RegisterMessage("UNIT_DEATH")
         self:RegisterMessage("UNIT_DESTROYED")
     else
@@ -209,28 +212,25 @@ function Powerbar:SetText(unit, power, powerMax, status)
 end
 
 function Powerbar:SetPower(powerBar, unit, power, powerMax, powerType, status)
-    Powerbar:SetText(unit, power, powerMax, status)
+    self:SetText(unit, power, powerMax, status)
     powerBar.energy.current = power
     powerBar.energy.max = powerMax
-    powerBar.energy.powerType = powerType
 
-    if (powerType == 1 and powerBar.powerType ~= powerType) then
-        powerBar.energy:SetStatusBarColor(1, 0, 0, 1)
-        powerBar.powerColor = {r = 1, g = 0, b = 0}
-        powerBar.powerType = powerType
-    elseif (powerType == 3 and powerBar.powerType ~= powerType) then
-        powerBar.energy:SetStatusBarColor(1, 1, 0, 1)
-        powerBar.powerColor = {r = 1, g = 1, b = 0}
-        powerBar.powerType = powerType
-    elseif powerBar.powerType ~= powerType then
+    if (powerType and powerType == 0 and powerBar.powerType ~= powerType) then
         powerBar.energy:SetStatusBarColor(.18, .44, .75, 1)
         powerBar.powerColor = {r = .18, g = .44, b = .75}
-        powerBar.powerType = powerType
+        powerBar.energy.powerType = powerType
+    elseif (powerType and PowerBarColor[powerType] and powerBar.powerType ~= powerType) then
+        local info = PowerBarColor[powerType]
+        powerBar.energy:SetStatusBarColor(info.r, info.g, info.b, 1)
+        powerBar.powerColor = {r = info.r, g = info.g, b = info.b}
+        powerBar.energy.powerType = powerType
     end
 
-    powerBar.energy:SetMinMaxValues(0, powerMax)
-    powerBar.energy:SetValue(power)
-
+    if power and powerMax then
+        powerBar.energy:SetMinMaxValues(0, powerMax)
+        powerBar.energy:SetValue(power)
+    end
 end
 
 function Powerbar:ResetUnit(unit)
@@ -243,6 +243,9 @@ function Powerbar:ResetUnit(unit)
     powerBar.raceText:SetText("")
     powerBar.powerText:SetText("")
     powerBar.energy:SetValue(0)
+    powerBar.energy.current = 0
+    powerBar.energy.max = 1
+    powerBar.energy.powerType = ""
     powerBar.powerType = ""
     powerBar.powerColor = {r = 1, g = 1, b = 1}
 end
@@ -274,7 +277,7 @@ function Powerbar:ENEMY_SPOTTED(unit)
     if UnitExists(unit) then
         powerBar.energy.powerType = select(1, UnitPowerType(unit))
         powerBar.energy.current, powerBar.energy.max = UnitPower(unit, powerBar.energy.powerType, true), UnitPowerMax(unit, powerBar.energy.powerType, true)
-        Powerbar:SetPower(powerBar, unit, powerBar.energy.current, powerBar.energy.max, powerBar.energy.powerType)
+        self:SetPower(powerBar, unit, powerBar.energy.current, powerBar.energy.max, powerBar.energy.powerType)
     end
 end
 
@@ -284,10 +287,16 @@ function Powerbar:UNIT_SPEC(unit, spec)
     if (not powerBar or not button) then
         return
     end
+    self:SetPower(powerBar, unit, powerBar.energy.current, powerBar.energy.max, powerBar.energy.powerType)
+end
 
-    if UnitExists(unit) then
-        Powerbar:SetPower(powerBar, unit, powerBar.energy.current, powerBar.energy.max, powerBar.energy.powerType)
+function Powerbar:UNIT_SPEC_PREPARATION(unit, spec)
+    local powerBar = self.frames[unit]
+    local button = Gladdy.buttons[unit]
+    if (not powerBar or not button) then
+        return
     end
+    self:SetPower(powerBar, unit, nil, nil, nil)
 end
 
 function Powerbar:UNIT_POWER(unit, power, powerMax, powerType)
@@ -315,7 +324,7 @@ function Powerbar:UNIT_DESTROYED(unit)
     if (not powerBar) then
         return
     end
-    Powerbar:SetPower(powerBar, unit, 0, powerBar.energy.max, powerBar.energy.powerType, L["LEAVE"])
+    Powerbar:SetPower(powerBar, unit, 0, powerBar.energy.max or 1, powerBar.energy.powerType, L["LEAVE"])
 end
 
 local function option(params)

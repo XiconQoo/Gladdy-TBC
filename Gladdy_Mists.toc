@@ -1,5 +1,5 @@
-## Interface: 40401
-## Title: Gladdy - Cata
+## Interface: 50500
+## Title: Gladdy - MoP
 ## Version: 2.53-Release
 ## Notes: The most powerful arena AddOn for WoW 4.4.1
 ## Author: XiconQoo, DnB_Junkee, Knall
@@ -17,7 +17,7 @@ Util.lua
 Frame.lua
 Options.lua
 Constants_shared.lua
-Constants_Cata.lua
+Constants_Mists.lua
 ImportStrings.lua
 
 Modules\Announcements.lua
@@ -26,6 +26,7 @@ Modules\Powerbar.lua
 Modules\Auras.lua
 Modules\Castbar.lua
 Modules\Classicon.lua
+Modules\DispelIcon.lua
 Modules\Clicks.lua
 Modules\Diminishings.lua
 Modules\Highlight.lua

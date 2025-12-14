@@ -1,10 +1,10 @@
 # Gladdy - Classic
 
-### The most powerful arena addon for WoW TBC 2.5.4 & WotLK 3.4.0 & Cataclysm 4.4.0
+### The most powerful arena addon for WoW TBC 2.5.5 & WotLK 3.4.0 & Cataclysm 4.4.0 & Mist of Pandaria 5.5.0
 
 ---
 
-## [v2.43-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.43-Release/Gladdy_Classic_v2.43-Release.zip)
+## [v2.60-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.60-Beta/Gladdy_Classic_v2.60-Beta.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -81,6 +81,31 @@ Thank you!
 ---
 
 ### Changes
+
+### v2.60-Beta
+- BCC 2.5.5 support
+- refactor constants
+- refactor cooldowns
+- config UI and tooltip updates
+- moving away from spellnames to spellids WIP
+
+### v2.53-Release
+- added/deleted some CDs and Auras (still WIP)
+- Balance Druid Treant roots and more storm bolt spells now tracked in DRs
+- removed spellschool lockdown duration reduction for holy paladins or resto shamans
+- reverted mana bar color to previous state
+- fixed some Range Check default spells
+- updated Mir Profile to latest submitted profile
+
+### v2.52-Release
+- fixed Arena Preparation breaking Gladdy
+
+### v2.51-Release
+- fixed migration bug from cata-data
+
+### v2.50-Release
+- added MoP support
+- fixed DRs not showing correct boarders and texts
 
 ### v2.43-Release
 - update libs

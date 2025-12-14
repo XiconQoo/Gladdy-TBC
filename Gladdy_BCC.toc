@@ -1,6 +1,6 @@
-## Interface: 20504
+## Interface: 20505
 ## Title: Gladdy - TBC
-## Version: 2.43-Release
+## Version: 2.53-Release
 ## Notes: The most powerful arena AddOn for WoW 2.5.4
 ## Author: XiconQoo, DnB_Junkee, Knall
 ## X-Email: contact me on discord Knall#1751
@@ -39,6 +39,7 @@ Modules\BuffsDebuffs.lua
 Modules\VersionCheck.lua
 Modules\XiconProfiles.lua
 Modules\Pets.lua
+Modules\Targets.lua
 Modules\ExportImport.lua
 Modules\CombatIndicator.lua
 Modules\RangeCheck.lua

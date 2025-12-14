@@ -726,6 +726,8 @@ function Auras:GetInterruptColor(extraSpellSchool)
     end
 end
 
+local interfaceVersion = select(4, GetBuildInfo())
+interfaceVersion = tonumber(interfaceVersion)
 function Auras:SPELL_INTERRUPT(unit,spellID,spellName,spellSchool,extraSpellId,extraSpellName,extraSpellSchool)
     local auraFrame = self.frames[unit]
     local interruptFrame = auraFrame ~= nil and auraFrame.interruptFrame
@@ -733,23 +735,31 @@ function Auras:SPELL_INTERRUPT(unit,spellID,spellName,spellSchool,extraSpellId,e
     if (not interruptFrame) then
         return
     end
-    local dbEntry = Gladdy.db.auraListInterrupts[tostring(spellID)]
+    local spellId = Gladdy:GetInterruptsCanonical()[spellID]
+    if not spellId then
+        return
+    end
+
+    local dbEntry = Gladdy.db.auraListInterrupts[tostring(spellId)]
     if not dbEntry or not dbEntry.enabled then
         return
     end
     if (interruptFrame.priority and interruptFrame.priority > dbEntry.priority) then
         return
     end
-    local multiplier = ((button.spec == L["Restoration"] and button.class == "SHAMAN") or (button.spec == L["Holy"] and button.class == "PALADIN")) and 0.7 or 1
+    local multiplier = 1
+    if interfaceVersion < 50000 then
+        multiplier = ((button.spec == L["Restoration"] and button.class == "SHAMAN") or (button.spec == L["Holy"] and button.class == "PALADIN")) and 0.7 or 1
+    end
 
-    local duration = Gladdy:GetInterrupts()[spellID].duration * multiplier
+    local duration = Gladdy:GetInterrupts()[spellId].duration * multiplier
 
     interruptFrame.startTime = GetTime()
     interruptFrame.endTime = GetTime() + duration
     interruptFrame.name = spellName
     interruptFrame.timeLeft = duration
     interruptFrame.priority = dbEntry.priority
-    interruptFrame.icon:SetTexture(Gladdy:GetInterrupts()[spellID].texture)
+    interruptFrame.icon:SetTexture(Gladdy:GetInterrupts()[spellId].texture)
     interruptFrame.spellSchool = extraSpellSchool
     interruptFrame.active = true
     interruptFrame.icon.overlay:Show()
@@ -1386,7 +1396,7 @@ function Auras:GetAuraOptions(auraType)
         options[tostring(k)] = {
             type = "group",
             name = Gladdy:GetExceptionSpellName(k),
-            desc = Gladdy:GetSpellDescription(k), --GetSpellDescription(k),
+            desc = Gladdy:GetSpellDescription(k, Gladdy.db.auraListDefault[tostring(k)]), --GetSpellDescription(k),
             order = i+2,
             icon = texture,
             args = {
@@ -1565,7 +1575,7 @@ function Auras:GetInterruptOptions()
         options[tostring(spellID)] = {
             type = "group",
             name = GetSpellInfo(spellID),
-            desc = Gladdy:GetSpellDescription(spellID),
+            desc = Gladdy:GetSpellDescription(spellID, Gladdy:GetInterrupts()[spellID]),
             order = i+2,
             icon = Gladdy:GetInterrupts()[spellID] and Gladdy:GetInterrupts()[spellID].texture or select(3, GetSpellInfo(spellID)),
             args = {

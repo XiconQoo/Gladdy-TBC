@@ -80,7 +80,7 @@ SlashCmdList["GLADDY"] = function(msg)
     end
 end
 
-function Gladdy:option(params)
+function Gladdy:option(params, func)
     local defaults = {
         get = function(info)
             local key = info.arg or info[#info]
@@ -89,6 +89,9 @@ function Gladdy:option(params)
         set = function(info, value)
             local key = info.arg or info[#info]
             Gladdy.dbi.profile[key] = value
+            if func then
+                func()
+            end
             Gladdy:UpdateFrame()
         end,
     }
@@ -456,6 +459,7 @@ function Gladdy:SetupOptions()
                                                 Gladdy.db.drDisableCircle,
                                                 Gladdy.db.racialDisableCircle,
                                                 Gladdy.db.trinketDisableCircle,
+                                                Gladdy.db.dispelIconDisableCircle,
                                             })
                                             if isAllSameValue then
                                                 return Gladdy.db.auraDisableCircle
@@ -470,6 +474,7 @@ function Gladdy:SetupOptions()
                                             Gladdy.db.drDisableCircle = value
                                             Gladdy.db.racialDisableCircle = value
                                             Gladdy.db.trinketDisableCircle = value
+                                            Gladdy.db.dispelIconDisableCircle = value
                                             Gladdy:UpdateFrame()
                                         end,
                                         width= "full",
@@ -493,6 +498,7 @@ function Gladdy:SetupOptions()
                                                 Gladdy.db.racialCooldownAlpha,
                                                 Gladdy.db.totemPulseCooldownAlpha,
                                                 Gladdy.db.trinketCooldownAlpha,
+                                                Gladdy.db.dispelIconCooldownAlpha,
                                             })
                                         end,
                                         set = function(info, value)
@@ -503,6 +509,7 @@ function Gladdy:SetupOptions()
                                             Gladdy.db.racialCooldownAlpha = value
                                             Gladdy.db.totemPulseCooldownAlpha = value
                                             Gladdy.db.trinketCooldownAlpha = value
+                                            Gladdy.db.dispelIconCooldownAlpha = value
                                             Gladdy:UpdateFrame()
                                         end
                                     },
@@ -655,6 +662,7 @@ function Gladdy:SetupOptions()
                                                 Gladdy.db.targetPortraitBorderStyle,
                                                 Gladdy.db.npTotemPlatesBorderStyle,
                                                 Gladdy.db.trinketBorderStyle,
+                                                Gladdy.db.dispelIconBorderStyle,
                                             })
                                         end,
                                         set = function(info, value)
@@ -671,6 +679,7 @@ function Gladdy:SetupOptions()
                                                 targetPortraitBorderStyle = true,
                                                 npTotemPlatesBorderStyle = true,
                                                 trinketBorderStyle = true,
+                                                dispelIconBorderStyle = true,
                                             })
                                         end,
                                     },
@@ -692,6 +701,7 @@ function Gladdy:SetupOptions()
                                                 Gladdy.db.racialBorderColor,
                                                 Gladdy.db.targetPortraitBorderColor,
                                                 Gladdy.db.trinketBorderColor,
+                                                Gladdy.db.dispelIconBorderColor,
                                             })
                                         end,
                                         set = function(info, r, g, b, a)
@@ -707,6 +717,7 @@ function Gladdy:SetupOptions()
                                                 racialBorderColor = true,
                                                 targetPortraitBorderColor = true,
                                                 trinketBorderColor = true,
+                                                dispelIconBorderColor = true,
                                             })
                                         end,
                                     },
@@ -846,6 +857,7 @@ function Gladdy:SetupOptions()
     self.options.plugins.profiles = { profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.dbi) }
     LibStub("AceConfig-3.0"):RegisterOptionsTable("Gladdy_blizz", options)
     LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Gladdy_blizz", "Gladdy")
+    LibStub("AceConfigDialog-3.0"):SetDefaultSize("Gladdy", 800, 650)
     LibStub("AceConfig-3.0"):RegisterOptionsTable("Gladdy", self.options)
 
 end

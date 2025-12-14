@@ -2,7 +2,6 @@ local select, str_gsub = select, string.gsub
 
 local Gladdy = LibStub("Gladdy")
 local CreateFrame = CreateFrame
-local GetSpellInfo = GetSpellInfo
 local L = Gladdy.L
 local Classicon = Gladdy:NewModule("Class Icon", 81, {
     classIconEnabled = true,
@@ -20,59 +19,7 @@ local Classicon = Gladdy:NewModule("Class Icon", 81, {
     classIconGroupDirection = "DOWN"
 })
 
-local specIcons = {
-    --DRUID
-    ["DRUID"] = {
-        [L["Balance"]] = 136096, -- Moonfire
-        [L["Feral"]] = 132276, -- Cat Form
-        [L["Restoration"]] = 136041, -- Healing Touch
-    },
-    ["DEATHKNIGHT"] = {
-        [L["Unholy"]] = 135775, -- Unholy Presence
-        [L["Blood"]] = 135773, -- Blood Presence
-        [L["Frost"]] = 135770, -- Frost Presence
-    },
-    ["HUNTER"] = {
-        [L["Beast Mastery"]] = 132164, -- Tame Beast
-        [L["Marksmanship"]] = 236179, -- Focused Aim
-        [L["Survival"]] = 461113, -- Mongoose Bite or Camouflage
-    },
-    ["MAGE"] = {
-        [L["Arcane"]] = 135932, -- Arcane Intellect
-        [L["Fire"]] = 135812, -- Fireball
-        [L["Frost"]] = 135846, -- Frostbolt
-    },
-    ["PALADIN"] = {
-        [L["Holy"]] = 135920, -- Holy Light
-        [L["Retribution"]] = 135873, -- Retribution Aura
-        [L["Protection"]] = 236264, -- Ability_paladin_shieldofthetemplar
-    },
-    ["PRIEST"] = {
-        [L["Discipline"]] = 135987, -- Power Word: Fortitude
-        [L["Shadow"]] = 136207, -- Shadow Word: Pain
-        [L["Holy"]] = 135920, -- Holy Light
-    },
-    ["ROGUE"] = {
-        [L["Assassination"]] = 132304, -- Mutilate (Eviscerate? 2098)
-        [L["Combat"]] = 132090, -- Backstab
-        [L["Subtlety"]] = 132320, -- Stealth
-    },
-    ["SHAMAN"] = {
-        [L["Elemental"]] = 136048, -- Lightning Bolt
-        [L["Enhancement"]] = 136051, -- Lightning Shield
-        [L["Restoration"]] = 136052, -- Healing Wave
-    },
-    ["WARLOCK"] = {
-        [L["Affliction"]] = 136145, -- Affliction
-        [L["Demonology"]] = 136172, -- Sense Demons
-        [L["Destruction"]] = 136186, -- Rain of Fire
-    },
-    ["WARRIOR"] = {
-        [L["Arms"]] = 132355, -- Mortal Strike
-        [L["Fury"]] = 132347, -- Inner Rage
-        [L["Protection"]] = 132341, -- Defensive Stance
-    },
-}
+local specIcons = Gladdy:GetSpecIcons()
 
 function Classicon:Initialize()
     self.frames = {}
@@ -81,6 +28,7 @@ function Classicon:Initialize()
         self:RegisterMessage("ENEMY_SPOTTED")
         self:RegisterMessage("UNIT_DEATH")
         self:RegisterMessage("UNIT_SPEC")
+        self:RegisterMessage("UNIT_SPEC_PREPARATION")
     end
 end
 
@@ -89,6 +37,7 @@ function Classicon:UpdateFrameOnce()
         self:RegisterMessage("ENEMY_SPOTTED")
         self:RegisterMessage("UNIT_DEATH")
         self:RegisterMessage("UNIT_SPEC")
+        self:RegisterMessage("UNIT_SPEC_PREPARATION")
     else
         self:UnregisterAllMessages()
     end
@@ -195,18 +144,20 @@ function Classicon:ENEMY_SPOTTED(unit)
     if (not classIcon) then
         return
     end
-
-    classIcon.texture:SetTexture(Gladdy.classIcons[Gladdy.buttons[unit].class])
-    --classIcon.texture:SetTexCoord(unpack(CLASS_BUTTONS[Gladdy.buttons[unit].class]))
+    if Gladdy.db.classIconSpecIcon and Gladdy.buttons[unit].spec then
+        classIcon.texture:SetTexture(specIcons[Gladdy.buttons[unit].class][Gladdy.buttons[unit].spec])
+    else
+        classIcon.texture:SetTexture(Gladdy.classIcons[Gladdy.buttons[unit].class])
+    end
     classIcon.texture:SetAllPoints(classIcon)
 end
 
 function Classicon:UNIT_SPEC(unit, spec)
-    local classIcon = self.frames[unit]
-    if (not Gladdy.db.classIconSpecIcon or not classIcon) then
-        return
-    end
-    classIcon.texture:SetTexture(specIcons[Gladdy.buttons[unit].class][spec])
+    self:ENEMY_SPOTTED(unit)
+end
+
+function Classicon:UNIT_SPEC_PREPARATION(unit, spec)
+    self:ENEMY_SPOTTED(unit)
 end
 
 function Classicon:ResetUnit(unit)

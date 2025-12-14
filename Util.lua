@@ -260,28 +260,48 @@ function Gladdy:GetSpellDescription(spellID, cooldown) -- GetSpellPowerCost(5105
     local str = ""
     if cooldown then
         --[586] = { cd = 30, [L["Shadow"]] = 15, }
-        if type(cooldown) == "table" then
+        if type(cooldown) == "table" and cooldown.cd then
             local defaultCD = cooldown.cd .. "s" .. " cd" .. "\n"
 
             local spec = cooldown.spec or cooldown.notSpec
             if spec and not cooldown.sharedCD then
-                str = str .. ((cooldown.spec and "") or (cooldown.notSpec and "NOT ")) .. (cooldown.spec or cooldown.notSpec) .. " : " .. defaultCD
+                if type(spec) == "table" then
+                    for _,specialization in ipairs(spec) do
+                        str = str .. (specialization) .. " : " .. (cooldown[specialization] or defaultCD)
+                    end
+                else
+                    str = str .. ((cooldown.spec and "") or (cooldown.notSpec and "NOT ")) .. (cooldown.spec or cooldown.notSpec) .. " : " .. defaultCD
+                end
             else
                 str = str .. defaultCD
                 for k,v in pairs(cooldown) do
-                    if k ~= "cd" and k ~= "pet" and k ~= "sharedCD" and k ~= "notSpec" then
-                        str = str .. k .. " : " .. v .. "s" .. " cd" .. "\n"
+                    if k ~= "cd" and k ~= "pet" and k ~= "sharedCD" and k ~= "notSpec" and k ~= "resetCD" and k ~= "talent" and k ~= "enabled" and k ~= "spellIDs" then
+                        str = str .. k .. " : " .. tostring(v) .. "s" .. " cd" .. "\n"
+                    end
+                end
+            end
+            if cooldown.talent then
+                str = str .. "talent" .. " row " .. cooldown.talent+1 .. "\n"
+            end
+            if cooldown.sharedCD then
+                str = str .. "\nshares cd with \n"
+                for spellId,v in pairs(cooldown.sharedCD) do
+                    local spell = select(1, GetSpellInfo(spellId))
+                    if spell then
+                        str = str  .. " - " .. spell .. "\n"
                     end
                 end
             end
             str = str .. "\n"
+        elseif type(cooldown) == "table" and cooldown.track then -- AURA
+            --ignore
         else
             str = str .. cooldown .. "s" .. " cd" .. "\n\n"
         end
     end
     str = str .. castTime
     local desc = GetSpellDescription(spellID)
-    if not desc or desc == "" then
+    if not desc or desc == "" then -- TODO wait for event
         for i=1, 100 do
             desc = GetSpellDescription(spellID)
             if desc and desc ~= "" then
@@ -290,7 +310,15 @@ function Gladdy:GetSpellDescription(spellID, cooldown) -- GetSpellPowerCost(5105
         end
     end
     str = str .. Gladdy:SetTextColor(desc, {r = 1, g=0.82, b=0})
-    str = str .. "\n\n" .. Gladdy:SetTextColor("spell id = ".. spellID, {r = 0, g=0.82, b=0})
+    str = str .. "\n\n" .. Gladdy:SetTextColor("spell ids", {r = 0, g=0.82, b=0}) .. "\n"
+    if cooldown and cooldown.spellIDs then
+        for i,rankedSpellID in ipairs(cooldown.spellIDs) do
+            local sep = i == 1 and "" or "\n"
+            str = str .. sep .. Gladdy:SetTextColor(rankedSpellID, {r = 0, g=0.82, b=0})
+        end
+    else
+        str = str .. Gladdy:SetTextColor(spellID, {r = 0, g=0.82, b=0})
+    end
     return str
 end
 

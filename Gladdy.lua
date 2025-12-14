@@ -12,7 +12,7 @@ local GetPhysicalScreenSize = GetPhysicalScreenSize
 local InCombatLockdown = InCombatLockdown
 local CreateFrame = CreateFrame
 local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
-local IsAddOnLoaded = IsAddOnLoaded
+local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 local GetBattlefieldStatus = GetBattlefieldStatus
 local IsInInstance = IsInInstance
 local GetNumArenaOpponents = GetNumArenaOpponents
@@ -21,6 +21,7 @@ local RELEASE_TYPES = { alpha = "Alpha", beta = "Beta", release = "Release"}
 local PREFIX = "Gladdy v"
 local VERSION_REGEX = PREFIX .. "(%d+%.%d+)%-(%a)"
 local LibStub = LibStub
+local GetSpellInfo = GetSpellInfo
 
 ---------------------------
 
@@ -28,13 +29,13 @@ local LibStub = LibStub
 
 ---------------------------
 
-local MAJOR, MINOR = "Gladdy", 18
+local MAJOR, MINOR = "Gladdy", 23
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
 Gladdy.version_major_num = 2
-Gladdy.version_minor_num = 0.43
+Gladdy.version_minor_num = 60
 Gladdy.version_num = Gladdy.version_major_num + Gladdy.version_minor_num
-Gladdy.version_releaseType = RELEASE_TYPES.release
+Gladdy.version_releaseType = RELEASE_TYPES.beta
 Gladdy.version = PREFIX .. string.format("%.2f", Gladdy.version_num) .. "-" .. Gladdy.version_releaseType
 Gladdy.VERSION_REGEX = VERSION_REGEX
 
@@ -241,10 +242,23 @@ function Gladdy:CleanupIgnoredOptions(tbl, refTbl, str, refOptionStruct)
                 end
             elseif type(tbl[k]) == "table" then--is table, go over items
                 if not refTbl[k] then -- all options must be present because not default option
-                    for refKey, refValue in pairs(refOptionStruct) do
-                        if tbl[k][refKey] == nil or type(tbl[k][refKey]) ~= type(refValue) then -- should have this option .. delete tbl[k]
-                            self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, " - should have the option", refKey)
+                    if (str == "Gladdy.db.auraListDefault" and type(tbl[k]) == "table") then --potential not in expansion
+                        if (not GetSpellInfo(k)) then -- not a spell
                             tbl[k] = nil
+                        end
+                        if (not type(tbl[k]).spellIDs) then -- not in other expansion defaults
+                            tbl[k] = nil
+                        end
+                    elseif (str == "Gladdy.db.trackedDebuffs" and not GetSpellInfo(k)) then
+                        tbl[k] = nil
+                    elseif (str == "Gladdy.db.trackedBuffs" and not GetSpellInfo(k)) then
+                        tbl[k] = nil
+                    else
+                        for refKey, refValue in pairs(refOptionStruct) do
+                            if tbl[k][refKey] == nil or type(tbl[k][refKey]) ~= type(refValue) then -- should have this option .. delete tbl[k]
+                                self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, " - should have the option", refKey)
+                                tbl[k] = nil
+                            end
                         end
                     end
                 end
@@ -341,7 +355,7 @@ function Gladdy:OnInitialize()
         ["arena1"] = { name = "Swift", raceLoc = L["NightElf"], classLoc = L["Druid"], class = "DRUID", health = 67, healthMax = 100, power = 76, powerMax = 100, powerType = 1, testSpec = L["Restoration"], race = "NightElf" },
         ["arena2"] = { name = "Vilden", raceLoc = L["Undead"], classLoc = L["Mage"], class = "MAGE", health = 99, healthMax = 100, power = 7833, powerMax = 10460, powerType = 0, testSpec = L["Frost"], race = "Scourge" },
         ["arena3"] = { name = "Krymu", raceLoc = L["Human"], classLoc = L["Rogue"], class = "ROGUE", health = 10, healthMax = 100, power = 45, powerMax = 110, powerType = 3, testSpec = L["Subtlety"], race = "Human" },
-        ["arena4"] = { name = "Talmon", raceLoc = L["Human"], classLoc = L["Warlock"], class = "WARLOCK", health = 40, healthMax = 100, power = 9855, powerMax = 9855, powerType = 0, testSpec = L["Demonology"], race = "Human" },
+        ["arena4"] = { name = "Talmon", raceLoc = L["Human"], classLoc = L["Hunter"], class = "HUNTER", health = 40, healthMax = 100, power = 9855, powerMax = 9855, powerType = 1, testSpec = L["Beast Mastery"], race = "Dwarf" },
         ["arena5"] = { name = "Hydra", raceLoc = L["Undead"], classLoc = L["Priest"], class = "PRIEST", health = 70, healthMax = 100, power = 2515, powerMax = 10240, powerType = 0, testSpec = L["Discipline"], race = "Human" },
     }
 
@@ -387,6 +401,7 @@ function Gladdy:OnProfileChanged()
 end
 
 function Gladdy:OnEnable()
+    self:RegisterEvent("ARENA_PREP_OPPONENT_SPECIALIZATIONS")
     self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("PLAYER_REGEN_ENABLED")
@@ -426,7 +441,6 @@ function Gladdy:GetIconStyles()
         ["Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp"] = L["Gladdy Tooltip round"],
         ["Interface\\AddOns\\Gladdy\\Images\\Border_squared_blp"] = L["Gladdy Tooltip squared"],
         ["Interface\\AddOns\\Gladdy\\Images\\Border_Gloss"] = L["Gloss (black border)"],
-        ["Interface\\AddOns\\Gladdy\\Images\\HabBorder1"] = L["Habborder"],
     }
 end
 
@@ -599,7 +613,8 @@ function Gladdy:InitFrames()
         self.startTest = nil
     end
     self.frame:Show()
-    self:SendMessage("JOINED_ARENA") -- /run LibStub("Gladdy"):SendMessage("JOINED_ARENA")
+    self:SendMessage("JOINED_ARENA")
+
 
     for i=1, self.curBracket do
         self.buttons["arena" .. i]:SetAlpha(1)
@@ -611,47 +626,60 @@ function Gladdy:InitFrames()
     end
 end
 
+function Gladdy:TestGladdyPrep() --/run TestGladdyPrep()
+    Gladdy:JoinedArena()
+
+    for unit,button in pairs(Gladdy.buttons) do
+        button.classLoc = Gladdy.testData[unit].classLoc
+        button.class = Gladdy.testData[unit].class
+        button.spec = Gladdy.testData[unit].testSpec
+        Gladdy:SendMessage("UNIT_SPEC_PREPARATION", unit, Gladdy.testData[unit].testSpec)
+    end
+end
+
+function Gladdy:TestGladdyArenaStart() --/run TestGladdyArenaStart()
+    for unit,button in pairs(Gladdy.buttons) do
+        button.raceLoc = Gladdy.testData[unit].raceLoc
+        button.race = Gladdy.testData[unit].race
+        button.classLoc = Gladdy.testData[unit].classLoc
+        button.class = Gladdy.testData[unit].class
+        button.name = Gladdy.testData[unit].name
+        Gladdy.guids["123"] = unit
+        Gladdy:SendMessage("ENEMY_SPOTTED", unit)
+    end
+end
+
 ---------------------------
 
 -- BLIZZARD FRAMES
 
 ---------------------------
 
+local function FrameSetAlpha(frame, alpha)
+    if frame and frame.SetAlpha then
+        frame:SetAlpha(alpha)
+    end
+end
 function Gladdy:BlizzArenaSetAlpha(alpha)
     if IsAddOnLoaded("Blizzard_ArenaUI") then
-        if (ArenaEnemyFrames) then
-            ArenaEnemyFrames:SetAlpha(alpha)
-        end
-        if ArenaEnemyFrame1 then
-            ArenaEnemyFrame1:SetAlpha(alpha)
-        end
-        if ArenaEnemyFrame1PetFrame then
-            ArenaEnemyFrame1PetFrame:SetAlpha(alpha)
-        end
-        if ArenaEnemyFrame2 then
-            ArenaEnemyFrame2:SetAlpha(alpha)
-        end
-        if ArenaEnemyFrame2PetFrame then
-            ArenaEnemyFrame2PetFrame:SetAlpha(alpha)
-        end
-        if ArenaEnemyFrame3 then
-            ArenaEnemyFrame3:SetAlpha(alpha)
-        end
-        if ArenaEnemyFrame3PetFrame then
-            ArenaEnemyFrame3PetFrame:SetAlpha(alpha)
-        end
-        if ArenaEnemyFrame4 then
-            ArenaEnemyFrame4:SetAlpha(alpha)
-        end
-        if ArenaEnemyFrame4PetFrame then
-            ArenaEnemyFrame4PetFrame:SetAlpha(alpha)
-        end
-        if ArenaEnemyFrame5 then
-            ArenaEnemyFrame5:SetAlpha(alpha)
-        end
-        if ArenaEnemyFrame5PetFrame then
-            ArenaEnemyFrame5PetFrame:SetAlpha(alpha)
-        end
+        FrameSetAlpha(ArenaEnemyFrames, alpha)
+        FrameSetAlpha(ArenaEnemyFrame1, alpha)
+        FrameSetAlpha(ArenaEnemyFrame1PetFrame, alpha)
+        FrameSetAlpha(ArenaEnemyFrame2, alpha)
+        FrameSetAlpha(ArenaEnemyFrame2PetFrame, alpha)
+        FrameSetAlpha(ArenaEnemyFrame3, alpha)
+        FrameSetAlpha(ArenaEnemyFrame3PetFrame, alpha)
+        FrameSetAlpha(ArenaEnemyFrame4, alpha)
+        FrameSetAlpha(ArenaEnemyFrame4PetFrame, alpha)
+        FrameSetAlpha(ArenaEnemyFrame5, alpha)
+        FrameSetAlpha(ArenaEnemyFrame5PetFrame, alpha)
+
+        FrameSetAlpha(ArenaPrepFrames, alpha)
+        FrameSetAlpha(ArenaPrepFrame1, alpha)
+        FrameSetAlpha(ArenaPrepFrame2, alpha)
+        FrameSetAlpha(ArenaPrepFrame3, alpha)
+        FrameSetAlpha(ArenaPrepFrame4, alpha)
+        FrameSetAlpha(ArenaPrepFrame5, alpha)
     end
 end
 

@@ -7,13 +7,13 @@ local GetTime = GetTime
 local SendChatMessage = SendChatMessage
 local RaidNotice_AddMessage = RaidNotice_AddMessage
 local RaidBossEmoteFrame = RaidBossEmoteFrame
-local IsAddOnLoaded = IsAddOnLoaded
+local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 local IsInGroup = IsInGroup
 local LE_PARTY_CATEGORY_HOME = LE_PARTY_CATEGORY_HOME
 local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
 local CombatText_AddMessage = CombatText_AddMessage
 local UnitName = UnitName
-local GetSchoolString = GetSchoolString
+local GetSchoolString = C_Spell.GetSchoolString
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
@@ -120,7 +120,7 @@ function Announcements:UNIT_SPEC(unit, spec)
     if button.name == "Unknown" then
         button.name = UnitName(unit)
     end
-    self:Send(L["SPEC DETECTED: %s - %s (%s)"]:format(button.name, spec, button.classLoc), 1, RAID_CLASS_COLORS[button.class], unit)
+    self:Send(L["SPEC DETECTED: %s - %s (%s)"]:format(button.name or "", spec, button.classLoc), 1, RAID_CLASS_COLORS[button.class], unit)
 end
 
 function Announcements:UNIT_HEALTH(unit, health, healthMax)

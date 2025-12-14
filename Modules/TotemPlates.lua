@@ -234,20 +234,20 @@ function TotemPlates:Initialize()
         SetCVar("nameplateShowFriendlyTotems", true);
     end
     self.addon = "Blizzard"
-    if (IsAddOnLoaded("Plater")) then
+    if (C_AddOns.IsAddOnLoaded("Plater")) then
         self.addon = "Plater"
-    elseif (IsAddOnLoaded("Kui_Nameplates")) then
+    elseif (C_AddOns.IsAddOnLoaded("Kui_Nameplates")) then
         self.addon = "Kui_Nameplates"
-    elseif (IsAddOnLoaded("NeatPlates")) then
+    elseif (C_AddOns.IsAddOnLoaded("NeatPlates")) then
         self.addon = "NeatPlates"
-    elseif (IsAddOnLoaded("TidyPlates_ThreatPlates")) then
+    elseif (C_AddOns.IsAddOnLoaded("TidyPlates_ThreatPlates")) then
         self.addon = "TidyPlates_ThreatPlates"
-    elseif (IsAddOnLoaded("Tukui")) then
+    elseif (C_AddOns.IsAddOnLoaded("Tukui")) then
         local _, C, _ = Tukui:unpack()
         if C.NamePlates.Enable then
             self.addon = "Tukui"
         end
-    elseif (IsAddOnLoaded("ElvUI")) then
+    elseif (C_AddOns.IsAddOnLoaded("ElvUI")) then
         local E = unpack(ElvUI)
         if E.private.nameplates.enable then
             self.addon = "ElvUI"

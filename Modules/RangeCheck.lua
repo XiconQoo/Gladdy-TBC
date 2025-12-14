@@ -19,18 +19,7 @@ local LSR = LibStub("SpellRange-1.0")
 local L = Gladdy.L
 local HealthBar = Gladdy.modules["Health Bar"]
 
-local classSpells = {
-    ["MAGE"] = { spellID = 118, melee = false, range = false },
-    ["PRIEST"] = { spellID = 32379, melee = false, range = false },
-    ["DRUID"] = { spellID = 33786, melee = true, range = false },
-    ["SHAMAN"] = { spellID = 8042, melee = true, range = false },
-    ["PALADIN"] = { spellID = 853, melee = true, range = false },
-    ["WARLOCK"] = { spellID = 5782, melee = false, range = false },
-    ["WARRIOR"] = { spellID = 20252, melee = true, range = false },
-    ["HUNTER"] = { spellID = 1978, melee = true, range = true },
-    ["ROGUE"] = { spellID = 36554, melee = true, range = false },
-    ["DEATHKNIGHT"] = { spellID = 49576, melee = true, range = false },
-}
+local classSpells = Gladdy.classRangeSpells
 
 local function defaultSpells()
     local defaults = {}
@@ -201,7 +190,7 @@ function RangeCheck.CheckRange(self)
     end
 end
 
-local IsItemInRange,IsCurrentSpell = IsItemInRange,IsCurrentSpell
+local IsItemInRange,IsCurrentSpell = C_Item.IsItemInRange,IsCurrentSpell
 local UnitExists, UnitIsFriend, UnitIsDeadOrGhost = UnitExists, UnitIsFriend, UnitIsDeadOrGhost
 local AuraUtil = AuraUtil
 local feignDeath = GetSpellInfo(5384)
@@ -221,9 +210,9 @@ function RangeCheck:isAutoattackInRange(button)
     end
 
     if not IsItemInRange(16114, button.unit) then --not in melee range
-        return 0 --aura_env.displayText = "TOO FAR"
+        return 0
     elseif IsCurrentSpell(6603) == false then --auto attack is not queued
-        return 1 --aura_env.displayText = "NOT ATTACKING"
+        return 1
     else
         return 1
     end
