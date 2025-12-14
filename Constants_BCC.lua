@@ -11,6 +11,15 @@ Gladdy.expansion = "BCC"
 Gladdy.CLASSES = {"MAGE", "PRIEST", "DRUID", "SHAMAN", "PALADIN", "WARLOCK", "WARRIOR", "HUNTER", "ROGUE"}
 tbl_sort(Gladdy.CLASSES)
 
+local specIcons = Gladdy:GetSpecIcons()
+specIcons["DRUID"][L["Feral"]] = 132276 -- Bear Form
+specIcons["HUNTER"][L["Beast Mastery"]] = 132164 -- Tame Beast
+specIcons["HUNTER"][L["Marksmanship"]] = 132222 -- Focused Aim
+specIcons["HUNTER"][L["Survival"]] = 132215 -- Mongoose Bite
+specIcons["PALADIN"][L["Protection"]] = 135893 -- devotionaura
+specIcons["PRIEST"][L["Discipline"]] = 135987 -- Power Word: Shield
+specIcons["SHAMAN"][L["Enhancement"]] = 136051 -- Lighning Shield
+
 Gladdy.specBuffs = {}
 local function AddSpecBuff(spellIDs, spec)
     for _, spellId in ipairs(spellIDs) do
