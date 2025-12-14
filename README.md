@@ -4,7 +4,7 @@
 
 ---
 
-## [v2.61-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.61-Beta/Gladdy_Classic_v2.61-Beta.zip)
+## [v2.62-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.62-Beta/Gladdy_Classic_v2.62-Beta.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -81,6 +81,9 @@ Thank you!
 ---
 
 ### Changes
+
+### v2.62-Beta
+- specicons corrected
 
 ### v2.61-Beta
 - hide absorb WIP
