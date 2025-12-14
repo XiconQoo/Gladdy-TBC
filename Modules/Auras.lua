@@ -735,7 +735,12 @@ function Auras:SPELL_INTERRUPT(unit,spellID,spellName,spellSchool,extraSpellId,e
     if (not interruptFrame) then
         return
     end
-    local dbEntry = Gladdy.db.auraListInterrupts[tostring(spellID)]
+    local spellId = Gladdy:GetInterruptsCanonical()[spellID]
+    if not spellId then
+        return
+    end
+
+    local dbEntry = Gladdy.db.auraListInterrupts[tostring(spellId)]
     if not dbEntry or not dbEntry.enabled then
         return
     end
@@ -747,14 +752,14 @@ function Auras:SPELL_INTERRUPT(unit,spellID,spellName,spellSchool,extraSpellId,e
         multiplier = ((button.spec == L["Restoration"] and button.class == "SHAMAN") or (button.spec == L["Holy"] and button.class == "PALADIN")) and 0.7 or 1
     end
 
-    local duration = Gladdy:GetInterrupts()[spellID].duration * multiplier
+    local duration = Gladdy:GetInterrupts()[spellId].duration * multiplier
 
     interruptFrame.startTime = GetTime()
     interruptFrame.endTime = GetTime() + duration
     interruptFrame.name = spellName
     interruptFrame.timeLeft = duration
     interruptFrame.priority = dbEntry.priority
-    interruptFrame.icon:SetTexture(Gladdy:GetInterrupts()[spellID].texture)
+    interruptFrame.icon:SetTexture(Gladdy:GetInterrupts()[spellId].texture)
     interruptFrame.spellSchool = extraSpellSchool
     interruptFrame.active = true
     interruptFrame.icon.overlay:Show()

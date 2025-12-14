@@ -260,7 +260,7 @@ AddImportantAura(710, AURA_TYPE_DEBUFF, 40, { 710, 18647 }, { duration = 10 }) -
 AddImportantAura(30283, AURA_TYPE_DEBUFF, 40, { 30283, 30413, 30414 }, { duration = 2, magic = true }) -- Shadowfury
 AddImportantAura(6358, AURA_TYPE_DEBUFF, 40, { 6358, 20407, 30850 }, { duration = 10, magic = true }) -- Seduction (Succubus)
 AddImportantAura(5484, AURA_TYPE_DEBUFF, 40, { 5484, 17928 }, { duration = 8, magic = true }) -- Howl of Terror
-AddImportantAura(24259, AURA_TYPE_DEBUFF, 15, { 24259 }, { duration = 3, magic = true }) -- Spell Lock (Felhunter)
+AddImportantAura(24259, AURA_TYPE_DEBUFF, 15, { 19244, 24259 }, { duration = 3, magic = true }) -- Spell Lock (Felhunter)
 AddImportantAura(31117, AURA_TYPE_DEBUFF, 15, { 30108, 30404, 30405, 31117 }, { duration = 5, magic = true, altName = select(1, GetSpellInfo(31117)) .. " Silence" }) -- Unstable Affliction Silence
 
 -- WARRIOR
@@ -272,15 +272,17 @@ AddImportantAura(23920, AURA_TYPE_BUFF, 50, { 23920 }, { duration = 5 }) -- Spel
 AddImportantAura(18498, AURA_TYPE_DEBUFF, 15, { 18498 }, { duration = 3 }) -- Shield Bash - Silenced
 AddImportantAura(12292, AURA_TYPE_BUFF, 15, { 12292 }, { duration = 3 }) -- Death Wish
 AddImportantAura(676, AURA_TYPE_DEBUFF, 20, { 676 }, { duration = 10 }) -- Disarm
+AddImportantAura(3411, AURA_TYPE_BUFF, 10, { 3411 }, { duration = 10 }) -- Intervene
+AddImportantAura(23694, AURA_TYPE_DEBUFF, 40, { 23694 }, { duration = 5 }) -- Improved Hamstring
 
 -- MISC / ITEMS / RACIALS
 AddImportantAura(8178, AURA_TYPE_BUFF, 20, { 8178 }, { duration = 0 }) -- Grounding Totem Effect
-AddImportantAura(3411, AURA_TYPE_BUFF, 10, { 3411 }, { duration = 10 }) -- Intervene
-AddImportantAura(23694, AURA_TYPE_DEBUFF, 40, { 23694 }, { duration = 5 }) -- Improved Hamstring
 AddImportantAura(5530, AURA_TYPE_DEBUFF, 40, { 5530 }, { duration = 3, texture = select(3, GetSpellInfo(12284)) }) -- Mace Stun Effect
 AddImportantAura(34510, AURA_TYPE_DEBUFF, 40, { 34510 }, { duration = 4 }) -- Storm Herald Stun effect
 AddImportantAura(20549, AURA_TYPE_DEBUFF, 40, { 20549 }, { duration = 2 }) -- War Stomp
 AddImportantAura(28730, AURA_TYPE_DEBUFF, 15, { 28730 }, { duration = 2, magic = true }) -- Arcane Torrent
+AddImportantAura(20600, AURA_TYPE_BUFF, 10, { 20600 }, { duration = 20 }) -- Perception
+AddImportantAura(20594, AURA_TYPE_BUFF, 10, { 20594 }, { duration = 8 }) -- Stoneform
 AddImportantAura(34709, AURA_TYPE_DEBUFF, 9, { 34709 }, { duration = 15, magic = true }) -- Shadowsight Buff
 AddImportantAura(13120, AURA_TYPE_DEBUFF, 30, { 13120 }, { duration = 10 }) -- Net-o-Matic
 AddImportantAura(30458, AURA_TYPE_BUFF, 15, { 30458 }, { duration = 8, texture = select(10, GetItemInfo(23825)) }) -- Nigh Invulnerability Shield
@@ -293,12 +295,13 @@ end
 
 local interrupts = {}
 
-local function AddInterrupt(spellID, duration, priority)
+local function AddInterrupt(spellID, duration, priority, spellIDs)
     local name, _, texture = GetSpellInfo(spellID)
     if name then
         interrupts[spellID] = {
             duration = duration,
             spellID = spellID,
+            spellIDs = spellIDs,
             track = AURA_TYPE_DEBUFF,
             texture = texture or GetSpellTexture(spellID),
             priority = priority
@@ -306,17 +309,31 @@ local function AddInterrupt(spellID, duration, priority)
     end
 end
 
-AddInterrupt(19675, 4, 15)   -- Feral Charge Effect (Druid)
-AddInterrupt(2139, 8, 15)   -- Counterspell (Mage)
-AddInterrupt(1766, 5, 15)   -- Kick (Rogue)
-AddInterrupt(6552, 4, 15)   -- Pummel (Warrior)
-AddInterrupt(72, 6, 15)   -- Shield Bash (Warrior)
-AddInterrupt(8042, 2, 15)   -- Earth Shock (Shaman)
-AddInterrupt(19244, 5, 15)   -- Spell Lock (Warlock)
-AddInterrupt(32747, 3, 15)   -- Deadly Throw Interrupt
+AddInterrupt(19675, 4, 15, { 19675 })   -- Feral Charge Effect (Druid)
+AddInterrupt(2139, 8, 15, { 2139 })   -- Counterspell (Mage)
+AddInterrupt(1766, 5, 15, { 1766, 1769, 1769, 1768, 1767, 38768 })   -- Kick (Rogue)
+AddInterrupt(6552, 4, 15, { 6552, 6554 })   -- Pummel (Warrior) -- 6554
+AddInterrupt(72, 6, 15, { 72, 1671, 1672, 29704 })   -- Shield Bash (Warrior)
+AddInterrupt(8042, 2, 15, { 8042, 10414, 10412, 25454, 8044, 10413, 8046, 8045 })   -- Earth Shock (Shaman)
+AddInterrupt(19244, 5, 15, { 19675, 19647, 19244, 24259 })   -- Spell Lock (Warlock)
+AddInterrupt(32747, 3, 15, { 19675 })   -- Deadly Throw Interrupt
 
 function Gladdy:GetInterrupts()
     return interrupts
+end
+
+local interruptsToCanonical = {} -- Reverse lookup: spellID -> canonical spellID
+for spellId,info in pairs(Gladdy:GetInterrupts()) do
+    interruptsToCanonical[spellId] = spellId
+    if info.spellIDs then
+        for rankedSpellID in pairs(info.spellIDs) do
+            interruptsToCanonical[rankedSpellID] = spellId
+        end
+    end
+end
+
+function Gladdy:GetInterruptsCanonical()
+    return interruptsToCanonical
 end
 
 Gladdy.cooldownBuffs = {

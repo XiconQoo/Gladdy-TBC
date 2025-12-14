@@ -179,7 +179,7 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
         if Gladdy.buttons[destUnit] then
             if eventType == "SPELL_INTERRUPT" then
                 Gladdy:SendMessage("SPELL_INTERRUPT", destUnit,spellID,spellName,spellSchool,extraSpellId,extraSpellName,extraSpellSchool)
-            elseif (eventType == "SPELL_CAST_SUCCESS" and Gladdy:GetInterrupts()[spellName]) then
+            elseif (eventType == "SPELL_CAST_SUCCESS" and Gladdy:GetInterruptsCanonical()[spellID]) then
                 local spellNameChanneled, _, _, _, _, _, interruptable, spellIdChanneled = UnitChannelInfo(destUnit)
                 if interruptable == false and spellNameChanneled then
                     if Gladdy.buttons[destUnit].lastCastSpell and Gladdy.buttons[destUnit].lastCastSpell.spellName == spellNameChanneled then
