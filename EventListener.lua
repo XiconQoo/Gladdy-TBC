@@ -95,9 +95,9 @@ function EventListener:CooldownCheck(eventType, srcUnit, spellName, spellID)
     if not Gladdy.buttons[srcUnit] or not spellName or not spellID then
         return
     end
-    --TODO incorperate all spellranks
-    -- spellID = Cooldowns.cooldownSpells[spellName]
-    local cooldown = Gladdy:GetCooldownList()[Gladdy.buttons[srcUnit].class][spellID]
+    -- Resolve spellID to canonical spellID (handles multiple spell ranks)
+    local canonicalSpellID = Cooldowns:GetCanonicalSpellID(spellID)
+    local cooldown = Gladdy:GetCooldownList()[Gladdy.buttons[srcUnit].class][canonicalSpellID]
 
     if not cooldown then
         return
@@ -106,15 +106,13 @@ function EventListener:CooldownCheck(eventType, srcUnit, spellName, spellID)
         return
     end
     if eventType == "SPELL_DISPEL" then
-        Gladdy:SendMessage("DISPEL_USED", srcUnit, spellID)
+        Gladdy:SendMessage("DISPEL_USED", srcUnit, canonicalSpellID)
         return
     end
-    if Gladdy.db.cooldown and Cooldowns.cooldownSpells[spellName] then
+    if Gladdy.db.cooldown and Cooldowns:GetCanonicalSpellID(spellID) then
         local unitClass
-        local spellId = Cooldowns.cooldownSpells[spellName] -- don't use spellId from combatlog, in case of different spellrank
-        if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
-            spellId = spellID
-        end
+        -- Use canonical spellID for consistency
+        local spellId = Cooldowns:GetCanonicalSpellID(spellID)
         if Gladdy.db.cooldownCooldowns[tostring(spellId)] then
             if (cooldown) then
                 unitClass = Gladdy.buttons[srcUnit].class
@@ -123,7 +121,7 @@ function EventListener:CooldownCheck(eventType, srcUnit, spellName, spellID)
             end
             --TODO find a better solution
             if spellID ~= 16188 and spellID ~= 17116 and spellID ~= 16166 and spellID ~= 12043 and spellID ~= 5384 and spellID ~= 132158 or spellID == 14751 or spellID == 89485 then -- Nature's Swiftness CD starts when buff fades
-                Gladdy:Debug("INFO", eventType, "- CooldownUsed", srcUnit, "spellID:", spellID)
+                Gladdy:Debug("INFO", eventType, "- CooldownUsed", srcUnit, "spellID:", spellID, "canonical:", canonicalSpellID)
                 Cooldowns:CooldownUsed(srcUnit, unitClass, spellId)
             end
         end
@@ -221,15 +219,14 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
         end
         --TODO find a better solution
         if (eventType == "SPELL_AURA_REMOVED" and (spellID == 16188 or spellID == 17116 or spellID == 16166 or spellID == 12043 or spellID == 14751 or spellID == 89485 or spellID == 132158) and Gladdy.buttons[srcUnit].class) then
-            Gladdy:Debug("INFO", "SPELL_AURA_REMOVED - CooldownUsed", srcUnit, "spellID:", spellID)
-            Cooldowns:CooldownUsed(srcUnit, Gladdy.buttons[srcUnit].class, spellID)
+            local canonicalSpellID = Cooldowns:GetCanonicalSpellID(spellID)
+            Gladdy:Debug("INFO", "SPELL_AURA_REMOVED - CooldownUsed", srcUnit, "spellID:", spellID, "canonical:", canonicalSpellID)
+            Cooldowns:CooldownUsed(srcUnit, Gladdy.buttons[srcUnit].class, canonicalSpellID)
         end
-        if (eventType == "SPELL_AURA_REMOVED" and Gladdy.db.cooldown and Cooldowns.cooldownSpells[spellName]) then
+        if (eventType == "SPELL_AURA_REMOVED" and Gladdy.db.cooldown and Cooldowns:GetCanonicalSpellID(spellID)) then
             local unit = Gladdy:GetArenaUnit(srcUnit, true)
-            local spellId = Cooldowns.cooldownSpells[spellName] -- don't use spellId from combatlog, in case of different spellrank
-            if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
-                spellId = spellID
-            end
+            -- Use canonical spellID for consistency
+            local spellId = Cooldowns:GetCanonicalSpellID(spellID)
             if unit then
                 --Gladdy:Debug("INFO", "EL:CL:SPELL_AURA_REMOVED (srcUnit)", "Cooldowns:AURA_FADE", unit, spellId)
                 Cooldowns:AURA_FADE(unit, spellId, spellName)
@@ -417,11 +414,9 @@ function EventListener:ScanAuras(unit)
     for spellID,v in pairs(button.lastAuras) do
         if not button.auras[spellID] then
             local spellName = v[3]
-            if Gladdy.db.cooldown and Cooldowns.cooldownSpells[spellName] then
-                local spellId = Cooldowns.cooldownSpells[spellName] -- don't use spellId from combatlog, in case of different spellrank
-                if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
-                    spellId = spellID
-                end
+            if Gladdy.db.cooldown and Cooldowns:GetCanonicalSpellID(spellID) then
+                -- Use canonical spellID for consistency
+                local spellId = Cooldowns:GetCanonicalSpellID(spellID)
                 --Gladdy:Debug("INFO", "EL:UNIT_AURA Cooldowns:AURA_FADE", unit, spellId)
                 Cooldowns:AURA_FADE(unit, spellId, spellName)
                 if spellID == 5384 then -- Feign Death CD Detection needs this

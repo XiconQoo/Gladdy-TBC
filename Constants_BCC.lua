@@ -360,7 +360,7 @@ end
 
 -- Mage
 AddCooldownEntry("MAGE", 1953, { cd = 15 }) -- Blink
-AddCooldownEntry("MAGE", 122, { cd = 22 }) -- Frost Nova
+AddCooldownEntry("MAGE", 122,  { cd = 22, spellIDs = { 122, 10230, 6131, 27088, 865 } }) -- Frost Nova
 AddCooldownEntry("MAGE", 12051, { cd = 480 }) -- Evocation
 AddCooldownEntry("MAGE", 2139, { cd = 24 }) -- Counterspell
 AddCooldownEntry("MAGE", 45438, { cd = 300, [L["Frost"]] = 240 }) -- Ice Block
@@ -368,31 +368,31 @@ AddCooldownEntry("MAGE", 12472, { cd = 180, spec = L["Frost"] }) -- Icy Veins
 AddCooldownEntry("MAGE", 31687, { cd = 180, spec = L["Frost"] }) -- Summon Water Elemental
 AddCooldownEntry("MAGE", 12043, { cd = 180, spec = L["Arcane"] }) -- Presence of Mind
 AddCooldownEntry("MAGE", 11129, { cd = 180, spec = L["Fire"] }) -- Combustion
-AddCooldownEntry("MAGE", 120, { cd = 10, sharedCD = { [31661] = true } }) -- Cone of Cold
-AddCooldownEntry("MAGE", 31661, { cd = 20, sharedCD = { [120] = true }, spec = L["Fire"] }) -- Dragon's Breath
+AddCooldownEntry("MAGE", 120, { cd = 10, sharedCD = { [31661] = true }, spellIDs = { 120, 10160, 10159, 10161, 8492, 27087 } }) -- Cone of Cold
+AddCooldownEntry("MAGE", 31661, { cd = 20, sharedCD = { [120] = true }, spec = L["Fire"], spellIDs = { 31661, 33041, 33043, 33042 } }) -- Dragon's Breath
 AddCooldownEntry("MAGE", 12042, { cd = 180, spec = L["Arcane"] }) -- Arcane Power
 AddCooldownEntry("MAGE", 11958, { cd = 384, spec = L["Frost"], resetCD = { [12472] = true, [45438] = true, [31687] = true } }) -- Coldsnap
 
 -- Priest
-AddCooldownEntry("PRIEST", 10890, { cd = 27, [L["Shadow"]] = 23 }) -- Psychic Scream
+AddCooldownEntry("PRIEST", 10890, { cd = 27, [L["Shadow"]] = 23, spellIDs = { 10890, 8122, 8124, 10888 } }) -- Psychic Scream
 AddCooldownEntry("PRIEST", 15487, { cd = 45, spec = L["Shadow"] }) -- Silence
 AddCooldownEntry("PRIEST", 10060, { cd = 180, spec = L["Discipline"] }) -- Power Infusion
 AddCooldownEntry("PRIEST", 33206, { cd = 120, spec = L["Discipline"] }) -- Pain Suppression
 AddCooldownEntry("PRIEST", 34433, { cd = 300 }) -- Shadowfiend
-AddCooldownEntry("PRIEST", 32379, { cd = 12 }) -- Shadow Word: Death
+AddCooldownEntry("PRIEST", 32379, { cd = 12, spellIDs = { 32379, 32996 } }) -- Shadow Word: Death
 AddCooldownEntry("PRIEST", 6346, { cd = 180 }) -- Fear Ward
 
 -- Druid
 AddCooldownEntry("DRUID", 22812, { cd = 60 }) -- Barkskin
 AddCooldownEntry("DRUID", 29166, { cd = 360 }) -- Innervate
-AddCooldownEntry("DRUID", 8983, { cd = 60 }) -- Bash
-AddCooldownEntry("DRUID", 16689, { cd = 60 }) -- Natures Grasp
+AddCooldownEntry("DRUID", 8983, { cd = 60, spellIDs = { 8983, 5211, 6798 } }) -- Bash
+AddCooldownEntry("DRUID", 16689, { cd = 60, spellIDs = { 16689, 16810, 16813, 16811, 27009, 17329, 16812 } }) -- Natures Grasp
 AddCooldownEntry("DRUID", 18562, { cd = 15, spec = L["Restoration"] }) -- Swiftmend
 AddCooldownEntry("DRUID", 17116, { cd = 180, spec = L["Restoration"] }) -- Natures Swiftness
 AddCooldownEntry("DRUID", 33831, { cd = 180, spec = L["Balance"] }) -- Force of Nature
 
 -- Shaman
-AddCooldownEntry("SHAMAN", 8042, { cd = 6, sharedCD = { [8056] = true, [8050] = true } }) -- Earth Shock
+AddCooldownEntry("SHAMAN", 8042, { cd = 6, sharedCD = { [8056] = true, [8050] = true }, spellIDs = { 8042, 10414, 10412, 25454, 8044, 10413, 8046, 8045 } }) -- Earth Shock
 AddCooldownEntry("SHAMAN", 30823, { cd = 120, spec = L["Enhancement"] }) -- Shamanistic Rage
 AddCooldownEntry("SHAMAN", 16166, { cd = 180, spec = L["Elemental"] }) -- Elemental Mastery
 AddCooldownEntry("SHAMAN", 16188, { cd = 180, spec = L["Restoration"] }) -- Natures Swiftness
@@ -400,28 +400,28 @@ AddCooldownEntry("SHAMAN", 16190, { cd = 300, spec = L["Restoration"] }) -- Mana
 AddCooldownEntry("SHAMAN", 8177, { cd = 15 }) -- Grounding Totem
 
 -- Paladin
-AddCooldownEntry("PALADIN", 10278, { cd = 180 }) -- Blessing of Protection
+AddCooldownEntry("PALADIN", 10278, { cd = 180, spellIDs = { 10278, 1022, 5599 } }) -- Blessing of Protection
 AddCooldownEntry("PALADIN", 1044, { cd = 25 }) -- Blessing of Freedom
-AddCooldownEntry("PALADIN", 10308, { cd = 60, [L["Retribution"]] = 40 }) -- Hammer of Justice
-AddCooldownEntry("PALADIN", 642, { cd = 300, sharedCD = { cd = 60, [31884] = true } }) -- Divine Shield
+AddCooldownEntry("PALADIN", 10308, { cd = 60, [L["Retribution"]] = 40, spellIDs = { 10308, 5589, 5588, 853 } }) -- Hammer of Justice
+AddCooldownEntry("PALADIN", 642, { cd = 300, sharedCD = { cd = 60, [31884] = true }, spellIDs = { 642, 1020 } }) -- Divine Shield
 AddCooldownEntry("PALADIN", 31884, { cd = 180, spec = L["Retribution"], sharedCD = { cd = 60, [642] = true } }) -- Avenging Wrath
 AddCooldownEntry("PALADIN", 20066, { cd = 60, spec = L["Retribution"] }) -- Repentance
 AddCooldownEntry("PALADIN", 31842, { cd = 180, spec = L["Holy"] }) -- Divine Illumination
-AddCooldownEntry("PALADIN", 31935, { cd = 30, spec = L["Protection"] }) -- Avengers Shield
+AddCooldownEntry("PALADIN", 31935, { cd = 30, spec = L["Protection"], spellIDs = { 31935, 32699, 32700 } }) -- Avengers Shield
 
 -- Warlock
-AddCooldownEntry("WARLOCK", 17928, { cd = 40 }) -- Howl of Terror
-AddCooldownEntry("WARLOCK", 27223, { cd = 120 }) -- Death Coil
+AddCooldownEntry("WARLOCK", 17928, { cd = 40, spellIDs = { 17928, 5484 } }) -- Howl of Terror
+AddCooldownEntry("WARLOCK", 27223, { cd = 120, spellIDs = { 27223, 17925, 17926, 6789 } }) -- Death Coil
 AddCooldownEntry("WARLOCK", 19647, { cd = 24 }) -- Spell Lock
 AddCooldownEntry("WARLOCK", 27277, { cd = 8 }) -- Devour Magic
-AddCooldownEntry("WARLOCK", 30414, { cd = 20, spec = L["Destruction"] }) -- Shadowfury
-AddCooldownEntry("WARLOCK", 17877, { cd = 15, spec = L["Destruction"] }) -- Shadowburn
-AddCooldownEntry("WARLOCK", 30912, { cd = 10, spec = L["Destruction"] }) -- Conflagrate
+AddCooldownEntry("WARLOCK", 30414, { cd = 20, spec = L["Destruction"], spellIDs = { 30414, 30413, 30283 } }) -- Shadowfury
+AddCooldownEntry("WARLOCK", 17877, { cd = 15, spec = L["Destruction"], spellIDs = { 17877, 18869, 18867, 27263, 18870, 18871, 30546, 18868 } }) -- Shadowburn
+AddCooldownEntry("WARLOCK", 30912, { cd = 10, spec = L["Destruction"], spellIDs = { 30912, 18930, 27266, 18931, 18932, 17962 } }) -- Conflagrate
 AddCooldownEntry("WARLOCK", 18708, { cd = 900, spec = L["Demonology"] }) -- Feldom
 
 -- Warrior
-AddCooldownEntry("WARRIOR", 6552, { cd = 10, sharedCD = { [72] = true } }) -- Pummel
-AddCooldownEntry("WARRIOR", 72, { cd = 12, sharedCD = { [6552] = true } }) -- Shield Bash
+AddCooldownEntry("WARRIOR", 6552, { cd = 10, sharedCD = { [72] = true }, spellIDs = { 6552, 6554 } }) -- Pummel
+AddCooldownEntry("WARRIOR", 72, { cd = 12, sharedCD = { [6552] = true }, spellIDs = { 72, 1672, 29704, 1671 } }) -- Shield Bash
 AddCooldownEntry("WARRIOR", 23920, { cd = 10 }) -- Spell Reflection
 AddCooldownEntry("WARRIOR", 3411, { cd = 30 }) -- Intervene
 AddCooldownEntry("WARRIOR", 676, { cd = 60 }) -- Disarm
@@ -429,33 +429,33 @@ AddCooldownEntry("WARRIOR", 5246, { cd = 180 }) -- Intimidating Shout
 AddCooldownEntry("WARRIOR", 18499, { cd = 30 }) -- Berserker Rage
 AddCooldownEntry("WARRIOR", 2565, { cd = 60 }) -- Shield Block
 AddCooldownEntry("WARRIOR", 12292, { cd = 180, spec = L["Arms"] }) -- Death Wish
-AddCooldownEntry("WARRIOR", 20252, { cd = 25, [L["Arms"]] = 15 }) -- Intercept
+AddCooldownEntry("WARRIOR", 20252, { cd = 25, [L["Arms"]] = 15, spellIDs = { 20252, 20616, 25275, 20617, 25272 } }) -- Intercept
 AddCooldownEntry("WARRIOR", 12975, { cd = 180, spec = L["Protection"] }) -- Last Stand
 AddCooldownEntry("WARRIOR", 12809, { cd = 30, spec = L["Protection"] }) -- Concussion Blow
 
 -- Hunter
 AddCooldownEntry("HUNTER", 19503, { cd = 30 }) -- Scatter Shot
-AddCooldownEntry("HUNTER", 14327, { cd = 30 }) -- Scare Beast
+AddCooldownEntry("HUNTER", 14327, { cd = 30, spellIDs = { 14327, 14326, 1513 } }) -- Scare Beast
 AddCooldownEntry("HUNTER", 19263, { cd = 300, spec = { L["Marksmanship"], L["Survival"] } }) -- Deterrence; not on BM but can't do 2 specs
 AddCooldownEntry("HUNTER", 13809, { cd = 30, sharedCD = { [14311] = true, [34600] = true }, icon = select(3, GetSpellInfo(14311)) }) -- Frost Trap
-AddCooldownEntry("HUNTER", 14311, { cd = 30, sharedCD = { [13809] = true, [34600] = true }, icon = select(3, GetSpellInfo(14311)) }) -- Freezing Trap
+AddCooldownEntry("HUNTER", 14311, { cd = 30, sharedCD = { [13809] = true, [34600] = true }, icon = select(3, GetSpellInfo(14311)), spellIDs = { 14311, 1499, 14310 } }) -- Freezing Trap
 AddCooldownEntry("HUNTER", 34600, { cd = 30, sharedCD = { [14311] = true, [13809] = true }, icon = select(3, GetSpellInfo(14311)) }) -- Snake Trap
 AddCooldownEntry("HUNTER", 34490, { cd = 20, spec = L["Marksmanship"] }) -- Silencing Shot
-AddCooldownEntry("HUNTER", 19386, { cd = 120, spec = L["Survival"] }) -- Wyvern Sting
+AddCooldownEntry("HUNTER", 19386, { cd = 120, spec = L["Survival"], spellIDs = { 19386, 24132, 24133, 27068 } }) -- Wyvern Sting
 AddCooldownEntry("HUNTER", 19577, { cd = 60, spec = L["Beast Mastery"] }) -- Intimidation
 AddCooldownEntry("HUNTER", 34471, { cd = 120, spec = L["Beast Mastery"] }) -- The Beast Within
 AddCooldownEntry("HUNTER", 5384, { cd = 30 }) -- Feign Death
-AddCooldownEntry("HUNTER", 3034, { cd = 15 }) -- Viper Sting
+AddCooldownEntry("HUNTER", 3034, { cd = 15, spellIDs = { 3034, 14280, 27018, 14279 } }) -- Viper Sting
 AddCooldownEntry("HUNTER", 1543, { cd = 20 }) -- Flare
 
 -- Rogue
-AddCooldownEntry("ROGUE", 1766, { cd = 10 }) -- Kick
-AddCooldownEntry("ROGUE", 8643, { cd = 20 }) -- Kidney Shot
+AddCooldownEntry("ROGUE", 1766, { cd = 10, spellIDs = { 1766, 1767, 1769, 1768, 38768 } }) -- Kick
+AddCooldownEntry("ROGUE", 8643, { cd = 20, spellIDs = { 8643, 408 } }) -- Kidney Shot
 AddCooldownEntry("ROGUE", 31224, { cd = 60 }) -- Cloak of Shadow
-AddCooldownEntry("ROGUE", 26889, { cd = 300, [L["Subtlety"]] = 180 }) -- Vanish
+AddCooldownEntry("ROGUE", 26889, { cd = 300, [L["Subtlety"]] = 180, spellIDs = { 26889, 1857, 1856 } }) -- Vanish
 AddCooldownEntry("ROGUE", 2094, { cd = 180, [L["Subtlety"]] = 90 }) -- Blind
-AddCooldownEntry("ROGUE", 11305, { cd = 300, [L["Combat"]] = 180 }) -- Sprint
-AddCooldownEntry("ROGUE", 26669, { cd = 300, [L["Combat"]] = 180 }) -- Evasion
+AddCooldownEntry("ROGUE", 11305, { cd = 300, [L["Combat"]] = 180, spellIDs = { 11305, 8696, 2983 } }) -- Sprint
+AddCooldownEntry("ROGUE", 26669, { cd = 300, [L["Combat"]] = 180, spellIDs = { 26669, 5277 } }) -- Evasion
 AddCooldownEntry("ROGUE", 14177, { cd = 180, spec = L["Assassination"] }) -- Cold Blood
 AddCooldownEntry("ROGUE", 13750, { cd = 300, spec = L["Combat"] }) -- Adrenaline Rush
 AddCooldownEntry("ROGUE", 13877, { cd = 120, spec = L["Combat"] }) -- Blade Flurry

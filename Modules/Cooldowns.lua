@@ -83,7 +83,6 @@ local Cooldowns = Gladdy:NewModule("Cooldowns", nil, {
 
 function Cooldowns:Initialize()
     self.frames = {}
-    self.cooldownSpells = {}
     self.spellTextures = {}
     self.iconCache = {}
     for _,spellTable in pairs(Gladdy:GetCooldownList()) do
@@ -98,8 +97,8 @@ function Cooldowns:Initialize()
                 end
             end
             if spellName then
-                self.cooldownSpells[spellName] = spellId
                 self.spellTextures[spellId] = texture
+                self.spellIdToCanonical[spellId] = spellId
             else
                 Gladdy:Debug("ERROR", "spellid does not exist  " .. spellId)
             end
@@ -705,10 +704,8 @@ function Cooldowns:AURA_GAIN(_, auraType, spellID, spellName, _, duration, _, _,
     end
     local cooldownFrame = Gladdy.buttons[arenaUnit].spellCooldownFrame
 
-    local spellId = Cooldowns.cooldownSpells[spellName] -- don't use spellId from combatlog, in case of different spellrank
-    if spellID == 16188 or spellID == 17116 then -- Nature's Swiftness (same name for druid and shaman)
-        spellId = spellID
-    end
+    -- Use canonical spellID for consistency
+    local spellId = Cooldowns:GetCanonicalSpellID(spellID)
 
     for _,icon in pairs(cooldownFrame.icons) do
         if (icon.spellId == spellId) then
@@ -729,7 +726,8 @@ function Cooldowns:AURA_FADE(unit, spellID, spellName)
     if not Gladdy.buttons[unit] or Gladdy.buttons[unit].stealthed then
         return
     end
-    local spellId = Cooldowns.cooldownSpells[spellName] -- don't use spellId from combatlog, in case of different spellrank
+    -- Use canonical spellID for consistency
+    local spellId = Cooldowns:GetCanonicalSpellID(spellID)
     local cooldownFrame = Gladdy.buttons[unit].spellCooldownFrame
     for _,icon in pairs(cooldownFrame.icons) do
         if (icon.spellId == spellId) then
@@ -905,13 +903,15 @@ function Cooldowns:CooldownReady(button, spellId, frame)
     end
 end
 
-function Cooldowns:CooldownUsed(unit, unitClass, spellId, expirationTimeInSeconds)
+function Cooldowns:CooldownUsed(unit, unitClass, spellID, expirationTimeInSeconds)
     local button = Gladdy.buttons[unit]
     if not button then
         return
     end
 
     -- Always react to used spells (even if disabled in options) so replacements and talents work on use
+    -- Use canonical spellID for consistency
+    local spellId = Cooldowns:GetCanonicalSpellID(spellID)
 
     print(unit, unitClass, spellId)
     local cooldown = Gladdy:GetCooldownList()[unitClass][spellId]
