@@ -145,7 +145,6 @@ end
 local min, max = math.min, math.max
 function Healthbar:UpdateAbsorb(healthBar)
     local totalAbsorb = Gladdy.frame.testing and 1000 or UnitGetTotalAbsorbs(healthBar.unit) or 0
-    print(totalAbsorb)
     if totalAbsorb > 0 then
         if healthBar.totalAbsorb:IsShown() then
             healthBar.absorbOverlay:SetPoint("TOPRIGHT", healthBar.totalAbsorb, "TOPRIGHT", 0, 0)
@@ -161,7 +160,9 @@ function Healthbar:UpdateAbsorb(healthBar)
 
         healthBar.absorbOverlay:SetWidth(barSize)
         healthBar.absorbOverlay:SetTexCoord(minX, maxX, minY, maxY)
+        healthBar.totalAbsorb:Show()
         healthBar.absorbOverlay:Show()
+        healthBar.overAbsorbGlow:Show()
     else
         healthBar.totalAbsorb:Hide()
         healthBar.absorbOverlay:Hide()
@@ -189,7 +190,6 @@ function Healthbar.OnEvent(self, event, unit)
         Gladdy.buttons[unit].name = name
         Healthbar:SetText(unit, self.hp.current, self.hp.max)
     elseif event == "UNIT_ABSORB_AMOUNT_CHANGED" then
-        print("UNIT_ABSORB_AMOUNT_CHANGED")
         Healthbar:UpdateAbsorb(self)
     end
     if not Gladdy.buttons[unit].class then
@@ -385,7 +385,7 @@ function Healthbar:Test(unit)
     self:ENEMY_SPOTTED(unit)
     self:SetText(unit, button.health, button.healthMax)
     healthBar.hp:SetValue(button.health)
-    Healthbar:UpdateAbsorb(healthBar)
+    --Healthbar:UpdateAbsorb(healthBar)
     --healthBar.hp.absorb:UpdateHealthMinMax()
     --healthBar.hp.absorb:UpdateLossAnimation(button.health)
     --healthBar.hp.absorb:BeginAnimation(button.health, button.health + 50);
