@@ -283,6 +283,15 @@ function Gladdy:GetSpellDescription(spellID, cooldown) -- GetSpellPowerCost(5105
             if cooldown.talent then
                 str = str .. "talent" .. " row " .. cooldown.talent+1 .. "\n"
             end
+            if cooldown.sharedCD then
+                str = str .. "\nshares cd with \n"
+                for spellId,v in pairs(cooldown.sharedCD) do
+                    local spell = select(1, GetSpellInfo(spellId))
+                    if spell then
+                        str = str  .. " - " .. spell .. "\n"
+                    end
+                end
+            end
             str = str .. "\n"
         else
             str = str .. cooldown .. "s" .. " cd" .. "\n\n"
