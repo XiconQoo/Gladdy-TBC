@@ -84,6 +84,7 @@ local Cooldowns = Gladdy:NewModule("Cooldowns", nil, {
 function Cooldowns:Initialize()
     self.frames = {}
     self.spellTextures = {}
+    self.spellIdToCanonical = {} -- Reverse lookup: spellID -> canonical spellID
     self.iconCache = {}
     for _,spellTable in pairs(Gladdy:GetCooldownList()) do
         for spellId,val in pairs(spellTable) do
@@ -94,6 +95,12 @@ function Cooldowns:Initialize()
                 end
                 if val.altName then
                     spellName = val.altName
+                end
+                -- Build reverse lookup: map all spellIDs to canonical spellId
+                if val.spellIDs then
+                    for _,altSpellId in ipairs(val.spellIDs) do
+                        self.spellIdToCanonical[altSpellId] = spellId
+                    end
                 end
             end
             if spellName then
@@ -738,6 +745,14 @@ function Cooldowns:AURA_FADE(unit, spellID, spellName)
             LCG.PixelGlow_Stop(icon.glow)
         end
     end
+end
+
+---------------------
+-- Helper Functions
+---------------------
+
+function Cooldowns:GetCanonicalSpellID(spellID)
+    return self.spellIdToCanonical[spellID] or spellID
 end
 
 ---------------------
