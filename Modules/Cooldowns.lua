@@ -627,6 +627,7 @@ end
 
 -- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 116011)
 -- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena2", "MAGE", 102051)
+-- /run LibStub("Gladdy").modules["Cooldowns"]:CooldownUsed("arena1", "DRUID", 33831)
 -- /run local G=LibStub("Gladdy") G.buttons["arena2"].spellCooldownFrame.icons modules["Cooldowns"]:UpdateTestCooldowns("arena2")
 function Cooldowns:Test(unit, showTalents)
     if Gladdy.frame.testing and Gladdy.buttons[unit] then

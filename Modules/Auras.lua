@@ -1396,7 +1396,7 @@ function Auras:GetAuraOptions(auraType)
         options[tostring(k)] = {
             type = "group",
             name = Gladdy:GetExceptionSpellName(k),
-            desc = Gladdy:GetSpellDescription(k), --GetSpellDescription(k),
+            desc = Gladdy:GetSpellDescription(k, Gladdy.db.auraListDefault[tostring(k)]), --GetSpellDescription(k),
             order = i+2,
             icon = texture,
             args = {
@@ -1575,7 +1575,7 @@ function Auras:GetInterruptOptions()
         options[tostring(spellID)] = {
             type = "group",
             name = GetSpellInfo(spellID),
-            desc = Gladdy:GetSpellDescription(spellID),
+            desc = Gladdy:GetSpellDescription(spellID, Gladdy:GetInterrupts()[spellID]),
             order = i+2,
             icon = Gladdy:GetInterrupts()[spellID] and Gladdy:GetInterrupts()[spellID].texture or select(3, GetSpellInfo(spellID)),
             args = {
