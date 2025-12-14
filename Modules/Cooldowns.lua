@@ -1171,37 +1171,37 @@ function Cooldowns:UpdateCooldowns(button)
             replaced[data.replaces] = true
         end
     end
-    for k, v in pairs(Gladdy:GetCooldownList()[class]) do
-        if Gladdy.db.cooldownCooldowns[tostring(k)] then
-            if replaced[k] then
+    for spellID, cooldownInfo in pairs(Gladdy:GetCooldownList()[class]) do
+        if Gladdy.db.cooldownCooldowns[tostring(spellID)] then
+            if replaced[spellID] then
                 -- Skip base spell when there is a replacement
             else
                 local add = false
-                if type(v) ~= "table" then
+                if type(cooldownInfo) ~= "table" then
                     add = true
                 else
                     -- spec gating
-                    if v.notSpec and spec == v.notSpec then
+                    if cooldownInfo.notSpec and spec == cooldownInfo.notSpec then
                         add = false
-                    elseif not v.spec then
+                    elseif not cooldownInfo.spec then
                         add = true
-                    elseif type(v.spec) == "table" then
-                        for _,specialization in pairs(v.spec) do
+                    elseif type(cooldownInfo.spec) == "table" then
+                        for _,specialization in pairs(cooldownInfo.spec) do
                             if spec == specialization then
                                 add = true
                                 break
                             end
                         end
                     else
-                        add = (v.spec == spec)
+                        add = (cooldownInfo.spec == spec)
                     end
                     -- hide talent rows until used (they will be added dynamically on first use)
-                    if add and v.talent then
+                    if add and cooldownInfo.talent then
                         add = false
                     end
                 end
                 if add then
-                    Cooldowns:AddCooldown(k, v, button)
+                    Cooldowns:AddCooldown(spellID, cooldownInfo, button)
                 end
             end
         end
