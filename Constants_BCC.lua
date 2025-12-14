@@ -158,7 +158,6 @@ local specSpells = {
     -- WARLOCK
     [GetSpellInfo(30405)] = L["Affliction"], -- Unstable Affliction
     [GetSpellInfo(18220)] = L["Affliction"], -- Dark Pact
-    --[GetSpellInfo(30911)] = L["Affliction"], -- Siphon Life
     [GetSpellInfo(30414)] = L["Destruction"], -- Shadowfury
     [GetSpellInfo(30912)] = L["Destruction"], -- Conflagrate
     [GetSpellInfo(18708)] = L["Demonology"], -- Fel Domination
@@ -323,16 +322,17 @@ function Gladdy:GetInterrupts()
 end
 
 local interruptsToCanonical = {} -- Reverse lookup: spellID -> canonical spellID
-for spellId,info in pairs(Gladdy:GetInterrupts()) do
-    interruptsToCanonical[spellId] = spellId
-    if info.spellIDs then
-        for rankedSpellID in pairs(info.spellIDs) do
-            interruptsToCanonical[rankedSpellID] = spellId
+function Gladdy:GetInterruptsCanonical()
+    if #interruptsToCanonical == 0 then
+        for spellId,info in pairs(Gladdy:GetInterrupts()) do
+            interruptsToCanonical[spellId] = spellId
+            if info.spellIDs then
+                for _, rankedSpellID in pairs(info.spellIDs) do
+                    interruptsToCanonical[rankedSpellID] = spellId
+                end
+            end
         end
     end
-end
-
-function Gladdy:GetInterruptsCanonical()
     return interruptsToCanonical
 end
 

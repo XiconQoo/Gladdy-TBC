@@ -899,6 +899,21 @@ function Gladdy:GetInterrupts()
     return interrupts
 end
 
+local interruptsToCanonical = {} -- Reverse lookup: spellID -> canonical spellID
+function Gladdy:GetInterruptsCanonical()
+    if #interruptsToCanonical == 0 then
+        for spellId,info in pairs(Gladdy:GetInterrupts()) do
+            interruptsToCanonical[spellId] = spellId
+            if info.spellIDs then
+                for _, rankedSpellID in pairs(info.spellIDs) do
+                    interruptsToCanonical[rankedSpellID] = spellId
+                end
+            end
+        end
+    end
+    return interruptsToCanonical
+end
+
 local cooldownList = {
     -- Spell Name			   Cooldown[, Spec]
     -- Mage

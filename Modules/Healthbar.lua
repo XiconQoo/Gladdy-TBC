@@ -154,8 +154,6 @@ function Healthbar:UpdateAbsorb(healthBar)
         local barSize = healthBar.hp.max and totalAbsorb / healthBar.hp.max * totalWidth or 0
         local minX, maxX, minY, maxY = 0, min(max(barSize / healthBar.absorbOverlay.tileSize, 0), 1), 0, min(max(totalHeight / healthBar.absorbOverlay.tileSize, 0), 1)
 
-        --print(totalWidth, totalHeight, barSize, healthBar.hp.max, minX, maxX, minY, maxY)
-
         healthBar.absorbOverlay:SetWidth(barSize)
         healthBar.absorbOverlay:SetTexCoord(minX, maxX, minY, maxY)
         healthBar.absorbOverlay:Show()
