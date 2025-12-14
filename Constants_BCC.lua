@@ -262,6 +262,11 @@ AddImportantAura(26669, AURA_TYPE_BUFF, 10, { 5277, 26669 }, { duration = 15 }) 
 AddImportantAura(11305, AURA_TYPE_BUFF, 10, { 11305, 8696, 2983 }, { duration = 15 }) -- Sprint
 AddImportantAura(14251, AURA_TYPE_DEBUFF, 20, { 14251 }, { duration = 6 }) -- Riposte
 
+--SHAMAN
+AddImportantAura(8178, AURA_TYPE_BUFF, 20, { 8178 }, { duration = 0 }) -- Grounding Totem Effect
+AddImportantAura(30823, AURA_TYPE_BUFF, 14, { 30823, 30824 }, { duration = 15 }) -- Shamanistic Rage
+AddImportantAura(16188, AURA_TYPE_BUFF, 25, { 16188, 17116 }, { duration = 180 }) -- Nature's Swiftness
+
 -- WARLOCK
 AddImportantAura(5782, AURA_TYPE_DEBUFF, 40, { 5782, 6213, 6215 }, { duration = 10, magic = true }) -- Fear
 AddImportantAura(27223, AURA_TYPE_DEBUFF, 40, { 6789, 17925, 17926, 27223 }, { duration = 3 }) -- Death Coil
@@ -285,7 +290,6 @@ AddImportantAura(3411, AURA_TYPE_BUFF, 10, { 3411 }, { duration = 10 }) -- Inter
 AddImportantAura(23694, AURA_TYPE_DEBUFF, 40, { 23694 }, { duration = 5 }) -- Improved Hamstring
 
 -- MISC / ITEMS / RACIALS
-AddImportantAura(8178, AURA_TYPE_BUFF, 20, { 8178 }, { duration = 0 }) -- Grounding Totem Effect
 AddImportantAura(5530, AURA_TYPE_DEBUFF, 40, { 5530 }, { duration = 3, texture = select(3, GetSpellInfo(12284)) }) -- Mace Stun Effect
 AddImportantAura(34510, AURA_TYPE_DEBUFF, 40, { 34510 }, { duration = 4 }) -- Storm Herald Stun effect
 AddImportantAura(20549, AURA_TYPE_DEBUFF, 40, { 20549 }, { duration = 2 }) -- War Stomp
