@@ -194,73 +194,74 @@ local function AddImportantAura(spellID, track, priority, spellIDs, options)
 end
 -- DRUID
 AddImportantAura(33786, AURA_TYPE_DEBUFF, 40, { 33786 }, { duration = 6 }) -- Cyclone
-AddImportantAura(18658, AURA_TYPE_DEBUFF, 40, { 18658 }, { duration = 10, magic = true }) -- Hibernate
-AddImportantAura(26989, AURA_TYPE_DEBUFF, 30, { 26989 }, { duration = 10, magic = true }) -- Entangling Roots
+AddImportantAura(18658, AURA_TYPE_DEBUFF, 40, { 2637, 18657, 18658 }, { duration = 10, magic = true }) -- Hibernate
+AddImportantAura(26989, AURA_TYPE_DEBUFF, 30, { 339, 1062, 5195, 5196, 9852, 9853, 26989 }, { duration = 10, magic = true }) -- Entangling Roots
 AddImportantAura(27010, AURA_TYPE_DEBUFF, 30, { 27010 }, { duration = 10, altName = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)) }) -- Entangling Roots (Nature's Grasp)
 AddImportantAura(16979, AURA_TYPE_DEBUFF, 30, { 16979 }, { duration = 4 }) -- Feral Charge
-AddImportantAura(8983, AURA_TYPE_DEBUFF, 30, { 8983 }, { duration = 4 }) -- Bash
-AddImportantAura(9005, AURA_TYPE_DEBUFF, 40, { 9005 }, { duration = 3 }) -- Pounce
+AddImportantAura(8983, AURA_TYPE_DEBUFF, 30, { 5211, 6798, 8983 }, { duration = 4 }) -- Bash
+AddImportantAura(9005, AURA_TYPE_DEBUFF, 40, { 9005, 9823, 9827, 27006 }, { duration = 3 }) -- Pounce
 AddImportantAura(22570, AURA_TYPE_DEBUFF, 40, { 22570 }, { duration = 6 }) -- Maim
 AddImportantAura(29166, AURA_TYPE_BUFF, 10, { 29166 }, { duration = 20 }) -- Innervate
 AddImportantAura(16922, AURA_TYPE_DEBUFF, 40, { 16922 }, { duration = 3 }) -- Imp Starfire Stun
 
 -- HUNTER
 AddImportantAura(14309, AURA_TYPE_DEBUFF, 40, { 14309 }, { duration = 10, magic = true }) -- Freezing Trap Effect
-AddImportantAura(19386, AURA_TYPE_DEBUFF, 40, { 19386 }, { duration = 10 }) -- Wyvern Sting
+AddImportantAura(19386, AURA_TYPE_DEBUFF, 40, { 19386, 24131, 24132, 24133, 24134, 24135, 27068, 27069 }, { duration = 10 }) -- Wyvern Sting
 AddImportantAura(19503, AURA_TYPE_DEBUFF, 40, { 19503 }, { duration = 4 }) -- Scatter Shot
-AddImportantAura(14327, AURA_TYPE_DEBUFF, 40, { 14327 }, { duration = 8, magic = true }) -- Scare Beast
+AddImportantAura(14327, AURA_TYPE_DEBUFF, 40, { 1513, 14326, 14327 }, { duration = 8, magic = true }) -- Scare Beast
 AddImportantAura(34490, AURA_TYPE_DEBUFF, 15, { 34490 }, { duration = 3, magic = true }) -- Silencing Shot
 AddImportantAura(19577, AURA_TYPE_DEBUFF, 40, { 19577 }, { duration = 2 }) -- Intimidation
-AddImportantAura(34471, AURA_TYPE_BUFF, 20, { 34471 }, { duration = 18 }) -- The Beast Within
+AddImportantAura(34471, AURA_TYPE_BUFF, 20, { 34471, 34692 }, { duration = 18 }) -- The Beast Within
 
 -- MAGE
-AddImportantAura(12826, AURA_TYPE_DEBUFF, 40, { 12826 }, { duration = 10, magic = true }) -- Polymorph
-AddImportantAura(31661, AURA_TYPE_DEBUFF, 40, { 31661 }, { duration = 3, magic = true }) -- Dragon's Breath
-AddImportantAura(27088, AURA_TYPE_DEBUFF, 30, { 27088 }, { duration = 8, magic = true }) -- Frost Nova
+AddImportantAura(12826, AURA_TYPE_DEBUFF, 40, { 118, 12824, 12825, 12826, 28271, 28272 }, { duration = 10, magic = true }) -- Polymorph
+AddImportantAura(31661, AURA_TYPE_DEBUFF, 40, { 31661, 33041, 33042, 33043 }, { duration = 3, magic = true }) -- Dragon's Breath
+AddImportantAura(27088, AURA_TYPE_DEBUFF, 30, { 122, 865, 6131, 10230, 27088 }, { duration = 8, magic = true }) -- Frost Nova
 AddImportantAura(33395, AURA_TYPE_DEBUFF, 30, { 33395 }, { duration = 8, magic = true }) -- Freeze (Water Elemental)
 AddImportantAura(18469, AURA_TYPE_DEBUFF, 15, { 18469 }, { duration = 4, magic = true }) -- Counterspell - Silence
 AddImportantAura(45438, AURA_TYPE_BUFF, 20, { 45438 }, { duration = 10 }) -- Ice Block
 AddImportantAura(41425, AURA_TYPE_DEBUFF, 8, { 41425 }) -- Hypothermia
-AddImportantAura(12355, AURA_TYPE_DEBUFF, 40, { 12355 }, { duration = 2 }) -- Impact
+AddImportantAura(12355, AURA_TYPE_DEBUFF, 40, { 11103, 12355, 12357, 12358, 12359, 12360 }, { duration = 2 }) -- Impact
 
 -- PALADIN
-AddImportantAura(10308, AURA_TYPE_DEBUFF, 40, { 10308 }, { duration = 6, magic = true }) -- Hammer of Justice
+AddImportantAura(10308, AURA_TYPE_DEBUFF, 40, { 853, 5588, 5589, 10308 }, { duration = 6, magic = true }) -- Hammer of Justice
 AddImportantAura(20066, AURA_TYPE_DEBUFF, 40, { 20066 }, { duration = 6, magic = true }) -- Repentance
-AddImportantAura(10278, AURA_TYPE_BUFF, 10, { 10278 }, { duration = 10 }) -- Blessing of Protection
+AddImportantAura(10278, AURA_TYPE_BUFF, 10, { 1022, 5599, 10278 }, { duration = 10 }) -- Blessing of Protection
 AddImportantAura(1044, AURA_TYPE_BUFF, 10, { 1044 }, { duration = 14 }) -- Blessing of Freedom
-AddImportantAura(6940, AURA_TYPE_BUFF, 12, { 6940 }, { duration = 30 }) -- Blessing of Sacrifice
-AddImportantAura(642, AURA_TYPE_BUFF, 20, { 642 }, { duration = 12 }) -- Divine Shield
+AddImportantAura(6940, AURA_TYPE_BUFF, 12, { 6940, 20729, 27147, 27148 }, { duration = 30 }) -- Blessing of Sacrifice
+AddImportantAura(642, AURA_TYPE_BUFF, 20, { 642, 1020 }, { duration = 12 }) -- Divine Shield
 
 -- PRIEST
-AddImportantAura(8122, AURA_TYPE_DEBUFF, 40, { 8122 }, { duration = 8, magic = true }) -- Psychic Scream
-AddImportantAura(44047, AURA_TYPE_DEBUFF, 30, { 44047 }, { duration = 8 }) -- Chastise
-AddImportantAura(605, AURA_TYPE_DEBUFF, 40, { 605 }, { duration = 10, magic = true }) -- Mind Control
+AddImportantAura(8122, AURA_TYPE_DEBUFF, 40, { 8122, 8124, 10888, 10890 }, { duration = 8, magic = true }) -- Psychic Scream
+AddImportantAura(44047, AURA_TYPE_DEBUFF, 30, { 44041, 44043, 44044, 44045, 44046, 44047 }, { duration = 8 }) -- Chastise
+AddImportantAura(605, AURA_TYPE_DEBUFF, 40, { 605, 10911, 10912 }, { duration = 10, magic = true }) -- Mind Control
 AddImportantAura(15269, AURA_TYPE_DEBUFF, 40, { 15269 }, { duration = 3 }) -- Blackout Stun
 AddImportantAura(15487, AURA_TYPE_DEBUFF, 15, { 15487 }, { duration = 5, magic = true }) -- Silence
-AddImportantAura(33206, AURA_TYPE_BUFF, 10, { 33206 }, { duration = 8 }) -- Pain Suppression
+AddImportantAura(33206, AURA_TYPE_BUFF, 10, { 33206, 44416 }, { duration = 8 }) -- Pain Suppression
 AddImportantAura(6346, AURA_TYPE_BUFF, 9, { 6346 }, { duration = 180 }) -- Fear Ward
 
 -- ROGUE
-AddImportantAura(6770, AURA_TYPE_DEBUFF, 40, { 6770 }, { duration = 10 }) -- Sap
+AddImportantAura(6770, AURA_TYPE_DEBUFF, 40, { 2070, 6770, 11297 }, { duration = 10 }) -- Sap
 AddImportantAura(2094, AURA_TYPE_DEBUFF, 40, { 2094 }, { duration = 10 }) -- Blind
 AddImportantAura(1833, AURA_TYPE_DEBUFF, 40, { 1833 }, { duration = 4 }) -- Cheap Shot
-AddImportantAura(8643, AURA_TYPE_DEBUFF, 40, { 8643 }, { duration = 6 }) -- Kidney Shot
-AddImportantAura(1776, AURA_TYPE_DEBUFF, 40, { 1776 }, { duration = 4 }) -- Gouge
+AddImportantAura(8643, AURA_TYPE_DEBUFF, 40, { 408, 8643 }, { duration = 6 }) -- Kidney Shot
+AddImportantAura(1776, AURA_TYPE_DEBUFF, 40, { 1776, 1777, 8629, 11285, 11286, 38764 }, { duration = 4 }) -- Gouge
 AddImportantAura(18425, AURA_TYPE_DEBUFF, 15, { 18425 }, { duration = 2 }) -- Kick - Silence
 AddImportantAura(1330, AURA_TYPE_DEBUFF, 15, { 1330 }, { duration = 3 }) -- Garrote - Silence
 AddImportantAura(31224, AURA_TYPE_BUFF, 20, { 31224 }, { duration = 5 }) -- Cloak of Shadows
-AddImportantAura(26669, AURA_TYPE_BUFF, 10, { 26669 }, { duration = 15 }) -- Evasion
+AddImportantAura(26669, AURA_TYPE_BUFF, 10, { 5277, 26669 }, { duration = 15 }) -- Evasion
+AddImportantAura(11305, AURA_TYPE_BUFF, 10, { 11305, 8696, 2983 }, { duration = 15 }) -- Sprint
 AddImportantAura(14251, AURA_TYPE_DEBUFF, 20, { 14251 }, { duration = 6 }) -- Riposte
 
 -- WARLOCK
-AddImportantAura(5782, AURA_TYPE_DEBUFF, 40, { 5782 }, { duration = 10, magic = true }) -- Fear
-AddImportantAura(27223, AURA_TYPE_DEBUFF, 40, { 27223 }, { duration = 3 }) -- Death Coil
-AddImportantAura(710, AURA_TYPE_DEBUFF, 40, { 710 }, { duration = 10 }) -- Banish
-AddImportantAura(30283, AURA_TYPE_DEBUFF, 40, { 30283 }, { duration = 2, magic = true }) -- Shadowfury
-AddImportantAura(6358, AURA_TYPE_DEBUFF, 40, { 6358 }, { duration = 10, magic = true }) -- Seduction (Succubus)
-AddImportantAura(5484, AURA_TYPE_DEBUFF, 40, { 5484 }, { duration = 8, magic = true }) -- Howl of Terror
+AddImportantAura(5782, AURA_TYPE_DEBUFF, 40, { 5782, 6213, 6215 }, { duration = 10, magic = true }) -- Fear
+AddImportantAura(27223, AURA_TYPE_DEBUFF, 40, { 6789, 17925, 17926, 27223 }, { duration = 3 }) -- Death Coil
+AddImportantAura(710, AURA_TYPE_DEBUFF, 40, { 710, 18647 }, { duration = 10 }) -- Banish
+AddImportantAura(30283, AURA_TYPE_DEBUFF, 40, { 30283, 30413, 30414 }, { duration = 2, magic = true }) -- Shadowfury
+AddImportantAura(6358, AURA_TYPE_DEBUFF, 40, { 6358, 20407, 30850 }, { duration = 10, magic = true }) -- Seduction (Succubus)
+AddImportantAura(5484, AURA_TYPE_DEBUFF, 40, { 5484, 17928 }, { duration = 8, magic = true }) -- Howl of Terror
 AddImportantAura(24259, AURA_TYPE_DEBUFF, 15, { 24259 }, { duration = 3, magic = true }) -- Spell Lock (Felhunter)
-AddImportantAura(31117, AURA_TYPE_DEBUFF, 15, { 31117 }, { duration = 5, magic = true, altName = select(1, GetSpellInfo(31117)) .. " Silence" }) -- Unstable Affliction Silence
+AddImportantAura(31117, AURA_TYPE_DEBUFF, 15, { 30108, 30404, 30405, 31117 }, { duration = 5, magic = true, altName = select(1, GetSpellInfo(31117)) .. " Silence" }) -- Unstable Affliction Silence
 
 -- WARRIOR
 AddImportantAura(5246, AURA_TYPE_DEBUFF, 15, { 5246 }, { duration = 8 }) -- Intimidating Shout
