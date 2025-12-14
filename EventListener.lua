@@ -199,7 +199,7 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
             Gladdy:SpotEnemy(srcUnit, true, true)
         end
         if not Gladdy.buttons[srcUnit].spec then
-            self:DetectSpec(srcUnit, (Gladdy.specSpells[spellID] or Gladdy.specSpells[spellName]))
+            self:DetectSpec(srcUnit, (Gladdy.specSpells[spellID] or Gladdy.specBuffs[spellID]))
         end
         if (eventType == "SPELL_DISPEL") then
             EventListener:CooldownCheck(eventType, srcUnit, spellName, spellID)
@@ -386,9 +386,9 @@ function EventListener:ScanAuras(unit)
                 spellName = Gladdy.exceptionNames[spellID]
             end
             button.auras[spellID] = { auraType, spellID, spellName, texture, duration, expirationTime, count, dispelType }
-            if not button.spec and (Gladdy.specSpells[spellID] or Gladdy.specSpells[spellName]) and unitCaster then
+            if not button.spec and (Gladdy.specSpells[spellID] or Gladdy.specBuffs[spellID]) and unitCaster then
                 if unitCaster and (UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster)) then
-                    self:DetectSpec(unit, (Gladdy.specSpells[spellID] or Gladdy.specSpells[spellName]))
+                    self:DetectSpec(unit, (Gladdy.specSpells[spellID] or Gladdy.specBuffs[spellID]))
                 end
             end
             if (Gladdy.cooldownBuffs[spellName] or Gladdy.cooldownBuffs[spellID]) and unitCaster then -- Check for auras that hint used CDs (like Fear Ward)
@@ -442,8 +442,8 @@ end
 function EventListener:UNIT_SPELLCAST_START(unit)
     if Gladdy.buttons[unit] then
         local spellName, _, _, _, _, _, _, spellID = UnitCastingInfo(unit)
-        if (Gladdy.specSpells[spellID] or Gladdy.specSpells[spellName]) and not Gladdy.buttons[unit].spec then
-            self:DetectSpec(unit, (Gladdy.specSpells[spellID] or Gladdy.specSpells[spellName]))
+        if (Gladdy.specSpells[spellID] or Gladdy.specBuffs[spellID]) and not Gladdy.buttons[unit].spec then
+            self:DetectSpec(unit, (Gladdy.specSpells[spellID] or Gladdy.specBuffs[spellID]))
         end
     end
 end
@@ -451,8 +451,8 @@ end
 function EventListener:UNIT_SPELLCAST_CHANNEL_START(unit)
     if Gladdy.buttons[unit] then
         local spellName, _, _, _, _, _, _, spellID = UnitChannelInfo(unit)
-        if (Gladdy.specSpells[spellID] or Gladdy.specSpells[spellName]) and not Gladdy.buttons[unit].spec then
-            self:DetectSpec(unit, (Gladdy.specSpells[spellID] or Gladdy.specSpells[spellName]))
+        if (Gladdy.specSpells[spellID] or Gladdy.specBuffs[spellID]) and not Gladdy.buttons[unit].spec then
+            self:DetectSpec(unit, (Gladdy.specSpells[spellID] or Gladdy.specBuffs[spellID]))
         end
     end
 end
@@ -474,8 +474,8 @@ function EventListener:UNIT_SPELLCAST_SUCCEEDED(...)
         end
 
         -- spec detection
-        if spellName and (Gladdy.specSpells[spellID] or Gladdy.specSpells[spellName]) and not button.spec then
-            self:DetectSpec(unit, (Gladdy.specSpells[spellID] or Gladdy.specSpells[spellName]))
+        if spellName and (Gladdy.specSpells[spellID] or Gladdy.specBuffs[spellID]) and not button.spec then
+            self:DetectSpec(unit, (Gladdy.specSpells[spellID] or Gladdy.specBuffs[spellID]))
         end
 
         -- trinket

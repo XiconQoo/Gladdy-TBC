@@ -11,167 +11,176 @@ Gladdy.expansion = "BCC"
 Gladdy.CLASSES = {"MAGE", "PRIEST", "DRUID", "SHAMAN", "PALADIN", "WARLOCK", "WARRIOR", "HUNTER", "ROGUE"}
 tbl_sort(Gladdy.CLASSES)
 
-local specBuffs = {
-    -- DRUID
-    [GetSpellInfo(45283)] = L["Restoration"], -- Natural Perfection
-    [GetSpellInfo(16880)] = L["Restoration"], -- Nature's Grace; Dreamstate spec in TBC equals Restoration
-    [GetSpellInfo(24858)] = L["Restoration"], -- Moonkin Form; Dreamstate spec in TBC equals Restoration
-    [GetSpellInfo(17007)] = L["Feral"], -- Leader of the Pack
-    [GetSpellInfo(16188)] = L["Restoration"], -- Nature's Swiftness
-    [GetSpellInfo(33891)] = L["Restoration"], -- Tree of Life
-
-    -- HUNTER
-    [GetSpellInfo(34471)] = L["Beast Mastery"], -- The Beast Within
-    [GetSpellInfo(20895)] = L["Beast Mastery"], -- Spirit Bond
-    [GetSpellInfo(34455)] = L["Beast Mastery"], -- Ferocious Inspiration
-    [GetSpellInfo(27066)] = L["Marksmanship"], -- Trueshot Aura
-    [GetSpellInfo(34501)] = L["Survival"], -- Expose Weakness
-
-    -- MAGE
-    [GetSpellInfo(33405)] = L["Frost"], -- Ice Barrier
-    [GetSpellInfo(11129)] = L["Fire"], -- Combustion
-    [GetSpellInfo(12042)] = L["Arcane"], -- Arcane Power
-    [GetSpellInfo(12043)] = L["Arcane"], -- Presence of Mind
-    [GetSpellInfo(31589)] = L["Arcane"], -- Slow
-    [GetSpellInfo(12472)] = L["Frost"], -- Icy Veins
-    [GetSpellInfo(46989)] = L["Arcane"], -- Improved Blink
-
-    -- PALADIN
-    [GetSpellInfo(31836)] = L["Holy"], -- Light's Grace
-    [GetSpellInfo(31842)] = L["Holy"], -- Divine Illumination
-    [GetSpellInfo(20216)] = L["Holy"], -- Divine Favor
-    [GetSpellInfo(20375)] = L["Retribution"], -- Seal of Command
-    [GetSpellInfo(20049)] = L["Retribution"], -- Vengeance
-    [GetSpellInfo(20218)] = L["Retribution"], -- Sanctity Aura
-    [GetSpellInfo(26018)] = L["Retribution"], -- Vindication
-    [GetSpellInfo(27179)] = L["Protection"], -- Holy Shield
-
-    -- PRIEST
-    [GetSpellInfo(15473)] = L["Shadow"], -- Shadowform
-    [GetSpellInfo(15286)] = L["Shadow"], -- Vampiric Embrace
-    [GetSpellInfo(45234)] = L["Discipline"], -- Focused Will
-    [GetSpellInfo(27811)] = L["Discipline"], -- Blessed Recovery
-    [GetSpellInfo(33142)] = L["Holy"], -- Blessed Resilience
-    [GetSpellInfo(14752)] = L["Discipline"], -- Divine Spirit
-    [GetSpellInfo(27681)] = L["Discipline"], -- Prayer of Spirit
-    [GetSpellInfo(10060)] = L["Discipline"], -- Power Infusion
-    [GetSpellInfo(33206)] = L["Discipline"], -- Pain Suppression
-    [GetSpellInfo(14893)] = L["Discipline"], -- Inspiration
-
-    -- ROGUE
-    [GetSpellInfo(36554)] = L["Subtlety"], -- Shadowstep
-    [GetSpellInfo(44373)] = L["Subtlety"], -- Shadowstep Speed
-    [GetSpellInfo(36563)] = L["Subtlety"], -- Shadowstep DMG
-    [GetSpellInfo(14278)] = L["Subtlety"], -- Ghostly Strike
-    [GetSpellInfo(31233)] = L["Assassination"], -- Find Weakness
-    [GetSpellInfo(13877)] = L["Combat"], -- Blade Flurry
-
-    --Shaman
-    [GetSpellInfo(30807)] = L["Enhancement"], -- Unleashed Rage
-    [GetSpellInfo(16280)] = L["Enhancement"], -- Flurry
-    [GetSpellInfo(30823)] = L["Enhancement"], -- Shamanistic Rage
-    [GetSpellInfo(16190)] = L["Restoration"], -- Mana Tide Totem
-    [GetSpellInfo(32594)] = L["Restoration"], -- Earth Shield
-    [GetSpellInfo(29202)] = L["Restoration"], -- Healing Way
-
-    -- WARLOCK
-    [GetSpellInfo(19028)] = L["Demonology"], -- Soul Link
-    [GetSpellInfo(23759)] = L["Demonology"], -- Master Demonologist
-    [GetSpellInfo(35696)] = L["Demonology"], -- Demonic Knowledge
-    [GetSpellInfo(30300)] = L["Destruction"], -- Nether Protection
-    [GetSpellInfo(34936)] = L["Destruction"], -- Backlash
-
-    -- WARRIOR
-    [GetSpellInfo(29838)] = L["Arms"], -- Second Wind
-    [GetSpellInfo(12292)] = L["Arms"], -- Death Wish
-
-}
-function Gladdy:GetSpecBuffs()
-    return specBuffs
+Gladdy.specBuffs = {}
+local function AddSpecBuff(spellIDs, spec)
+    for _, spellId in ipairs(spellIDs) do
+        Gladdy.specBuffs[spellId] = spec
+    end
 end
 
-local specSpells = {
-    -- DRUID
-    [GetSpellInfo(33831)] = L["Balance"], -- Force of Nature
-    [GetSpellInfo(33983)] = L["Feral"], -- Mangle (Cat)
-    [GetSpellInfo(33987)] = L["Feral"], -- Mangle (Bear)
-    [GetSpellInfo(18562)] = L["Restoration"], -- Swiftmend
-    [GetSpellInfo(17116)] = L["Restoration"], -- Nature's Swiftness
-    [GetSpellInfo(33891)] = L["Restoration"], -- Tree of Life
+-- DRUID
+AddSpecBuff({33883, 33881, 33882}, L["Restoration"]) -- Natural Perfection
+AddSpecBuff({16880, 16886}, L["Restoration"]) -- Nature's Grace; Dreamstate spec in TBC equals Restoration
+AddSpecBuff({24858}, L["Restoration"]) -- Moonkin Form; Dreamstate spec in TBC equals Restoration
+AddSpecBuff({17007}, L["Feral"]) -- Leader of the Pack
+AddSpecBuff({16188}, L["Restoration"]) -- Nature's Swiftness
+AddSpecBuff({33891}, L["Restoration"]) -- Tree of Life
 
-    -- HUNTER
-    [GetSpellInfo(19577)] = L["Beast Mastery"], -- Intimidation
-    [GetSpellInfo(34490)] = L["Marksmanship"], -- Silencing Shot
-    [GetSpellInfo(27068)] = L["Survival"], -- Wyvern Sting
-    [GetSpellInfo(19306)] = L["Survival"], -- Counterattack
-    [GetSpellInfo(27066)] = L["Marksmanship"], -- Trueshot Aura
+-- HUNTER
+AddSpecBuff({34471, 34692}, L["Beast Mastery"]) -- The Beast Within
+AddSpecBuff({20895, 19578}, L["Beast Mastery"]) -- Spirit Bond
+AddSpecBuff({34460, 34455, 34459}, L["Beast Mastery"]) -- Ferocious Inspiration
+AddSpecBuff({27066}, L["Marksmanship"]) -- Trueshot Aura
+AddSpecBuff({34502, 34500, 34503, 34501}, L["Survival"]) -- Expose Weakness
 
-    -- MAGE
-    [GetSpellInfo(12042)] = L["Arcane"], -- Arcane Power
-    [GetSpellInfo(33043)] = L["Fire"], -- Dragon's Breath
-    [GetSpellInfo(33933)] = L["Fire"], -- Blast Wave
-    [GetSpellInfo(33405)] = L["Frost"], -- Ice Barrier
-    [GetSpellInfo(31687)] = L["Frost"], -- Summon Water Elemental
-    [GetSpellInfo(12472)] = L["Frost"], -- Icy Veins
-    [GetSpellInfo(11958)] = L["Frost"], -- Cold Snap
+-- MAGE
+AddSpecBuff({13032, 33405, 13033, 27134, 11426, 13031}, L["Frost"]) -- Ice Barrier
+AddSpecBuff({11129}, L["Fire"]) -- Combustion
+AddSpecBuff({12042}, L["Arcane"]) -- Arcane Power
+AddSpecBuff({12043}, L["Arcane"]) -- Presence of Mind
+AddSpecBuff({31589}, L["Arcane"]) -- Slow
+AddSpecBuff({12472}, L["Frost"]) -- Icy Veins
+AddSpecBuff({31570, 31569}, L["Arcane"]) -- Improved Blink
 
-    -- PALADIN
-    [GetSpellInfo(33072)] = L["Holy"], -- Holy Shock
-    [GetSpellInfo(20216)] = L["Holy"], -- Divine Favor
-    [GetSpellInfo(31842)] = L["Holy"], -- Divine Illumination
-    [GetSpellInfo(32700)] = L["Protection"], -- Avenger's Shield
-    [GetSpellInfo(27170)] = L["Retribution"], -- Seal of Command
-    [GetSpellInfo(35395)] = L["Retribution"], -- Crusader Strike
-    [GetSpellInfo(20066)] = L["Retribution"], -- Repentance
-    [GetSpellInfo(20218)] = L["Retribution"], -- Sanctity Aura
+-- PALADIN
+AddSpecBuff({31836, 31834, 31833, 31835}, L["Holy"]) -- Light's Grace
+AddSpecBuff({31842}, L["Holy"]) -- Divine Illumination
+AddSpecBuff({20216}, L["Holy"]) -- Divine Favor
+AddSpecBuff({27170}, L["Retribution"]) -- Seal of Command
+AddSpecBuff({20049}, L["Retribution"]) -- Vengeance
+AddSpecBuff({20218}, L["Retribution"]) -- Sanctity Aura
+AddSpecBuff({26017, 26018, 67, 26016, 9452, 26021}, L["Retribution"]) -- Vindication
+AddSpecBuff({27179}, L["Protection"]) -- Holy Shield
 
-    -- PRIEST
-    [GetSpellInfo(10060)] = L["Discipline"], -- Power Infusion
-    [GetSpellInfo(33206)] = L["Discipline"], -- Pain Suppression
-    [GetSpellInfo(14752)] = L["Discipline"], -- Divine Spirit
-    [GetSpellInfo(33143)] = L["Holy"], -- Blessed Resilience
-    [GetSpellInfo(34861)] = L["Holy"], -- Circle of Healing
-    [GetSpellInfo(15473)] = L["Shadow"], -- Shadowform
-    [GetSpellInfo(34917)] = L["Shadow"], -- Vampiric Touch
-    [GetSpellInfo(15286)] = L["Shadow"], -- Vampiric Embrace
+-- PRIEST
+AddSpecBuff({15473}, L["Shadow"]) -- Shadowform
+AddSpecBuff({15286}, L["Shadow"]) -- Vampiric Embrace
+AddSpecBuff({45241, 45244, 45237, 45243, 45242, 45234}, L["Discipline"]) -- Focused Will
+AddSpecBuff({27811, 27816, 27815, 27813, 27818, 27817}, L["Discipline"]) -- Blessed Recovery
+AddSpecBuff({33146, 33143, 33142, 33145}, L["Holy"]) -- Blessed Resilience
+AddSpecBuff({14818, 27841, 14819, 25312, 14752}, L["Discipline"]) -- Divine Spirit
+AddSpecBuff({32999, 27681}, L["Discipline"]) -- Prayer of Spirit
+AddSpecBuff({10060}, L["Discipline"]) -- Power Infusion
+AddSpecBuff({33206, 44416}, L["Discipline"]) -- Pain Suppression
+AddSpecBuff({14893}, L["Discipline"]) -- Inspiration
 
-    -- ROGUE
-    [GetSpellInfo(34413)] = L["Assassination"], -- Mutilate
-    [GetSpellInfo(14177)] = L["Assassination"], -- Cold Blood
-    [GetSpellInfo(13750)] = L["Combat"], -- Adrenaline Rush
-    [GetSpellInfo(13877)] = L["Combat"], -- Blade Flurry
-    [GetSpellInfo(14185)] = L["Subtlety"], -- Preparation
-    [GetSpellInfo(16511)] = L["Subtlety"], -- Hemorrhage
-    [GetSpellInfo(36554)] = L["Subtlety"], -- Shadowstep
-    [GetSpellInfo(14278)] = L["Subtlety"], -- Ghostly Strike
-    [GetSpellInfo(14183)] = L["Subtlety"], -- Premeditation
+-- ROGUE
+AddSpecBuff({36554}, L["Subtlety"]) -- Shadowstep
+AddSpecBuff({44373}, L["Subtlety"]) -- Shadowstep Speed
+AddSpecBuff({36563}, L["Subtlety"]) -- Shadowstep DMG
+AddSpecBuff({14278}, L["Subtlety"]) -- Ghostly Strike
+AddSpecBuff({31240, 31237, 31238, 31241, 31233, 31236, 31242, 31235, 31239, 31234}, L["Assassination"]) -- Find Weakness
+AddSpecBuff({13877}, L["Combat"]) -- Blade Flurry
 
-    -- SHAMAN
-    [GetSpellInfo(16166)] = L["Elemental"], -- Elemental Mastery
-    [GetSpellInfo(30706)] = L["Elemental"], -- Totem of Wrath
-    [GetSpellInfo(30823)] = L["Enhancement"], -- Shamanistic Rage
-    [GetSpellInfo(17364)] = L["Enhancement"], -- Stormstrike
-    [GetSpellInfo(16190)] = L["Restoration"], -- Mana Tide Totem
-    [GetSpellInfo(32594)] = L["Restoration"], -- Earth Shield
-    [GetSpellInfo(16188)] = L["Restoration"], -- Nature's Swiftness
+-- SHAMAN
+AddSpecBuff({30809, 30805, 30802, 30808, 30807, 30810, 30804, 30811, 30806, 30803}, L["Enhancement"]) -- Unleashed Rage
+AddSpecBuff({16280}, L["Enhancement"]) -- Flurry
+AddSpecBuff({30824, 30823}, L["Enhancement"]) -- Shamanistic Rage
+AddSpecBuff({16190}, L["Restoration"]) -- Mana Tide Totem
+AddSpecBuff({32593, 974, 32594, 379}, L["Restoration"]) -- Earth Shield
+AddSpecBuff({29205, 29206, 29202, 29203}, L["Restoration"]) -- Healing Way
 
-    -- WARLOCK
-    [GetSpellInfo(30405)] = L["Affliction"], -- Unstable Affliction
-    [GetSpellInfo(18220)] = L["Affliction"], -- Dark Pact
-    [GetSpellInfo(30414)] = L["Destruction"], -- Shadowfury
-    [GetSpellInfo(30912)] = L["Destruction"], -- Conflagrate
-    [GetSpellInfo(18708)] = L["Demonology"], -- Fel Domination
+-- WARLOCK
+AddSpecBuff({19028}, L["Demonology"]) -- Soul Link
+AddSpecBuff({23842, 23839, 35706, 23829, 23761, 23826, 23822, 35705, 23835, 23825, 23838, 23841, 23827, 35702, 23828, 35704, 23824, 35703, 23844, 23843, 23840, 23823, 23836, 23785, 23833, 23762, 23760, 23759, 23834, 23837}, L["Demonology"]) -- Master Demonologist
+AddSpecBuff({35693, 35691, 35692}, L["Demonology"]) -- Demonic Knowledge
+AddSpecBuff({30301, 30302, 30300, 30299}, L["Destruction"]) -- Nether Protection
+AddSpecBuff({34936, 34939, 34938, 34935}, L["Destruction"]) -- Backlash
 
-    -- WARRIOR
-    [GetSpellInfo(30330)] = L["Arms"], -- Mortal Strike
-    [GetSpellInfo(12292)] = L["Arms"], -- Death Wish
-    [GetSpellInfo(30335)] = L["Fury"], -- Bloodthirst
-    [GetSpellInfo(12809)] = L["Protection"], -- Concussion Blow
-    [GetSpellInfo(30022)] = L["Protection"], -- Devastation
-    [GetSpellInfo(30356)] = L["Protection"], -- Shield Slam
-}
+-- WARRIOR
+AddSpecBuff({29841, 29834, 29838, 29842}, L["Arms"]) -- Second Wind
+AddSpecBuff({12292}, L["Arms"]) -- Death Wish
+function Gladdy:GetSpecBuffs()
+    return Gladdy.specBuffs
+end
+
+Gladdy.specSpells = {}
+local function AddSpecSpell(spellIDs, spec)
+    for _, spellId in ipairs(spellIDs) do
+        Gladdy.specSpells[spellId] = spec
+    end
+end
+
+-- DRUID
+AddSpecSpell({33831}, L["Balance"]) -- Force of Nature
+AddSpecSpell({33876, 33983, 33982}, L["Feral"]) -- Mangle (Cat)
+AddSpecSpell({33986, 33878, 33987}, L["Feral"]) -- Mangle (Bear)
+AddSpecSpell({18562}, L["Restoration"]) -- Swiftmend
+AddSpecSpell({17116}, L["Restoration"]) -- Nature's Swiftness
+AddSpecSpell({33891}, L["Restoration"]) -- Tree of Life
+
+-- HUNTER
+AddSpecSpell({19577}, L["Beast Mastery"]) -- Intimidation
+AddSpecSpell({34490}, L["Marksmanship"]) -- Silencing Shot
+AddSpecSpell({24134, 24132, 19386, 24135, 27069, 24133, 24131, 27068}, L["Survival"]) -- Wyvern Sting
+AddSpecSpell({20909, 19306, 27067, 20910}, L["Survival"]) -- Counterattack
+AddSpecSpell({27066}, L["Marksmanship"]) -- Trueshot Aura
+
+-- MAGE
+AddSpecSpell({12042}, L["Arcane"]) -- Arcane Power
+AddSpecSpell({33042, 33043, 31661, 33041}, L["Fire"]) -- Dragon's Breath
+AddSpecSpell({33933, 11113, 13018, 27133, 13019, 13021, 13020}, L["Fire"]) -- Blast Wave
+AddSpecSpell({13032, 33405, 13033, 27134, 11426, 13031}, L["Frost"]) -- Ice Barrier
+AddSpecSpell({31687}, L["Frost"]) -- Summon Water Elemental
+AddSpecSpell({12472}, L["Frost"]) -- Icy Veins
+AddSpecSpell({11958}, L["Frost"]) -- Cold Snap
+
+-- PALADIN
+AddSpecSpell({33073, 33072, 27175, 25914, 33074, 25903, 20930, 25911, 25902, 25913, 25912, 20473, 27174, 20929, 27176}, L["Holy"]) -- Holy Shock
+AddSpecSpell({20216}, L["Holy"]) -- Divine Favor
+AddSpecSpell({31842}, L["Holy"]) -- Divine Illumination
+AddSpecSpell({32699, 31935, 32700}, L["Protection"]) -- Avenger's Shield
+AddSpecSpell({27170}, L["Retribution"]) -- Seal of Command
+AddSpecSpell({35395}, L["Retribution"]) -- Crusader Strike
+AddSpecSpell({20066}, L["Retribution"]) -- Repentance
+AddSpecSpell({20218}, L["Retribution"]) -- Sanctity Aura
+
+-- PRIEST
+AddSpecSpell({10060}, L["Discipline"]) -- Power Infusion
+AddSpecSpell({33206, 44416}, L["Discipline"]) -- Pain Suppression
+AddSpecSpell({14818, 27841, 14819, 25312, 14752}, L["Discipline"]) -- Divine Spirit
+AddSpecSpell({33146, 33143, 33142, 33145}, L["Holy"]) -- Blessed Resilience
+AddSpecSpell({34865, 34861, 34866, 34863, 34864}, L["Holy"]) -- Circle of Healing
+AddSpecSpell({15473}, L["Shadow"]) -- Shadowform
+AddSpecSpell({34916, 34917, 34914, 34919}, L["Shadow"]) -- Vampiric Touch
+AddSpecSpell({15286}, L["Shadow"]) -- Vampiric Embrace
+
+-- ROGUE
+AddSpecSpell({34411, 34413, 34412, 1329}, L["Assassination"]) -- Mutilate
+AddSpecSpell({14177}, L["Assassination"]) -- Cold Blood
+AddSpecSpell({13750}, L["Combat"]) -- Adrenaline Rush
+AddSpecSpell({13877}, L["Combat"]) -- Blade Flurry
+AddSpecSpell({14185}, L["Subtlety"]) -- Preparation
+AddSpecSpell({26864, 17348, 16511, 17347}, L["Subtlety"]) -- Hemorrhage
+AddSpecSpell({36554}, L["Subtlety"]) -- Shadowstep
+AddSpecSpell({14278}, L["Subtlety"]) -- Ghostly Strike
+AddSpecSpell({14183}, L["Subtlety"]) -- Premeditation
+
+-- SHAMAN
+AddSpecSpell({16166}, L["Elemental"]) -- Elemental Mastery
+AddSpecSpell({30708, 30706}, L["Elemental"]) -- Totem of Wrath
+AddSpecSpell({30824, 30823}, L["Enhancement"]) -- Shamanistic Rage
+AddSpecSpell({32176, 17364, 32175}, L["Enhancement"]) -- Stormstrike
+AddSpecSpell({16190}, L["Restoration"]) -- Mana Tide Totem
+AddSpecSpell({32593, 974, 32594, 379}, L["Restoration"]) -- Earth Shield
+AddSpecSpell({16188}, L["Restoration"]) -- Nature's Swiftness
+
+-- WARLOCK
+AddSpecSpell({30108, 31117, 30404, 30405}, L["Affliction"]) -- Unstable Affliction
+AddSpecSpell({18220, 27265, 18937, 18938}, L["Affliction"]) -- Dark Pact
+AddSpecSpell({30413, 30414, 30283}, L["Destruction"]) -- Shadowfury
+AddSpecSpell({30912, 17962, 18932, 18931, 27266, 18930}, L["Destruction"]) -- Conflagrate
+AddSpecSpell({18708}, L["Demonology"]) -- Fel Domination
+
+-- WARRIOR
+AddSpecSpell({21552, 30330, 12294, 21553, 25248, 21551}, L["Arms"]) -- Mortal Strike
+AddSpecSpell({12292}, L["Arms"]) -- Death Wish
+AddSpecSpell({30335, 23881, 25253, 23885, 23890, 23886, 25252, 23889, 30339, 23893, 23887, 30340, 23894, 23880, 23888, 25251, 23891, 23892}, L["Fury"]) -- Bloodthirst
+AddSpecSpell({12809}, L["Protection"]) -- Concussion Blow
+AddSpecSpell({20243, 30016, 30022}, L["Protection"]) -- Devastate
+AddSpecSpell({23923, 23925, 23924, 30356, 23922, 25258}, L["Protection"]) -- Shield Slam
 function Gladdy:GetSpecSpells()
-    return specSpells
+    return Gladdy.specSpells
 end
 local importantAuras = {}
 
