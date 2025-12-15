@@ -4,7 +4,7 @@
 
 ---
 
-## [v2.62-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.62-Beta/Gladdy_Classic_v2.62-Beta.zip)
+## [v2.63-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.63-Beta/Gladdy_Classic_v2.63-Beta.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -81,6 +81,9 @@ Thank you!
 ---
 
 ### Changes
+
+### v2.63-Beta
+- entangling roots spellids
 
 ### v2.62-Beta
 - specicons corrected
