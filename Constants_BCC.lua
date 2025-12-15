@@ -213,8 +213,8 @@ end
 AddImportantAura(33786, AURA_TYPE_DEBUFF, 40, { 33786 }, { duration = 6 }) -- Cyclone
 AddImportantAura(18658, AURA_TYPE_DEBUFF, 40, { 2637, 18657, 18658 }, { duration = 10, magic = true }) -- Hibernate
 AddImportantAura(26989, AURA_TYPE_DEBUFF, 30, { 339, 1062, 5195, 5196, 9852, 9853, 26989 }, { duration = 10, magic = true }) -- Entangling Roots
-AddImportantAura(27010, AURA_TYPE_DEBUFF, 30, { 27010 }, { duration = 10, altName = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)) }) -- Entangling Roots (Nature's Grasp)
-AddImportantAura(16979, AURA_TYPE_DEBUFF, 30, { 16979 }, { duration = 4 }) -- Feral Charge
+AddImportantAura(27010, AURA_TYPE_DEBUFF, 30, { 19970, 19971, 19972, 19973, 19974, 19975, 27010 }, { duration = 10, altName = select(1, GetSpellInfo(27010)) .. " " .. select(1, GetSpellInfo(16689)) }) -- Entangling Roots (Nature's Grasp)
+AddImportantAura(16979, AURA_TYPE_DEBUFF, 30, { 16979, 45334 }, { duration = 4 }) -- Feral Charge
 AddImportantAura(8983, AURA_TYPE_DEBUFF, 30, { 5211, 6798, 8983 }, { duration = 4 }) -- Bash
 AddImportantAura(9005, AURA_TYPE_DEBUFF, 40, { 9005, 9823, 9827, 27006 }, { duration = 3 }) -- Pounce
 AddImportantAura(22570, AURA_TYPE_DEBUFF, 40, { 22570 }, { duration = 6 }) -- Maim
@@ -251,7 +251,7 @@ AddImportantAura(642, AURA_TYPE_BUFF, 20, { 642, 1020 }, { duration = 12 }) -- D
 
 -- PRIEST
 AddImportantAura(8122, AURA_TYPE_DEBUFF, 40, { 8122, 8124, 10888, 10890 }, { duration = 8, magic = true }) -- Psychic Scream
-AddImportantAura(44047, AURA_TYPE_DEBUFF, 30, { 44041, 44043, 44044, 44045, 44046, 44047 }, { duration = 8 }) -- Chastise
+AddImportantAura(44047, AURA_TYPE_DEBUFF, 30, { 44041, 44043, 44044, 44045, 44046, 44047 }, { duration = 2 }) -- Chastise
 AddImportantAura(605, AURA_TYPE_DEBUFF, 40, { 605, 10911, 10912 }, { duration = 10, magic = true }) -- Mind Control
 AddImportantAura(15269, AURA_TYPE_DEBUFF, 40, { 15269 }, { duration = 3 }) -- Blackout Stun
 AddImportantAura(15487, AURA_TYPE_DEBUFF, 15, { 15487 }, { duration = 5, magic = true }) -- Silence
@@ -337,7 +337,7 @@ AddInterrupt(1766, 5, 15, { 1766, 1769, 1769, 1768, 1767, 38768 })   -- Kick (Ro
 AddInterrupt(6552, 4, 15, { 6552, 6554 })   -- Pummel (Warrior) -- 6554
 AddInterrupt(72, 6, 15, { 72, 1671, 1672, 29704 })   -- Shield Bash (Warrior)
 AddInterrupt(8042, 2, 15, { 8042, 10414, 10412, 25454, 8044, 10413, 8046, 8045 })   -- Earth Shock (Shaman)
-AddInterrupt(19244, 5, 15, { 19675, 19647, 19244, 24259 })   -- Spell Lock (Warlock)
+AddInterrupt(19244, 5, 15, { 19647, 19244, 24259 })   -- Spell Lock (Warlock)
 AddInterrupt(32747, 3, 15, { 19675 })   -- Deadly Throw Interrupt
 
 function Gladdy:GetInterrupts()
