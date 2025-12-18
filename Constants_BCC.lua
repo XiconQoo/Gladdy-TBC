@@ -20,6 +20,19 @@ specIcons["PALADIN"][L["Protection"]] = 135893 -- devotionaura
 specIcons["PRIEST"][L["Discipline"]] = 135987 -- Power Word: Shield
 specIcons["SHAMAN"][L["Enhancement"]] = 136051 -- Lighning Shield
 
+local classRangeSpells = {
+    ["MAGE"] = { spellID = 118, melee = false, range = false },
+    ["PRIEST"] = { spellID = 32379, melee = false, range = false },
+    ["DRUID"] = { spellID = 33786, melee = true, range = false },
+    ["SHAMAN"] = { spellID = 8042, melee = true, range = false },
+    ["PALADIN"] = { spellID = 853, melee = true, range = false },
+    ["WARLOCK"] = { spellID = 5782, melee = false, range = false },
+    ["WARRIOR"] = { spellID = 25275, melee = true, range = false },
+    ["HUNTER"] = { spellID = 1978, melee = true, range = true },
+    ["ROGUE"] = { spellID = 36554, melee = true, range = false },
+}
+Gladdy.classRangeSpells = classRangeSpells
+
 Gladdy.specBuffs = {}
 local function AddSpecBuff(spellIDs, spec)
     for _, spellId in ipairs(spellIDs) do
@@ -205,7 +218,8 @@ local function AddImportantAura(spellID, track, priority, spellIDs, options)
             textureSpell = options.textureSpell or spellID,
             altName = options.altName,
             duration = options.duration or 0,
-            magic = options.magic
+            magic = options.magic,
+            noDuration = options.noDuration
         }
     end
 end
@@ -256,7 +270,7 @@ AddImportantAura(605, AURA_TYPE_DEBUFF, 40, { 605, 10911, 10912 }, { duration = 
 AddImportantAura(15269, AURA_TYPE_DEBUFF, 40, { 15269 }, { duration = 3 }) -- Blackout Stun
 AddImportantAura(15487, AURA_TYPE_DEBUFF, 15, { 15487 }, { duration = 5, magic = true }) -- Silence
 AddImportantAura(33206, AURA_TYPE_BUFF, 10, { 33206, 44416 }, { duration = 8 }) -- Pain Suppression
-AddImportantAura(6346, AURA_TYPE_BUFF, 9, { 6346 }, { duration = 180 }) -- Fear Ward
+AddImportantAura(6346, AURA_TYPE_BUFF, 8, { 6346 }, { duration = 180 }) -- Fear Ward
 
 -- ROGUE
 AddImportantAura(6770, AURA_TYPE_DEBUFF, 40, { 2070, 6770, 11297 }, { duration = 10 }) -- Sap
@@ -272,7 +286,7 @@ AddImportantAura(11305, AURA_TYPE_BUFF, 10, { 11305, 8696, 2983 }, { duration = 
 AddImportantAura(14251, AURA_TYPE_DEBUFF, 20, { 14251 }, { duration = 6 }) -- Riposte
 
 --SHAMAN
-AddImportantAura(8178, AURA_TYPE_BUFF, 20, { 8178 }, { duration = 0 }) -- Grounding Totem Effect
+AddImportantAura(8178, AURA_TYPE_BUFF, 20, { 8178 }, { duration = 0, noDuration = true }) -- Grounding Totem Effect
 AddImportantAura(30823, AURA_TYPE_BUFF, 14, { 30823, 30824 }, { duration = 15 }) -- Shamanistic Rage
 AddImportantAura(16188, AURA_TYPE_BUFF, 25, { 16188, 17116 }, { duration = 180 }) -- Nature's Swiftness
 
@@ -287,7 +301,7 @@ AddImportantAura(24259, AURA_TYPE_DEBUFF, 15, { 19244, 24259 }, { duration = 3, 
 AddImportantAura(31117, AURA_TYPE_DEBUFF, 15, { 30108, 30404, 30405, 31117 }, { duration = 5, magic = true, altName = select(1, GetSpellInfo(31117)) .. " Silence" }) -- Unstable Affliction Silence
 
 -- WARRIOR
-AddImportantAura(5246, AURA_TYPE_DEBUFF, 15, { 5246 }, { duration = 8 }) -- Intimidating Shout
+AddImportantAura(5246, AURA_TYPE_DEBUFF, 15, { 5246, 20511 }, { duration = 8 }) -- Intimidating Shout
 AddImportantAura(12809, AURA_TYPE_DEBUFF, 40, { 12809 }, { duration = 5 }) -- Concussion Blow
 AddImportantAura(25274, AURA_TYPE_DEBUFF, 40, { 25274 }, { duration = 3, texture = select(3, GetSpellInfo(25272)) }) -- Intercept Stun
 AddImportantAura(7922, AURA_TYPE_DEBUFF, 40, { 7922 }, { duration = 1, texture = select(3, GetSpellInfo(100)) }) -- Charge Stun
@@ -376,9 +390,9 @@ Gladdy.cooldownBuffs = {
         return 180 - (3 - expTime)
     end, spellId = 1856, class = "ROGUE" }, -- Vanish
     racials = {
-        --[[[GetSpellInfo(20600)] = { cd = function(expTime) -- 20s uptime
-            return GetTime() - (20 - expTime)
-        end, spellId = 20600 }, -- Perception]]
+    [GetSpellInfo(20600)] = { cd = function(expTime) -- 20s uptime
+        return 180 - (20 - expTime)
+    end, spellId = 20600 }, -- Perception
     },
     [GetSpellInfo(31224)] = { cd = function(expTime) -- 180s uptime == cd
         return 60 - (5 - expTime)
