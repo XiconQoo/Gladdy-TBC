@@ -1,4 +1,4 @@
-local pairs, ipairs, select, tinsert, tbl_sort, tostring, tonumber = pairs, ipairs, select, table.insert, table.sort, tostring, tonumber
+local pairs, ipairs, select, tinsert, tremove, tbl_sort, tostring, tonumber, rand = pairs, ipairs, select, table.insert, table.remove, table.sort, tostring, tonumber, math.random
 local GetSpellInfo = GetSpellInfo
 local CreateFrame, GetTime = CreateFrame, GetTime
 local UnitGUID, UnitAura, UnitExists = UnitGUID, UnitAura, UnitExists
@@ -42,7 +42,9 @@ local Nameplates = Gladdy:NewModule("Nameplates", nil, {
 
 function Nameplates:Initialize()
     self.activeNameplates = {}
+    self.activeAuras = {}
     self.iconCache = {}
+    self.auraFrameCache = {}
     self.testFrame = nil
     
     if Gladdy.db.nameplateEnabled then
@@ -78,6 +80,42 @@ end
 --- Frame Creation
 -------------------------------------------
 
+function Nameplates:CreateAuraFrame(unitID, nameplate)
+    local auraFrame
+    if #self.auraFrameCache > 0 then
+        auraFrame = tremove(self.auraFrameCache, #self.auraFrameCache)
+    else
+        auraFrame = CreateFrame("Frame", nil, nameplate)
+    end
+    nameplate.gladdyAuraFrame = auraFrame
+    nameplate.gladdyAuraFrame:SetFrameStrata(Gladdy.db.nameplateFrameStrata)
+    nameplate.gladdyAuraFrame:SetFrameLevel(Gladdy.db.nameplateFrameLevel)
+    nameplate.gladdyAuraFrame:SetPoint("BOTTOMLEFT", nameplate, "TOPLEFT", 0, 0)
+    nameplate.gladdyAuraFrame:SetPoint("BOTTOMRIGHT", nameplate, "TOPRIGHT", 0, 0)
+    nameplate.gladdyAuraFrame:SetHeight(1)
+    nameplate.gladdyAuraFrame.icons = {}
+    nameplate.gladdyAuraFrame.unitID = unitID
+end
+
+function Nameplates:CacheAuraFrame(auraFrame, nameplate)
+    if not auraFrame then
+        return
+    end
+    for i,v in ipairs(auraFrame.icons) do
+        self:CacheIcon(v, auraFrame, i)
+    end
+
+    if nameplate and nameplate.gladdyAuraFrame then
+        auraFrame.icons = {}
+        auraFrame.unitID = nil
+        auraFrame:ClearAllPoints()
+        auraFrame:Hide()
+        tinsert(self.auraFrameCache, auraFrame)
+        nameplate.gladdyAuraFrame = nil
+    end
+end
+
+
 function Nameplates:CreateIcon()
     local icon
     if #self.iconCache > 0 then
@@ -110,10 +148,55 @@ function Nameplates:CreateIcon()
         icon.text = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
         icon.text:SetJustifyH("CENTER")
         icon.text:SetPoint("CENTER")
+
+        icon:SetScript("OnUpdate", function(self, elapsed)
+            if self.active then
+                if self.timeLeft <= 0 then
+                    Nameplates:AURA_FADE(self.unit, self.track, self.spellID)
+                else
+                    if not self.noDuration then
+                        self.timeLeft = self.timeLeft - elapsed
+                        if not Gladdy.db.useOmnicc then
+                            Gladdy:FormatTimer(self.text, self.timeLeft, self.timeLeft < 10)
+                        end
+                    else
+                        self.text:SetText("")
+                    end
+                end
+            end
+        end)
         
         self:UpdateIcon(icon)
     end
     return icon
+end
+
+function Nameplates:CacheIcon(icon, auraFrame, index)
+    if not icon then
+        return
+    end
+    icon:Hide()
+    icon:ClearAllPoints()
+    icon:SetParent(nil)
+    icon.unit = nil
+    icon.spellID = nil
+    icon.track = nil
+    icon.priority = nil
+    icon.startTime = nil
+    icon.endTime = nil
+    icon.timeLeft = nil
+    icon.noDuration = nil
+    icon.active = nil
+    tinsert(self.iconCache, icon)
+    if auraFrame and auraFrame.icons and auraFrame.icons[index] == icon then
+        tremove(auraFrame.icons, index)
+    end
+end
+
+function Nameplates:CacheIcons(auraFrame)
+    for i = #auraFrame.icons, 1, -1 do
+        self:CacheIcon(auraFrame.icons[i], auraFrame, i)
+    end
 end
 
 function Nameplates:UpdateIcon(icon)
@@ -207,6 +290,7 @@ end
 -------------------------------------------
 
 function Nameplates:NAME_PLATE_UNIT_ADDED(unitID)
+    unitID = Gladdy:GetArenaUnit(unitID, false)
     if not Gladdy.db.nameplateEnabled or not UnitExists(unitID) then
         return
     end
@@ -217,46 +301,20 @@ function Nameplates:NAME_PLATE_UNIT_ADDED(unitID)
     end
     
     if not nameplate.gladdyAuraFrame then
-        nameplate.gladdyAuraFrame = CreateFrame("Frame", nil, nameplate)
-        nameplate.gladdyAuraFrame:SetFrameStrata(Gladdy.db.nameplateFrameStrata)
-        nameplate.gladdyAuraFrame:SetFrameLevel(Gladdy.db.nameplateFrameLevel)
-        nameplate.gladdyAuraFrame:SetPoint("BOTTOMLEFT", nameplate, "TOPLEFT", 0, 0)
-        nameplate.gladdyAuraFrame:SetPoint("BOTTOMRIGHT", nameplate, "TOPRIGHT", 0, 0)
-        nameplate.gladdyAuraFrame:SetHeight(1)
-        nameplate.gladdyAuraFrame.icons = {}
-        nameplate.gladdyAuraFrame.unitID = unitID
+        self:CreateAuraFrame(unitID, nameplate)
     end
     
     self.activeNameplates[unitID] = nameplate
-    -- Scan for existing auras when nameplate is added
-    self:UpdateNameplateAuras(unitID)
+    self:LayoutIcons(unitID)
 end
 
 function Nameplates:NAME_PLATE_UNIT_REMOVED(unitID)
     local nameplate = self.activeNameplates[unitID]
     if nameplate and nameplate.gladdyAuraFrame then
-        -- Return icons to cache
-        for i = #nameplate.gladdyAuraFrame.icons, 1, -1 do
-            local icon = nameplate.gladdyAuraFrame.icons[i]
-            icon:Hide()
-            icon:ClearAllPoints()
-            icon:SetParent(nil)
-            icon.active = false
-            icon.spellID = nil
-            icon.timeLeft = nil
-            icon.priority = nil
-            icon.startTime = nil
-            icon.endTime = nil
-            icon.track = nil
-            icon.cooldown:Clear()
-            icon.text:SetText("")
-            icon.texture:SetTexture("")
-            tinsert(self.iconCache, icon)
-        end
-        nameplate.gladdyAuraFrame.icons = {}
-        nameplate.gladdyAuraFrame:Hide()
+        Nameplates:CacheAuraFrame(nameplate.gladdyAuraFrame, nameplate)
     end
     self.activeNameplates[unitID] = nil
+    self:LayoutIcons(unitID)
 end
 
 -------------------------------------------
@@ -268,223 +326,132 @@ function Nameplates:AURA_GAIN(unit, auraType, spellID, spellName, icon, duration
         return
     end
     
-    -- In test mode, check test frame first
-    local nameplate = nil
-    local foundUnitID = nil
-    
-    if Gladdy.frame and Gladdy.frame.testing and self.testFrame and self.testFrame.gladdyAuraFrame then
-        if UnitIsUnit(self.testFrame.gladdyAuraFrame.unitID, unit) then
-            nameplate = self.testFrame
-            foundUnitID = self.testFrame.gladdyAuraFrame.unitID
-        end
-    end
-    
-    -- Find nameplate for this unit
-    if not nameplate then
-        for unitID, np in pairs(self.activeNameplates) do
-            if UnitIsUnit(unitID, unit) then
-                nameplate = np
-                foundUnitID = unitID
-                break
-            end
-        end
-    end
-    
-    -- If no nameplate found, try to get it directly
-    if not nameplate then
-        local nameplateForUnit = C_NamePlate.GetNamePlateForUnit(unit)
-        if nameplateForUnit then
-            nameplate = nameplateForUnit
-            foundUnitID = unit
-            if not nameplate.gladdyAuraFrame then
-                nameplate.gladdyAuraFrame = CreateFrame("Frame", nil, nameplate)
-                nameplate.gladdyAuraFrame:SetFrameStrata(Gladdy.db.nameplateFrameStrata)
-                nameplate.gladdyAuraFrame:SetFrameLevel(Gladdy.db.nameplateFrameLevel)
-                nameplate.gladdyAuraFrame:ClearAllPoints()
-                nameplate.gladdyAuraFrame:SetPoint("BOTTOMLEFT", nameplate, "TOPLEFT", 0, 0)
-                nameplate.gladdyAuraFrame:SetPoint("BOTTOMRIGHT", nameplate, "TOPRIGHT", 0, 0)
-                nameplate.gladdyAuraFrame:SetHeight(1)
-                nameplate.gladdyAuraFrame.icons = {}
-                nameplate.gladdyAuraFrame.unitID = foundUnitID
-            end
-            self.activeNameplates[foundUnitID] = nameplate
-        end
-    end
-    
-    if not nameplate or not nameplate.gladdyAuraFrame then
-        return
+    if Gladdy.frame and Gladdy.frame.testing and self.testFrame and self.testFrame.gladdyAuraFrame and unit == "player" then
+        self.activeNameplates[unit] = self.testFrame
     end
 
     
     -- Use the same aura system as Auras module
     local auraData = Gladdy.enabledAuras and Gladdy.enabledAuras[auraType] and Gladdy.enabledAuras[auraType][spellID]
+    --print("Nameplates:AURA_GAIN", unit, auraType, spellID, spellName, icon, duration, expirationTime, count, dispelType, n, unitCaster)
     if not auraData then
         return
     end
 
-    
+    if not self.activeAuras then
+        self.activeAuras = {}
+    end
+
+    if not self.activeAuras[unit] then
+        self.activeAuras[unit] = {}
+    end
+
+    --print("AURA_GAIN", unit, spellID, auraType)
+    self.activeAuras[unit][spellID] = {
+        startTime = expirationTime - duration,
+        endTime = expirationTime,
+        duration = duration,
+        name = spellName,
+        priority = auraData.priority,
+        noDuration = auraData.noDuration,
+        texture = auraData.texture or icon,
+        track = auraType,
+        active = true
+    }
+    --auraFrame.startTime = expirationTime - duration
+    --auraFrame.endTime = expirationTime
+    --auraFrame.name = spellName
+    --auraFrame.spellID = spellID
+    --auraFrame.timeLeft = auraFrame.noDuration and 999 or expirationTime - GetTime()
+    --auraFrame.priority = auraData.priority
+    --auraFrame.icon:SetTexture(auraData.texture or icon)
+    --auraFrame.track = auraType
+    --auraFrame.active = true
+
+
     -- Check if icon already exists
-    local existingIcon = nil
-    for _, iconFrame in ipairs(nameplate.gladdyAuraFrame.icons) do
-        if iconFrame.spellID == spellID and iconFrame.track == auraType then
-            existingIcon = iconFrame
-            break
-        end
-    end
-    
-    if not existingIcon then
-        -- Create new icon
-        if #nameplate.gladdyAuraFrame.icons >= Gladdy.db.nameplateMaxIcons then
-            return -- Max icons reached
-        end
-        existingIcon = self:CreateIcon()
-        existingIcon:SetParent(nameplate.gladdyAuraFrame)
-        existingIcon:SetAlpha(1)
-        existingIcon:Show()
-        nameplate.gladdyAuraFrame:Show()
-        tinsert(nameplate.gladdyAuraFrame.icons, existingIcon)
-    end
-    
-    -- Update icon
-    existingIcon.spellID = spellID
-    existingIcon.track = auraType
-    existingIcon.priority = auraData.priority
-    existingIcon.startTime = expirationTime - duration
-    existingIcon.endTime = expirationTime
-    existingIcon.timeLeft = duration > 0 and (expirationTime - GetTime()) or 999
-    existingIcon.noDuration = duration == 0
-    existingIcon.active = true
-    
-    existingIcon.texture:SetTexture(auraData.texture or icon)
-    existingIcon.border:Show()
-    
-    if auraType == AURA_TYPE_DEBUFF then
-        existingIcon.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.nameplateDebuffBorderColor))
-    elseif auraType == AURA_TYPE_BUFF then
-        existingIcon.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.nameplateBuffBorderColor))
-    end
-    
-    if not existingIcon.noDuration then
-        existingIcon.cooldown:SetCooldown(existingIcon.startTime, duration)
-    else
-        existingIcon.cooldown:Clear()
-    end
-    
-    existingIcon:SetScript("OnUpdate", function(self, elapsed)
-        if self.active then
-            if self.timeLeft <= 0 then
-                Nameplates:AURA_FADE(nameplate.gladdyAuraFrame.unitID, self.track, self.spellID)
-            else
-                if not self.noDuration then
-                    self.timeLeft = self.timeLeft - elapsed
-                    if not Gladdy.db.useOmnicc then
-                        Gladdy:FormatTimer(self.text, self.timeLeft, self.timeLeft < 10)
-                    end
-                else
-                    self.text:SetText("")
-                end
-            end
-        end
-    end)
-    print("AURA_GAIN")
-    self:LayoutIcons(nameplate.gladdyAuraFrame)
+    self:LayoutIcons(unit)
 end
 
 function Nameplates:AURA_FADE(unit, auraType, spellID)
-    if not Gladdy.db.nameplateEnabled then
+    if not Gladdy.db.nameplateEnabled  then
         return
     end
-    
-    -- Find nameplate for this unit
-    local nameplate = nil
-    for unitID, np in pairs(self.activeNameplates) do
-        if UnitIsUnit(unitID, unit) then
-            nameplate = np
-            break
-        end
+    print("AURA_FADE", unit, auraType, spellID)
+    if spellID and self.activeAuras[unit] then
+        self.activeAuras[unit][spellID] = nil
+    else
+        self.activeAuras[unit] = {}
     end
-    
-    -- Also check test frame
-    if not nameplate and self.testFrame and self.testFrame.gladdyAuraFrame and UnitIsUnit(self.testFrame.gladdyAuraFrame.unitID, unit) then
-        nameplate = self.testFrame
-    end
-    
-    if not nameplate or not nameplate.gladdyAuraFrame then
-        return
-    end
-    
-    -- Find and remove icon
-    for i = #nameplate.gladdyAuraFrame.icons, 1, -1 do
-        local icon = nameplate.gladdyAuraFrame.icons[i]
-        if icon.spellID == spellID and icon.track == auraType then
-            icon:SetScript("OnUpdate", nil)
-            icon.cooldown:Clear()
-            icon.active = false
-            icon.spellID = nil
-            icon.timeLeft = nil
-            icon.priority = nil
-            icon.startTime = nil
-            icon.endTime = nil
-            icon.track = nil
-            icon.texture:SetTexture("")
-            icon.text:SetText("")
-            icon:Hide()
-            icon:ClearAllPoints()
-            icon:SetParent(nil)
-            table.remove(nameplate.gladdyAuraFrame.icons, i)
-            tinsert(self.iconCache, icon)
-            break
-        end
-    end
-    
-    self:LayoutIcons(nameplate.gladdyAuraFrame)
+    self:LayoutIcons(unit)
 end
 
-function Nameplates:UpdateNameplateAuras(unitID)
-    if not Gladdy.enabledAuras then
+function Nameplates:LayoutIcons(unit)
+    if not unit then
         return
     end
-    
-    local nameplate = self.activeNameplates[unitID]
-    if not nameplate or not nameplate.gladdyAuraFrame then
-        return
-    end
-    
-    -- Scan auras on the unit
-    for i = 1, 2 do
-        local filter = (i == 1 and "HELPFUL" or "HARMFUL")
-        local auraType = i == 1 and AURA_TYPE_BUFF or AURA_TYPE_DEBUFF
-        
-        for n = 1, 40 do
-            local spellName, texture, count, dispelType, duration, expirationTime, unitCaster, _, shouldConsolidate, spellID = UnitAura(unitID, n, filter)
-            if not spellID then
-                break
-            end
-            
-            local auraData = Gladdy.enabledAuras[auraType] and Gladdy.enabledAuras[auraType][spellID]
-            if auraData then
-                self:AURA_GAIN(unitID, auraType, spellID, spellName, texture, duration, expirationTime, count, dispelType, n, unitCaster)
-            end
-        end
-    end
-end
 
-function Nameplates:LayoutIcons(auraFrame)
-    if not auraFrame or not auraFrame.icons then
+    local nameplate = self.activeNameplates[unit]
+    local activeAuras = self.activeAuras[unit]
+
+    if not nameplate or not activeAuras then
         return
+    end
+
+    local auraFrame = nameplate.gladdyAuraFrame
+
+    if not auraFrame then
+        nameplate.gladdyAuraFrame = self:CreateAuraFrame(unit, nameplate)
+    end
+
+    self:CacheIcons(auraFrame)
+
+    local newIcon
+    for spellID, auraData in pairs(activeAuras) do
+        -- create icon with data
+        newIcon = self:CreateIcon()
+        newIcon:SetParent(nameplate.gladdyAuraFrame)
+        newIcon:SetAlpha(1)
+
+        newIcon.unit = unit
+        newIcon.spellID = spellID
+        newIcon.track = auraData.track
+        newIcon.priority = auraData.priority
+        newIcon.startTime = auraData.startTime
+        newIcon.endTime = auraData.endTime
+        newIcon.timeLeft = auraData.duration > 0 and (auraData.endTime - GetTime()) or 999
+        newIcon.noDuration = auraData.noDuration
+        newIcon.active = auraData.active
+
+        newIcon.texture:SetTexture(auraData.texture)
+        newIcon.border:Show()
+
+        newIcon:Show()
+        nameplate.gladdyAuraFrame:Show()
+
+        tinsert(nameplate.gladdyAuraFrame.icons, newIcon)
+
+        if auraData.track == AURA_TYPE_DEBUFF then
+            newIcon.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.nameplateDebuffBorderColor))
+        elseif auraData.track == AURA_TYPE_BUFF then
+            newIcon.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.nameplateBuffBorderColor))
+        end
+
+        if not newIcon.noDuration then
+            newIcon.cooldown:SetCooldown(newIcon.startTime, auraData.duration)
+        else
+            newIcon.cooldown:Clear()
+        end
     end
     
     -- Sort icons
     self:SortIcons(auraFrame.icons, Gladdy.db.nameplateSortOrder)
     
     -- Limit to max icons
-    while #auraFrame.icons > Gladdy.db.nameplateMaxIcons do
-        local icon = table.remove(auraFrame.icons, #auraFrame.icons)
-        icon:SetScript("OnUpdate", nil)
-        icon:Hide()
-        icon:ClearAllPoints()
-        icon:SetParent(nil)
-        tinsert(self.iconCache, icon)
+    if #auraFrame.icons > Gladdy.db.nameplateMaxIcons then
+        for i = #auraFrame.icons, Gladdy.db.nameplateMaxIcons, -1 do
+            self:CacheIcon(auraFrame.icons[i], auraFrame, i)
+        end
     end
     
     -- Position icons
@@ -513,10 +480,54 @@ end
 -------------------------------------------
 
 function Nameplates:TestOnce()
+    print("Nameplates:TestOnce")
     if not self.testFrame then
+
+--[[
+
+            <StatusBar parentKey="healthBar" frameLevel="-1">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="4" y="4"/>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-21" y="4"/>
+				</Anchors>
+				<Frames>
+					<Frame parentKey="border" inherits="NamePlateFullBorderTemplate" />
+				</Frames>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture parentKey="background">
+							<Color r=".2" g=".2" b=".2" a=".85"/>
+							<Anchors>
+								<Anchor point="TOPLEFT" />
+								<Anchor point="BOTTOMRIGHT" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<BarTexture parentKey="barTexture" file="Interface/TargetingFrame/UI-TargetingFrame-BarFill"/>
+				<Scripts>
+					<OnLoad>
+						self:GetStatusBarTexture():SetDrawLayer("BORDER");
+					</OnLoad>
+				</Scripts>
+			</StatusBar>
+
+			<Layer level="ARTWORK">
+				<FontString parentKey="name" inherits="SystemFont_NamePlate" wordwrap="false" justifyH="CENTER" ignoreParentScale="false">
+					<Anchors>
+						<Anchor point="BOTTOM" relativeKey="$parent.healthBar.border" relativePoint="TOP" x="0" y="2" />
+					</Anchors>
+				</FontString>
+				<FontString parentKey="statusText" inherits="GameFontDisable" />
+			</Layer>
+
+
+
+        ]]
+
         self.testFrame = CreateFrame("Frame", nil, UIParent, BackdropTemplateMixin and "BackdropTemplate")
         self.testFrame:SetWidth(200)
-        self.testFrame:SetHeight(50)
+        self.testFrame:SetHeight(30)
         self.testFrame:SetPoint("CENTER", UIParent, "CENTER", 0, -200)
         self.testFrame:SetBackdrop({
             bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -531,8 +542,8 @@ function Nameplates:TestOnce()
         
         -- Create fake nameplate text
         self.testFrame.nameText = self.testFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        self.testFrame.nameText:SetPoint("CENTER", self.testFrame, "CENTER", 0, 10)
-        self.testFrame.nameText:SetText("Test Nameplate")
+        self.testFrame.nameText:SetPoint("CENTER", self.testFrame, "CENTER", 0, 0)
+        self.testFrame.nameText:SetText("TEST NAMEPLATE")
         self.testFrame.nameText:SetTextColor(1, 1, 1, 1)
         
         -- Create aura frame (positioned at top of test frame for icon anchoring)
@@ -559,6 +570,7 @@ function Nameplates:TestOnce()
             self.testFrame.gladdyAuraFrame:SetHeight(1)
         end
         self.testFrame:Show()
+        self.activeAuras["player"] = {}
         -- Add some test auras
         self:TestAuras()
     else
@@ -574,79 +586,59 @@ function Nameplates:TestAuras()
     end
     
     -- Clear existing test icons
-    for i = #self.testFrame.gladdyAuraFrame.icons, 1, -1 do
-        local icon = self.testFrame.gladdyAuraFrame.icons[i]
-        icon:SetScript("OnUpdate", nil)
-        icon:Hide()
-        icon:ClearAllPoints()
-        icon:SetParent(nil)
-        table.remove(self.testFrame.gladdyAuraFrame.icons, i)
-        tinsert(self.iconCache, icon)
-    end
+    self:CacheIcons(self.testFrame.gladdyAuraFrame)
     
     -- Add test auras from enabled list
-    local testAuras = {}
+    local testAuras = 0
     if Gladdy.enabledAuras then
+        local random, spellID
+        local auras = { [AURA_TYPE_DEBUFF] = {},  [AURA_TYPE_BUFF] = {} }
+
         for auraType, spells in pairs(Gladdy.enabledAuras) do
-            for spellID, data in pairs(spells) do
-                if #testAuras < Gladdy.db.nameplateMaxIcons then
+            for spellId, data in pairs(spells) do
+                tinsert(auras[auraType], spellId)
+            end
+        end
+
+        for auraType, spells in pairs(Gladdy.enabledAuras) do
+            local max = Gladdy.db.nameplateMaxIcons / 2
+            for i = 1, max do
+                if #auras[auraType] > 0 then
+                    random = rand(1, #auras[auraType])
+                    spellID = tonumber(auras[auraType][random])
+                    tremove(auras[auraType], random)
+
+                    local data = Gladdy.enabledAuras[auraType][spellID]
+                    --print("spellid", auraType, random, data.auraType, data.spellID)
                     local texture = data.texture
-                    if not texture or texture == "" then
+                    if not texture then
                         texture = select(3, GetSpellInfo(spellID))
                     end
-                    tinsert(testAuras, {
-                        spellID = spellID,
-                        auraType = auraType,
-                        priority = data.priority or 40,
-                        texture = texture,
-                        duration = data.duration or 10
-                    })
+                    local expirationTime = GetTime() + data.duration
+                    print(i, auraType, #auras[auraType], spellID, data.duration)
+                    self:AURA_GAIN("player", auraType, spellID, GetSpellInfo(spellID), data.texture, data.duration, expirationTime, 1, nil, i, "player")
+                    testAuras = testAuras + 1
                 end
             end
         end
     end
     
     -- Fallback: if no enabled auras, use some default test auras
-    if #testAuras == 0 then
+    if testAuras == 0 then
         local defaultSpells = {
             {spellID = 22812, auraType = AURA_TYPE_BUFF, priority = 40, duration = 12}, -- Barkskin
             {spellID = 45438, auraType = AURA_TYPE_BUFF, priority = 40, duration = 10}, -- Ice Block
             {spellID = 31224, auraType = AURA_TYPE_BUFF, priority = 50, duration = 5}, -- Cloak of Shadows
         }
-        for i, spell in ipairs(defaultSpells) do
-            if #testAuras < Gladdy.db.nameplateMaxIcons then
-                local texture = select(3, GetSpellInfo(spell.spellID))
-                if texture then
-                    tinsert(testAuras, {
-                        spellID = spell.spellID,
-                        auraType = spell.auraType,
-                        priority = spell.priority,
-                        texture = texture,
-                        duration = spell.duration
-                    })
-                end
+        for i, data in ipairs(defaultSpells) do
+            local texture = data.texture
+            if not texture then
+                texture = select(3, GetSpellInfo(data.spellID))
             end
-        end
-    end
-    
-    -- Sort and add test auras
-    tbl_sort(testAuras, function(a, b)
-        if Gladdy.db.nameplateSortOrder == "priority" then
-            if a.priority == b.priority then
-                return a.duration < b.duration
+            if texture then
+                local expirationTime = GetTime() + data.duration
+                self:AURA_GAIN("player", data.auraType, data.spellID, GetSpellInfo(data.spellID), data.texture, data.duration, expirationTime, 1, nil, i, "player")
             end
-            return a.priority > b.priority
-        elseif Gladdy.db.nameplateSortOrder == "timeleft" then
-            return a.duration < b.duration
-        else
-            return a.spellID < b.spellID
-        end
-    end)
-    
-    for i, testAura in ipairs(testAuras) do
-        if i <= Gladdy.db.nameplateMaxIcons then
-            local expirationTime = GetTime() + testAura.duration
-            self:AURA_GAIN("player", testAura.auraType, testAura.spellID, GetSpellInfo(testAura.spellID), testAura.texture, testAura.duration, expirationTime, 1, nil, i, "player")
         end
     end
 end
@@ -660,7 +652,7 @@ function Nameplates:Reset()
         if self.testFrame.gladdyAuraFrame then
             for i = #self.testFrame.gladdyAuraFrame.icons, 1, -1 do
                 local icon = self.testFrame.gladdyAuraFrame.icons[i]
-                icon:SetScript("OnUpdate", nil)
+                --icon:SetScript("OnUpdate", nil)
                 icon:Hide()
                 icon:ClearAllPoints()
                 icon:SetParent(nil)
@@ -679,7 +671,7 @@ function Nameplates:UpdateFrameOnce()
     -- Update all active nameplates
     for unitID, nameplate in pairs(self.activeNameplates) do
         if nameplate.gladdyAuraFrame then
-            self:LayoutIcons(nameplate.gladdyAuraFrame)
+            self:LayoutIcons(unitID)
             for _, icon in ipairs(nameplate.gladdyAuraFrame.icons) do
                 self:UpdateIcon(icon)
             end
