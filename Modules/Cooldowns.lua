@@ -201,7 +201,27 @@ function Cooldowns:CreateIcon()
         icon.flash:SetAlpha(0)
         icon.flash:Hide()
 
-        -- Activation animation group (Alpha ping then fade out)
+        -- Activation animation group (Scale)
+        icon.ActivationAnimationScale = icon:CreateAnimationGroup()
+        do
+            local f3 = icon.ActivationAnimationScale:CreateAnimation("Scale")
+            f3:SetTarget(icon)
+            f3:SetSmoothing("NONE")
+            f3:SetOrder(1)
+            f3:SetScaleFrom(1, 1)
+            f3:SetScaleTo(1.25, 1.25)
+            f3:SetDuration(0.12)
+
+            local f4 = icon.ActivationAnimationScale:CreateAnimation("Scale")
+            f4:SetTarget(icon)
+            f4:SetSmoothing("NONE")
+            f4:SetOrder(2)
+            f4:SetScaleFrom(1.25, 1.25)
+            f4:SetScaleTo(1,1)
+            f4:SetDuration(0.1)
+        end
+
+        -- Activation animation group (Alpha)
         icon.ActivationAnimation = icon:CreateAnimationGroup()
         icon.ActivationAnimation:SetToFinalAlpha(true)
         icon.ActivationAnimation:SetScript("OnPlay", function(self)
@@ -234,7 +254,7 @@ function Cooldowns:CreateIcon()
             local a3 = icon.ActivationAnimation:CreateAnimation("Alpha")
             a3:SetTarget(icon.activationTexture)
             a3:SetSmoothing("NONE")
-            a3:SetOrder(2)
+            a3:SetOrder(3)
             a3:SetFromAlpha(1)
             a3:SetToAlpha(0)
             a3:SetDuration(0.6)
@@ -254,29 +274,29 @@ function Cooldowns:CreateIcon()
             i.flash:SetAlpha(0)
         end)
         do
-            local f1 = icon.FlashAnimation:CreateAnimation("Alpha")
-            f1:SetTarget(icon.flash)
-            f1:SetSmoothing("NONE")
-            f1:SetOrder(2)
-            f1:SetFromAlpha(1)
-            f1:SetToAlpha(0)
-            f1:SetDuration(0.6)
+            local a1 = icon.FlashAnimation:CreateAnimation("Alpha")
+            a1:SetTarget(icon.flash)
+            a1:SetSmoothing("NONE")
+            a1:SetOrder(1)
+            a1:SetFromAlpha(0.8)
+            a1:SetToAlpha(1)
+            a1:SetDuration(0.2)
 
-            local f2 = icon.FlashAnimation:CreateAnimation("Alpha")
-            f2:SetTarget(icon.flash)
-            f2:SetSmoothing("NONE")
-            f2:SetOrder(3)
-            f2:SetFromAlpha(0)
-            f2:SetToAlpha(1)
-            f2:SetDuration(0.6)
+            local a2 = icon.FlashAnimation:CreateAnimation("Alpha")
+            a2:SetTarget(icon.flash)
+            a2:SetSmoothing("NONE")
+            a2:SetOrder(2)
+            a2:SetFromAlpha(1)
+            a2:SetToAlpha(1)
+            a2:SetDuration(0.4)
 
-            local f3 = icon.FlashAnimation:CreateAnimation("Scale")
-            f3:SetTarget(icon.flash)
-            f3:SetSmoothing("NONE")
-            f3:SetOrder(1)
-            f3:SetScaleFrom(1,1)
-            f3:SetScaleTo(1.4, 1.4)
-            f3:SetDuration(0.8)
+            local a3 = icon.FlashAnimation:CreateAnimation("Alpha")
+            a3:SetTarget(icon.flash)
+            a3:SetSmoothing("NONE")
+            a3:SetOrder(3)
+            a3:SetFromAlpha(1)
+            a3:SetToAlpha(0)
+            a3:SetDuration(0.6)
         end
 
         self:UpdateIcon(icon)
@@ -782,6 +802,10 @@ function Cooldowns:CooldownStart(button, spellId, duration, start)
                 if icon.ActivationAnimation:IsPlaying() then icon.ActivationAnimation:Stop() end
                 icon.ActivationAnimation:Play()
             end
+            if icon.ActivationAnimationScale then
+                if icon.ActivationAnimationScale:IsPlaying() then icon.ActivationAnimationScale:Stop() end
+                icon.ActivationAnimationScale:Play()
+            end
             -- Charge-style cooldown handling
             if icon.maxCharges then
                 -- dynamic chargeMod: if we detect a second use while on cooldown and a modifier exists, raise max charges
@@ -849,7 +873,7 @@ function Cooldowns:CooldownStart(button, spellId, duration, start)
                     return
                 end
                 icon.active = true
-                icon.timeLeft = start and start - GetTime() + duration or duration
+                icon.timeLeft = (start and start - GetTime() + duration) or duration
                 if (not Gladdy.db.cooldownDisableCircle) then icon.cooldown:SetCooldown(start or GetTime(), duration) end
                 if Gladdy.db.cooldownIconDesaturateOnCooldown then
                     icon.texture:SetDesaturated(true)
