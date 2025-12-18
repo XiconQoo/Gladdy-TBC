@@ -311,19 +311,28 @@ function Gladdy:DeleteUnknownOptions(tbl, refTbl, str)
 end
 
 function Gladdy:PixelPerfectScale(update)
-    local physicalWidth, physicalHeight = GetPhysicalScreenSize()
-    local perfectUIScale = 768.0/physicalHeight--768/select(2, strsplit("x",({ GetScreenResolutions()})[GetCurrentResolution()]))
     if self.db and self.db.pixelPerfect and self.frame then
-        self.frame:SetIgnoreParentScale(true)
-        self.frame:SetScale(perfectUIScale)
-        --local adaptiveScale = (GetCVar("useUiScale") == "1" and 1.0 + perfectUIScale - GetCVar("UIScale") or perfectUIScale)
-        --self.frame:SetScale(adaptiveScale)
+        self:PixelPerfectScaleFrame(self.frame, true)
         if update then
             self:UpdateFrame()
         end
     elseif self.frame then
+        self:PixelPerfectScaleFrame(self.frame, false)
         self.frame:SetScale(self.db.frameScale)
-        self.frame:SetIgnoreParentScale(false)
+    end
+end
+
+function Gladdy:PixelPerfectScaleFrame(frame, apply)
+    if apply then
+        local physicalWidth, physicalHeight = GetPhysicalScreenSize()
+        local perfectUIScale = 768.0/physicalHeight--768/select(2, strsplit("x",({ GetScreenResolutions()})[GetCurrentResolution()]))
+        frame:SetIgnoreParentScale(true)
+        frame:SetScale(perfectUIScale)
+        --local adaptiveScale = (GetCVar("useUiScale") == "1" and 1.0 + perfectUIScale - GetCVar("UIScale") or perfectUIScale)
+        --self.frame:SetScale(adaptiveScale)
+    else
+        frame:SetScale(1)
+        frame:SetIgnoreParentScale(false)
     end
 end
 

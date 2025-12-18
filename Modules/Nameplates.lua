@@ -86,6 +86,7 @@ function Nameplates:CreateAuraFrame(unitID, nameplate)
         auraFrame = tremove(self.auraFrameCache, #self.auraFrameCache)
     else
         auraFrame = CreateFrame("Frame", nil, nameplate)
+        Gladdy:PixelPerfectScaleFrame(auraFrame, true)
     end
     nameplate.gladdyAuraFrame = auraFrame
     nameplate.gladdyAuraFrame:SetFrameStrata(Gladdy.db.nameplateFrameStrata)
@@ -122,6 +123,7 @@ function Nameplates:CreateIcon()
         icon = table.remove(self.iconCache, #self.iconCache)
     else
         icon = CreateFrame("Frame")
+        Gladdy:PixelPerfectScaleFrame(icon, true)
         icon:EnableMouse(false)
         
         icon.frame = CreateFrame("Frame", nil, icon)
@@ -142,7 +144,7 @@ function Nameplates:CreateIcon()
         icon.texture:SetAllPoints(icon)
         icon.texture.masked = true
         
-        icon.border = icon.cooldownFrame:CreateTexture(nil, "OVERLAY")
+        icon.border = icon.cooldownFrame:CreateTexture(nil, "OVERLAY", nil, 7)
         icon.border:SetAllPoints(icon)
         
         icon.text = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
@@ -377,7 +379,7 @@ function Nameplates:AURA_FADE(unit, auraType, spellID)
     if not Gladdy.db.nameplateEnabled  then
         return
     end
-    print("AURA_FADE", unit, auraType, spellID)
+    --print("AURA_FADE", unit, auraType, spellID)
     if spellID and self.activeAuras[unit] then
         self.activeAuras[unit][spellID] = nil
     else
@@ -480,7 +482,7 @@ end
 -------------------------------------------
 
 function Nameplates:TestOnce()
-    print("Nameplates:TestOnce")
+    --print("Nameplates:TestOnce")
     if not self.testFrame then
 
 --[[
@@ -615,7 +617,7 @@ function Nameplates:TestAuras()
                         texture = select(3, GetSpellInfo(spellID))
                     end
                     local expirationTime = GetTime() + data.duration
-                    print(i, auraType, #auras[auraType], spellID, data.duration)
+                    --print(i, auraType, #auras[auraType], spellID, data.duration)
                     self:AURA_GAIN("player", auraType, spellID, GetSpellInfo(spellID), data.texture, data.duration, expirationTime, 1, nil, i, "player")
                     testAuras = testAuras + 1
                 end
