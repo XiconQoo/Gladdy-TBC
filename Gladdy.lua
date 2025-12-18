@@ -244,9 +244,11 @@ function Gladdy:CleanupIgnoredOptions(tbl, refTbl, str, refOptionStruct)
                 if not refTbl[k] then -- all options must be present because not default option
                     if (str == "Gladdy.db.auraListDefault" and type(tbl[k]) == "table") then --potential not in expansion
                         if (not GetSpellInfo(k)) then -- not a spell
+                            self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, " - GetSpellInfo failed \"" .. type(tbl[k]) .. "\" - deleting")
                             tbl[k] = nil
                         end
-                        if (not type(tbl[k]).spellIDs) then -- not in other expansion defaults
+                        if (not tbl[k].spellIDs) then -- not in other expansion defaults
+                            self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, " - not in other expansion defaults \"" .. type(tbl[k]) .. "\" - deleting")
                             tbl[k] = nil
                         end
                     elseif (str == "Gladdy.db.trackedDebuffs" and not GetSpellInfo(k)) then
