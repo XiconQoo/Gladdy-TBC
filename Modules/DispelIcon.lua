@@ -96,7 +96,7 @@ function DispelIcon:CreateFrame(unit)
     dispelIcon.texture:SetMask("Interface\\AddOns\\Gladdy\\Images\\mask")
     dispelIcon.texture.masked = true
 
-    dispelIcon.texture.overlay = dispelIcon:CreateTexture(nil, "BORDER")
+    dispelIcon.texture.overlay = dispelIcon:CreateTexture(nil, "OVERLAY", nil, 7)
     dispelIcon.texture.overlay:SetAllPoints(dispelIcon)
     dispelIcon.texture.overlay:SetTexture(Gladdy.db.dispelIconBorderStyle)
 

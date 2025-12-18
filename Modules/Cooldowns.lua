@@ -166,7 +166,7 @@ function Cooldowns:CreateIcon()
         icon.cooldownFrame:ClearAllPoints()
         icon.cooldownFrame:SetAllPoints(icon)
 
-        icon.border = icon.cooldownFrame:CreateTexture(nil, "OVERLAY")
+        icon.border = icon.cooldownFrame:CreateTexture(nil, "OVERLAY", nil, 7)
         icon.border:SetAllPoints(icon)
 
         icon.cooldownFont = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")

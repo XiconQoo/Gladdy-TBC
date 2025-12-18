@@ -50,7 +50,7 @@ local function updateEnabledAuras()
                     texture = v.texture,
                     priority = v.priority,
                     duration = Gladdy:GetImportantAuras()[tonumber(k)] and Gladdy:GetImportantAuras()[tonumber(k)].duration,
-                    noDuration = Gladdy:GetImportantAuras()[tonumber(k)].noDuration
+                    noDuration = Gladdy:GetImportantAuras()[tonumber(k)] and Gladdy:GetImportantAuras()[tonumber(k)].noDuration
                 }
             else
                 Gladdy.enabledAuras[v.track][spellID] = nil
@@ -138,7 +138,7 @@ function Auras:CreateFrame(unit)
     auraFrame.icon:SetAllPoints(auraFrame)
     auraFrame.icon.masked = true
 
-    auraFrame.icon.overlay = auraFrame.cooldownFrame:CreateTexture(nil, "OVERLAY")
+    auraFrame.icon.overlay = auraFrame.cooldownFrame:CreateTexture(nil, "OVERLAY", nil, 7)
     auraFrame.icon.overlay:SetAllPoints(auraFrame)
     auraFrame.icon.overlay:SetTexture(Gladdy.db.buttonBorderStyle)
 

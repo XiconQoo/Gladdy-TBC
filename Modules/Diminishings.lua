@@ -154,7 +154,7 @@ function Diminishings:CreateFrame(unit)
 
         --icon.overlay = CreateFrame("Frame", nil, icon)
         --icon.overlay:SetAllPoints(icon)
-        icon.border = icon.cooldownFrame:CreateTexture(nil, "OVERLAY")
+        icon.border = icon.cooldownFrame:CreateTexture(nil, "OVERLAY", nil, 7)
         icon.border:SetTexture("Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp")
         icon.border:SetAllPoints(icon)
 
