@@ -49,7 +49,8 @@ local function updateEnabledAuras()
                 Gladdy.enabledAuras[v.track][spellID] = {
                     texture = v.texture,
                     priority = v.priority,
-                    duration = Gladdy:GetImportantAuras()[tonumber(k)] and Gladdy:GetImportantAuras()[tonumber(k)].duration
+                    duration = Gladdy:GetImportantAuras()[tonumber(k)] and Gladdy:GetImportantAuras()[tonumber(k)].duration,
+                    noDuration = Gladdy:GetImportantAuras()[tonumber(k)].noDuration
                 }
             else
                 Gladdy.enabledAuras[v.track][spellID] = nil
