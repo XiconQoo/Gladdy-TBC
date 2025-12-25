@@ -36,6 +36,7 @@ local Nameplates = Gladdy:NewModule("Nameplates", nil, {
     nameplateMaxIcons = 5,
     nameplateIconPadding = 2,
     nameplateSortOrder = "priority", -- "time", "timeleft", "priority"
+    nameplateCenterIcons = false,
     nameplateFrameStrata = "TOOLTIP",
     nameplateFrameLevel = 10,
 })
@@ -448,33 +449,150 @@ function Nameplates:LayoutIcons(unit)
     
     -- Sort icons
     self:SortIcons(auraFrame.icons, Gladdy.db.nameplateSortOrder)
-    
     -- Limit to max icons
     if #auraFrame.icons > Gladdy.db.nameplateMaxIcons then
-        for i = #auraFrame.icons, Gladdy.db.nameplateMaxIcons, -1 do
+        for i = #auraFrame.icons, Gladdy.db.nameplateMaxIcons + 1, -1 do
             self:CacheIcon(auraFrame.icons[i], auraFrame, i)
         end
     end
     
     -- Position icons
-    local padding = Gladdy.db.nameplateIconPadding
-    for i, icon in ipairs(auraFrame.icons) do
-        self:UpdateIcon(icon)
-        icon:ClearAllPoints()
-        icon:SetAlpha(1)
-        if i == 1 then
-            icon:SetPoint("BOTTOMLEFT", auraFrame, "TOPLEFT", Gladdy.db.nameplateXOffset, Gladdy.db.nameplateYOffset)
-        else
-            icon:SetPoint("LEFT", auraFrame.icons[i-1], "RIGHT", padding, 0)
-        end
-        icon:Show()
-    end
+    self:PositionIcons(auraFrame)
     
     if #auraFrame.icons > 0 then
         auraFrame:Show()
     else
         auraFrame:Hide()
     end
+end
+
+function Nameplates:PositionIcons(auraFrame)
+    local padding = Gladdy.db.nameplateIconPadding
+    local center = Gladdy.db.nameplateCenterIcons
+
+    local xOffset = 0
+    local yOffset = 0
+    local size = Gladdy.db.nameplateSize
+    local width = size * Gladdy.db.nameplateWidthFactor
+
+
+
+    if center and #auraFrame.icons > 1 then
+        xOffset = ((#auraFrame.icons - 1) * width + (#auraFrame.icons - 1) * padding) / 2
+    end
+
+    for i, icon in ipairs(auraFrame.icons) do
+        self:UpdateIcon(icon)
+        icon:ClearAllPoints()
+        icon:SetAlpha(1)
+        if i == 1 then
+            icon:SetPoint("BOTTOMLEFT", auraFrame, "TOPLEFT", Gladdy.db.nameplateXOffset - xOffset, Gladdy.db.nameplateYOffset)
+        else
+            icon:SetPoint("LEFT", auraFrame.icons[i-1], "RIGHT", padding, 0)
+        end
+        icon:Show()
+    end
+
+
+    --local xCenterDebuff = 0
+    --local yCenterDebuff = 0
+    --if XPB.db.profile.debuff.center and #trackedUnitNames[dstName].debuff > 1 and (XPB.db.profile.debuff.growDirection.icon == "LEFT" or XPB.db.profile.debuff.growDirection.icon == "RIGHT") then
+    --    xCenterDebuff = ((#trackedUnitNames[dstName].debuff - 1) * sizeDebuff + (#trackedUnitNames[dstName].debuff - 1) * XPB.db.profile.debuff.iconPadding) / 2
+    --elseif XPB.db.profile.debuff.center and #trackedUnitNames[dstName].debuff > 1 and (XPB.db.profile.debuff.growDirection.icon == "TOP" or XPB.db.profile.debuff.growDirection.icon == "BOTTOM") then
+    --    yCenterDebuff = ((#trackedUnitNames[dstName].debuff - 1) * sizeDebuff + (#trackedUnitNames[dstName].debuff - 1) * XPB.db.profile.debuff.iconPadding) / 2
+    --end
+    --
+    --for i = 1, #trackedUnitNames[dstName].debuff do
+    --    trackedUnitNames[dstName].debuff[i]:SetParent(namePlate)
+    --    trackedUnitNames[dstName].debuff[i]:SetFrameLevel(namePlate.xiconFrameLevel)
+    --    trackedUnitNames[dstName].debuff[i]:SetFrameStrata(force and "LOW" or "BACKGROUND")
+    --    trackedUnitNames[dstName].debuff[i]:ClearAllPoints()
+    --    trackedUnitNames[dstName].debuff[i]:SetWidth(sizeDebuff)
+    --    trackedUnitNames[dstName].debuff[i]:SetHeight(sizeDebuff)
+    --    trackedUnitNames[dstName].debuff[i]:SetAlpha(XPB.db.profile.debuff.alpha)
+    --    trackedUnitNames[dstName].debuff[i].cooldown:SetAlpha(XPB.db.profile.debuff.alpha)
+    --    trackedUnitNames[dstName].debuff[i].cooldown:SetFont(XPB.db.profile.debuff.font, fontSizeDebuff, "OUTLINE")
+    --    trackedUnitNames[dstName].debuff[i].stacks:SetFont(XPB.db.profile.debuff.font, fontSizeStacksDebuff, "OUTLINE")
+    --    if i == 1 then
+    --        trackedUnitNames[dstName].debuff[i]:SetPoint(XPB.db.profile.debuff.anchor.self,
+    --                namePlate, XPB.db.profile.debuff.anchor.nameplate,
+    --                XPB.db.profile.debuff.xOffset - xCenterDebuff,
+    --                XPB.db.profile.debuff.yOffset - yCenterDebuff)
+    --    else
+    --        x,y = 0,0
+    --        if XPB.db.profile.debuff.growDirection.icon == "LEFT" then
+    --            x = -XPB.db.profile.debuff.iconPadding
+    --        elseif XPB.db.profile.debuff.growDirection.icon == "RIGHT" then
+    --            x = XPB.db.profile.debuff.iconPadding
+    --        elseif XPB.db.profile.debuff.growDirection.icon == "TOP" then
+    --            y = XPB.db.profile.debuff.iconPadding
+    --        elseif XPB.db.profile.debuff.growDirection.icon == "BOTTOM" then
+    --            y = -XPB.db.profile.debuff.iconPadding
+    --        end
+    --        trackedUnitNames[dstName].debuff[i]:SetPoint(XPB.db.profile.debuff.growDirection.self,
+    --                trackedUnitNames[dstName].debuff[i - 1], XPB.db.profile.debuff.growDirection.icon, x, y)
+    --    end
+    --    trackedUnitNames[dstName].debuff[i]:Show()
+    --end
+    --
+    --
+    --for i = 1, #trackedUnitNames[dstName].buff do
+    --    trackedUnitNames[dstName].buff[i]:SetParent(namePlate)
+    --    trackedUnitNames[dstName].buff[i]:SetFrameLevel(namePlate.xiconFrameLevel)
+    --    trackedUnitNames[dstName].buff[i]:SetFrameStrata(force and "LOW" or "BACKGROUND")
+    --    trackedUnitNames[dstName].buff[i]:ClearAllPoints()
+    --    trackedUnitNames[dstName].buff[i]:SetWidth(sizeBuff)
+    --    trackedUnitNames[dstName].buff[i]:SetHeight(sizeBuff)
+    --    trackedUnitNames[dstName].buff[i]:SetAlpha(XPB.db.profile.buff.alpha)
+    --    trackedUnitNames[dstName].buff[i].cooldown:SetAlpha(XPB.db.profile.buff.alpha)
+    --    trackedUnitNames[dstName].buff[i].cooldown:SetFont(XPB.db.profile.buff.font, fontSizeBuff, "OUTLINE")
+    --    trackedUnitNames[dstName].buff[i].stacks:SetFont(XPB.db.profile.buff.font, fontSizeStacksBuff, "OUTLINE")
+    --    if i == 1 then
+    --        local xCenter = 0
+    --        local yCenter = 0
+    --        if XPB.db.profile.buff.center and #trackedUnitNames[dstName].buff > 1 and (XPB.db.profile.buff.growDirection.icon == "LEFT" or XPB.db.profile.buff.growDirection.icon == "RIGHT") then
+    --            xCenter = ((#trackedUnitNames[dstName].buff - 1) * sizeBuff + (#trackedUnitNames[dstName].buff - 1) * XPB.db.profile.buff.iconPadding) / 2
+    --        elseif XPB.db.profile.buff.center and #trackedUnitNames[dstName].buff > 1 and (XPB.db.profile.buff.growDirection.icon == "TOP" or XPB.db.profile.buff.growDirection.icon == "BOTTOM") then
+    --            yCenter = ((#trackedUnitNames[dstName].buff - 1) * sizeBuff + (#trackedUnitNames[dstName].buff - 1) * XPB.db.profile.buff.iconPadding) / 2
+    --        else
+    --            xCenterDebuff = 0
+    --            yCenterDebuff = 0
+    --        end
+    --        if XPB.db.profile.attachBuffsToDebuffs then
+    --            if #trackedUnitNames[dstName].debuff > 0 then
+    --                trackedUnitNames[dstName].buff[i]:SetPoint(XPB.db.profile.buff.anchor.self,
+    --                        trackedUnitNames[dstName].debuff[1], XPB.db.profile.buff.anchor.nameplate,
+    --                        XPB.db.profile.buff.xOffset + xCenterDebuff - xCenter,
+    --                        XPB.db.profile.buff.yOffset + yCenterDebuff - yCenter)
+    --
+    --            else
+    --                trackedUnitNames[dstName].buff[i]:SetPoint(XPB.db.profile.debuff.anchor.self,
+    --                        namePlate, XPB.db.profile.debuff.anchor.nameplate,
+    --                        XPB.db.profile.debuff.xOffset - xCenter,
+    --                        XPB.db.profile.debuff.yOffset - yCenter)
+    --            end
+    --        else
+    --            trackedUnitNames[dstName].buff[i]:SetPoint(XPB.db.profile.buff.anchor.self,
+    --                    namePlate, XPB.db.profile.buff.anchor.nameplate,
+    --                    XPB.db.profile.buff.xOffset- xCenter,
+    --                    XPB.db.profile.buff.yOffset - yCenter)
+    --        end
+    --    else
+    --        x,y = 0,0
+    --        if XPB.db.profile.buff.growDirection.icon == "LEFT" then
+    --            x = -XPB.db.profile.buff.iconPadding
+    --        elseif XPB.db.profile.buff.growDirection.icon == "RIGHT" then
+    --            x = XPB.db.profile.buff.iconPadding
+    --        elseif XPB.db.profile.buff.growDirectionicon == "TOP" then
+    --            y = XPB.db.profile.buff.iconPadding
+    --        elseif XPB.db.profile.buff.growDirection.icon == "BOTTOM" then
+    --            y = -XPB.db.profile.buff.iconPadding
+    --        end
+    --        trackedUnitNames[dstName].buff[i]:SetPoint(XPB.db.profile.buff.growDirection.self, trackedUnitNames[dstName].buff[i - 1],
+    --                XPB.db.profile.buff.growDirection.icon, x, y)
+    --    end
+    --    trackedUnitNames[dstName].buff[i]:Show()
+    --end
 end
 
 -------------------------------------------
@@ -592,34 +710,36 @@ function Nameplates:TestAuras()
     
     -- Add test auras from enabled list
     local testAuras = 0
-    if Gladdy.enabledAuras then
+    if Gladdy.enabledAuras then -- TODO Gladdy.db.auraListInterrupts
         local random, spellID
         local auras = { [AURA_TYPE_DEBUFF] = {},  [AURA_TYPE_BUFF] = {} }
 
-        for auraType, spells in pairs(Gladdy.enabledAuras) do
-            for spellId, data in pairs(spells) do
-                tinsert(auras[auraType], spellId)
-            end
+        for spellId, data in pairs(Gladdy:GetImportantAuras()) do
+            tinsert(auras[data.track], spellId)
         end
 
-        for auraType, spells in pairs(Gladdy.enabledAuras) do
-            local max = Gladdy.db.nameplateMaxIcons / 2
+
+
+        for auraType, spells in pairs(auras) do
+            local max = math.ceil(Gladdy.db.nameplateMaxIcons / 2.0)
             for i = 1, max do
-                if #auras[auraType] > 0 then
-                    random = rand(1, #auras[auraType])
-                    spellID = tonumber(auras[auraType][random])
-                    tremove(auras[auraType], random)
+                if #spells > 0 then
+                    random = rand(1, #spells)
+                    spellID = tonumber(tremove(spells, random))
 
                     local data = Gladdy.enabledAuras[auraType][spellID]
-                    --print("spellid", auraType, random, data.auraType, data.spellID)
-                    local texture = data.texture
-                    if not texture then
-                        texture = select(3, GetSpellInfo(spellID))
+                    if data then
+                        --print("spellid", auraType, random, data.auraType, data.spellID)
+                        local texture = data.texture
+                        if not texture then
+                            texture = select(3, GetSpellInfo(spellID))
+                        end
+                        local expirationTime = GetTime() + data.duration
+                        self:AURA_GAIN("player", auraType, spellID, GetSpellInfo(spellID), data.texture, data.duration, expirationTime, 1, nil, i, "player")
+                        testAuras = testAuras + 1
+                    else -- TODO ????
+                        i = i - 1
                     end
-                    local expirationTime = GetTime() + data.duration
-                    --print(i, auraType, #auras[auraType], spellID, data.duration)
-                    self:AURA_GAIN("player", auraType, spellID, GetSpellInfo(spellID), data.texture, data.duration, expirationTime, 1, nil, i, "player")
-                    testAuras = testAuras + 1
                 end
             end
         end
@@ -633,13 +753,10 @@ function Nameplates:TestAuras()
             {spellID = 31224, auraType = AURA_TYPE_BUFF, priority = 50, duration = 5}, -- Cloak of Shadows
         }
         for i, data in ipairs(defaultSpells) do
-            local texture = data.texture
-            if not texture then
-                texture = select(3, GetSpellInfo(data.spellID))
-            end
+            local texture = select(3, GetSpellInfo(data.spellID))
             if texture then
                 local expirationTime = GetTime() + data.duration
-                self:AURA_GAIN("player", data.auraType, data.spellID, GetSpellInfo(data.spellID), data.texture, data.duration, expirationTime, 1, nil, i, "player")
+                self:AURA_GAIN("player", data.auraType, data.spellID, GetSpellInfo(data.spellID), texture, data.duration, expirationTime, 1, nil, i, "player")
             end
         end
     end
@@ -801,6 +918,12 @@ function Nameplates:GetOptions()
                             min = -200,
                             max = 200,
                             step = 1,
+                            width = "full",
+                        }),
+                        nameplateCenterIcons = Gladdy:option({
+                            type = "toggle",
+                            name = L["Center Icons"],
+                            order = 4,
                             width = "full",
                         }),
                     },
