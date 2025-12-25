@@ -298,12 +298,13 @@ AddImportantAura(30283, AURA_TYPE_DEBUFF, 40, { 30283, 30413, 30414 }, { duratio
 AddImportantAura(6358, AURA_TYPE_DEBUFF, 40, { 6358, 20407, 30850 }, { duration = 10, magic = true }) -- Seduction (Succubus)
 AddImportantAura(5484, AURA_TYPE_DEBUFF, 40, { 5484, 17928 }, { duration = 8, magic = true }) -- Howl of Terror
 AddImportantAura(24259, AURA_TYPE_DEBUFF, 15, { 19244, 24259 }, { duration = 3, magic = true }) -- Spell Lock (Felhunter)
-AddImportantAura(31117, AURA_TYPE_DEBUFF, 15, { 30108, 30404, 30405, 31117 }, { duration = 5, magic = true, altName = select(1, GetSpellInfo(31117)) .. " Silence" }) -- Unstable Affliction Silence
+AddImportantAura(31117, AURA_TYPE_DEBUFF, 15, { 31117, 43523 }, { duration = 5, magic = true, altName = select(1, GetSpellInfo(31117)) .. " Silence" }) -- Unstable Affliction Silence
+AddImportantAura(30153, AURA_TYPE_DEBUFF, 40, { 30153, 30195, 30197 }, { duration = 3, texture = select(3, GetSpellInfo(30151)) }) -- Felguard Stun
 
 -- WARRIOR
 AddImportantAura(5246, AURA_TYPE_DEBUFF, 15, { 5246, 20511 }, { duration = 8 }) -- Intimidating Shout
 AddImportantAura(12809, AURA_TYPE_DEBUFF, 40, { 12809 }, { duration = 5 }) -- Concussion Blow
-AddImportantAura(25274, AURA_TYPE_DEBUFF, 40, { 25274 }, { duration = 3, texture = select(3, GetSpellInfo(25272)) }) -- Intercept Stun
+AddImportantAura(25274, AURA_TYPE_DEBUFF, 40, { 25274, 20253, 20614, 20615, 25273 }, { duration = 3, texture = select(3, GetSpellInfo(25272)) }) -- Intercept Stun
 AddImportantAura(7922, AURA_TYPE_DEBUFF, 40, { 7922 }, { duration = 1, texture = select(3, GetSpellInfo(100)) }) -- Charge Stun
 AddImportantAura(23920, AURA_TYPE_BUFF, 50, { 23920 }, { duration = 5 }) -- Spell Reflection
 AddImportantAura(18498, AURA_TYPE_DEBUFF, 15, { 18498 }, { duration = 3 }) -- Shield Bash - Silenced
