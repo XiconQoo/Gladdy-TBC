@@ -1298,6 +1298,7 @@ function Auras:GetAuraOptions(auraType)
                 for k,_ in pairs(defaultSpells(auraType)) do
                     Gladdy.db.auraListDefault[k].enabled = true
                 end
+                updateEnabledAuras()
             end,
         },
         uncheckAll = {
@@ -1309,6 +1310,7 @@ function Auras:GetAuraOptions(auraType)
                 for k,_ in pairs(defaultSpells(auraType)) do
                     Gladdy.db.auraListDefault[k].enabled = false
                 end
+                updateEnabledAuras()
             end,
         },
         add = {
