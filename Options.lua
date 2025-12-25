@@ -829,12 +829,38 @@ function Gladdy:SetupOptions()
                     },
                 },
             },
+            separator1 = {
+                type = "group",
+                name = "— Modules —",
+                order = 6,
+                disabled = true,
+                args = {},
+            }
         },
     }
 
-    local order = 6
-    for k, v in pairsByKeys(self.modules) do
-        self:SetupModule(k, v, order)
+    local order = 7
+    local lastModules = {
+        ["XiconProfiles"] = true,
+        ["Export Import"] = true,
+    }
+    for name, module in pairsByKeys(self.modules) do
+        if not lastModules[name] then
+            self:SetupModule(name, module, order)
+            order = order + 1
+        end
+    end
+    self.options.args["separator2"] = {
+        type = "group",
+        name = "— Profiles —",
+        order = order,
+        disabled = true,
+        args = {},
+    }
+
+    order = order + 1
+    for name in pairsByKeys(lastModules) do
+        self:SetupModule(name, self.modules[name], order)
         order = order + 1
     end
 
