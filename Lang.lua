@@ -1323,7 +1323,7 @@ elseif GetLocale() == "zhTW" then
     L["Fade"] = "變暗"
     L["Out of Range Darkening Level"] = "超出距離時變暗程度"
     L["Higher is darker"] = "數值越高越暗"
-    L["yds"] = " 碼" --Line 366, 388
+    L["yards"] = " 碼" --Line 366, 388
     L["Changing the spellID only applies to your player class!\n\nExample: If you are a Paladin and wish to change your range check spell to Repentance, edit the Paladin spellID to 20066."] = "對應您的職業修改欲用於監控距離的技能。\n\n範例:若您為聖騎士且想以懺悔技能用於距離監控，請將聖騎士的法術ID改為20066。" --Line 352
 
     --ShadowsightTimer.lua
@@ -1914,7 +1914,7 @@ elseif GetLocale() == "zhCN" then
     L["Fade"] = "变暗"
     L["Out of Range Darkening Level"] = "超出距离时变暗程度"
     L["Higher is darker"] = "数值越高越暗"
-    L["yds"] = " 码" --Line 366, 388
+    L["yards"] = " 码" --Line 366, 388
     L["Changing the spellID only applies to your player class!\n\nExample: If you are a Paladin and wish to change your range check spell to Repentance, edit the Paladin spellID to 20066."] = "对应您的职业修改欲使用监控距离的技能。\n\n例:若您为圣骑士且想以忏悔技能用于距离监控，请将圣骑士的法术ID改为20066。" --Line 352
 
     --ShadowsightTimer.lua
