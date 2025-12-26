@@ -131,12 +131,12 @@ function ShadowsightTimer:UpdateFrameOnce()
             self.anchor:SetHeight(34)
             self.timerFrame2:ClearAllPoints()
             self.timerFrame2:SetPoint("TOP", self.timerFrame1, "BOTTOM")
-            ShadowsightTimer:NotifyStart()
+            ShadowsightTimer:UpdateShownTimer()
         else
             self.anchor:SetHeight(17)
             self.timerFrame2:ClearAllPoints()
             self.timerFrame2:SetPoint("TOP", self.anchor, "TOP")
-            ShadowsightTimer:NotifyStart()
+            ShadowsightTimer:UpdateShownTimer()
         end
     else
         self.anchor:SetScale(Gladdy.db.shadowsightTimerScale)
@@ -205,7 +205,7 @@ end
 function ShadowsightTimer:Start(time, frame)
     frame.endTime = time or Gladdy.db.shadowsightTimerStartTime
     frame.active = true
-    ShadowsightTimer:NotifyStart()
+    ShadowsightTimer:UpdateShownTimer()
     frame.announced = nil
     frame.timeSinceLastUpdate = 0
     frame.font:SetTextColor(1, 0.8, 0)
@@ -232,11 +232,11 @@ function ShadowsightTimer.OnUpdate(self, elapsed)
         self.font:SetText("0:00")
         self.font:SetTextColor(0, 1, 0)
         self.active = false
-        ShadowsightTimer:NotifyEnd()
+        ShadowsightTimer:UpdateShownTimer()
     end
 end
 
-function ShadowsightTimer:NotifyStart()
+function ShadowsightTimer:UpdateShownTimer()
     local show = Gladdy.db.shadowsightTimerShowTwoTimer
     if self.timerFrame1.active and self.timerFrame2.active then
         if self.timerFrame1.endTime < self.timerFrame2.endTime then
@@ -247,31 +247,19 @@ function ShadowsightTimer:NotifyStart()
             self.timerFrame2:SetAlpha(1)
         end
     else
-        if self.timerFrame1.active then
-            self.timerFrame1:SetAlpha(1)
-            self.timerFrame2:SetAlpha(show and 1 or 0)
-        elseif self.timerFrame2.active then
-            self.timerFrame1:SetAlpha(show and 1 or 0)
+        if self.timerFrame1.active and not self.timerFrame2.active then
             self.timerFrame2:SetAlpha(1)
+            self.timerFrame1:SetAlpha(show and 1 or 0)
+        elseif self.timerFrame2.active and not self.timerFrame1.active then
+            self.timerFrame2:SetAlpha(show and 1 or 0)
+            self.timerFrame1:SetAlpha(1)
         else
             self.timerFrame1:SetAlpha(1)
             self.timerFrame2:SetAlpha(show and 1 or 0)
         end
     end
 end
-function ShadowsightTimer:NotifyEnd()
-    local show = Gladdy.db.shadowsightTimerShowTwoTimer
-    if self.timerFrame1.active then
-        self.timerFrame1:SetAlpha(1)
-        self.timerFrame2:SetAlpha(show and 1 or 0)
-    elseif self.timerFrame2.active then
-        self.timerFrame1:SetAlpha(show and 1 or 0)
-        self.timerFrame2:SetAlpha(1)
-    else
-        self.timerFrame1:SetAlpha(1)
-        self.timerFrame2:SetAlpha(show and 1 or 0)
-    end
-end
+
 function ShadowsightTimer:GetHiddenTimer()
     if self.timerFrame1.active and self.timerFrame2.active then
         return self.timerFrame1.endTime < self.timerFrame2.endTime and self.timerFrame1 or self.timerFrame2

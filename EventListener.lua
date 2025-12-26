@@ -136,7 +136,7 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
     local _,eventType,_,sourceGUID,_,_,_,destGUID,_,_,_,spellID,spellName,spellSchool,extraSpellId,extraSpellName,extraSpellSchool = CombatLogGetCurrentEventInfo()
     local srcUnit = Gladdy.guids[sourceGUID] -- can be a PET
     local destUnit = Gladdy.guids[destGUID] -- can be a PET
-    if (Gladdy.db.shadowsightTimerEnabled and eventType == "SPELL_AURA_APPLIED" and spellID == 34709) then
+    if (Gladdy.db.shadowsightTimerEnabled and (eventType == "SPELL_AURA_APPLIED" or eventType == "SPELL_AURA_REFRESH") and spellID == 34709) then
         Gladdy.modules["Shadowsight Timer"]:AURA_GAIN(nil, nil, 34709)
     end
 
