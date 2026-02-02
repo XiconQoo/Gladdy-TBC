@@ -190,5 +190,24 @@ function XiconProfiles:GetOptions()
             width = "full",
             order = 19,
         },
+        headerProfileBalthaTV = {
+            type = "header",
+            name = "Baltha_TV's " .. L["Profile"],
+            order = 20,
+        },
+        balthaTVProfile = {
+            type = "execute",
+            func = function()
+                Gladdy.dbi:ResetProfile(Gladdy.dbi:GetCurrentProfile())
+                applyProfile(Gladdy:GetBalthaTVProfile())
+            end,
+            name = " ",
+            desc = "Baltha_TV's " .. L["Profile"],
+            image = "Interface\\AddOns\\Gladdy\\Images\\BasicProfiles\\Baltha_TV.tga",
+            imageWidth = 350,
+            imageHeight = 175,
+            width = "full",
+            order = 21,
+        },
     }
 end
