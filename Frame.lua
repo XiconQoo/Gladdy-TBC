@@ -192,43 +192,40 @@ function Gladdy:UpdateFrame()
         local button = self.buttons["arena" .. i]
         button:SetWidth(self.db.barWidth)
         button:SetHeight(self.db.healthBarHeight)
-        button.secure:SetWidth(self.db.barWidth)
-        button.secure:SetHeight(self.db.healthBarHeight + powerBarHeight)
+        button.secure:SetWidth(self.db.barWidth + self.db.secretButtonXMargin * 2)
+        button.secure:SetHeight(self.db.healthBarHeight + powerBarHeight + self.db.secretButtonYMargin * 2)
 
         button:ClearAllPoints()
         button.secure:ClearAllPoints()
+        button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT", -self.db.secretButtonXMargin, self.db.secretButtonYMargin)
         if (self.db.growDirection == "TOP") then
             if (i == 1) then
                 button:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", 0, powerBarHeight)
-                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             else
                 button:SetPoint("BOTTOMLEFT", self.buttons["arena" .. (i - 1)], "TOPLEFT", 0, margin + self.db.bottomMargin)
-                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             end
         elseif (self.db.growDirection == "BOTTOM") then
             if (i == 1) then
                 button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 0, 0)
-                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             else
                 button:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "BOTTOMLEFT", 0, -margin - self.db.bottomMargin)
-                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             end
         elseif (self.db.growDirection == "LEFT") then
             if (i == 1) then
                 button:SetPoint("TOPRIGHT", self.frame, "TOPRIGHT", -0, 0)
-                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             else
                 button:SetPoint("TOPRIGHT", self.buttons["arena" .. (i - 1)], "TOPLEFT", - self.db.bottomMargin, 0)
-                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             end
         elseif (self.db.growDirection == "RIGHT") then
             if (i == 1) then
                 button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 0, 0)
-                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             else
                 button:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "TOPRIGHT", self.db.bottomMargin, 0)
-                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             end
+        end
+        if button.secure.ActivationAnimation and self.frame.testing then
+            if button.secure.ActivationAnimation:IsPlaying() then button.secure.ActivationAnimation:Stop() end
+            button.secure.ActivationAnimation:Play()
         end
 
         for _, v in ipairs(self.indexedModules) do
@@ -349,6 +346,62 @@ function Gladdy:CreateButton(i)
     secure:SetAttribute("target", "arena" .. i)
     secure:SetAttribute("focus", "arena" .. i)
     secure:SetAttribute("unit", "arena" .. i)
+
+    local targetBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
+    targetBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = Gladdy.db.highlightBorderSize })
+    targetBorder:SetFrameStrata(Gladdy.db.highlightFrameStrata)
+    targetBorder:SetFrameLevel(Gladdy.db.highlightFrameLevel + 1)
+    targetBorder:SetAlpha(0)
+    targetBorder:Hide()
+
+    targetBorder:SetWidth(2)
+    targetBorder:SetHeight(2)
+    targetBorder:ClearAllPoints()
+    targetBorder:SetPoint("TOPLEFT", secure, "TOPLEFT")
+    targetBorder:SetPoint("BOTTOMRIGHT", secure, "BOTTOMRIGHT")
+    targetBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = Gladdy.db.highlightBorderSize })
+    targetBorder:SetBackdropBorderColor(Gladdy:SetColor({r = 0, g = 1, b = 0}))
+
+    secure.activationTexture = targetBorder
+
+    -- Activation animation group (Alpha)
+    secure.ActivationAnimation = secure:CreateAnimationGroup()
+    secure.ActivationAnimation:SetToFinalAlpha(true)
+    secure.ActivationAnimation:SetScript("OnPlay", function(self)
+        local parent = self:GetParent()
+        parent.activationTexture:SetAlpha(1)
+        parent.activationTexture:Show()
+    end)
+    secure.ActivationAnimation:SetScript("OnFinished", function(self)
+        local parent = self:GetParent()
+        parent.activationTexture:Hide()
+        parent.activationTexture:SetAlpha(0)
+    end)
+    do
+        local a1 = secure.ActivationAnimation:CreateAnimation("Alpha")
+        a1:SetTarget(secure.activationTexture)
+        a1:SetSmoothing("NONE")
+        a1:SetOrder(1)
+        a1:SetFromAlpha(0.8)
+        a1:SetToAlpha(1)
+        a1:SetDuration(0.2)
+
+        local a2 = secure.ActivationAnimation:CreateAnimation("Alpha")
+        a2:SetTarget(secure.activationTexture)
+        a2:SetSmoothing("NONE")
+        a2:SetOrder(2)
+        a2:SetFromAlpha(1)
+        a2:SetToAlpha(1)
+        a2:SetDuration(0.4)
+
+        local a3 = secure.ActivationAnimation:CreateAnimation("Alpha")
+        a3:SetTarget(secure.activationTexture)
+        a3:SetSmoothing("NONE")
+        a3:SetOrder(3)
+        a3:SetFromAlpha(1)
+        a3:SetToAlpha(0)
+        a3:SetDuration(0.6)
+    end
 
     --[[
     secure:SetAttribute("target", i == 1 and "player" or "focus")
@@ -523,38 +576,35 @@ function Gladdy:LegacyPositioning(margin, height, teamSize)
 end
 
 function Gladdy:PositionButton(button, i, leftSize, rightSize, powerBarHeight, margin)
+    button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT", -self.db.secretButtonXMargin, self.db.secretButtonYMargin)
     if (self.db.growDirection == "TOP") then
         if (i == 1) then
             button:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", leftSize, powerBarHeight)
-            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
         else
             button:SetPoint("BOTTOMLEFT", self.buttons["arena" .. (i - 1)], "TOPLEFT", 0, margin + self.db.bottomMargin)
-            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
         end
     elseif (self.db.growDirection == "BOTTOM") then
         if (i == 1) then
             button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", leftSize, 0)
-            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
         else
             button:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "BOTTOMLEFT", 0, -margin - self.db.bottomMargin)
-            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
         end
     elseif (self.db.growDirection == "LEFT") then
         if (i == 1) then
             button:SetPoint("TOPRIGHT", self.frame, "TOPRIGHT", -rightSize, 0)
-            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
         else
             button:SetPoint("TOPRIGHT", self.buttons["arena" .. (i - 1)], "TOPLEFT", -rightSize - leftSize - self.db.bottomMargin, 0)
-            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
         end
     elseif (self.db.growDirection == "RIGHT") then
         if (i == 1) then
             button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", leftSize, 0)
-            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
         else
             button:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "TOPRIGHT", leftSize + rightSize + self.db.bottomMargin, 0)
-            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
         end
+    end
+    if button.secure.ActivationAnimation and self.frame.testing then
+        if button.secure.ActivationAnimation:IsPlaying() then button.secure.ActivationAnimation:Stop() end
+        button.secure.ActivationAnimation:Play()
     end
 end
 
