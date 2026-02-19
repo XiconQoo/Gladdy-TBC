@@ -236,7 +236,7 @@ AddImportantAura(29166, AURA_TYPE_BUFF, 10, { 29166 }, { duration = 20 }) -- Inn
 AddImportantAura(16922, AURA_TYPE_DEBUFF, 40, { 16922 }, { duration = 3 }) -- Imp Starfire Stun
 
 -- HUNTER
-AddImportantAura(14309, AURA_TYPE_DEBUFF, 40, { 14309 }, { duration = 10, magic = true }) -- Freezing Trap Effect
+AddImportantAura(14309, AURA_TYPE_DEBUFF, 40, { 3355, 14308, 14309, 31932 }, { duration = 10, magic = true }) -- Freezing Trap Effect
 AddImportantAura(19386, AURA_TYPE_DEBUFF, 40, { 19386, 24131, 24132, 24133, 24134, 24135, 27068, 27069 }, { duration = 10 }) -- Wyvern Sting
 AddImportantAura(19503, AURA_TYPE_DEBUFF, 40, { 19503 }, { duration = 4 }) -- Scatter Shot
 AddImportantAura(14327, AURA_TYPE_DEBUFF, 40, { 1513, 14326, 14327 }, { duration = 8, magic = true }) -- Scare Beast

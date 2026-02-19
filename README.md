@@ -82,6 +82,15 @@ Thank you!
 
 ### Changes
 
+### v2.65-Beta
+- Freezing Trap not showing fixed
+
+### v2.64-Beta
+- added module nameplates
+- added translations
+- fixed totem plates module not showing certain totems
+- fixed DR timer falsely showing incorrect DR
+
 ### v2.63-Beta
 - entangling roots spellids
 
