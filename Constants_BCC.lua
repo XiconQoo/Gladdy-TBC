@@ -623,7 +623,7 @@ local totemData = {
     [string_lower("Poison Cleansing Totem")] = {id = 8166,texture = select(3, GetSpellInfo(8166)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 5},
     [string_lower("Disease Cleansing Totem")] = {id = 8170,texture = select(3, GetSpellInfo(8170)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 5},
     [string_lower("Healing Stream Totem")] = {id = 5394,texture = select(3, GetSpellInfo(5394)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 2},
-    [string_lower("Mana Tide Totem")] = {id = 16190,texture = select(3, GetSpellInfo(16190)), color = {r = 0.078, g = 0.9, b = 0.16, a = 1}},
+    [string_lower("Mana Tide Totem")] = {id = 16190,texture = select(3, GetSpellInfo(16190)), color = {r = 0.078, g = 0.9, b = 0.16, a = 1}, pulse = 3},
     [string_lower("Mana Spring Totem")] = {id = 5675,texture = select(3, GetSpellInfo(5675)), color = {r = 0, g = 0, b = 0, a = 1}, pulse = 2},
     -- Earth
     [string_lower("Earthbind Totem")] = {id = 2484,texture = select(3, GetSpellInfo(2484)), color = {r = 0.5, g = 0.5, b = 0.5, a = 1}, pulse = 3},
@@ -679,6 +679,8 @@ local totemSpellIdToPulse = {
     [10496] = totemData[string_lower("Mana Spring Totem")].pulse, -- Rank 3
     [10497] = totemData[string_lower("Mana Spring Totem")].pulse, -- Rank 4
     [25570] = totemData[string_lower("Mana Spring Totem")].pulse, -- Rank 5
+    [GetSpellInfo(totemData[string_lower("Mana Tide Totem")].id)] = totemData[string_lower("Mana Tide Totem")].pulse,
+    [16190] = totemData[string_lower("Mana Tide Totem")].pulse,
     [GetSpellInfo(totemData[string_lower("Stoneclaw Totem")].id)] = totemData[string_lower("Stoneclaw Totem")].pulse,
     [5730] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 1
     [6390] = totemData[string_lower("Stoneclaw Totem")].pulse, -- Rank 2

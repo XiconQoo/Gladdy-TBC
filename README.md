@@ -82,6 +82,9 @@ Thank you!
 
 ### Changes
 
+### v2.66-Beta
+- bugfixes from stacktraces
+
 ### v2.65-Beta
 - Freezing Trap not showing fixed
 

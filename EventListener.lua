@@ -367,9 +367,11 @@ function EventListener:UNIT_AURA(unit, info)
         if info.updatedAuraInstanceIDs then
             for _, auraInstanceID in pairs(info.updatedAuraInstanceIDs) do
                 local aura = C_UnitAuras.GetAuraDataByAuraInstanceID(unit, auraInstanceID)
-                self.activeAuras[unit][auraInstanceID] = aura
-                --print("UNIT_AURA_REFRESH", unit, aura.spellId, aura.expirationTime)
-                Gladdy:SendMessage("UNIT_AURA_REFRESH", unit, aura.spellId, aura.expirationTime, aura.isHarmful)
+                if aura then
+                    self.activeAuras[unit][auraInstanceID] = aura
+                    --print("UNIT_AURA_REFRESH", unit, aura.spellId, aura.expirationTime)
+                    Gladdy:SendMessage("UNIT_AURA_REFRESH", unit, aura.spellId, aura.expirationTime, aura.isHarmful)
+                end
             end
         end
         if info.removedAuraInstanceIDs then
