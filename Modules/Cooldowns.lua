@@ -182,7 +182,7 @@ function Cooldowns:CreateIcon()
         icon.activationTexture = icon.cooldownFrame:CreateTexture(nil, "OVERLAY")
         icon.activationTexture:SetAllPoints(icon)
         if icon.activationTexture.SetAtlas then
-            icon.activationTexture:SetAtlas("bags-innerglow", true)
+            icon.activationTexture:SetAtlas("bags-innerglow", false)
         else
             icon.activationTexture:SetTexture("Interface\\Buttons\\CheckButtonHilight")
         end
@@ -193,7 +193,7 @@ function Cooldowns:CreateIcon()
         icon.flash = icon.cooldownFrame:CreateTexture(nil, "OVERLAY")
         icon.flash:SetAllPoints(icon)
         if icon.flash.SetAtlas then
-            icon.flash:SetAtlas("bags-glow-flash", true)
+            icon.flash:SetAtlas("bags-glow-flash", false)
         else
             icon.flash:SetTexture("Interface\\Buttons\\WHITE8x8")
         end

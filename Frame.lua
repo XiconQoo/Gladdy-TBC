@@ -361,6 +361,7 @@ function Gladdy:CreateButton(i)
     targetBorder:SetPoint("BOTTOMRIGHT", secure, "BOTTOMRIGHT")
     targetBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = Gladdy.db.highlightBorderSize })
     targetBorder:SetBackdropBorderColor(Gladdy:SetColor({r = 0, g = 1, b = 0}))
+    targetBorder:EnableMouse(false)
 
     secure.activationTexture = targetBorder
 
