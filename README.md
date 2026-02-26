@@ -82,6 +82,9 @@ Thank you!
 
 ### Changes
 
+### v2.67-Beta
+- clickable area was covered by new animation
+
 ### v2.66-Beta
 - bugfixes from stacktraces
 

@@ -351,6 +351,7 @@ function Gladdy:CreateButton(i)
     targetBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = Gladdy.db.highlightBorderSize })
     targetBorder:SetFrameStrata(Gladdy.db.highlightFrameStrata)
     targetBorder:SetFrameLevel(Gladdy.db.highlightFrameLevel + 1)
+    targetBorder:EnableMouse(false)
     targetBorder:SetAlpha(0)
     targetBorder:Hide()
 
@@ -361,7 +362,6 @@ function Gladdy:CreateButton(i)
     targetBorder:SetPoint("BOTTOMRIGHT", secure, "BOTTOMRIGHT")
     targetBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = Gladdy.db.highlightBorderSize })
     targetBorder:SetBackdropBorderColor(Gladdy:SetColor({r = 0, g = 1, b = 0}))
-    targetBorder:EnableMouse(false)
 
     secure.activationTexture = targetBorder
 
