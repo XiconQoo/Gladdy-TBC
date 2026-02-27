@@ -4,7 +4,7 @@
 
 ---
 
-## [v2.63-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.63-Beta/Gladdy_Classic_v2.63-Beta.zip)
+## [v2.68-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.68-Beta/Gladdy_Classic_v2.68-Beta.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -82,8 +82,15 @@ Thank you!
 
 ### Changes
 
+### v2.68-Beta
+- clickable area fix v2
+- hide blizz arena countdown when module enabled
+- nameplate center fix
+- mists added nameplates module
+
 ### v2.67-Beta
 - clickable area was covered by new animation
+- flashing atlas regions in cooldown fix attempt
 
 ### v2.66-Beta
 - bugfixes from stacktraces
