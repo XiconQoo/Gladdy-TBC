@@ -45,4 +45,5 @@ Modules\ExportImport.lua
 Modules\CombatIndicator.lua
 Modules\RangeCheck.lua
 Modules\ShadowsightTimer.lua
+Modules\Nameplates.lua
 EventListener.lua

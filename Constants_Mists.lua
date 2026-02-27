@@ -18,6 +18,12 @@ local specSpells = {
     -- spec to class
 }
 
+Gladdy.specBuffs = {}
+Gladdy.specSpells = {}
+Gladdy.cooldownBuffs = {
+    racials = {}
+}
+
 local classRangeSpells = {
     ["MAGE"] = { spellID = 2139, melee = false, range = false }, -- Fireblast 30y (same as Polymorph, but does not bug IsSpellInRange API)
     ["PRIEST"] = { spellID = 32379, melee = false, range = false }, -- Shadow Word: Death
