@@ -198,7 +198,7 @@ function Gladdy:SetupModule(name, module, order)
                     end
 
                     Gladdy:UpdateFrame()
-                    Gladdy:SetupModule(name, module, order) -- For example click names are not reset by default
+                    Gladdy:SetupModule(name, module, order)
                 end
             }
         else
@@ -419,6 +419,17 @@ function Gladdy:SetupOptions()
                                         min = 0,
                                         max = 500,
                                         step = .1,
+                                        set = function(info, value)
+                                            Gladdy.db.secretButtonXMargin = value
+                                            Gladdy:UpdateFrame()
+                                            if GladdyButton1 and GladdyButton1.ActivationAnimation and Gladdy.frame.testing then
+                                                if GladdyButton1.ActivationAnimation:IsPlaying() then GladdyButton1.ActivationAnimation:Stop() end
+                                                GladdyButton1.ActivationAnimation:Play()
+                                            end
+                                        end,
+                                        get = function(info)
+                                            return Gladdy.db.secretButtonXMargin
+                                        end,
                                     },
                                     secretButtonYMargin = {
                                         type = "range",
@@ -428,6 +439,17 @@ function Gladdy:SetupOptions()
                                         min = 0,
                                         max = 500,
                                         step = .1,
+                                        set = function(info, value)
+                                            Gladdy.db.secretButtonYMargin = value
+                                            Gladdy:UpdateFrame()
+                                            if GladdyButton1 and GladdyButton1.ActivationAnimation and Gladdy.frame.testing then
+                                                if GladdyButton1.ActivationAnimation:IsPlaying() then GladdyButton1.ActivationAnimation:Stop() end
+                                                GladdyButton1.ActivationAnimation:Play()
+                                            end
+                                        end,
+                                        get = function(info)
+                                            return Gladdy.db.secretButtonYMargin
+                                        end,
                                     },
                                     bottomMargin = {
                                         type = "range",

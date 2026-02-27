@@ -223,10 +223,6 @@ function Gladdy:UpdateFrame()
                 button:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "TOPRIGHT", self.db.bottomMargin, 0)
             end
         end
-        if button.secure.ActivationAnimation and self.frame.testing then
-            if button.secure.ActivationAnimation:IsPlaying() then button.secure.ActivationAnimation:Stop() end
-            button.secure.ActivationAnimation:Play()
-        end
 
         for _, v in ipairs(self.indexedModules) do
             self:Call(v, "UpdateFrame", "arena" .. i)
@@ -347,40 +343,36 @@ function Gladdy:CreateButton(i)
     secure:SetAttribute("focus", "arena" .. i)
     secure:SetAttribute("unit", "arena" .. i)
 
-    local targetBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
-    targetBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = Gladdy.db.highlightBorderSize })
-    targetBorder:SetFrameStrata(Gladdy.db.highlightFrameStrata)
-    targetBorder:SetFrameLevel(Gladdy.db.highlightFrameLevel + 1)
-    targetBorder:EnableMouse(false)
-    targetBorder:SetAlpha(0)
-    targetBorder:Hide()
+    local testModeBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
+    testModeBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = 1 })
+    testModeBorder:SetBackdropBorderColor(Gladdy:SetColor({ r = 0, g = 1, b = 0}))
+    testModeBorder:SetWidth(2)
+    testModeBorder:SetHeight(2)
+    testModeBorder:ClearAllPoints()
+    testModeBorder:SetPoint("TOPLEFT", secure, "TOPLEFT")
+    testModeBorder:SetPoint("BOTTOMRIGHT", secure, "BOTTOMRIGHT")
+    testModeBorder:SetFrameStrata(Gladdy.db.highlightFrameStrata)
+    testModeBorder:SetFrameLevel(Gladdy.db.highlightFrameLevel + 1)
+    testModeBorder:EnableMouse(false)
+    testModeBorder:SetAlpha(0)
+    testModeBorder:Hide()
 
-    targetBorder:SetWidth(2)
-    targetBorder:SetHeight(2)
-    targetBorder:ClearAllPoints()
-    targetBorder:SetPoint("TOPLEFT", secure, "TOPLEFT")
-    targetBorder:SetPoint("BOTTOMRIGHT", secure, "BOTTOMRIGHT")
-    targetBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = Gladdy.db.highlightBorderSize })
-    targetBorder:SetBackdropBorderColor(Gladdy:SetColor({r = 0, g = 1, b = 0}))
-
-    secure.activationTexture = targetBorder
+    secure.testModeBorder = testModeBorder
 
     -- Activation animation group (Alpha)
-    secure.ActivationAnimation = secure:CreateAnimationGroup()
+    secure.ActivationAnimation = testModeBorder:CreateAnimationGroup()
     secure.ActivationAnimation:SetToFinalAlpha(true)
     secure.ActivationAnimation:SetScript("OnPlay", function(self)
-        local parent = self:GetParent()
-        parent.activationTexture:SetAlpha(1)
-        parent.activationTexture:Show()
+        secure.testModeBorder:SetAlpha(1)
+        secure.testModeBorder:Show()
     end)
     secure.ActivationAnimation:SetScript("OnFinished", function(self)
-        local parent = self:GetParent()
-        parent.activationTexture:Hide()
-        parent.activationTexture:SetAlpha(0)
+        secure.testModeBorder:Hide()
+        secure.testModeBorder:SetAlpha(0)
     end)
     do
         local a1 = secure.ActivationAnimation:CreateAnimation("Alpha")
-        a1:SetTarget(secure.activationTexture)
+        a1:SetTarget(secure.testModeBorder)
         a1:SetSmoothing("NONE")
         a1:SetOrder(1)
         a1:SetFromAlpha(0.8)
@@ -388,7 +380,7 @@ function Gladdy:CreateButton(i)
         a1:SetDuration(0.2)
 
         local a2 = secure.ActivationAnimation:CreateAnimation("Alpha")
-        a2:SetTarget(secure.activationTexture)
+        a2:SetTarget(secure.testModeBorder)
         a2:SetSmoothing("NONE")
         a2:SetOrder(2)
         a2:SetFromAlpha(1)
@@ -396,7 +388,7 @@ function Gladdy:CreateButton(i)
         a2:SetDuration(0.4)
 
         local a3 = secure.ActivationAnimation:CreateAnimation("Alpha")
-        a3:SetTarget(secure.activationTexture)
+        a3:SetTarget(secure.testModeBorder)
         a3:SetSmoothing("NONE")
         a3:SetOrder(3)
         a3:SetFromAlpha(1)
@@ -404,21 +396,24 @@ function Gladdy:CreateButton(i)
         a3:SetDuration(0.6)
     end
 
-    --[[
-    secure:SetAttribute("target", i == 1 and "player" or "focus")
-    secure:SetAttribute("focus", i == 1 and "player" or "focus")
-    secure:SetAttribute("unit", i == 1 and "player" or "focus")
-    --]]
+    --- FOR TESTING ---
+    -- /run LibStub("Gladdy"):InitFrames()
+    -- /run LibStub("Gladdy").buttons["arena1"].healthBar.hp:SetMinMaxValues(0, 100)
+    -- /run LibStub("Gladdy").buttons["arena1"].healthBar.hp:SetValue(100)
+    -- secure.unit = i == 1 and "player" or "focus"
+    -- secure:SetAttribute("target", i == 1 and "player" or "focus")
+    -- secure:SetAttribute("focus", i == 1 and "player" or "focus")
+    -- secure:SetAttribute("unit", i == 1 and "player" or "focus")
 
     --secure.texture = secure:CreateTexture(nil, "OVERLAY")
     --secure.texture:SetAllPoints(secure)
     --secure.texture:SetTexture("Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp")
+    --button.unit = i == 1 and "player" or "focus"
+    --- FOR TESTING ---
 
     button.id = i
-    --button.unit = i == 1 and "player" or "focus"
     button.unit = "arena" .. i
     button.secure = secure
-
 
     self:ResetButton("arena" .. i)
 
