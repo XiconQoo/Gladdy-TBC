@@ -475,8 +475,6 @@ function Nameplates:PositionIcons(auraFrame)
     local size = Gladdy.db.nameplateSize
     local width = size * Gladdy.db.nameplateWidthFactor
 
-
-
     if center and #auraFrame.icons > 1 then
         xOffset = ((#auraFrame.icons - 1) * width + (#auraFrame.icons - 1) * padding) / 2
     end
@@ -486,113 +484,16 @@ function Nameplates:PositionIcons(auraFrame)
         icon:ClearAllPoints()
         icon:SetAlpha(1)
         if i == 1 then
-            icon:SetPoint("BOTTOMLEFT", auraFrame, "TOPLEFT", Gladdy.db.nameplateXOffset - xOffset, Gladdy.db.nameplateYOffset)
+            if center then
+                icon:SetPoint("BOTTOM", auraFrame, "TOP", Gladdy.db.nameplateXOffset - xOffset, Gladdy.db.nameplateYOffset)
+            else
+                icon:SetPoint("BOTTOMLEFT", auraFrame, "TOPLEFT", Gladdy.db.nameplateXOffset - xOffset, Gladdy.db.nameplateYOffset)
+            end
         else
             icon:SetPoint("LEFT", auraFrame.icons[i-1], "RIGHT", padding, 0)
         end
         icon:Show()
     end
-
-
-    --local xCenterDebuff = 0
-    --local yCenterDebuff = 0
-    --if XPB.db.profile.debuff.center and #trackedUnitNames[dstName].debuff > 1 and (XPB.db.profile.debuff.growDirection.icon == "LEFT" or XPB.db.profile.debuff.growDirection.icon == "RIGHT") then
-    --    xCenterDebuff = ((#trackedUnitNames[dstName].debuff - 1) * sizeDebuff + (#trackedUnitNames[dstName].debuff - 1) * XPB.db.profile.debuff.iconPadding) / 2
-    --elseif XPB.db.profile.debuff.center and #trackedUnitNames[dstName].debuff > 1 and (XPB.db.profile.debuff.growDirection.icon == "TOP" or XPB.db.profile.debuff.growDirection.icon == "BOTTOM") then
-    --    yCenterDebuff = ((#trackedUnitNames[dstName].debuff - 1) * sizeDebuff + (#trackedUnitNames[dstName].debuff - 1) * XPB.db.profile.debuff.iconPadding) / 2
-    --end
-    --
-    --for i = 1, #trackedUnitNames[dstName].debuff do
-    --    trackedUnitNames[dstName].debuff[i]:SetParent(namePlate)
-    --    trackedUnitNames[dstName].debuff[i]:SetFrameLevel(namePlate.xiconFrameLevel)
-    --    trackedUnitNames[dstName].debuff[i]:SetFrameStrata(force and "LOW" or "BACKGROUND")
-    --    trackedUnitNames[dstName].debuff[i]:ClearAllPoints()
-    --    trackedUnitNames[dstName].debuff[i]:SetWidth(sizeDebuff)
-    --    trackedUnitNames[dstName].debuff[i]:SetHeight(sizeDebuff)
-    --    trackedUnitNames[dstName].debuff[i]:SetAlpha(XPB.db.profile.debuff.alpha)
-    --    trackedUnitNames[dstName].debuff[i].cooldown:SetAlpha(XPB.db.profile.debuff.alpha)
-    --    trackedUnitNames[dstName].debuff[i].cooldown:SetFont(XPB.db.profile.debuff.font, fontSizeDebuff, "OUTLINE")
-    --    trackedUnitNames[dstName].debuff[i].stacks:SetFont(XPB.db.profile.debuff.font, fontSizeStacksDebuff, "OUTLINE")
-    --    if i == 1 then
-    --        trackedUnitNames[dstName].debuff[i]:SetPoint(XPB.db.profile.debuff.anchor.self,
-    --                namePlate, XPB.db.profile.debuff.anchor.nameplate,
-    --                XPB.db.profile.debuff.xOffset - xCenterDebuff,
-    --                XPB.db.profile.debuff.yOffset - yCenterDebuff)
-    --    else
-    --        x,y = 0,0
-    --        if XPB.db.profile.debuff.growDirection.icon == "LEFT" then
-    --            x = -XPB.db.profile.debuff.iconPadding
-    --        elseif XPB.db.profile.debuff.growDirection.icon == "RIGHT" then
-    --            x = XPB.db.profile.debuff.iconPadding
-    --        elseif XPB.db.profile.debuff.growDirection.icon == "TOP" then
-    --            y = XPB.db.profile.debuff.iconPadding
-    --        elseif XPB.db.profile.debuff.growDirection.icon == "BOTTOM" then
-    --            y = -XPB.db.profile.debuff.iconPadding
-    --        end
-    --        trackedUnitNames[dstName].debuff[i]:SetPoint(XPB.db.profile.debuff.growDirection.self,
-    --                trackedUnitNames[dstName].debuff[i - 1], XPB.db.profile.debuff.growDirection.icon, x, y)
-    --    end
-    --    trackedUnitNames[dstName].debuff[i]:Show()
-    --end
-    --
-    --
-    --for i = 1, #trackedUnitNames[dstName].buff do
-    --    trackedUnitNames[dstName].buff[i]:SetParent(namePlate)
-    --    trackedUnitNames[dstName].buff[i]:SetFrameLevel(namePlate.xiconFrameLevel)
-    --    trackedUnitNames[dstName].buff[i]:SetFrameStrata(force and "LOW" or "BACKGROUND")
-    --    trackedUnitNames[dstName].buff[i]:ClearAllPoints()
-    --    trackedUnitNames[dstName].buff[i]:SetWidth(sizeBuff)
-    --    trackedUnitNames[dstName].buff[i]:SetHeight(sizeBuff)
-    --    trackedUnitNames[dstName].buff[i]:SetAlpha(XPB.db.profile.buff.alpha)
-    --    trackedUnitNames[dstName].buff[i].cooldown:SetAlpha(XPB.db.profile.buff.alpha)
-    --    trackedUnitNames[dstName].buff[i].cooldown:SetFont(XPB.db.profile.buff.font, fontSizeBuff, "OUTLINE")
-    --    trackedUnitNames[dstName].buff[i].stacks:SetFont(XPB.db.profile.buff.font, fontSizeStacksBuff, "OUTLINE")
-    --    if i == 1 then
-    --        local xCenter = 0
-    --        local yCenter = 0
-    --        if XPB.db.profile.buff.center and #trackedUnitNames[dstName].buff > 1 and (XPB.db.profile.buff.growDirection.icon == "LEFT" or XPB.db.profile.buff.growDirection.icon == "RIGHT") then
-    --            xCenter = ((#trackedUnitNames[dstName].buff - 1) * sizeBuff + (#trackedUnitNames[dstName].buff - 1) * XPB.db.profile.buff.iconPadding) / 2
-    --        elseif XPB.db.profile.buff.center and #trackedUnitNames[dstName].buff > 1 and (XPB.db.profile.buff.growDirection.icon == "TOP" or XPB.db.profile.buff.growDirection.icon == "BOTTOM") then
-    --            yCenter = ((#trackedUnitNames[dstName].buff - 1) * sizeBuff + (#trackedUnitNames[dstName].buff - 1) * XPB.db.profile.buff.iconPadding) / 2
-    --        else
-    --            xCenterDebuff = 0
-    --            yCenterDebuff = 0
-    --        end
-    --        if XPB.db.profile.attachBuffsToDebuffs then
-    --            if #trackedUnitNames[dstName].debuff > 0 then
-    --                trackedUnitNames[dstName].buff[i]:SetPoint(XPB.db.profile.buff.anchor.self,
-    --                        trackedUnitNames[dstName].debuff[1], XPB.db.profile.buff.anchor.nameplate,
-    --                        XPB.db.profile.buff.xOffset + xCenterDebuff - xCenter,
-    --                        XPB.db.profile.buff.yOffset + yCenterDebuff - yCenter)
-    --
-    --            else
-    --                trackedUnitNames[dstName].buff[i]:SetPoint(XPB.db.profile.debuff.anchor.self,
-    --                        namePlate, XPB.db.profile.debuff.anchor.nameplate,
-    --                        XPB.db.profile.debuff.xOffset - xCenter,
-    --                        XPB.db.profile.debuff.yOffset - yCenter)
-    --            end
-    --        else
-    --            trackedUnitNames[dstName].buff[i]:SetPoint(XPB.db.profile.buff.anchor.self,
-    --                    namePlate, XPB.db.profile.buff.anchor.nameplate,
-    --                    XPB.db.profile.buff.xOffset- xCenter,
-    --                    XPB.db.profile.buff.yOffset - yCenter)
-    --        end
-    --    else
-    --        x,y = 0,0
-    --        if XPB.db.profile.buff.growDirection.icon == "LEFT" then
-    --            x = -XPB.db.profile.buff.iconPadding
-    --        elseif XPB.db.profile.buff.growDirection.icon == "RIGHT" then
-    --            x = XPB.db.profile.buff.iconPadding
-    --        elseif XPB.db.profile.buff.growDirectionicon == "TOP" then
-    --            y = XPB.db.profile.buff.iconPadding
-    --        elseif XPB.db.profile.buff.growDirection.icon == "BOTTOM" then
-    --            y = -XPB.db.profile.buff.iconPadding
-    --        end
-    --        trackedUnitNames[dstName].buff[i]:SetPoint(XPB.db.profile.buff.growDirection.self, trackedUnitNames[dstName].buff[i - 1],
-    --                XPB.db.profile.buff.growDirection.icon, x, y)
-    --    end
-    --    trackedUnitNames[dstName].buff[i]:Show()
-    --end
 end
 
 -------------------------------------------
@@ -602,48 +503,6 @@ end
 function Nameplates:TestOnce()
     --print("Nameplates:TestOnce")
     if not self.testFrame then
-
---[[
-
-            <StatusBar parentKey="healthBar" frameLevel="-1">
-				<Anchors>
-					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="4" y="4"/>
-					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-21" y="4"/>
-				</Anchors>
-				<Frames>
-					<Frame parentKey="border" inherits="NamePlateFullBorderTemplate" />
-				</Frames>
-				<Layers>
-					<Layer level="BACKGROUND">
-						<Texture parentKey="background">
-							<Color r=".2" g=".2" b=".2" a=".85"/>
-							<Anchors>
-								<Anchor point="TOPLEFT" />
-								<Anchor point="BOTTOMRIGHT" />
-							</Anchors>
-						</Texture>
-					</Layer>
-				</Layers>
-				<BarTexture parentKey="barTexture" file="Interface/TargetingFrame/UI-TargetingFrame-BarFill"/>
-				<Scripts>
-					<OnLoad>
-						self:GetStatusBarTexture():SetDrawLayer("BORDER");
-					</OnLoad>
-				</Scripts>
-			</StatusBar>
-
-			<Layer level="ARTWORK">
-				<FontString parentKey="name" inherits="SystemFont_NamePlate" wordwrap="false" justifyH="CENTER" ignoreParentScale="false">
-					<Anchors>
-						<Anchor point="BOTTOM" relativeKey="$parent.healthBar.border" relativePoint="TOP" x="0" y="2" />
-					</Anchors>
-				</FontString>
-				<FontString parentKey="statusText" inherits="GameFontDisable" />
-			</Layer>
-
-
-
-        ]]
 
         self.testFrame = CreateFrame("Frame", nil, UIParent, BackdropTemplateMixin and "BackdropTemplate")
         self.testFrame:SetWidth(200)
@@ -718,8 +577,6 @@ function Nameplates:TestAuras()
             tinsert(auras[data.track], spellId)
         end
 
-
-
         for auraType, spells in pairs(auras) do
             local max = math.ceil(Gladdy.db.nameplateMaxIcons / 2.0)
             for i = 1, max do
@@ -729,13 +586,14 @@ function Nameplates:TestAuras()
 
                     local data = Gladdy.enabledAuras[auraType][spellID]
                     if data then
-                        --print("spellid", auraType, random, data.auraType, data.spellID)
+                        --print("spellid", auraType, random, data.auraType, data.spellID, data.duration)
                         local texture = data.texture
                         if not texture then
                             texture = select(3, GetSpellInfo(spellID))
                         end
-                        local expirationTime = GetTime() + data.duration
-                        self:AURA_GAIN("player", auraType, spellID, GetSpellInfo(spellID), data.texture, data.duration, expirationTime, 1, nil, i, "player")
+                        local duration = math.random(6, 17)
+                        local expirationTime = GetTime() + duration
+                        self:AURA_GAIN("player", auraType, spellID, GetSpellInfo(spellID), data.texture, duration, expirationTime, 1, nil, i, "player")
                         testAuras = testAuras + 1
                     else -- TODO ????
                         i = i - 1
