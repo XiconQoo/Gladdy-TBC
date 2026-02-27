@@ -37,7 +37,7 @@ local Nameplates = Gladdy:NewModule("Nameplates", nil, {
     nameplateIconPadding = 2,
     nameplateSortOrder = "priority", -- "time", "timeleft", "priority"
     nameplateCenterIcons = false,
-    nameplateFrameStrata = "TOOLTIP",
+    nameplateFrameStrata = "FULLSCREEN_DIALOG",
     nameplateFrameLevel = 10,
 })
 
@@ -507,7 +507,7 @@ function Nameplates:TestOnce()
         self.testFrame = CreateFrame("Frame", nil, UIParent, BackdropTemplateMixin and "BackdropTemplate")
         self.testFrame:SetWidth(200)
         self.testFrame:SetHeight(30)
-        self.testFrame:SetPoint("CENTER", UIParent, "CENTER", 0, -200)
+        self.testFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 220)
         self.testFrame:SetBackdrop({
             bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
             edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -516,7 +516,7 @@ function Nameplates:TestOnce()
             edgeSize = 16,
             insets = { left = 4, right = 4, top = 4, bottom = 4 }
         })
-        self.testFrame:SetBackdropColor(0, 0, 0, 0.8)
+        self.testFrame:SetBackdropColor(0.9, 0.1, 0, 0.8)
         self.testFrame:SetBackdropBorderColor(1, 1, 1, 1)
         
         -- Create fake nameplate text
