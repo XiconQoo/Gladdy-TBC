@@ -336,12 +336,9 @@ function Gladdy:CreateButton(i)
             Gladdy.modules["Highlight"]:Toggle(self.unit, nil, false, true)
         end
     end)
-    secure:RegisterForClicks("AnyUp")
-    secure:RegisterForClicks("AnyDown")
-
-    secure:SetAttribute("target", "arena" .. i)
-    secure:SetAttribute("focus", "arena" .. i)
+    secure:RegisterForClicks("AnyUp", "AnyDown")
     secure:SetAttribute("unit", "arena" .. i)
+    secure:SetAttribute("useOnKeyDown", true)
 
     local testModeBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
     testModeBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = 1 })
