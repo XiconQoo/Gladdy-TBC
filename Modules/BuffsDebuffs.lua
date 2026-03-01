@@ -1239,6 +1239,7 @@ function BuffsDebuffs:GetOptions()
             set = function(info, state)
                 local optionKey = info[#info]
                 Gladdy.db[TRACKED_DEBUFFS][optionKey].active = state
+                BuffsDebuffs:UpdateTrackedBuffs(TRACKED_DEBUFFS)
             end,
             get = function(info)
                 local optionKey = info[#info]
@@ -1255,6 +1256,7 @@ function BuffsDebuffs:GetOptions()
             set = function(info, state)
                 local optionKey = info[#info]
                 Gladdy.db[TRACKED_BUFFS][optionKey].active = state
+                BuffsDebuffs:UpdateTrackedBuffs(TRACKED_BUFFS)
             end,
             get = function(info)
                 local optionKey = info[#info]
