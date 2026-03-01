@@ -61,6 +61,8 @@ local Cooldowns = Gladdy:NewModule("Cooldowns", nil, {
     cooldownXOffset = 0,
     cooldownSize = 30,
     cooldownIconGlow = true,
+    cooldownIconAnimationActivation = true,
+    cooldownIconAnimationReady = true,
     cooldownIconGlowColor = {r = 0.95, g = 0.95, b = 0.32, a = 1},
     cooldownIconZoomed = false,
     cooldownIconDesaturateOnCooldown = false,
@@ -179,7 +181,7 @@ function Cooldowns:CreateIcon()
         icon.glow:SetAllPoints(icon)
 
         -- Activation and Flash textures (hidden by default)
-        icon.activationTexture = icon.cooldownFrame:CreateTexture(nil, "OVERLAY")
+        icon.activationTexture = icon:CreateTexture(nil, "OVERLAY")
         icon.activationTexture:SetAllPoints(icon)
         if icon.activationTexture.SetAtlas then
             icon.activationTexture:SetAtlas("bags-innerglow", false)
@@ -190,7 +192,7 @@ function Cooldowns:CreateIcon()
         icon.activationTexture:SetAlpha(0)
         icon.activationTexture:Hide()
 
-        icon.flash = icon.cooldownFrame:CreateTexture(nil, "OVERLAY")
+        icon.flash = icon:CreateTexture(nil, "OVERLAY")
         icon.flash:SetAllPoints(icon)
         if icon.flash.SetAtlas then
             icon.flash:SetAtlas("bags-glow-flash", false)
@@ -798,11 +800,11 @@ function Cooldowns:CooldownStart(button, spellId, duration, start)
     for _,icon in pairs(button.spellCooldownFrame.icons) do
         if (icon.spellId == spellId) then
             -- brief activation on cooldown start
-            if icon.ActivationAnimation then
+            if icon.ActivationAnimation and Gladdy.db.cooldownIconAnimationActivation then
                 if icon.ActivationAnimation:IsPlaying() then icon.ActivationAnimation:Stop() end
                 icon.ActivationAnimation:Play()
             end
-            if icon.ActivationAnimationScale then
+            if icon.ActivationAnimationScale and Gladdy.db.cooldownIconAnimationActivation then
                 if icon.ActivationAnimationScale:IsPlaying() then icon.ActivationAnimationScale:Stop() end
                 icon.ActivationAnimationScale:Play()
             end
@@ -930,7 +932,7 @@ function Cooldowns:CooldownReady(button, spellId, frame)
     if (frame == false) then
         for _,icon in pairs(button.spellCooldownFrame.icons) do
             if (icon.spellId == spellId) then
-                if icon.FlashAnimation then
+                if icon.FlashAnimation and Gladdy.db.cooldownIconAnimationReady then
                     if icon.FlashAnimation:IsPlaying() then icon.FlashAnimation:Stop() end
                     icon.FlashAnimation:Play()
                 end
@@ -938,7 +940,7 @@ function Cooldowns:CooldownReady(button, spellId, frame)
             end
         end
     else
-        if frame and frame.FlashAnimation then
+        if frame and frame.FlashAnimation and Gladdy.db.cooldownIconAnimationReady then
             if frame.FlashAnimation:IsPlaying() then frame.FlashAnimation:Stop() end
             frame.FlashAnimation:Play()
         end
@@ -1486,10 +1488,36 @@ function Cooldowns:GetOptions()
                         }
                     },
                 },
+                animation = {
+                    type = "group",
+                    name = L["Animation"],
+                    order = 4,
+                    args = {
+                        header = {
+                            type = "header",
+                            name = L["Animation"],
+                            order = 1,
+                        },
+                        cooldownIconAnimationActivation = Gladdy:option({
+                            type = "toggle",
+                            name = L["Animation when used"],
+                            desc = L["Flash the icon when cooldown is used"],
+                            order = 3,
+                            width = "full",
+                        }),
+                        cooldownIconAnimationReady = Gladdy:option({
+                            type = "toggle",
+                            name = L["Animation when ready"],
+                            desc = L["Flash the icon when cooldown becomes usable"],
+                            order = 4,
+                            width = "full",
+                        }),
+                    }
+                },
                 font = {
                     type = "group",
                     name = L["Font"],
-                    order = 4,
+                    order = 5,
                     disabled = function()
                         return Gladdy.db.useOmnicc
                     end,
