@@ -82,6 +82,13 @@ Thank you!
 
 ### Changes
 
+### v2.69-Beta
+- clickable area fix v3 (force on key down behaviour)
+- BuffsDebuffs filter applies without reloading now
+- Cooldowns get rid of Scale Animation
+- MoP Barkskin CD duration fixed
+- DR-List Lib update
+
 ### v2.68-Beta
 - clickable area fix v2
 - hide blizz arena countdown when module enabled
