@@ -1,4 +1,4 @@
-local MAJOR, MINOR = "DRList-1.0", 77 -- Don't forget to change this in DRList-1.0.lua aswell!
+local MAJOR, MINOR = "DRList-1.0", 82 -- Don't forget to change this in DRList-1.0.lua aswell!
 local Lib = LibStub(MAJOR)
 if Lib.spellListVersion and Lib.spellListVersion >= MINOR then
     return
@@ -22,7 +22,6 @@ if Lib.gameExpansion == "retail" then
         [1513]    = "disorient", -- Scare Beast
         [31661]   = "disorient", -- Dragon's Breath
         [353084]  = "disorient", -- Ring of Fire
-        [198909]  = "disorient", -- Song of Chi-ji
         [202274]  = "disorient", -- Hot Trub
         [105421]  = "disorient", -- Blinding Light
         [10326]   = "disorient", -- Turn Evil
@@ -44,6 +43,7 @@ if Lib.gameExpansion == "retail" then
         -- *** Incapacitate Effects ***
         [217832]  = "incapacitate", -- Imprison
         [221527]  = "incapacitate", -- Imprison (Honor talent)
+        [198909]  = "incapacitate", -- Song of Chi-ji
         [2637]    = "incapacitate", -- Hibernate
         [99]      = "incapacitate", -- Incapacitating Roar
         [378441]  = "incapacitate", -- Time Stop
@@ -101,6 +101,7 @@ if Lib.gameExpansion == "retail" then
         [91797]   = "stun", -- Monstrous Blow (Mutated Ghoul)
         [287254]  = "stun", -- Dead of Winter
         [179057]  = "stun", -- Chaos Nova
+        [1234195] = "stun", -- Void Nova
         [205630]  = "stun", -- Illidan's Grasp (Primary effect)
         [208618]  = "stun", -- Illidan's Grasp (Secondary effect)
         [211881]  = "stun", -- Fel Eruption
@@ -170,7 +171,6 @@ if Lib.gameExpansion == "retail" then
         [324382]  = "root", -- Clash
         [64695]   = "root", -- Earthgrab (Totem effect)
         --[356738]  = "root", -- Earth Unleashed
-        [285515]  = "root", -- Surge of Power
         [199042]  = "root", -- Thunderstruck (Protection PvP Talent)
         --[356356]  = "root", -- Warbringer
         [39965]   = "root", -- Frost Grenade (Item)
@@ -891,6 +891,7 @@ elseif Lib.gameExpansion == "mop" then
         [19503]  = "disorient", -- Scatter Shot
         [31661]  = "disorient", -- Dragon's Breath
         [123393] = "disorient", -- Glyph of Breath of Fire
+        [105421] = "disorient", -- Blinding Light
         [88625]  = "disorient", -- Holy Word: Chastise
 
         -- *** Controlled Stun Effects ***
@@ -931,8 +932,7 @@ elseif Lib.gameExpansion == "mop" then
         [30283]  = "stun", -- Shadowfury
         [132168] = "stun", -- Shockwave
         [107570] = "stun", -- Storm Bolt
-        [132169] = "stun", -- Storm Bolt
-        [145585] = "stun", -- Storm Bolt
+        [132169] = "stun", -- Storm Bolt 2
         [20549]  = "stun", -- War Stomp (Racial)
 
         -- *** Non-controlled Stun Effects ***
@@ -963,10 +963,8 @@ elseif Lib.gameExpansion == "mop" then
         -- *** Controlled Root Effects ***
         [96294]  = "root", -- Chains of Ice (Chilblains Root)
         [339]    = "root", -- Entangling Roots
-        [19975]  = "root", -- Entangling Roots
-        [102359] = "root", -- Entangling Roots
-        [113770] = "root", -- Entangling Roots Treants
         [113275] = "root", -- Entangling Roots (Symbiosis)
+        [113770] = "root", -- Entangling Roots (Treants)
         [102359] = "root", -- Mass Entanglement
         [19975]  = "root", -- Nature's Grasp
         [128405] = "root", -- Narrow Escape
@@ -978,6 +976,7 @@ elseif Lib.gameExpansion == "mop" then
         [33395]  = "root", -- Freeze (Water Elemental)
         [122]    = "root", -- Frost Nova
         [110693] = "root", -- Frost Nova (Symbiosis)
+        [115757] = "root", -- Frost Nova (Glyph of Ice Block)
         [116706] = "root", -- Disable
         [87194]  = "root", -- Glyph of Mind Blast
         [114404] = "root", -- Void Tendrils
