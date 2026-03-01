@@ -180,7 +180,8 @@ function Cooldowns:CreateIcon()
         icon.glow = CreateFrame("Frame", nil, icon)
         icon.glow:SetAllPoints(icon)
 
-        -- Activation and Flash textures (hidden by default)
+
+        --- Activation and Flash textures (hidden by default)
         icon.activationTexture = icon:CreateTexture(nil, "OVERLAY")
         icon.activationTexture:SetAllPoints(icon)
         if icon.activationTexture.SetAtlas then
@@ -203,27 +204,7 @@ function Cooldowns:CreateIcon()
         icon.flash:SetAlpha(0)
         icon.flash:Hide()
 
-        -- Activation animation group (Scale)
-        icon.ActivationAnimationScale = icon:CreateAnimationGroup()
-        do
-            local f3 = icon.ActivationAnimationScale:CreateAnimation("Scale")
-            f3:SetTarget(icon)
-            f3:SetSmoothing("NONE")
-            f3:SetOrder(1)
-            f3:SetScaleFrom(1, 1)
-            f3:SetScaleTo(1.25, 1.25)
-            f3:SetDuration(0.12)
-
-            local f4 = icon.ActivationAnimationScale:CreateAnimation("Scale")
-            f4:SetTarget(icon)
-            f4:SetSmoothing("NONE")
-            f4:SetOrder(2)
-            f4:SetScaleFrom(1.25, 1.25)
-            f4:SetScaleTo(1,1)
-            f4:SetDuration(0.1)
-        end
-
-        -- Activation animation group (Alpha)
+        --- Activation animation group (Alpha)
         icon.ActivationAnimation = icon:CreateAnimationGroup()
         icon.ActivationAnimation:SetToFinalAlpha(true)
         icon.ActivationAnimation:SetScript("OnPlay", function(self)
@@ -262,7 +243,7 @@ function Cooldowns:CreateIcon()
             a3:SetDuration(0.6)
         end
 
-        -- Flash animation group (quick flash fade out)
+        --- Flash animation group (quick flash fade out)
         icon.FlashAnimation = icon:CreateAnimationGroup()
         icon.FlashAnimation:SetToFinalAlpha(true)
         icon.FlashAnimation:SetScript("OnPlay", function(self)
@@ -803,10 +784,6 @@ function Cooldowns:CooldownStart(button, spellId, duration, start)
             if icon.ActivationAnimation and Gladdy.db.cooldownIconAnimationActivation then
                 if icon.ActivationAnimation:IsPlaying() then icon.ActivationAnimation:Stop() end
                 icon.ActivationAnimation:Play()
-            end
-            if icon.ActivationAnimationScale and Gladdy.db.cooldownIconAnimationActivation then
-                if icon.ActivationAnimationScale:IsPlaying() then icon.ActivationAnimationScale:Stop() end
-                icon.ActivationAnimationScale:Play()
             end
             -- Charge-style cooldown handling
             if icon.maxCharges then
