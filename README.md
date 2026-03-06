@@ -1,12 +1,12 @@
 # Gladdy - Classic
 
-### The most powerful arena addon for WoW TBC 2.5.5 & WotLK 3.4.0 & Cataclysm 4.4.0 & Mist of Pandaria 5.5.0
+### The most powerful arena addon for WoW TBC 2.5.5 & WotLK 3.4.2 & Cataclysm 4.4.1 & Mist of Pandaria 5.5.3
 
 ---
 
-## [v2.63-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.63-Beta/Gladdy_Classic_v2.63-Beta.zip)
+## [v2.70-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.70-Release/Gladdy_Classic_v2.70-Release.zip)
 
-###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
+###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/dnbjunkee/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
 ### Origin
 
@@ -81,6 +81,40 @@ Thank you!
 ---
 
 ### Changes
+
+### v2.70-Release
+- fix breaking Blizzard_CombatText on login
+- fix reported stacktraces (Pets & Eventlistener)
+- combat indicator skip check for pet classes not having a pet currently
+
+### v2.69-Beta
+- clickable area fix v3 (force on key down behaviour)
+- BuffsDebuffs filter applies without reloading now
+- Cooldowns get rid of Scale Animation
+- MoP Barkskin CD duration fixed
+- DR-List Lib update
+
+### v2.68-Beta
+- clickable area fix v2
+- hide blizz arena countdown when module enabled
+- nameplate center fix
+- mists added nameplates module
+
+### v2.67-Beta
+- clickable area was covered by new animation
+- flashing atlas regions in cooldown fix attempt
+
+### v2.66-Beta
+- bugfixes from stacktraces
+
+### v2.65-Beta
+- Freezing Trap not showing fixed
+
+### v2.64-Beta
+- added module nameplates
+- added translations
+- fixed totem plates module not showing certain totems
+- fixed DR timer falsely showing incorrect DR
 
 ### v2.63-Beta
 - entangling roots spellids

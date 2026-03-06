@@ -1,13 +1,13 @@
-## Interface: 50500
-## Title: Gladdy - MoP
-## Version: 2.53-Release
+## Interface: 50503
+## Title: Gladdy - |cFF1ADB04 MoP|r
+## Version: 2.70-Beta
 ## Notes: The most powerful arena AddOn for WoW 4.4.1
 ## Author: XiconQoo, DnB_Junkee, Knall
 ## X-Email: contact me on discord Knall#1751
 ## X-Curse-Project-ID: 482332
 ## X-WoWI-ID: 26350
 ## SavedVariables: GladdyXZ
-## OptionalDeps: SharedMedia, Blizzard_CombatLog, Blizzard_ArenaUI, Blizzard_CombatText, Plater, Kui_Nameplates, NeatPlates, TidyPlates_ThreatPlates, Tukui, ElvUI
+## OptionalDeps: SharedMedia, Plater, Kui_Nameplates, NeatPlates, TidyPlates_ThreatPlates, Tukui, ElvUI
 
 embeds.xml
 
@@ -45,4 +45,5 @@ Modules\ExportImport.lua
 Modules\CombatIndicator.lua
 Modules\RangeCheck.lua
 Modules\ShadowsightTimer.lua
+Modules\Nameplates.lua
 EventListener.lua

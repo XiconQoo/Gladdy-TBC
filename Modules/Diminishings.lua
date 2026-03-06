@@ -1,5 +1,6 @@
 local select = select
 local pairs,ipairs,tbl_sort,tinsert,format,rand = pairs,ipairs,table.sort,tinsert,format,math.random
+local math_abs = math.abs
 local str_gsub = string.gsub
 
 local GetSpellInfo = GetSpellInfo
@@ -95,7 +96,33 @@ end
 
 function Diminishings:Initialize()
     self.frames = {}
-    self:RegisterMessage("UNIT_DESTROYED")
+    self.maxDurationCache = {}
+    self:LoadModule()
+end
+
+function Diminishings:LoadModule()
+    if Gladdy.db.drEnabled then
+        self:RegisterMessage("UNIT_DESTROYED")
+        self:RegisterMessage("UNIT_AURA_GAIN")
+        self:RegisterMessage("UNIT_AURA_FADE")
+        self:RegisterMessage("UNIT_AURA_REFRESH")
+    else
+        self:UnregisterAllMessages()
+    end
+end
+
+function Diminishings:GetBaseMaxDuration(spellID,  currentDuration)
+    local cached = self.maxDurationCache[spellID]
+
+    -- update cache when we have a valid duration
+    if cached and currentDuration and currentDuration >= 3.0 and currentDuration > cached then
+        self.maxDurationCache[spellID] = currentDuration
+        return currentDuration
+    elseif not cached and currentDuration and currentDuration >= 3.0 then
+        self.maxDurationCache[spellID] = currentDuration
+    end
+
+    return cached
 end
 
 function Diminishings:CreateFrame(unit)
@@ -154,7 +181,7 @@ function Diminishings:CreateFrame(unit)
 
         --icon.overlay = CreateFrame("Frame", nil, icon)
         --icon.overlay:SetAllPoints(icon)
-        icon.border = icon.cooldownFrame:CreateTexture(nil, "OVERLAY")
+        icon.border = icon.cooldownFrame:CreateTexture(nil, "OVERLAY", nil, 7)
         icon.border:SetTexture("Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp")
         icon.border:SetAllPoints(icon)
 
@@ -359,8 +386,39 @@ function Diminishings:ResetUnit(unit)
     end
 end
 
+----------------
+--  Message Handlers
+----------------
+
 function Diminishings:UNIT_DESTROYED(unit)
     Diminishings:ResetUnit(unit)
+end
+
+function Diminishings:UNIT_AURA_GAIN(unit, spellID, expirationTime, isHarmful, isTest)
+    local drCat = DRList:GetSpellCategory(spellID)
+    if drCat and self.frames[unit] and spellID and expirationTime and isHarmful then
+        if not isTest then
+            self:GetBaseMaxDuration(spellID, expirationTime - GetTime())
+        end
+        self:AuraGain(unit, spellID, expirationTime)
+    end
+end
+
+function Diminishings:UNIT_AURA_FADE(unit, spellID, isHarmful)
+    local drCat = DRList:GetSpellCategory(spellID)
+    if isHarmful and drCat and self.frames[unit] and spellID then
+        self:AuraFade(unit, spellID)
+    end
+end
+
+function Diminishings:UNIT_AURA_REFRESH(unit, spellID, expirationTime, isHarmful)
+    local drCat = DRList:GetSpellCategory(spellID)
+    if isHarmful and  drCat and self.frames[unit] and spellID and expirationTime then
+        if not Gladdy.db.drShowIconOnAuraApplied then
+            self:AuraFade(unit, spellID)
+        end
+        self:AuraGain(unit, spellID, expirationTime)
+    end
 end
 
 function Diminishings:Test(unit)
@@ -387,9 +445,16 @@ function Diminishings:Test(unit)
         for i=1, (#enabledCategories < 4 and #enabledCategories or 4) do
             amount = rand(1,3)
             index = rand(1, #enabledCategories[i].spellIDs)
-            for _=1, amount do
-                self:AuraGain(unit, enabledCategories[i].spellIDs[index])
-                self:AuraFade(unit, enabledCategories[i].spellIDs[index])
+            for applied=1, amount do
+                local duration = self:GetBaseMaxDuration(enabledCategories[i].spellIDs[index]) or 8
+                if applied > 1 then
+                    duration = duration / (applied == 2 and 4 or 2)
+                    self:UNIT_AURA_REFRESH(unit, enabledCategories[i].spellIDs[index], duration)
+                    self:UNIT_AURA_FADE(unit, enabledCategories[i].spellIDs[index])
+                else
+                    self:UNIT_AURA_GAIN(unit, enabledCategories[i].spellIDs[index], duration, true, true)
+                    self:UNIT_AURA_FADE(unit, enabledCategories[i].spellIDs[index])
+                end
             end
         end
     end
@@ -494,12 +559,24 @@ function Diminishings:TriggerDR(unit, spellID, drCat, noTimer)
     end
 end
 
-function Diminishings:AuraGainCheck(unit, spellID, drFrame, drCat)
-    -- due to dynamic DR we reset the DR here if dr == 0
-    if not drFrame.tracked[drCat] or drFrame.tracked[drCat] == 0 then
-        drFrame.tracked[drCat] = DRList:NextDR(1, drCat)
+function Diminishings:AuraGainCheck(unit, spellID, drFrame, drCat, expirationTime)
+    local maxDuration = self:GetBaseMaxDuration(spellID)
+    local currentDr = drFrame.tracked[drCat]
+    local remaining = expirationTime and (expirationTime - GetTime()) or nil
+    local ratio = maxDuration and maxDuration > 0 and (remaining / maxDuration) or nil
+
+    if maxDuration then
+        if not currentDr or currentDr == 0 then
+            -- If no DR or DR is 0, use ratio or 1 if ratio > 0.5
+            drFrame.tracked[drCat] = DRList:NextDR(ratio and ratio > 0.5 and 1 or ratio or 0, drCat)
+        else
+            -- If currentDr exists, use ratio if it's larger and significantly different
+            local newDrValue = ratio and ratio > currentDr and math_abs(currentDr - ratio) > 1e-3 and ratio or currentDr
+            drFrame.tracked[drCat] = DRList:NextDR(newDrValue, drCat)
+        end
     else
-        drFrame.tracked[drCat] = DRList:NextDR(drFrame.tracked[drCat], drCat)
+        -- If no maxDuration, reset or use currentDr
+        drFrame.tracked[drCat] = DRList:NextDR((not currentDr or currentDr == 0) and 1 or currentDr, drCat)
     end
 
     if Gladdy.db.drShowIconOnAuraApplied then
@@ -507,7 +584,42 @@ function Diminishings:AuraGainCheck(unit, spellID, drFrame, drCat)
     end
 end
 
-function Diminishings:AuraGain(unit, spellID)
+
+--[[function Diminishings:AuraGainCheck(unit, spellID, drFrame, drCat, expirationTime)
+    -- TODO react to dynamic DR based off aura duration
+    local maxDuration = self:GetBaseMaxDuration(spellID)
+    if maxDuration then
+        local currentDr = drFrame.tracked[drCat]
+        local remaining = expirationTime - GetTime()
+        local ratio = remaining / maxDuration -- 1, 0.5, 0.25
+        if not currentDr or currentDr == 0 then
+            if ratio > 0.5 then
+                drFrame.tracked[drCat] = DRList:NextDR(1, drCat)
+            else
+                drFrame.tracked[drCat] = DRList:NextDR(ratio, drCat)
+            end
+        elseif currentDr then
+            if ratio > currentDr and math_abs(currentDr - ratio) > 1e-3 then -- ratio is larger than current, apply ratio
+                drFrame.tracked[drCat] = DRList:NextDR(ratio, drCat)
+            else
+                drFrame.tracked[drCat] = DRList:NextDR(currentDr, drCat)
+            end
+        end
+    else
+        -- due to dynamic DR we reset the DR here if dr == 0
+        if not drFrame.tracked[drCat] or drFrame.tracked[drCat] == 0 then
+            drFrame.tracked[drCat] = DRList:NextDR(1, drCat)
+        else
+            drFrame.tracked[drCat] = DRList:NextDR(drFrame.tracked[drCat], drCat)
+        end
+    end
+
+    if Gladdy.db.drShowIconOnAuraApplied then
+        self:TriggerDR(unit, spellID, drCat, true)
+    end
+end]]
+
+function Diminishings:AuraGain(unit, spellID, expirationTime)
     local drFrame = self.frames[unit]
     local drCat, drCategories = DRList:GetSpellCategory(spellID)
     if (not drFrame or not drCat) then
@@ -517,11 +629,11 @@ function Diminishings:AuraGain(unit, spellID)
     if drCategories then
         for _, cat in ipairs(drCategories) do
             if Gladdy.db.drCategories[cat].enabled then
-                Diminishings:AuraGainCheck(unit, spellID, drFrame, cat)
+                Diminishings:AuraGainCheck(unit, spellID, drFrame, cat, expirationTime)
             end
         end
     elseif Gladdy.db.drCategories[drCat].enabled then
-        Diminishings:AuraGainCheck(unit, spellID, drFrame, drCat)
+        Diminishings:AuraGainCheck(unit, spellID, drFrame, drCat, expirationTime)
     end
 end
 
@@ -535,10 +647,16 @@ function Diminishings:AuraFade(unit, spellID)
     if drCategories then
         for _, cat in ipairs(drCategories) do
             if Gladdy.db.drCategories[cat].enabled then
+                if not drFrame.tracked[cat] then
+                    drFrame.tracked[cat] = DRList:NextDR(1, cat)
+                end
                 self:TriggerDR(unit, spellID, cat, false)
             end
         end
     elseif Gladdy.db.drCategories[drCat].enabled then
+        if not drFrame.tracked[drCat] then
+            drFrame.tracked[drCat] = DRList:NextDR(1, drCat)
+        end
         self:TriggerDR(unit, spellID, drCat, false)
     end
 end
@@ -589,7 +707,9 @@ function Diminishings:GetOptions()
             name = L["Enabled"],
             desc = L["Enabled DR module"],
             order = 3,
-        }),
+        }, function()
+            Diminishings:LoadModule()
+        end),
         drDuration = Gladdy:option({
             type = "range",
             name = L["DR Duration"],
@@ -597,7 +717,7 @@ function Diminishings:GetOptions()
             order = 4,
             disabled = function() return not Gladdy.db.drEnabled end,
             min = 15,
-            max = 20,
+            max = 30,
             step = .1,
         }),
         drShowIconOnAuraApplied = Gladdy:option({

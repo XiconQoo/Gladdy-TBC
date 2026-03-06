@@ -11,7 +11,6 @@ local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 local IsInGroup = IsInGroup
 local LE_PARTY_CATEGORY_HOME = LE_PARTY_CATEGORY_HOME
 local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
-local CombatText_AddMessage = CombatText_AddMessage
 local UnitName = UnitName
 local GetSchoolString = C_Spell.GetSchoolString
 
@@ -242,11 +241,9 @@ function Announcements:GetOptions()
         ["self"] = L["Self"],
         ["party"] = L["Party"],
         ["rw"] = L["Raid Warning"],
+        ["fct"] = L["Blizzard's Floating Combat Text"]
     }
 
-    if IsAddOnLoaded("Blizzard_CombatText") then
-        destValues["fct"] = L["Blizzard's Floating Combat Text"]
-    end
     if IsAddOnLoaded("MikScrollingBattleText") then
         destValues["msbt"] = L["MikScrollingBattleText"]
     end

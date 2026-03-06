@@ -3,19 +3,18 @@ local wipe = wipe
 local unpack = unpack
 
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
-local AURA_TYPE_DEBUFF = AURA_TYPE_DEBUFF
-local AURA_TYPE_BUFF = AURA_TYPE_BUFF
+local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = "DEBUFF", "BUFF"
 
 local UnitName, UnitAura, UnitRace, UnitClass, UnitGUID, UnitIsUnit, UnitExists = UnitName, UnitAura, UnitRace, UnitClass, UnitGUID, UnitIsUnit, UnitExists
 local UnitCastingInfo, UnitChannelInfo = UnitCastingInfo, UnitChannelInfo
 local GetSpellInfo = GetSpellInfo
 local FindAuraByName = AuraUtil.FindAuraByName
+local C_UnitAuras = C_UnitAuras
 local GetTime = GetTime
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local Cooldowns = Gladdy.modules["Cooldowns"]
-local Diminishings = Gladdy.modules["Diminishings"]
 
 local EventListener = Gladdy:NewModule("EventListener", 101, {
     test = true,
@@ -23,6 +22,7 @@ local EventListener = Gladdy:NewModule("EventListener", 101, {
 
 function EventListener:Initialize()
     self.friendlyUnits = {}
+    self.activeAuras = {}
     self:RegisterMessage("JOINED_ARENA")
 end
 
@@ -35,6 +35,7 @@ function EventListener:JOINED_ARENA()
     for i=2, Gladdy.curBracket do
         self.friendlyUnits["party" .. i-1] = true
     end
+    self.activeAuras = {}
     self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self:RegisterEvent("ARENA_OPPONENT_UPDATE")
     self:RegisterEvent("ARENA_PREP_OPPONENT_SPECIALIZATIONS")
@@ -67,6 +68,7 @@ function EventListener:Reset()
     self:UnregisterAllEvents()
     self:SetScript("OnEvent", nil)
     self.friendlyUnits = {}
+    self.activeAuras = {}
     Gladdy.bombExpireTime = {}
 end
 
@@ -133,7 +135,7 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
     local _,eventType,_,sourceGUID,_,_,_,destGUID,_,_,_,spellID,spellName,spellSchool,extraSpellId,extraSpellName,extraSpellSchool = CombatLogGetCurrentEventInfo()
     local srcUnit = Gladdy.guids[sourceGUID] -- can be a PET
     local destUnit = Gladdy.guids[destGUID] -- can be a PET
-    if (Gladdy.db.shadowsightTimerEnabled and eventType == "SPELL_AURA_APPLIED" and spellID == 34709) then
+    if (Gladdy.db.shadowsightTimerEnabled and (eventType == "SPELL_AURA_APPLIED" or eventType == "SPELL_AURA_REFRESH") and spellID == 34709) then
         Gladdy.modules["Shadowsight Timer"]:AURA_GAIN(nil, nil, 34709)
     end
 
@@ -153,16 +155,13 @@ function EventListener:COMBAT_LOG_EVENT_UNFILTERED()
         -- diminish tracker
         if Gladdy.buttons[destUnit] and Gladdy.db.drEnabled and extraSpellId == AURA_TYPE_DEBUFF then
             if (eventType == "SPELL_AURA_REMOVED") then
-                Diminishings:AuraFade(destUnit, spellID)
+                Gladdy:SendMessage("CLOG_AURA_FADE", destUnit, spellID)
             end
             if (eventType == "SPELL_AURA_REFRESH") then
-                if not Gladdy.db.drShowIconOnAuraApplied then
-                    Diminishings:AuraFade(destUnit, spellID)
-                end
-                Diminishings:AuraGain(destUnit, spellID)
+                Gladdy:SendMessage("CLOG_AURA_REFRESH", destUnit, spellID)
             end
             if (eventType == "SPELL_AURA_APPLIED") then
-                Diminishings:AuraGain(destUnit, spellID)
+                Gladdy:SendMessage("CLOG_AURA_GAIN", destUnit, spellID)
             end
         end
         -- death detection
@@ -311,7 +310,7 @@ end
 --[[
 /run local f,sn,dt for i=1,2 do f=(i==1 and "HELPFUL"or"HARMFUL")for n=1,30 do sn,_,_,dt=UnitAura("player",n,f) if(not sn)then break end print(sn,dt,dt and dt:len())end end
 --]]
-function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
+function EventListener:UNIT_AURA(unit, info)
     local button = Gladdy.buttons[unit]
     if not button then
         local skip = true
@@ -324,6 +323,7 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
         if not skip then
             if self.friendlyUnits[unit] then -- this is mainly for Blind detection when the unit was not seen before
                 for n = 1, 30 do
+                    local auraData = C_UnitAuras.GetAuraDataByIndex(unit, n, "HARMFUL")
                     local spellName, texture, count, dispelType, duration, expirationTime, unitCaster, _, shouldConsolidate, spellID = UnitAura(unit, n, "HARMFUL")
                     if spellName and (Gladdy.cooldownBuffs[spellName] or Gladdy.cooldownBuffs[spellID]) and unitCaster then
                         local cooldownBuff = Gladdy.cooldownBuffs[spellID] or Gladdy.cooldownBuffs[spellName]
@@ -346,6 +346,42 @@ function EventListener:UNIT_AURA(unit, isFullUpdate, updatedAuras)
             end
         end
         return
+    end
+    if button then
+        if not self.activeAuras[unit] then
+            self.activeAuras[unit] = {}
+        end
+        if info.isFullUpdate then
+            --("full update") -- loop over all auras, etc
+            EventListener:ScanAuras(unit)
+            return
+        end
+        if info.addedAuras then
+            for _, v in pairs(info.addedAuras) do
+                self.activeAuras[unit][v.auraInstanceID] = v
+                --print("UNIT_AURA_GAIN", unit, v.spellId, v.expirationTime, v.isHarmful)
+                Gladdy:SendMessage("UNIT_AURA_GAIN", unit, v.spellId, v.expirationTime, v.isHarmful)
+            end
+        end
+        if info.updatedAuraInstanceIDs then
+            for _, auraInstanceID in pairs(info.updatedAuraInstanceIDs) do
+                local aura = C_UnitAuras.GetAuraDataByAuraInstanceID(unit, auraInstanceID)
+                if aura then
+                    self.activeAuras[unit][auraInstanceID] = aura
+                    --print("UNIT_AURA_REFRESH", unit, aura.spellId, aura.expirationTime)
+                    Gladdy:SendMessage("UNIT_AURA_REFRESH", unit, aura.spellId, aura.expirationTime, aura.isHarmful)
+                end
+            end
+        end
+        if info.removedAuraInstanceIDs then
+            for _, auraInstanceID in pairs(info.removedAuraInstanceIDs) do
+                if self.activeAuras[unit] and self.activeAuras[unit][auraInstanceID] then
+                    --print("UNIT_AURA_FADE", unit, self.activeAuras[unit][auraInstanceID].spellId)
+                    Gladdy:SendMessage("UNIT_AURA_FADE", unit, self.activeAuras[unit][auraInstanceID].spellId, self.activeAuras[unit][auraInstanceID].isHarmful)
+                    self.activeAuras[unit][auraInstanceID] = nil
+                end
+            end
+        end
     end
     EventListener:ScanAuras(unit)
 end
@@ -375,7 +411,13 @@ function EventListener:ScanAuras(unit)
         local filter = (i == 1 and "HELPFUL" or "HARMFUL")
         local auraType = i == 1 and AURA_TYPE_BUFF or AURA_TYPE_DEBUFF
         for n = 1, 30 do
-            local auraTypeTemp = auraType
+            local auraData = C_UnitAuras.GetAuraDataByIndex(unit, n, filter)
+            if auraData then
+                if not self.activeAuras[unit] then
+                    self.activeAuras[unit] = {}
+                end
+                self.activeAuras[unit][auraData.auraInstanceID] = auraData
+            end
             local spellName, texture, count, dispelType, duration, expirationTime, unitCaster, _, shouldConsolidate, spellID = UnitAura(unit, n, filter)
             if ( not spellID ) then
                 Gladdy:SendMessage("AURA_GAIN_LIMIT", unit, auraType, n - 1)

@@ -192,42 +192,35 @@ function Gladdy:UpdateFrame()
         local button = self.buttons["arena" .. i]
         button:SetWidth(self.db.barWidth)
         button:SetHeight(self.db.healthBarHeight)
-        button.secure:SetWidth(self.db.barWidth)
-        button.secure:SetHeight(self.db.healthBarHeight + powerBarHeight)
+        button.secure:SetWidth(self.db.barWidth + self.db.secretButtonXMargin * 2)
+        button.secure:SetHeight(self.db.healthBarHeight + powerBarHeight + self.db.secretButtonYMargin * 2)
 
         button:ClearAllPoints()
         button.secure:ClearAllPoints()
+        button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT", -self.db.secretButtonXMargin, self.db.secretButtonYMargin)
         if (self.db.growDirection == "TOP") then
             if (i == 1) then
                 button:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", 0, powerBarHeight)
-                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             else
                 button:SetPoint("BOTTOMLEFT", self.buttons["arena" .. (i - 1)], "TOPLEFT", 0, margin + self.db.bottomMargin)
-                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             end
         elseif (self.db.growDirection == "BOTTOM") then
             if (i == 1) then
                 button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 0, 0)
-                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             else
                 button:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "BOTTOMLEFT", 0, -margin - self.db.bottomMargin)
-                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             end
         elseif (self.db.growDirection == "LEFT") then
             if (i == 1) then
                 button:SetPoint("TOPRIGHT", self.frame, "TOPRIGHT", -0, 0)
-                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             else
                 button:SetPoint("TOPRIGHT", self.buttons["arena" .. (i - 1)], "TOPLEFT", - self.db.bottomMargin, 0)
-                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             end
         elseif (self.db.growDirection == "RIGHT") then
             if (i == 1) then
                 button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 0, 0)
-                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             else
                 button:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "TOPRIGHT", self.db.bottomMargin, 0)
-                button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
             end
         end
 
@@ -343,28 +336,81 @@ function Gladdy:CreateButton(i)
             Gladdy.modules["Highlight"]:Toggle(self.unit, nil, false, true)
         end
     end)
-    secure:RegisterForClicks("AnyUp")
-    secure:RegisterForClicks("AnyDown")
-
-    secure:SetAttribute("target", "arena" .. i)
-    secure:SetAttribute("focus", "arena" .. i)
+    secure:RegisterForClicks("AnyUp", "AnyDown")
     secure:SetAttribute("unit", "arena" .. i)
+    secure:SetAttribute("useOnKeyDown", true)
 
-    --[[
-    secure:SetAttribute("target", i == 1 and "player" or "focus")
-    secure:SetAttribute("focus", i == 1 and "player" or "focus")
-    secure:SetAttribute("unit", i == 1 and "player" or "focus")
-    --]]
+    local testModeBorder = CreateFrame("Frame", nil, button, BackdropTemplateMixin and "BackdropTemplate")
+    testModeBorder:SetBackdrop({ edgeFile = Gladdy:SMFetch("border", "highlightBorderStyle"), edgeSize = 1 })
+    testModeBorder:SetBackdropBorderColor(Gladdy:SetColor({ r = 0, g = 1, b = 0}))
+    testModeBorder:SetWidth(2)
+    testModeBorder:SetHeight(2)
+    testModeBorder:ClearAllPoints()
+    testModeBorder:SetPoint("TOPLEFT", secure, "TOPLEFT")
+    testModeBorder:SetPoint("BOTTOMRIGHT", secure, "BOTTOMRIGHT")
+    testModeBorder:SetFrameStrata(Gladdy.db.highlightFrameStrata)
+    testModeBorder:SetFrameLevel(Gladdy.db.highlightFrameLevel + 1)
+    testModeBorder:EnableMouse(false)
+    testModeBorder:SetAlpha(0)
+    testModeBorder:Hide()
+
+    secure.testModeBorder = testModeBorder
+
+    -- Activation animation group (Alpha)
+    secure.ActivationAnimation = testModeBorder:CreateAnimationGroup()
+    secure.ActivationAnimation:SetToFinalAlpha(true)
+    secure.ActivationAnimation:SetScript("OnPlay", function(self)
+        secure.testModeBorder:SetAlpha(1)
+        secure.testModeBorder:Show()
+    end)
+    secure.ActivationAnimation:SetScript("OnFinished", function(self)
+        secure.testModeBorder:Hide()
+        secure.testModeBorder:SetAlpha(0)
+    end)
+    do
+        local a1 = secure.ActivationAnimation:CreateAnimation("Alpha")
+        a1:SetTarget(secure.testModeBorder)
+        a1:SetSmoothing("NONE")
+        a1:SetOrder(1)
+        a1:SetFromAlpha(0.8)
+        a1:SetToAlpha(1)
+        a1:SetDuration(0.2)
+
+        local a2 = secure.ActivationAnimation:CreateAnimation("Alpha")
+        a2:SetTarget(secure.testModeBorder)
+        a2:SetSmoothing("NONE")
+        a2:SetOrder(2)
+        a2:SetFromAlpha(1)
+        a2:SetToAlpha(1)
+        a2:SetDuration(0.4)
+
+        local a3 = secure.ActivationAnimation:CreateAnimation("Alpha")
+        a3:SetTarget(secure.testModeBorder)
+        a3:SetSmoothing("NONE")
+        a3:SetOrder(3)
+        a3:SetFromAlpha(1)
+        a3:SetToAlpha(0)
+        a3:SetDuration(0.6)
+    end
+
+    --- FOR TESTING ---
+    -- /run LibStub("Gladdy"):InitFrames()
+    -- /run LibStub("Gladdy").buttons["arena1"].healthBar.hp:SetMinMaxValues(0, 100)
+    -- /run LibStub("Gladdy").buttons["arena1"].healthBar.hp:SetValue(100)
+    -- secure.unit = i == 1 and "player" or "focus"
+    -- secure:SetAttribute("target", i == 1 and "player" or "focus")
+    -- secure:SetAttribute("focus", i == 1 and "player" or "focus")
+    -- secure:SetAttribute("unit", i == 1 and "player" or "focus")
 
     --secure.texture = secure:CreateTexture(nil, "OVERLAY")
     --secure.texture:SetAllPoints(secure)
     --secure.texture:SetTexture("Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp")
+    --button.unit = i == 1 and "player" or "focus"
+    --- FOR TESTING ---
 
     button.id = i
-    --button.unit = i == 1 and "player" or "focus"
     button.unit = "arena" .. i
     button.secure = secure
-
 
     self:ResetButton("arena" .. i)
 
@@ -523,38 +569,35 @@ function Gladdy:LegacyPositioning(margin, height, teamSize)
 end
 
 function Gladdy:PositionButton(button, i, leftSize, rightSize, powerBarHeight, margin)
+    button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT", -self.db.secretButtonXMargin, self.db.secretButtonYMargin)
     if (self.db.growDirection == "TOP") then
         if (i == 1) then
             button:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", leftSize, powerBarHeight)
-            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
         else
             button:SetPoint("BOTTOMLEFT", self.buttons["arena" .. (i - 1)], "TOPLEFT", 0, margin + self.db.bottomMargin)
-            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
         end
     elseif (self.db.growDirection == "BOTTOM") then
         if (i == 1) then
             button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", leftSize, 0)
-            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
         else
             button:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "BOTTOMLEFT", 0, -margin - self.db.bottomMargin)
-            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
         end
     elseif (self.db.growDirection == "LEFT") then
         if (i == 1) then
             button:SetPoint("TOPRIGHT", self.frame, "TOPRIGHT", -rightSize, 0)
-            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
         else
             button:SetPoint("TOPRIGHT", self.buttons["arena" .. (i - 1)], "TOPLEFT", -rightSize - leftSize - self.db.bottomMargin, 0)
-            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
         end
     elseif (self.db.growDirection == "RIGHT") then
         if (i == 1) then
             button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", leftSize, 0)
-            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
         else
             button:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "TOPRIGHT", leftSize + rightSize + self.db.bottomMargin, 0)
-            button.secure:SetPoint("TOPLEFT", button.healthBar, "TOPLEFT")
         end
+    end
+    if button.secure.ActivationAnimation and self.frame.testing then
+        if button.secure.ActivationAnimation:IsPlaying() then button.secure.ActivationAnimation:Stop() end
+        button.secure.ActivationAnimation:Play()
     end
 end
 

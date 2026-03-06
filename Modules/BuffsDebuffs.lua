@@ -3,7 +3,7 @@ local CreateFrame = CreateFrame
 local GetTime = GetTime
 local select, lower, ceil, tremove, tinsert, pairs, ipairs, tostring, random = select, string.lower, ceil, tremove, tinsert, pairs, ipairs, tostring, math.random
 local type = type
-local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
+local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = "DEBUFF", "BUFF"
 local auraTypes = {AURA_TYPE_BUFF, AURA_TYPE_DEBUFF}
 
 local TRACKED_BUFFS, TRACKED_DEBUFFS = "trackedBuffs", "trackedDebuffs"
@@ -1239,6 +1239,7 @@ function BuffsDebuffs:GetOptions()
             set = function(info, state)
                 local optionKey = info[#info]
                 Gladdy.db[TRACKED_DEBUFFS][optionKey].active = state
+                BuffsDebuffs:UpdateTrackedBuffs(TRACKED_DEBUFFS)
             end,
             get = function(info)
                 local optionKey = info[#info]
@@ -1255,6 +1256,7 @@ function BuffsDebuffs:GetOptions()
             set = function(info, state)
                 local optionKey = info[#info]
                 Gladdy.db[TRACKED_BUFFS][optionKey].active = state
+                BuffsDebuffs:UpdateTrackedBuffs(TRACKED_BUFFS)
             end,
             get = function(info)
                 local optionKey = info[#info]

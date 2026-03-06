@@ -359,7 +359,7 @@ function RangeCheck:GetSpells()
             args = {
                 headerMin = {
                     type = "header",
-                    name = GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID) and format("|T%s:20|t %s - %d" .. L["yds"], select(3, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID)), select(1, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID)), select(6, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID)))
+                    name = GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID) and format("|T%s:20|t %s - %d" .. L["yards"], select(3, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID)), select(1, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID)), select(6, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID)))
                             or "nil",
                     order = 1,
                 },
@@ -379,7 +379,7 @@ function RangeCheck:GetSpells()
                         end,
                     set = function(_, value)
                         Gladdy.db.rangeCheckDefaultSpells[class].spellID = tonumber(value)
-                        Gladdy.options.args["Range Check"].args.oorSpells.args[class].args.headerMin.name = GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID) and format("|T%s:20|t %s - %d" .. L["yds"], select(3, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID)), select(1, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID)), select(6, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID)))
+                        Gladdy.options.args["Range Check"].args.oorSpells.args[class].args.headerMin.name = GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID) and format("|T%s:20|t %s - %d" .. L["yards"], select(3, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID)), select(1, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID)), select(6, GetSpellInfo(Gladdy.db.rangeCheckDefaultSpells[class].spellID)))
                                 or "nil"
                     end
                 },

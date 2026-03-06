@@ -3,7 +3,7 @@ local str_gsub, str_match, str_gmatch = string.gsub, string.match, string.gmatch
 local GetSpellInfo = GetSpellInfo
 local CreateFrame, GetTime = CreateFrame, GetTime
 local UnitGUID = UnitGUID
-local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
+local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = "DEBUFF", "BUFF"
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
@@ -49,7 +49,8 @@ local function updateEnabledAuras()
                 Gladdy.enabledAuras[v.track][spellID] = {
                     texture = v.texture,
                     priority = v.priority,
-                    duration = Gladdy:GetImportantAuras()[tonumber(k)] and Gladdy:GetImportantAuras()[tonumber(k)].duration
+                    duration = Gladdy:GetImportantAuras()[tonumber(k)] and Gladdy:GetImportantAuras()[tonumber(k)].duration,
+                    noDuration = Gladdy:GetImportantAuras()[tonumber(k)] and Gladdy:GetImportantAuras()[tonumber(k)].noDuration
                 }
             else
                 Gladdy.enabledAuras[v.track][spellID] = nil
@@ -137,7 +138,7 @@ function Auras:CreateFrame(unit)
     auraFrame.icon:SetAllPoints(auraFrame)
     auraFrame.icon.masked = true
 
-    auraFrame.icon.overlay = auraFrame.cooldownFrame:CreateTexture(nil, "OVERLAY")
+    auraFrame.icon.overlay = auraFrame.cooldownFrame:CreateTexture(nil, "OVERLAY", nil, 7)
     auraFrame.icon.overlay:SetAllPoints(auraFrame)
     auraFrame.icon.overlay:SetTexture(Gladdy.db.buttonBorderStyle)
 
@@ -1297,6 +1298,7 @@ function Auras:GetAuraOptions(auraType)
                 for k,_ in pairs(defaultSpells(auraType)) do
                     Gladdy.db.auraListDefault[k].enabled = true
                 end
+                updateEnabledAuras()
             end,
         },
         uncheckAll = {
@@ -1308,6 +1310,7 @@ function Auras:GetAuraOptions(auraType)
                 for k,_ in pairs(defaultSpells(auraType)) do
                     Gladdy.db.auraListDefault[k].enabled = false
                 end
+                updateEnabledAuras()
             end,
         },
         add = {

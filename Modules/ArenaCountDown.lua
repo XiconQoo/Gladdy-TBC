@@ -14,6 +14,10 @@ function ACDFrame:OnEvent(event, ...)
     self[event](self, ...)
 end
 
+--TimerTracker_StartTimerOfType(self, Enum.StartTimerType.PlayerCountdown, timeSeconds, totalTime, informChat, initiatedByGuid, initiatedByName);
+-- /run TimerTracker_StartTimerOfType(TimerTracker, Enum.StartTimerType.PvPBeginTimer, 15, 40)
+-- /run TimerTracker_StartTimerOfType(TimerTracker, Enum.StartTimerType.PvPBeginTimer, 0, 40)
+
 function ACDFrame:Initialize()
     self.locale = Gladdy:GetArenaTimer()
     self.countdown = -1
@@ -134,6 +138,7 @@ end
 
 function ACDFrame:JOINED_ARENA()
     if Gladdy.db.countdown then
+        TimerTracker_OnEvent(TimerTracker, "STOP_TIMER_OF_TYPE", Enum.StartTimerType.PvPBeginTimer)
         self:CreateTicker(nil)
         self:RegisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
     end
@@ -166,6 +171,7 @@ function ACDFrame:CHAT_MSG_BG_SYSTEM_NEUTRAL(msg)
             if self.countdown and self.countdown == 0 then
                 return
             end
+            TimerTracker_OnEvent(TimerTracker, "STOP_TIMER_OF_TYPE", Enum.StartTimerType.PvPBeginTimer)
             self.countdown = k
         end
     end

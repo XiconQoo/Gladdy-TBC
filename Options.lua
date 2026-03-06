@@ -45,6 +45,8 @@ Gladdy.defaults = {
         frameScale = 1,
         pixelPerfect = false,
         barWidth = 180,
+        secretButtonXMargin = 0,
+        secretButtonYMargin = 0,
         bottomMargin = 2,
         statusbarBorderOffset = 6,
         timerFormat = Gladdy.TIMER_FORMAT.tenths,
@@ -196,7 +198,7 @@ function Gladdy:SetupModule(name, module, order)
                     end
 
                     Gladdy:UpdateFrame()
-                    Gladdy:SetupModule(name, module, order) -- For example click names are not reset by default
+                    Gladdy:SetupModule(name, module, order)
                 end
             }
         else
@@ -407,7 +409,47 @@ function Gladdy:SetupOptions()
                                         order = 7,
                                         min = 10,
                                         max = 500,
-                                        step = 5,
+                                        step = .1,
+                                    },
+                                    secretButtonXMargin = {
+                                        type = "range",
+                                        name = L["Click Frame X Margin"],
+                                        desc = L["Additional width of the clickable area"],
+                                        order = 7,
+                                        min = 0,
+                                        max = 500,
+                                        step = .1,
+                                        set = function(info, value)
+                                            Gladdy.db.secretButtonXMargin = value
+                                            Gladdy:UpdateFrame()
+                                            if GladdyButton1 and GladdyButton1.ActivationAnimation and Gladdy.frame.testing then
+                                                if GladdyButton1.ActivationAnimation:IsPlaying() then GladdyButton1.ActivationAnimation:Stop() end
+                                                GladdyButton1.ActivationAnimation:Play()
+                                            end
+                                        end,
+                                        get = function(info)
+                                            return Gladdy.db.secretButtonXMargin
+                                        end,
+                                    },
+                                    secretButtonYMargin = {
+                                        type = "range",
+                                        name = L["Click Frame Y Margin"],
+                                        desc = L["Additional height of the clickable area"],
+                                        order = 7,
+                                        min = 0,
+                                        max = 500,
+                                        step = .1,
+                                        set = function(info, value)
+                                            Gladdy.db.secretButtonYMargin = value
+                                            Gladdy:UpdateFrame()
+                                            if GladdyButton1 and GladdyButton1.ActivationAnimation and Gladdy.frame.testing then
+                                                if GladdyButton1.ActivationAnimation:IsPlaying() then GladdyButton1.ActivationAnimation:Stop() end
+                                                GladdyButton1.ActivationAnimation:Play()
+                                            end
+                                        end,
+                                        get = function(info)
+                                            return Gladdy.db.secretButtonYMargin
+                                        end,
                                     },
                                     bottomMargin = {
                                         type = "range",
@@ -416,7 +458,7 @@ function Gladdy:SetupOptions()
                                         order = 8,
                                         min = -200,
                                         max = 200,
-                                        step = 1,
+                                        step = .1,
                                     },
                                     backgroundColor = {
                                         type = "color",
@@ -460,6 +502,7 @@ function Gladdy:SetupOptions()
                                                 Gladdy.db.racialDisableCircle,
                                                 Gladdy.db.trinketDisableCircle,
                                                 Gladdy.db.dispelIconDisableCircle,
+                                                Gladdy.db.nameplateDisableCircle,
                                             })
                                             if isAllSameValue then
                                                 return Gladdy.db.auraDisableCircle
@@ -475,6 +518,7 @@ function Gladdy:SetupOptions()
                                             Gladdy.db.racialDisableCircle = value
                                             Gladdy.db.trinketDisableCircle = value
                                             Gladdy.db.dispelIconDisableCircle = value
+                                            Gladdy.db.nameplateDisableCircle = value
                                             Gladdy:UpdateFrame()
                                         end,
                                         width= "full",
@@ -499,6 +543,7 @@ function Gladdy:SetupOptions()
                                                 Gladdy.db.totemPulseCooldownAlpha,
                                                 Gladdy.db.trinketCooldownAlpha,
                                                 Gladdy.db.dispelIconCooldownAlpha,
+                                                Gladdy.db.nameplateCooldownAlpha,
                                             })
                                         end,
                                         set = function(info, value)
@@ -510,6 +555,7 @@ function Gladdy:SetupOptions()
                                             Gladdy.db.totemPulseCooldownAlpha = value
                                             Gladdy.db.trinketCooldownAlpha = value
                                             Gladdy.db.dispelIconCooldownAlpha = value
+                                            Gladdy.db.nameplateCooldownAlpha = value
                                             Gladdy:UpdateFrame()
                                         end
                                     },
@@ -553,10 +599,11 @@ function Gladdy:SetupOptions()
                                                 Gladdy.db.petHealthBarFont,
                                                 Gladdy.db.powerBarFont,
                                                 Gladdy.db.racialFont,
-                                                Gladdy.db.targetsHealthBarFont,
+                                                Gladdy.db.targetHealthBarFont,
                                                 Gladdy.db.npTremorFont,
                                                 Gladdy.db.totemPulseTextFont,
-                                                Gladdy.db.trinketFont
+                                                Gladdy.db.trinketFont,
+                                                Gladdy.db.nameplateFont,
                                             })
                                         end,
                                         set = function(info, value)
@@ -571,10 +618,11 @@ function Gladdy:SetupOptions()
                                                 petHealthBarFont = value,
                                                 powerBarFont = value,
                                                 racialFont = value,
-                                                targetsHealthBarFont = value,
+                                                targetHealthBarFont = value,
                                                 npTremorFont = value,
                                                 totemPulseTextFont = value,
                                                 trinketFont = value,
+                                                nameplateFont = value,
                                             })
                                         end,
                                     },
@@ -618,6 +666,7 @@ function Gladdy:SetupOptions()
                                                 Gladdy.db.buffsFontColor,
                                                 Gladdy.db.cooldownFontColor,
                                                 Gladdy.db.drFontColor,
+                                                Gladdy.db.nameplateFontColor,
                                             })
                                         end,
                                         set = function(info, r, g, b, a)
@@ -627,6 +676,7 @@ function Gladdy:SetupOptions()
                                                 buffsFontColor = true,
                                                 cooldownFontColor = true,
                                                 drFontColor = true,
+                                                nameplateFontColor = true,
                                             })
                                         end,
                                     },
@@ -663,6 +713,7 @@ function Gladdy:SetupOptions()
                                                 Gladdy.db.npTotemPlatesBorderStyle,
                                                 Gladdy.db.trinketBorderStyle,
                                                 Gladdy.db.dispelIconBorderStyle,
+                                                Gladdy.db.nameplateBorderStyle,
                                             })
                                         end,
                                         set = function(info, value)
@@ -680,6 +731,7 @@ function Gladdy:SetupOptions()
                                                 npTotemPlatesBorderStyle = true,
                                                 trinketBorderStyle = true,
                                                 dispelIconBorderStyle = true,
+                                                nameplateBorderStyle = true,
                                             })
                                         end,
                                     },
@@ -702,6 +754,7 @@ function Gladdy:SetupOptions()
                                                 Gladdy.db.targetPortraitBorderColor,
                                                 Gladdy.db.trinketBorderColor,
                                                 Gladdy.db.dispelIconBorderColor,
+                                                Gladdy.db.nameplateBuffBorderColor,
                                             })
                                         end,
                                         set = function(info, r, g, b, a)
@@ -718,6 +771,7 @@ function Gladdy:SetupOptions()
                                                 targetPortraitBorderColor = true,
                                                 trinketBorderColor = true,
                                                 dispelIconBorderColor = true,
+                                                nameplateBuffBorderColor = true,
                                             })
                                         end,
                                     },
@@ -829,12 +883,38 @@ function Gladdy:SetupOptions()
                     },
                 },
             },
+            separator1 = {
+                type = "group",
+                name = "— Modules —",
+                order = 6,
+                disabled = true,
+                args = {},
+            }
         },
     }
 
-    local order = 6
-    for k, v in pairsByKeys(self.modules) do
-        self:SetupModule(k, v, order)
+    local order = 7
+    local lastModules = {
+        ["XiconProfiles"] = true,
+        ["Export Import"] = true,
+    }
+    for name, module in pairsByKeys(self.modules) do
+        if not lastModules[name] then
+            self:SetupModule(name, module, order)
+            order = order + 1
+        end
+    end
+    self.options.args["separator2"] = {
+        type = "group",
+        name = "— Profiles —",
+        order = order,
+        disabled = true,
+        args = {},
+    }
+
+    order = order + 1
+    for name in pairsByKeys(lastModules) do
+        self:SetupModule(name, self.modules[name], order)
         order = order + 1
     end
 

@@ -29,13 +29,13 @@ local GetSpellInfo = GetSpellInfo
 
 ---------------------------
 
-local MAJOR, MINOR = "Gladdy", 26
+local MAJOR, MINOR = "Gladdy", 32
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
 Gladdy.version_major_num = 2
-Gladdy.version_minor_num = 63
+Gladdy.version_minor_num = .70
 Gladdy.version_num = Gladdy.version_major_num + Gladdy.version_minor_num
-Gladdy.version_releaseType = RELEASE_TYPES.beta
+Gladdy.version_releaseType = RELEASE_TYPES.release
 Gladdy.version = PREFIX .. string.format("%.2f", Gladdy.version_num) .. "-" .. Gladdy.version_releaseType
 Gladdy.VERSION_REGEX = VERSION_REGEX
 
@@ -80,6 +80,17 @@ function Gladdy:Debug(lvl, ...)
             EventRegistry:TriggerEvent(GLADDY_COLORED, self.ERROR, ...)
         end
     end
+end
+
+function Gladdy:Warn(...)
+    local text = "|cfff29f05Gladdy|r:"
+    local val
+    for i = 1, select("#", ...) do
+        val = select(i, ...)
+        if (type(val) == 'boolean') then val = val and "true" or false end
+        text = text .. " " .. tostring(val)
+    end
+    DEFAULT_CHAT_FRAME:AddMessage(text)
 end
 
 Gladdy.events = CreateFrame("Frame")
@@ -244,9 +255,11 @@ function Gladdy:CleanupIgnoredOptions(tbl, refTbl, str, refOptionStruct)
                 if not refTbl[k] then -- all options must be present because not default option
                     if (str == "Gladdy.db.auraListDefault" and type(tbl[k]) == "table") then --potential not in expansion
                         if (not GetSpellInfo(k)) then -- not a spell
+                            self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, " - GetSpellInfo failed \"" .. type(tbl[k]) .. "\" - deleting")
                             tbl[k] = nil
                         end
-                        if (not type(tbl[k]).spellIDs) then -- not in other expansion defaults
+                        if (not tbl[k].spellIDs) then -- not in other expansion defaults
+                            self:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, " - not in other expansion defaults \"" .. type(tbl[k]) .. "\" - deleting")
                             tbl[k] = nil
                         end
                     elseif (str == "Gladdy.db.trackedDebuffs" and not GetSpellInfo(k)) then
@@ -309,19 +322,28 @@ function Gladdy:DeleteUnknownOptions(tbl, refTbl, str)
 end
 
 function Gladdy:PixelPerfectScale(update)
-    local physicalWidth, physicalHeight = GetPhysicalScreenSize()
-    local perfectUIScale = 768.0/physicalHeight--768/select(2, strsplit("x",({ GetScreenResolutions()})[GetCurrentResolution()]))
     if self.db and self.db.pixelPerfect and self.frame then
-        self.frame:SetIgnoreParentScale(true)
-        self.frame:SetScale(perfectUIScale)
-        --local adaptiveScale = (GetCVar("useUiScale") == "1" and 1.0 + perfectUIScale - GetCVar("UIScale") or perfectUIScale)
-        --self.frame:SetScale(adaptiveScale)
+        self:PixelPerfectScaleFrame(self.frame, true)
         if update then
             self:UpdateFrame()
         end
     elseif self.frame then
+        self:PixelPerfectScaleFrame(self.frame, false)
         self.frame:SetScale(self.db.frameScale)
-        self.frame:SetIgnoreParentScale(false)
+    end
+end
+
+function Gladdy:PixelPerfectScaleFrame(frame, apply)
+    if apply then
+        local physicalWidth, physicalHeight = GetPhysicalScreenSize()
+        local perfectUIScale = 768.0/physicalHeight--768/select(2, strsplit("x",({ GetScreenResolutions()})[GetCurrentResolution()]))
+        frame:SetIgnoreParentScale(true)
+        frame:SetScale(perfectUIScale)
+        --local adaptiveScale = (GetCVar("useUiScale") == "1" and 1.0 + perfectUIScale - GetCVar("UIScale") or perfectUIScale)
+        --self.frame:SetScale(adaptiveScale)
+    else
+        frame:SetScale(1)
+        frame:SetIgnoreParentScale(false)
     end
 end
 

@@ -4,7 +4,7 @@ local GetSpellInfo = GetSpellInfo
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
-local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
+local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = "DEBUFF", "BUFF"
 
 Gladdy.expansion = "Wrath"
 Gladdy.CLASSES = { "MAGE", "PRIEST", "DRUID", "SHAMAN", "PALADIN", "WARLOCK", "WARRIOR", "HUNTER", "ROGUE", "DEATHKNIGHT", "MONK" }
@@ -16,6 +16,12 @@ tbl_sort(Gladdy.RACES)
 
 local specSpells = {
     -- spec to class
+}
+
+Gladdy.specBuffs = {}
+Gladdy.specSpells = {}
+Gladdy.cooldownBuffs = {
+    racials = {}
 }
 
 local classRangeSpells = {
@@ -552,14 +558,14 @@ AddCooldownEntry("DRUID", 5211, { cd = 50, talent = 4 }) -- Mighty Bash
 AddCooldownEntry("DRUID", 102793, { cd = 60, talent = 4 }) -- Ursol's Vortex
 AddCooldownEntry("DRUID", 108288, { cd = 360, talent = 5, enabled = false }) -- Heart of the Wild
 AddCooldownEntry("DRUID", 124974, { cd = 90, talent = 5, enabled = false }) -- Nature's Vigil
-AddCooldownEntry("DRUID", 22812, { cd = 60 }) -- Barkskin
+AddCooldownEntry("DRUID", 22812, { cd = 60, [L["Restoration"]] = 45 }) -- Barkskin
 AddCooldownEntry("DRUID", 1850, { cd = 180, enabled = false }) -- Dash
 AddCooldownEntry("DRUID", 29166, { cd = 180 }) -- Innervate
 AddCooldownEntry("DRUID", 22570, { cd = 10, enabled = false }) -- Maim
 AddCooldownEntry("DRUID", 106922, { cd = 180, enabled = false }) -- Might of Ursoc
 AddCooldownEntry("DRUID", 16689, { cd = 60, enabled = false }) -- Nature's Grasp
 AddCooldownEntry("DRUID", 106898, { cd = 120, enabled = false }) -- Stampeding Roar
-AddCooldownEntry("DRUID", 740, { cd = 480, enabled = false }) -- Tranquility
+AddCooldownEntry("DRUID", 740, { cd = 480, enabled = false, [L["Restoration"]] = 180 }) -- Tranquility
 
 AddCooldownEntry("HUNTER", 19574, { cd = 60, spec = L["Beast Mastery"] }) -- Bestial Wrath
 AddCooldownEntry("HUNTER", 34026, { cd = 6, spec = L["Beast Mastery"] }) -- Kill Command
