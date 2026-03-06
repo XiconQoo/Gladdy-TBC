@@ -89,7 +89,11 @@ function Pets:ResetUnit(unitId)
 end
 
 function Pets:PET_SPOTTED(unit)
-    Gladdy.guids[UnitGUID(unit)] = unit
+    local guid = UnitGUID(unit)
+    if not guid then
+        return
+    end
+    Gladdy.guids[guid] = unit
     if Gladdy.db.petEnabled then
         self.frames[unit].healthBar:SetAlpha(1)
         self.frames[unit].healthBar.hp:SetStatusBarColor(Gladdy:SetColor(Gladdy.db.petHealthBarColor))
