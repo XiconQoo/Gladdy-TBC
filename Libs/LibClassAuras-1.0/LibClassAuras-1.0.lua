@@ -1,6 +1,6 @@
 local type, ipairs, pairs, tinsert = type, ipairs, pairs, tinsert
 local GetSpellInfo = GetSpellInfo
-local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
+local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = "DEBUFF", "BUFF"
 
 local LibClassAuras = LibStub:NewLibrary("LibClassAuras-1.0", 1)
 LibClassAuras.debuffs = {}

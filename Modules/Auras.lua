@@ -3,7 +3,7 @@ local str_gsub, str_match, str_gmatch = string.gsub, string.match, string.gmatch
 local GetSpellInfo = GetSpellInfo
 local CreateFrame, GetTime = CreateFrame, GetTime
 local UnitGUID = UnitGUID
-local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
+local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = "DEBUFF", "BUFF"
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L

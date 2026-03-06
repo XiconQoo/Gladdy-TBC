@@ -3,8 +3,7 @@ local wipe = wipe
 local unpack = unpack
 
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
-local AURA_TYPE_DEBUFF = AURA_TYPE_DEBUFF
-local AURA_TYPE_BUFF = AURA_TYPE_BUFF
+local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = "DEBUFF", "BUFF"
 
 local UnitName, UnitAura, UnitRace, UnitClass, UnitGUID, UnitIsUnit, UnitExists = UnitName, UnitAura, UnitRace, UnitClass, UnitGUID, UnitIsUnit, UnitExists
 local UnitCastingInfo, UnitChannelInfo = UnitCastingInfo, UnitChannelInfo

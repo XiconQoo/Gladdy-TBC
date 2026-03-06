@@ -7,8 +7,6 @@ local GetSpellInfo = GetSpellInfo
 local CreateFrame = CreateFrame
 local GetTime = GetTime
 
-local AURA_TYPE_DEBUFF = AURA_TYPE_DEBUFF
-
 local Gladdy = LibStub("Gladdy")
 local DRList = LibStub("DRList-1.0")
 local L = Gladdy.L

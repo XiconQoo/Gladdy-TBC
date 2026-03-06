@@ -5,7 +5,7 @@ local GetItemInfo = GetItemInfo
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
-local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
+local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = "DEBUFF", "BUFF"
 
 Gladdy.expansion = "BCC"
 Gladdy.CLASSES = {"MAGE", "PRIEST", "DRUID", "SHAMAN", "PALADIN", "WARLOCK", "WARRIOR", "HUNTER", "ROGUE"}

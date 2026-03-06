@@ -2,7 +2,7 @@ local pairs, ipairs, select, tinsert, tremove, tbl_sort, tostring, tonumber, ran
 local GetSpellInfo = GetSpellInfo
 local CreateFrame, GetTime = CreateFrame, GetTime
 local UnitGUID, UnitAura, UnitExists = UnitGUID, UnitAura, UnitExists
-local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
+local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = "DEBUFF", "BUFF"
 local C_NamePlate = C_NamePlate
 
 local Gladdy = LibStub("Gladdy")

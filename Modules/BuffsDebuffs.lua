@@ -3,7 +3,7 @@ local CreateFrame = CreateFrame
 local GetTime = GetTime
 local select, lower, ceil, tremove, tinsert, pairs, ipairs, tostring, random = select, string.lower, ceil, tremove, tinsert, pairs, ipairs, tostring, math.random
 local type = type
-local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
+local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = "DEBUFF", "BUFF"
 local auraTypes = {AURA_TYPE_BUFF, AURA_TYPE_DEBUFF}
 
 local TRACKED_BUFFS, TRACKED_DEBUFFS = "trackedBuffs", "trackedDebuffs"

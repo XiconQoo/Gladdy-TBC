@@ -4,7 +4,7 @@ local C_Timer = C_Timer
 local GetTime = GetTime
 local CreateFrame = CreateFrame
 local GetSpellInfo = GetSpellInfo
-local AURA_TYPE_BUFF = AURA_TYPE_BUFF
+local AURA_TYPE_BUFF = "BUFF"
 local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 
 local Gladdy = LibStub("Gladdy")
