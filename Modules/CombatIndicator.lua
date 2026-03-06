@@ -25,11 +25,11 @@ local function InCombat(unit)
         return
     end
     local class = Gladdy.buttons[unit].class
+    local arenaNumber = str_match(unit, "%d")
 
     if UnitExists(unit) and UnitAffectingCombat(unit) then
         return true
-    elseif (petClasses[class]) then
-        local arenaNumber = str_match(unit, "%d")
+    elseif (petClasses[class]) and UnitExists("arenapet" .. arenaNumber) then
         if UnitExists("arenapet" .. arenaNumber .. "target") and
                 UnitDetailedThreatSituation("player", "arenapet" .. arenaNumber)
                 or UnitDetailedThreatSituation("playerpet", "arenapet" .. arenaNumber) then
