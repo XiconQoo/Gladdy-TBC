@@ -7,7 +7,7 @@
 ## X-Curse-Project-ID: 482332
 ## X-WoWI-ID: 26350
 ## SavedVariables: GladdyXZ
-## OptionalDeps: SharedMedia, Blizzard_CombatLog, Blizzard_ArenaUI, Blizzard_CombatText, Plater, Kui_Nameplates, NeatPlates, TidyPlates_ThreatPlates, Tukui, ElvUI
+## OptionalDeps: SharedMedia, Plater, Kui_Nameplates, NeatPlates, TidyPlates_ThreatPlates, Tukui, ElvUI
 
 embeds.xml
 
