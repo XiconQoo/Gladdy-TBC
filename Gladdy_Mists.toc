@@ -1,6 +1,6 @@
 ## Interface: 50503
 ## Title: Gladdy - |cFF1ADB04 MoP|r
-## Version: 2.69-Beta
+## Version: 2.70-Beta
 ## Notes: The most powerful arena AddOn for WoW 4.4.1
 ## Author: XiconQoo, DnB_Junkee, Knall
 ## X-Email: contact me on discord Knall#1751

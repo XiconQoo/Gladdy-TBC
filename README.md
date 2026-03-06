@@ -1,12 +1,12 @@
 # Gladdy - Classic
 
-### The most powerful arena addon for WoW TBC 2.5.5 & WotLK 3.4.0 & Cataclysm 4.4.0 & Mist of Pandaria 5.5.0
+### The most powerful arena addon for WoW TBC 2.5.5 & WotLK 3.4.2 & Cataclysm 4.4.1 & Mist of Pandaria 5.5.3
 
 ---
 
-## [v2.68-Beta Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.68-Beta/Gladdy_Classic_v2.68-Beta.zip)
+## [v2.70-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.70-Release/Gladdy_Classic_v2.70-Release.zip)
 
-###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
+###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/dnbjunkee/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
 ### Origin
 
@@ -81,6 +81,11 @@ Thank you!
 ---
 
 ### Changes
+
+### v2.70-Release
+- fix breaking Blizzard_CombatText on login
+- fix reported stacktraces (Pets & Eventlistener)
+- combat indicator skip check for pet classes not having a pet currently
 
 ### v2.69-Beta
 - clickable area fix v3 (force on key down behaviour)
