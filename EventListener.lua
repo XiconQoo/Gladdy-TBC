@@ -348,16 +348,16 @@ function EventListener:UNIT_AURA(unit, info)
         end
         return
     end
-    if string.find(unit, "arena") then
+    if button then
+        if not self.activeAuras[unit] then
+            self.activeAuras[unit] = {}
+        end
         if info.isFullUpdate then
             --("full update") -- loop over all auras, etc
             EventListener:ScanAuras(unit)
             return
         end
         if info.addedAuras then
-            if not self.activeAuras[unit] then
-                self.activeAuras[unit] = {}
-            end
             for _, v in pairs(info.addedAuras) do
                 self.activeAuras[unit][v.auraInstanceID] = v
                 --print("UNIT_AURA_GAIN", unit, v.spellId, v.expirationTime, v.isHarmful)
