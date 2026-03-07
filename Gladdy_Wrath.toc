@@ -1,7 +1,8 @@
 ## Interface: 30402
-## Title: Gladdy - |cFF1ADB04 WotLK|r
-## Version: 2.71-Beta
-## Notes: The most powerful arena AddOn for WoW 3.4.2
+## Title: Gladdy - |cFF1ADB04WotLK|r
+## Version: 2.71-Release
+## IconTexture: 236641
+## Notes: The most powerful arena AddOn for WoW Classic
 ## Author: XiconQoo, DnB_Junkee, Knall
 ## X-Email: contact me on discord Knall#1751
 ## X-Curse-Project-ID: 482332
