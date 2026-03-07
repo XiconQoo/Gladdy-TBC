@@ -453,7 +453,7 @@ function Diminishings:Test(unit)
                     self:UNIT_AURA_FADE(unit, enabledCategories[i].spellIDs[index])
                 else
                     self:UNIT_AURA_GAIN(unit, enabledCategories[i].spellIDs[index], duration, true, true)
-                    self:UNIT_AURA_FADE(unit, enabledCategories[i].spellIDs[index])
+                    self:UNIT_AURA_FADE(unit, enabledCategories[i].spellIDs[index], true)
                 end
             end
         end
