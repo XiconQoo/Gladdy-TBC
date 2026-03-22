@@ -621,21 +621,18 @@ function Nameplates:TestAuras()
 end
 
 function Nameplates:Reset()
-    -- Remove test frame from active nameplates
-    self.activeNameplates["player"] = nil
-    
+    for _, nameplate in pairs(self.activeNameplates) do
+        if nameplate and nameplate ~= self.testFrame and nameplate.gladdyAuraFrame then
+            self:CacheAuraFrame(nameplate.gladdyAuraFrame, nameplate)
+        end
+    end
+    self.activeNameplates = {}
+    self.activeAuras = {}
+
     if self.testFrame then
         self.testFrame:Hide()
         if self.testFrame.gladdyAuraFrame then
-            for i = #self.testFrame.gladdyAuraFrame.icons, 1, -1 do
-                local icon = self.testFrame.gladdyAuraFrame.icons[i]
-                --icon:SetScript("OnUpdate", nil)
-                icon:Hide()
-                icon:ClearAllPoints()
-                icon:SetParent(nil)
-                table.remove(self.testFrame.gladdyAuraFrame.icons, i)
-                tinsert(self.iconCache, icon)
-            end
+            self:CacheIcons(self.testFrame.gladdyAuraFrame)
         end
     end
 end
