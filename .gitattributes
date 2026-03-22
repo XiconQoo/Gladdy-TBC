@@ -5,3 +5,6 @@
 # Enforce LF for specific file types
 *.xml text eol=lf
 *.lua text eol=lf
+
+.cursor/** merge=ours
+docs/** merge=ours

@@ -76,7 +76,7 @@ Thank you!
 - **Klimp** (thanks for all the suggestions and active feedback)
 - **the whole TBC addons 2.4.3 discord** (thanks for the support and great community, especially the MVPs)
 - **Hydra** (thanks for constructive feedback and suggestions)
-- **Xyz** (thanks for suggestions and extensive testing <3)
+- **Xyz** (thanks for suggestions and extensive testing <3 https://github.com/XyzKangUI)
 
 ---
 
