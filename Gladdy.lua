@@ -23,6 +23,10 @@ local VERSION_REGEX = PREFIX .. "(%d+%.%d+)%-(%a)"
 local LibStub = LibStub
 local GetSpellInfo = GetSpellInfo
 
+local function versionToNumber(major, minor)
+    return tonumber(tostring(major) .. tostring(minor))
+end
+
 ---------------------------
 
 -- CORE
@@ -33,10 +37,10 @@ local MAJOR, MINOR = "Gladdy", 34
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
 Gladdy.version_major_num = 2
-Gladdy.version_minor_num = .72
-Gladdy.version_num = Gladdy.version_major_num + Gladdy.version_minor_num
+Gladdy.version_minor_num = 72
+Gladdy.version_num = versionToNumber(Gladdy.version_major_num ,Gladdy.version_minor_num)
 Gladdy.version_releaseType = RELEASE_TYPES.release
-Gladdy.version = PREFIX .. string.format("%.2f", Gladdy.version_num) .. "-" .. Gladdy.version_releaseType
+Gladdy.version = string.format("%s%d.%d-%s", PREFIX, Gladdy.version_major_num, Gladdy.version_minor_num, Gladdy.version_releaseType)
 Gladdy.VERSION_REGEX = VERSION_REGEX
 
 local GLADDY_COLORED = "|cff0384fcGladdy|r:"

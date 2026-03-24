@@ -41,7 +41,7 @@ end
 
 function VersionCheck.OnCommReceived(prefix, message, distribution, sender)
     if sender ~= VersionCheck.playerName then
-        local addonVersion = str_format("%.2f", Gladdy.version_num)
+        local addonVersion = str_format("%d", Gladdy.version_num)
         local message_num = tonumber(message) or 0
         if message and message_num <= Gladdy.version_num then
             --Gladdy:Print("Version", "\"".. addonVersion.."\"", "is up to date")
