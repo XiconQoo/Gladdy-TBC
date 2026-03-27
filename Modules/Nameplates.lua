@@ -103,9 +103,7 @@ function Nameplates:CacheAuraFrame(auraFrame, nameplate)
     if not auraFrame then
         return
     end
-    for i,v in ipairs(auraFrame.icons) do
-        self:CacheIcon(v, auraFrame, i)
-    end
+    self:CacheIcons(auraFrame)
 
     if nameplate and nameplate.gladdyAuraFrame then
         auraFrame.icons = {}
@@ -312,12 +310,11 @@ function Nameplates:NAME_PLATE_UNIT_ADDED(unitID)
 end
 
 function Nameplates:NAME_PLATE_UNIT_REMOVED(unitID)
-    local nameplate = self.activeNameplates[unitID]
+    local nameplate = C_NamePlate.GetNamePlateForUnit(unitID)
     if nameplate and nameplate.gladdyAuraFrame then
         Nameplates:CacheAuraFrame(nameplate.gladdyAuraFrame, nameplate)
     end
     self.activeNameplates[unitID] = nil
-    self:LayoutIcons(unitID)
 end
 
 -------------------------------------------
