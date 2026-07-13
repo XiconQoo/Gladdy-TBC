@@ -158,7 +158,7 @@ function Announcements:SPELL_INTERRUPT(unit,spellID,spellName,spellSchool,extraS
         return
     end
     if Gladdy.db.announcements.spellInterruptSpellSchool then
-        if extraSpellSchool ~= "unknown" then
+        if type(extraSpellSchool) == "number" then
             extraSpellName = GetSchoolString(extraSpellSchool)
         end
     end
