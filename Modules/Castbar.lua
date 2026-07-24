@@ -7,7 +7,7 @@ local UnitChannelInfo = UnitChannelInfo
 local UnitCastingInfo = UnitCastingInfo
 local GetTime = GetTime
 local GetBuildInfo = GetBuildInfo
-local CASTING_BAR_ALPHA_STEP = CASTING_BAR_ALPHA_STEP
+local CASTING_BAR_ALPHA_STEP = 0.05
 local BackdropTemplateMixin = BackdropTemplateMixin
 
 ---------------------------
