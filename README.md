@@ -4,7 +4,7 @@
 
 ---
 
-## [v2.721-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.72-Release/Gladdy_Classic_v2.721-Release.zip)
+## [v2.722-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.722-Release/Gladdy_Classic_v2.722-Release.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/dnbjunkee/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -63,6 +63,8 @@ The goal is to make Gladdy highly configurable in it's appearance. Everything ca
 - [miraage](https://github.com/miraage)
 - [veiz](https://github.com/veiz)
 - [Flamanis](https://github.com/Flamanis)
+- [korsal](https://github.com/korsal)
+- [esmalleydev](https://github.com/esmalleydev)
 
 Thank you!
 
@@ -81,6 +83,10 @@ Thank you!
 ---
 
 ### Changes
+
+### v2.722-Release
+- added PR
+- fix **Version** module
 
 ### v2.721-Release
 - fix SetFont API changes
