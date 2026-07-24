@@ -41,12 +41,12 @@ end
 
 function VersionCheck.OnCommReceived(prefix, message, distribution, sender)
     if sender ~= VersionCheck.playerName then
-        local addonVersion = str_format("%d", Gladdy.version_num)
+        local addonVersion = tonumber(Gladdy.version_num)
         local message_num = tonumber(message) or 0
-        if message and message_num <= Gladdy.version_num then
+        if message and message_num <= addonVersion then
             --Gladdy:Print("Version", "\"".. addonVersion.."\"", "is up to date")
         else
-            Gladdy:Warn("Current version", "\"".. addonVersion.."\"", "is outdated. Most recent version is", "\"".. message.."\"")
+            Gladdy:Warn("Current version", "\"".. Gladdy.version_num .."\"", "is outdated. Most recent version is", "\"".. message.."\"")
             Gladdy:Warn("Please download the latest Gladdy version at:")
             Gladdy:Warn("https://www.curseforge.com/wow/addons/gladdy-classic or https://github.com/XiconQoo/Gladdy-TBC")
         end
