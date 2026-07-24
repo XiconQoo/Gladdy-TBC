@@ -475,7 +475,7 @@ Castbar.CastEventsFunc["UNIT_SPELLCAST_INTERRUPTIBLE"] = function(castBar, event
         end
     end
 end
-Castbar.CastEventsFunc["UNIT_SPELLCAST_CHANNEL_UPDATE"] = Castbar.CastEventsFunc["UNIT_SPELLCAST_INTERRUPTIBLE"]
+Castbar.CastEventsFunc["UNIT_SPELLCAST_NOT_INTERRUPTIBLE"] = Castbar.CastEventsFunc["UNIT_SPELLCAST_INTERRUPTIBLE"]
 
 function Castbar.OnEvent(self, event, ...)
     local unit = ...
