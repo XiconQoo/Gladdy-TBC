@@ -27,7 +27,7 @@ local Castbar = Gladdy:NewModule("Cast Bar", 70, {
     castBarIconZoomed = false,
     castBarBorderSize = 8,
     castBarFontSize = 12,
-    castBarFontOutline = "NONE",
+    castBarFontOutline = "",
     castBarTexture = "Smooth",
     castBarIconStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     castBarBorderStyle = "Gladdy Tooltip round",
@@ -57,8 +57,8 @@ function Castbar:Initialize()
         self:RegisterMessage("UNIT_DEATH")
         self:RegisterMessage("JOINED_ARENA")
     end
-    if type(Gladdy.db.castBarFontOutline) ~= "string" then
-        Gladdy.db.castBarFontOutline = Gladdy.db.castBarFontOutline and "OUTLINE" or "NONE"
+    if type(Gladdy.db.castBarFontOutline) ~= "string" or Gladdy.db.castBarFontOutline == "NONE" then
+        Gladdy.db.castBarFontOutline = ""
     end
 end
 

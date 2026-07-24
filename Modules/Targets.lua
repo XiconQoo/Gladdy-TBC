@@ -236,10 +236,10 @@ function Targets:CreateFrame(unitId)
 
     healthBar.nameText = button:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     if (Gladdy.db.targetHealthTextLeftFontSize < 1) then
-        healthBar.nameText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), 1)
+        healthBar.nameText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), 1, "")
         healthBar.nameText:Hide()
     else
-        healthBar.nameText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), Gladdy.db.targetHealthTextLeftFontSize, Gladdy.db.targetHealthTextLeftOutline and "OUTLINE")
+        healthBar.nameText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), Gladdy.db.targetHealthTextLeftFontSize, Gladdy.db.targetHealthTextLeftOutline and "OUTLINE" or "")
         healthBar.nameText:Show()
     end
     healthBar.nameText:SetTextColor(Gladdy:SetColor(Gladdy.db.targetHealthBarFontColor))
@@ -251,10 +251,10 @@ function Targets:CreateFrame(unitId)
 
     healthBar.healthText = button:CreateFontString(nil, "OVERLAY")
     if (Gladdy.db.targetHealthTextRightFontSize < 1) then
-        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), 1)
+        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), 1, "")
         healthBar.healthText:Hide()
     else
-        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), Gladdy.db.targetHealthTextRightFontSize, Gladdy.db.targetHealthTextRightOutline and "OUTLINE")
+        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), Gladdy.db.targetHealthTextRightFontSize, Gladdy.db.targetHealthTextRightOutline and "OUTLINE" or "")
         healthBar.healthText:Show()
     end
     healthBar.healthText:SetTextColor(Gladdy:SetColor(Gladdy.db.targetHealthBarFontColor))
@@ -419,17 +419,17 @@ function Targets:UpdateFrame(unitId)
     end
 
     if (Gladdy.db.targetHealthTextLeftFontSize < 1) then
-        healthBar.nameText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), 1)
+        healthBar.nameText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), 1, "")
         healthBar.nameText:Hide()
     else
-        healthBar.nameText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), Gladdy.db.targetHealthTextLeftFontSize, Gladdy.db.targetHealthTextLeftOutline and "OUTLINE")
+        healthBar.nameText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), Gladdy.db.targetHealthTextLeftFontSize, Gladdy.db.targetHealthTextLeftOutline and "OUTLINE" or "")
         healthBar.nameText:Show()
     end
     if (Gladdy.db.targetHealthTextRightFontSize < 1) then
-        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), 1)
+        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), 1, "")
         healthBar.healthText:Hide()
     else
-        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), Gladdy.db.targetHealthTextRightFontSize, Gladdy.db.targetHealthTextRightOutline and "OUTLINE")
+        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "targetHealthBarFont"), Gladdy.db.targetHealthTextRightFontSize, Gladdy.db.targetHealthTextRightOutline and "OUTLINE" or "")
         healthBar.healthText:Show()
     end
 

@@ -308,7 +308,7 @@ Gladdy.positions = {
 }
 
 Gladdy.fontOutline = {
-    NONE = L["None"],
+    [""] = L["None"],
     OUTLINE = L["Thin Outline"],
     THICKOUTLINE = L["Thick Outline"]
 }

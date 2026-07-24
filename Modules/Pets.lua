@@ -222,10 +222,10 @@ function Pets:CreateFrame(unitId)
 
     healthBar.nameText = healthBar:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     if (Gladdy.db.petHealthBarFontSize < 1) then
-        healthBar.nameText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), 1)
+        healthBar.nameText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), 1, "")
         healthBar.nameText:Hide()
     else
-        healthBar.nameText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), Gladdy.db.petHealthBarFontSize)
+        healthBar.nameText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), Gladdy.db.petHealthBarFontSize, "")
         healthBar.nameText:Show()
     end
     healthBar.nameText:SetTextColor(Gladdy:SetColor(Gladdy.db.petHealthBarFontColor))
@@ -236,10 +236,10 @@ function Pets:CreateFrame(unitId)
 
     healthBar.healthText = healthBar:CreateFontString(nil, "OVERLAY")
     if (Gladdy.db.petHealthBarFontSize < 1) then
-        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), 1)
+        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), 1, "")
         healthBar.healthText:Hide()
     else
-        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), Gladdy.db.petHealthBarFontSize)
+        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), Gladdy.db.petHealthBarFontSize, "")
         healthBar.healthText:Hide()
     end
     healthBar.healthText:SetTextColor(Gladdy:SetColor(Gladdy.db.petHealthBarFontColor))
@@ -337,14 +337,14 @@ function Pets:UpdateFrame(unitId)
     healthBar.hp:SetPoint("BOTTOMRIGHT", healthBar, "BOTTOMRIGHT", -(Gladdy.db.petHealthBarBorderSize/Gladdy.db.statusbarBorderOffset), (Gladdy.db.petHealthBarBorderSize/Gladdy.db.statusbarBorderOffset))
 
     if (Gladdy.db.petHealthBarFontSize < 1) then
-        healthBar.nameText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), 1)
-        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), 1)
+        healthBar.nameText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), 1, "")
+        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), 1, "")
         healthBar.nameText:Hide()
         healthBar.healthText:Hide()
     else
-        healthBar.nameText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), Gladdy.db.petHealthBarFontSize)
+        healthBar.nameText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), Gladdy.db.petHealthBarFontSize, "")
         healthBar.nameText:Show()
-        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), Gladdy.db.petHealthBarFontSize)
+        healthBar.healthText:SetFont(Gladdy:SMFetch("font", "petHealthBarFont"), Gladdy.db.petHealthBarFontSize, "")
         healthBar.healthText:Show()
     end
     healthBar.nameText:SetTextColor(Gladdy:SetColor(Gladdy.db.petHealthBarFontColor))

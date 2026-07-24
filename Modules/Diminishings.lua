@@ -98,6 +98,9 @@ function Diminishings:Initialize()
     self.frames = {}
     self.maxDurationCache = {}
     self:LoadModule()
+    if Gladdy.db.drFontOutline == "NONE" then
+        Gladdy.db.drFontOutline = ""
+    end
 end
 
 function Diminishings:LoadModule()
