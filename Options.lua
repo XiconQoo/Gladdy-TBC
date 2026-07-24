@@ -269,7 +269,7 @@ end
 function Gladdy:SetupOptions()
     self.options = {
         type = "group",
-        name = "|T236641:16:16:0:0:512:512:32:480:32:480|t " .. L["Gladdy"] .. " |T236641:16:16:0:0:512:512:32:480:32:480|t",
+        name = "|T135993:16:16:0:0:512:512:32:480:32:480|t " .. L["Gladdy"] .. " |T135993:16:16:0:0:512:512:32:480:32:480|t",
         plugins = {},
         childGroups = "tree",
         get = getOpt,
