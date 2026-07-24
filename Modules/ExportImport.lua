@@ -261,6 +261,9 @@ function ExportImport:ApplyImport(t, table, str)
                 end
 
             else
+                if k:find("Outline") and v == "NONE" then
+                    v = ""
+                end
                 table[k] = v
             end
         end
