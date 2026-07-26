@@ -398,11 +398,11 @@ function Nameplates:LayoutIcons(unit)
         return
     end
 
-    local auraFrame = nameplate.gladdyAuraFrame
-
-    if not auraFrame then
+    if not nameplate.gladdyAuraFrame then
         nameplate.gladdyAuraFrame = self:CreateAuraFrame(unit, nameplate)
     end
+
+    local auraFrame = nameplate.gladdyAuraFrame
 
     self:CacheIcons(auraFrame)
 
@@ -410,7 +410,7 @@ function Nameplates:LayoutIcons(unit)
     for spellID, auraData in pairs(activeAuras) do
         -- create icon with data
         newIcon = self:CreateIcon()
-        newIcon:SetParent(nameplate.gladdyAuraFrame)
+        newIcon:SetParent(auraFrame)
         newIcon:SetAlpha(1)
 
         newIcon.unit = unit
@@ -427,9 +427,9 @@ function Nameplates:LayoutIcons(unit)
         newIcon.border:Show()
 
         newIcon:Show()
-        nameplate.gladdyAuraFrame:Show()
+        auraFrame:Show()
 
-        tinsert(nameplate.gladdyAuraFrame.icons, newIcon)
+        tinsert(auraFrame.icons, newIcon)
 
         if auraData.track == AURA_TYPE_DEBUFF then
             newIcon.border:SetVertexColor(Gladdy:SetColor(Gladdy.db.nameplateDebuffBorderColor))
