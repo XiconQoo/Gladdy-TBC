@@ -1,6 +1,6 @@
-## Interface: 20506
+﻿## Interface: 20506
 ## Title: Gladdy - |cFF1ADB04TBC|r
-## Version: 2.724-Release
+## Version: 2.725-Release
 ## IconTexture: 135993
 ## Notes: The most powerful arena AddOn for WoW Classic
 ## Author: XiconQoo, DnB_Junkee, Knall

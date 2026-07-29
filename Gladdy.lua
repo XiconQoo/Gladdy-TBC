@@ -1,4 +1,4 @@
-local setmetatable = setmetatable
+﻿local setmetatable = setmetatable
 local type = type
 local tostring = tostring
 local select = select
@@ -33,11 +33,11 @@ end
 
 ---------------------------
 
-local MAJOR, MINOR = "Gladdy", 37
+local MAJOR, MINOR = "Gladdy", 38
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
 Gladdy.version_major_num = 2
-Gladdy.version_minor_num = 724
+Gladdy.version_minor_num = 725
 Gladdy.version_num = versionToNumber(Gladdy.version_major_num, Gladdy.version_minor_num)
 Gladdy.version_releaseType = RELEASE_TYPES.release
 Gladdy.version = string.format("%s%d.%d-%s", PREFIX, Gladdy.version_major_num, Gladdy.version_minor_num, Gladdy.version_releaseType)

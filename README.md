@@ -1,10 +1,10 @@
-# Gladdy - Classic
+﻿# Gladdy - Classic
 
 ### The most powerful arena addon for WoW TBC 2.5.5 & WotLK 3.4.2 & Cataclysm 4.4.1 & Mist of Pandaria 5.5.3
 
 ---
 
-## [v2.724-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.724-Release/Gladdy_Classic_v2.724-Release.zip)
+## [v2.725-Release Download Here](https://github.com/XiconQoo/Gladdy-TBC/releases/download/v2.725-Release/Gladdy_Classic_v2.725-Release.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/dnbjunkee/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -83,6 +83,9 @@ Thank you!
 ---
 
 ### Changes
+
+### v2.725-Release
+- nil auraFrame bug fix v2
 
 ### v2.724-Release
 - nil auraFrame bug fix
