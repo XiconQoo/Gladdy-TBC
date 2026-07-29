@@ -401,7 +401,7 @@ function Nameplates:LayoutIcons(unit)
     end
 
     if not nameplate.gladdyAuraFrame then
-        nameplate.gladdyAuraFrame = self:CreateAuraFrame(unit, nameplate)
+        self:CreateAuraFrame(unit, nameplate)
     end
 
     local auraFrame = nameplate.gladdyAuraFrame
