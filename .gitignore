@@ -12,6 +12,7 @@ DoNotCommit
 Xyz
 untracked
 Gladdy_TW
-pack_*.sh
-pack_*.ps1
+*.sh
+*.ps1
+*.csv
 TODO.md
