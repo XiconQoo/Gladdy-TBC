@@ -203,7 +203,7 @@ function XiconProfiles:GetOptions()
             end,
             name = " ",
             desc = "Baltha_TV's " .. L["Profile"],
-            image = "Interface\\AddOns\\Gladdy\\Images\\BasicProfiles\\Baltha_TV.tga",
+            image = "Interface\\AddOns\\Gladdy\\Images\\BasicProfiles\\Baltha_TV.blp",
             imageWidth = 350,
             imageHeight = 175,
             width = "full",
