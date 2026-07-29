@@ -195,8 +195,10 @@ function Nameplates:CacheIcon(icon, auraFrame, index)
 end
 
 function Nameplates:CacheIcons(auraFrame)
-    for i = #auraFrame.icons, 1, -1 do
-        self:CacheIcon(auraFrame.icons[i], auraFrame, i)
+    if auraFrame and auraFrame.icons then
+        for i = #auraFrame.icons, 1, -1 do
+            self:CacheIcon(auraFrame.icons[i], auraFrame, i)
+        end
     end
 end
 
