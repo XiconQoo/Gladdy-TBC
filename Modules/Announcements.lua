@@ -158,7 +158,10 @@ function Announcements:SPELL_INTERRUPT(unit,spellID,spellName,spellSchool,extraS
         return
     end
     if Gladdy.db.announcements.spellInterruptSpellSchool then
-        if extraSpellSchool ~= "unknown" then
+        -- extraSpellSchool can be nil (e.g. interrupting a channel), and the
+        -- "unknown" check doesn't catch nil, so it reaches GetSchoolString and
+        -- errors. Only look up a real (numeric) school; otherwise keep the name.
+        if type(extraSpellSchool) == "number" then
             extraSpellName = GetSchoolString(extraSpellSchool)
         end
     end
