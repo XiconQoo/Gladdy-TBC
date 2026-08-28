@@ -173,6 +173,7 @@ Debuff({ 20170 } ,{ buffType = "physical", }, "PALADIN") -- Seal of Justice stun
 Debuff({ 63529 } ,{ buffType = "magic", }, "PALADIN") -- Shield of the Templar
 Debuff({ 61840 } ,{ buffType = "magic", }, "PALADIN") -- Righteous Vengeance
 Debuff({ 10326 }, { buffType = "magic"}, "PALADIN") -- Turn Evil
+Debuff({ 31803 }, { buffType = "magic"}, "PALADIN") -- Holy Vengeance
 
 
 -------------
